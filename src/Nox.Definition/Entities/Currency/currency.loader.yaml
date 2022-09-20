@@ -1,0 +1,40 @@
+﻿#
+# Currency data loader definition
+#
+
+Name: CurrencyLoader
+
+Description: Loads currency data 
+
+Schedule:
+  Start: Daily at 2am UTC
+  Retry:
+    Limit: 10
+    DelaySeconds: 60
+    DoubleDelayLimit: 5
+
+LoadStrategy: 
+  Type: MergeNew
+  Columns: [CreateDate,EditDate]
+
+Target:
+  Table: Currency
+  Schema: dbo
+
+Sources:
+  - ConnectionVariable: ConnectionString:MasterDataSource
+    DatabaseProvider: SqlServer
+    MinimumExpectedRecords: 160
+    Query: >-
+      SELECT [CurrencyID] AS [Id]
+          ,[CurrencyName] AS [Name]
+          ,[CurrencyCode] AS [ISO_Alpha3]
+          ,[CurrencySymbol] AS [Symbol]
+          ,[NameSingular] AS [SingularName]
+          ,[NameMultiple] AS [PluralName]
+          ,[NameSingularDecimal] AS [DecimalSingularName]
+          ,[NameMultipleDecimal] AS [DecimalPluralName]
+          ,[IsCurrencySymbolFirst] AS [IsSymbolPrefixed]
+          ,[CreateDate]
+          ,[EditDate]
+      FROM dbo.Currency WITH (NOLOCK)

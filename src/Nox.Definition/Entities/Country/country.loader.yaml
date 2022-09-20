@@ -1,0 +1,35 @@
+﻿#
+# Country data loader definition
+#
+
+Name: CountryLoader
+
+Description: Loads country data 
+
+Schedule:
+  Start: Daily at 2am UTC
+  Retry:
+    Limit: 10
+    DelaySeconds: 60
+    DoubleDelayLimit: 5
+
+LoadStrategy: 
+  Type: DropAndLoad
+
+Target:
+  Table: Country
+  Schema: dbo
+
+Sources:
+  - ConnectionVariable: ConnectionString:MasterDataSource
+    DatabaseProvider: SqlServer
+    MinimumExpectedRecords: 242 
+    Query: >-
+      SELECT [CountryID] AS [Id]
+          ,[CountryName] As [Name]
+          ,[CountryCodeISO2Alpha] AS [ISO_Alpha2]
+          ,[CountryCodeISO3Alpha] AS [ISO_Alpha3]
+          ,[CountryISONumber] AS [ISO_Numeric]
+          ,[CurrencyID] AS [CurrencyId]
+      FROM dbo.Country WITH (NOLOCK)
+

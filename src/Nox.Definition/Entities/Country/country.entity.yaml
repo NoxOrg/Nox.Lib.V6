@@ -1,0 +1,66 @@
+﻿#
+# Country entity definition
+#
+
+Name: Country
+Description: Country with ISO codes and related data
+PluralName: Countries
+Table: Country
+Schema: dbo
+
+RelatedParents: [Currency]
+
+Properties:
+
+  - Name: Id
+    Description: The country's unique identifier 
+    IsPrimaryKey: true
+    Type: int
+    CanFilter: true
+    CanSort: true
+
+  - Name: Name
+    Description: The country's short name 
+    IsRequired: true
+    Type: string
+    MaxWidth: 128
+    CanFilter: true
+    CanSort: true
+
+  - Name: LocalName
+    Description: The country's local name in local a language
+    Type: string
+    MaxWidth: 128
+    CanFilter: true
+    CanSort: true
+
+  - Name: ISO_Alpha2
+    Description: The country's official ISO 3166 alpha-2 code
+    IsRequired: true
+    IsUnicode: false
+    Type: char
+    MinWidth: 2
+    MaxWidth: 2
+
+  - Name: ISO_Alpha3
+    Description: The country's official ISO 3166 alpha-3 code
+    IsRequired: true
+    IsUnicode: false
+    Type: char
+    MinWidth: 3
+    MaxWidth: 3
+
+  - Name: ISO_Numeric
+    Description: The country's official ISO 3166 numeric-2 code
+    IsRequired: true
+    Type: int
+    MinValue: 1
+    MaxValue: 999
+
+  - Name: FlagSVG_1x1_Url
+    Description: Internet location of SVG file for square image of the country's flag
+    Type: url
+
+  - Name: FlagSVG_4x3_Url
+    Description: Internet location of SVG file for 4:3 image of the country's flag
+    Type: url

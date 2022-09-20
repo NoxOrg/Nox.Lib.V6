@@ -1,0 +1,16 @@
+#
+# Service definition
+#
+
+Name: Workplace
+
+Description: Workplace Microservice
+
+Database:
+  Name: Workplace
+  Provider: SqlServer
+  Server: localhost
+  User: sa
+  Password: Developer*123
+  Options: Trusted_Connection=no;connection timeout=120;
+  
