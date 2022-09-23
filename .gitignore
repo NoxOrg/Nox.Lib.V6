@@ -457,5 +457,5 @@ $RECYCLE.BIN/
 ## Project Exclusions
 ##
 
-/dist
-/sql-db
+**/dist
+**/sql-db

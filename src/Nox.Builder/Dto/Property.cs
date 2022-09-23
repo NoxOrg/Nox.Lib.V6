@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 
 namespace Nox.Dynamic.Dto
 {
-    internal class PropertyDefinition
+    internal class Property
     {
         public string Name { get; set; } = string.Empty;
-        public string? Description { get; set; }
-        public string? Type { get; set; }
+        public string Description { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+        public Type ClrType { get; set; } = typeof(string);
         public bool IsPrimaryKey { get; set; } = false;
+        public bool IsAutoNumber { get; set; } = false;
         public bool IsForeignKey { get; set; } = false;
         public bool IsRequired { get; set; } = false;
         public bool IsUnicode { get; set; } = true;
@@ -21,7 +23,7 @@ namespace Nox.Dynamic.Dto
         public int MaxWidth { get; set; } = 512;
         public int MinValue { get; set; } = int.MinValue;
         public int MaxValue { get; set; } = int.MaxValue;
-        public object? Default { get; set; }
+        public object Default { get; set; } = string.Empty;
 
 
     }

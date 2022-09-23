@@ -11,17 +11,13 @@ namespace Nox.Dynamic
 
         private IConfiguration _configuration = null!;
 
-        private ServiceDefinition _service = null!;
-
-        private EntityDefinition[] _entities = null!;
-
-        private LoaderDefinition[] _loaders = null!;
+        private Service _service = null!;
 
         public void ValidateDatabaseSchema()
         {
             if (_service.Database is not null)
             {
-                SqlServerMigrationProvider.ValidateDatabaseSchema(_service.Database, _entities);
+                SqlServerMigrationProvider.ValidateDatabaseSchema(_service.Database, _service.Entities);
             }
         }
 
@@ -31,7 +27,7 @@ namespace Nox.Dynamic
             {
                 var loaderProvider = new SqlServerLoaderProvider(_configuration);
 
-                loaderProvider.ExecuteLoaders(_service.Database, _loaders);
+                loaderProvider.ExecuteLoaders(_service.Database, _service.Loaders, _service.Entities);
             }
         }
 
@@ -60,11 +56,15 @@ namespace Nox.Dynamic
 
             public Builder FromRootFolder(string rootFolder)
             {
-                _dynamicService._service = ReadServiceDefinitionsFromFolder(rootFolder);
+                var service = ReadServiceDefinitionsFromFolder(rootFolder);
 
-                _dynamicService._entities = ReadEntityDefinitionsFromFolder(rootFolder);
+                service.Entities = ReadEntityDefinitionsFromFolder(rootFolder)
+                    .ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
 
-                _dynamicService._loaders = ReadLoaderDefinitionsFromFolder(rootFolder);
+                service.Loaders = ReadLoaderDefinitionsFromFolder(rootFolder)
+                    .ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
+
+                _dynamicService._service = service;
 
                 return this;
             }
@@ -82,29 +82,29 @@ namespace Nox.Dynamic
             }
 
 
-            private ServiceDefinition ReadServiceDefinitionsFromFolder(string rootFolder)
+            private Service ReadServiceDefinitionsFromFolder(string rootFolder)
             {
                 return Directory
                     .EnumerateFiles(rootFolder, SERVICE_DEFINITION_PATTERN, SearchOption.AllDirectories)
                     .Take(1)
-                    .Select(f => _deserializer.Deserialize<ServiceDefinition>(File.ReadAllText(f)))
+                    .Select(f => _deserializer.Deserialize<Service>(File.ReadAllText(f)))
                     .First();
             }
 
-            private EntityDefinition[] ReadEntityDefinitionsFromFolder(string rootFolder)
+            private List<Entity> ReadEntityDefinitionsFromFolder(string rootFolder)
             {
                 return Directory
                     .EnumerateFiles(rootFolder, ENTITITY_DEFINITION_PATTERN, SearchOption.AllDirectories)
-                    .Select(f => _deserializer.Deserialize<EntityDefinition>(File.ReadAllText(f)))
-                    .ToArray();
+                    .Select(f => _deserializer.Deserialize<Entity>(File.ReadAllText(f)))
+                    .ToList();
             }
 
-            private LoaderDefinition[] ReadLoaderDefinitionsFromFolder(string rootFolder)
+            private List<Loader> ReadLoaderDefinitionsFromFolder(string rootFolder)
             {
                 return Directory
                     .EnumerateFiles(rootFolder, LOADER_DEFINITION_PATTERN, SearchOption.AllDirectories)
-                    .Select(f => _deserializer.Deserialize<LoaderDefinition>(File.ReadAllText(f)))
-                    .ToArray();
+                    .Select(f => _deserializer.Deserialize<Loader>(File.ReadAllText(f)))
+                    .ToList();
             }
 
         }

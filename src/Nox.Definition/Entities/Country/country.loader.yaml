@@ -17,16 +17,16 @@ LoadStrategy:
   Type: DropAndLoad
 
 Target:
-  Table: Country
-  Schema: dbo
+  Entity: Country
 
 Sources:
   - ConnectionVariable: ConnectionString:MasterDataSource
     DatabaseProvider: SqlServer
     MinimumExpectedRecords: 242 
     Query: >-
-      SELECT [CountryID] AS [Id]
-          ,[CountryName] As [Name]
+      SELECT 
+           [CountryISONumber] AS [Id]
+          ,[CountryName] AS [Name]
           ,[CountryCodeISO2Alpha] AS [ISO_Alpha2]
           ,[CountryCodeISO3Alpha] AS [ISO_Alpha3]
           ,[CountryISONumber] AS [ISO_Numeric]

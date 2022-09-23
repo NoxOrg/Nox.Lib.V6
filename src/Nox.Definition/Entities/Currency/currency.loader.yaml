@@ -18,8 +18,7 @@ LoadStrategy:
   Columns: [CreateDate,EditDate]
 
 Target:
-  Table: Currency
-  Schema: dbo
+  Entity: Currency
 
 Sources:
   - ConnectionVariable: ConnectionString:MasterDataSource

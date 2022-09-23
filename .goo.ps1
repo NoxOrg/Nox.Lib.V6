@@ -66,6 +66,7 @@ $goo.Command.Add( 'clean', {
     $goo.Command.Run('dockerDownIfUp')
     $goo.IO.EnsureRemoveFolder("./sql-db")
     $goo.IO.EnsureRemoveFolder("./dist")
+    $goo.IO.EnsureRemoveFolder("./src/dist")
     $goo.Command.RunExternal('dotnet','restore --verbosity:quiet --nologo',$script:SolutionFolder)
     $goo.Command.RunExternal('dotnet','clean --verbosity:quiet --nologo',$script:SolutionFolder)
     $goo.StopIfError("Failed to clean previous builds. (Release)")
@@ -77,7 +78,7 @@ $goo.Command.Add( 'build', {
     $goo.Console.WriteInfo("Building solution...")
     $goo.Command.RunExternal('dotnet','build /clp:ErrorsOnly --configuration Release', $script:SolutionFolder)
     $goo.StopIfError("Failed to build solution. (Release)")
-    $goo.Command.RunExternal('dotnet','publish --configuration Release --output ..\dist --no-build', $script:CliProjectFolder)
+    $goo.Command.RunExternal('dotnet','publish --configuration Release --output ..\dist --no-build', $script:ProjectFolder )
     $goo.StopIfError("Failed to publish CLI project. (Release)")
 })
 

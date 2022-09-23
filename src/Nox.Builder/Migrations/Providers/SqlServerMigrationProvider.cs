@@ -8,7 +8,12 @@ namespace Nox.Dynamic.Migrations.Providers
     internal class SqlServerMigrationProvider
     {
 
-        public static void ValidateDatabaseSchema(ServiceDatabase dbDefinition, EntityDefinition[] entities)
+        public SqlServerMigrationProvider()
+        {
+
+        }
+
+        public static void ValidateDatabaseSchema(ServiceDatabase dbDefinition, Dictionary<string,Entity> entities)
         {
             var masterConnectionString = ConnectionString(dbDefinition, "master");
             
@@ -48,12 +53,14 @@ namespace Nox.Dynamic.Migrations.Providers
             if (!CheckDatabaseExists(connection, databaseName))
             {
                 CreateDatabase(connection, databaseName);
+                UseDatabase(connection, databaseName);
+                CreateMetaSchema(connection);
             }
         }
 
         private static bool CheckDatabaseExists(SqlConnection connection, string databaseName)
         {
-            var qry = $"select count(*) from master.dbo.sysdatabases where name = @database";
+            var qry = $"SELECT COUNT(*) FROM master.dbo.sysdatabases WHERE name = @database";
 
             using var cmd = new SqlCommand(qry, connection);
 
@@ -64,34 +71,70 @@ namespace Nox.Dynamic.Migrations.Providers
 
         private static void CreateDatabase(SqlConnection connection, string databaseName)
         {
-            var qryCreate = $"CREATE DATABASE {databaseName}";
+            var qry = $"CREATE DATABASE [{databaseName}];";
 
-            using var cmdCreate = new SqlCommand(qryCreate, connection);
+            using var cmd = new SqlCommand(qry, connection);
 
-            cmdCreate.ExecuteNonQuery();
+            cmd.ExecuteNonQuery();
+        }
+        private static void UseDatabase(SqlConnection connection, string databaseName)
+        {
+            var qry = $"USE [{databaseName}];";
+
+            using var cmd = new SqlCommand(qry, connection);
+
+            cmd.ExecuteNonQuery();
         }
 
-        private static void ValidateTables(SqlConnection connection, EntityDefinition[] entities)
+        private static void CreateMetaSchema(SqlConnection connection)
         {
-            EnsureRelationshipsExist(entities);
+            var qry = $"CREATE SCHEMA [meta];";
 
-            foreach (var entity in entities)
+            using var cmd = new SqlCommand(qry, connection);
+
+            cmd.ExecuteNonQuery();
+        }
+
+        private static void ValidateTables(SqlConnection connection, Dictionary<string, Entity> entities)
+        {
+            AddRelationshipProperties(entities);
+
+            foreach (var (_,entity) in entities)
             {
                 EnsureTableExists(connection, entity);
             }
+
+            var mergeState = new Entity()
+            {
+                Name = "LastDataMergedState",
+                Description = "Tracks state between data merge oprations",
+                Schema = "meta",
+                Table = "LastDataMergedState",
+                Properties = new()
+                {
+                    new() { Name = "Id", Type = "int", IsPrimaryKey = true, IsAutoNumber = true },
+                    new() { Name = "Loader", Type = "string", MaxWidth = 64 },
+                    new() { Name = "Property", Type = "string", MaxWidth = 64 },
+                    new() { Name = "LastDateLoaded", Type = "datetime" },
+                }
+
+            };
+
+            EnsureTableExists(connection, mergeState);
+
         }
 
-        private static void EnsureRelationshipsExist(EntityDefinition[] entities)
+        private static void AddRelationshipProperties(Dictionary<string, Entity> entities)
         {
-            foreach (var entity in entities)
+            foreach (var (name,entity) in entities)
             {
-                entity.Table ??= entity.Name;
+                entity.Table ??= name;
         
                 entity.Schema ??= "dbo";
 
                 foreach (var parent in entity.RelatedParents)
                 {
-                    var parentEntity = entities.Where(e => e.Name.Equals(parent, StringComparison.OrdinalIgnoreCase)).First();
+                    var parentEntity = entities[parent];
                     
                     var parentPK = parentEntity.Properties.Where(p => p.IsPrimaryKey).First();
                     
@@ -99,7 +142,7 @@ namespace Nox.Dynamic.Migrations.Providers
                         ? parentPK.Name
                         : $"{parentEntity.Name}{parentPK.Name}" ;
 
-                    entity.Properties.Add(new PropertyDefinition()
+                    entity.Properties.Add(new Property()
                     {
                         Name = fkName,
                         Type = parentPK.Type,
@@ -120,7 +163,7 @@ namespace Nox.Dynamic.Migrations.Providers
             }
         }
 
-        private static void EnsureTableExists(SqlConnection connection, EntityDefinition entity)
+        private static void EnsureTableExists(SqlConnection connection, Entity entity)
         {
             if (!CheckTableExists(connection, entity))
             {
@@ -128,9 +171,9 @@ namespace Nox.Dynamic.Migrations.Providers
             }
         }
 
-        private static bool CheckTableExists(SqlConnection connection, EntityDefinition entity)
+        private static bool CheckTableExists(SqlConnection connection, Entity entity)
         {
-            var qry = $"select count(*) from INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA = @schemaname AND TABLE_NAME = @tablename";
+            var qry = $"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = @schemaname AND TABLE_NAME = @tablename";
 
             using var cmd = new SqlCommand(qry, connection);
 
@@ -141,19 +184,20 @@ namespace Nox.Dynamic.Migrations.Providers
             return Convert.ToInt32(cmd.ExecuteScalar()) == 1;
         }
 
-        private static void CreateTable(SqlConnection connection, EntityDefinition entity)
+        private static void CreateTable(SqlConnection connection, Entity entity)
         {
             var sqlCode = new StringBuilder();
 
             sqlCode.Append( $"CREATE TABLE [{entity.Schema}].[{entity.Table}] (");
 
             var fieldPK = string.Empty;
+
             foreach (var prop in entity.Properties)
             {
                 var fieldName = prop.Name;
                 var fieldSqlType = MapToSqlType(prop);
                 var nullValue = prop.IsPrimaryKey || prop.IsRequired ? " NOT NULL" : " NULL";
-                var identity = prop.IsPrimaryKey && fieldSqlType == "int" ? " IDENTITY" : "";
+                var identity = prop.IsAutoNumber && prop.IsPrimaryKey && fieldSqlType == "int" ? " IDENTITY" : "";
                 
                 sqlCode.Append($"[{fieldName}] {fieldSqlType}{identity}{nullValue},");
 
@@ -172,7 +216,7 @@ namespace Nox.Dynamic.Migrations.Providers
             cmdCreate.ExecuteNonQuery();
         }
 
-        private static string MapToSqlType(PropertyDefinition prop)
+        private static string MapToSqlType(Property prop)
         {
             var propType = prop.Type?.ToLower() ?? "string";
             var propWidth = prop.MaxWidth < 1 ? "max" : prop.MaxWidth.ToString();
