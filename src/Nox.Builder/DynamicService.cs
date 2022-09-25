@@ -17,7 +17,9 @@ namespace Nox.Dynamic
         {
             if (_service.Database is not null)
             {
-                SqlServerMigrationProvider.ValidateDatabaseSchema(_service.Database, _service.Entities);
+                var migrationProvider = new SqlServerMigrationProvider(_configuration);
+
+                migrationProvider.ValidateDatabaseSchema(_service.Database, _service.Entities);
             }
         }
 

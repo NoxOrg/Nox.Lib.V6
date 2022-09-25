@@ -24,7 +24,7 @@ $goo = [Goo]::new($args)
 
 $script:SolutionName            = 'Nox'
 
-$script:ProjectRootFolder       = (Get-Location).Path
+$script:RootFolder       = (Get-Location).Path
 $script:SourceFolder            = '.\src'
 $script:SolutionFolder          = $script:SourceFolder
 $script:SolutionFile            = "$script:SolutionFolder\Nox.sln"
@@ -87,7 +87,7 @@ $goo.Command.Add( 'up', {
     $goo.Console.WriteInfo('Starting containers...')
     if($IsWindows) {
         $goo.Console.WriteInfo('Using override docker-compose.windows.yaml (fast Sql Server image)...')
-        $goo.Docker.Up( $script:ProjectRootFolder, 'docker-compose.windows.yaml' ) 
+        $goo.Docker.Up( $script:RootFolder, 'docker-compose.windows.yaml' ) 
     } else {
         $goo.Docker.Up() 
     }
@@ -107,7 +107,7 @@ $goo.Command.Add( 'refreshDocker', {
 })
 
 $goo.Command.Add( 'dockerDownIfUp', {
-    $goo.Docker.Down( $script:ProjectRootFolder )
+    $goo.Docker.Down( $script:RootFolder )
     $goo.StopIfError("Failed to stop container.")
 })
 
@@ -135,7 +135,7 @@ $goo.Command.Add( 'dev', {
 
 # command: goo run | Run the console application
 $goo.Command.Add( 'run', {
-    $goo.Command.RunExternal('dotnet','run',$script:SolutionFolder)
+    $goo.Command.RunExternal('dotnet','run',$script:ProjectFolder)
 })
 
 # command: goo feature <name> | Creates a new feature branch from your main git branch

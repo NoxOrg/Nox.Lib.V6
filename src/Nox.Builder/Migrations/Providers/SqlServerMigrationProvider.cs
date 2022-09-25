@@ -1,4 +1,5 @@
-﻿using Nox.Dynamic.Dto;
+﻿using Microsoft.Extensions.Configuration;
+using Nox.Dynamic.Dto;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
@@ -8,12 +9,14 @@ namespace Nox.Dynamic.Migrations.Providers
     internal class SqlServerMigrationProvider
     {
 
-        public SqlServerMigrationProvider()
-        {
+        private readonly IConfiguration _configuration;
 
+        public SqlServerMigrationProvider(IConfiguration configuration)
+        {
+            _configuration = configuration;
         }
 
-        public static void ValidateDatabaseSchema(ServiceDatabase dbDefinition, Dictionary<string,Entity> entities)
+        public void ValidateDatabaseSchema(ServiceDatabase dbDefinition, Dictionary<string,Entity> entities)
         {
             var masterConnectionString = ConnectionString(dbDefinition, "master");
             
