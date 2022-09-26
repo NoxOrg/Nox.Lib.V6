@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Nox.Dynamic.Extensions;
+using System.Text.Json;
 
 namespace Nox.OData.Models
 {
@@ -56,6 +57,11 @@ namespace Nox.OData.Models
             return _dynamicDbModel?.GetDynamicNavigation(this, dbSetName, id, navName)!;
         }
 
+        public object PostDynamicObject(string dbSetName, JsonElement obj)
+        {
+            return _dynamicDbModel?.PostDynamicObject(this, dbSetName, obj)!;
+        }
+
         // Stronly typed methods for model callback
 
         public IQueryable<T> GetDynamicTypedCollection<T>() where T : class
@@ -94,6 +100,21 @@ namespace Nox.OData.Models
             var result = whereResult.Queryable.Include(navName).Select(selectPropertyExpression);
 
             return result.Single();
+        }
+
+        public object PostDynamicTypedObject<T>(JsonElement obj) where T : class
+        {
+            var repo = Set<T>();
+            
+            var json = obj.GetRawText();
+
+            var tObj = JsonSerializer.Deserialize<T>(json);
+
+            repo.Add(tObj!);
+
+            this.SaveChanges();
+
+            return tObj!;
         }
     }
 

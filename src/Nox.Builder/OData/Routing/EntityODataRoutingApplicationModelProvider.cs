@@ -90,6 +90,13 @@ namespace Nox.OData.Routing
                         actionModel.AddSelector("get", prefix, model, path);
                     }
                 }
+                else if (actionModel.ActionName == "Post")
+                {
+                    var path = new ODataPathTemplate(new EntitySetTemplateSegment());
+
+                    actionModel.AddSelector("post", prefix, model, path);
+
+                }
             }
         }
 

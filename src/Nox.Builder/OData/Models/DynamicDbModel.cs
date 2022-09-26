@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text.Json;
 
 namespace Nox.OData.Models
 {
@@ -50,6 +51,9 @@ namespace Nox.OData.Models
             var dbContextGetNavigationMethod =
                 methods.First(m => m.Name == nameof(DynamicDbContext.GetDynamicTypedNavigation));
 
+            var dbContextPostMethod =
+                methods.First(m => m.Name == nameof(DynamicDbContext.PostDynamicTypedObject));
+
             foreach (var (entityName, (entity, typeBuilder)) in GetTablesAndTypeBuilders())
             {
                 var t = typeBuilder.CreateType();
@@ -70,7 +74,8 @@ namespace Nox.OData.Models
                     DbContextGetCollectionMethod = dbContextGetCollectionMethod.MakeGenericMethod(t!),
                     DbContextGetSingleResultMethod = dbContextGetSingleResultMethod.MakeGenericMethod(t!),
                     DbContextGetObjectPropertyMethod = dbContextGetObjectPropertyMethod.MakeGenericMethod(t!),
-                    DbContextGetNavigationMethod = dbContextGetNavigationMethod.MakeGenericMethod(t!)
+                    DbContextGetNavigationMethod = dbContextGetNavigationMethod.MakeGenericMethod(t!),
+                    DbContextPostMethod = dbContextPostMethod.MakeGenericMethod(t!)
                 };
             }
 
@@ -138,6 +143,14 @@ namespace Nox.OData.Models
             return ret!;
         }
 
+        public object PostDynamicObject(DbContext context, string dbSetName, JsonElement obj)
+        {
+            var parameters = new object[] { obj };
+
+            var ret = _dynamicDbEntities[dbSetName].DbContextPostMethod.Invoke(context, parameters);
+
+            return ret!;
+        }
         private Dictionary<string, (Entity Entity, TypeBuilder TypeBuilder)> GetTablesAndTypeBuilders()
         {
             var dynamicService = new DynamicService.Builder()

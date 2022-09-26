@@ -9,9 +9,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.OData.UriParser;
 using Nox.OData.Models;
+using System.Reflection;
+using System.Text.Json;
 
 namespace Nox.OData.Controllers
 {
@@ -72,6 +76,25 @@ namespace Nox.OData.Controllers
             var singleResult = _context.GetDynamicNavigation(entitySetName, key, navigation)!;
 
             return Ok(singleResult);
+        }
+
+        // post
+        [EnableQuery]
+        public IActionResult Post([FromBody]JsonElement data)
+        {
+            try
+            {
+                var entitySetName = GetEntitySetName(Request);
+
+                var obj = _context.PostDynamicObject(entitySetName, data)!;
+
+                return Created(obj);
+            }
+            catch (TargetInvocationException)
+            {
+                return new ConflictODataResult("Entity with supplied key already exists.");
+            }
+
         }
 
     }

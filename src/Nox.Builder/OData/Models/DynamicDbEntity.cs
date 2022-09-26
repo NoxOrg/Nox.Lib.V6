@@ -16,6 +16,7 @@ namespace Nox.OData.Models
         public MethodInfo DbContextGetSingleResultMethod { get; init; } = null!;
         public MethodInfo DbContextGetObjectPropertyMethod { get; init; } = null!;
         public MethodInfo DbContextGetNavigationMethod { get; init; } = null!;
+        public MethodInfo DbContextPostMethod { get; init; } = null!;
 
     }
 
