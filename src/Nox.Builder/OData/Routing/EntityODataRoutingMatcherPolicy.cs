@@ -127,15 +127,18 @@ namespace Nox.OData.Routing
             return Task.CompletedTask;
         }
 
-        private static void MergeRouteValues(RouteValueDictionary updates, RouteValueDictionary source)
+        private static void MergeRouteValues(RouteValueDictionary updates, RouteValueDictionary? source)
         {
-            foreach (var data in updates)
+            if (source != null)
             {
-                source[data.Key] = data.Value;
+                foreach (var data in updates)
+                {
+                    source[data.Key] = data.Value;
+                }
             }
         }
 
-        private IEdmModel GetEdmModel(RouteValueDictionary routeValues)
+        private IEdmModel? GetEdmModel(RouteValueDictionary? routeValues)
         {
             if (routeValues == null)
             {

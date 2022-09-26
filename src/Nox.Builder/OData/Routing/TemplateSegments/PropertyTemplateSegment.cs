@@ -24,33 +24,35 @@ namespace Nox.OData.Routing
 
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            if (!context.RouteValues.TryGetValue("entityset", out object entitysetNameObj))
+            if (!context.RouteValues.TryGetValue("entityset", out object? entitysetNameObj))
             {
                 return false;
             }
 
-            if (!context.RouteValues.TryGetValue("key", out object keyObj))
+            if (!context.RouteValues.TryGetValue("key", out object? keyObj))
             {
                 return false;
             }
 
-            if (!context.RouteValues.TryGetValue("property", out object propertyObj))
+            if (!context.RouteValues.TryGetValue("property", out object? propertyObj))
             {
                 return false;
             }
 
-            string entitySetName = entitysetNameObj as string;
-            string keyValue = keyObj as string;
-            string propertyName = propertyObj as string;
+            string? entitySetName = entitysetNameObj as string;
+
+            string? keyValue = keyObj as string;
+
+            string? propertyName = propertyObj as string;
 
             var edmEntitySet = context.Model.EntityContainer.EntitySets()
                 .FirstOrDefault(e => string.Equals(entitySetName, e.Name));
             
             if (edmEntitySet != null)
             {
-                KeySegment keySegment = context.Segments.Last() as KeySegment;
-                IEdmEntityType entityType = keySegment.EdmType as IEdmEntityType;
-                IEdmProperty edmProperty = entityType.Properties()
+                KeySegment? keySegment = context.Segments.Last() as KeySegment;
+                IEdmEntityType? entityType = keySegment?.EdmType as IEdmEntityType;
+                IEdmProperty? edmProperty = entityType?.Properties()
                     .FirstOrDefault(p => p.PropertyKind == EdmPropertyKind.Structural && p.Name.Equals(propertyName));
                 if (edmProperty != null)
                 {

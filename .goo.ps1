@@ -58,6 +58,8 @@ if($null -eq $Env:Environment)
 $goo.Command.Add( 'init', {
     $goo.Command.Run( 'clean' )
     $goo.Command.Run( 'build' )
+    $goo.Command.Run( 'up' )
+    $goo.Command.Run( 'run' )
 })
 
 # command: goo clean | Removes data and build output

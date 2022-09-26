@@ -56,9 +56,9 @@ namespace Nox.OData.Serializers
             return untyped;
         }
 
-        internal static object ConvertUntypedValue(object value, IEdmPrimitiveTypeReference primitiveType, TimeZoneInfo timeZoneInfo)
+        internal static object? ConvertUntypedValue(object value, IEdmPrimitiveTypeReference primitiveType, TimeZoneInfo? timeZoneInfo)
         {
-            if (value == null)
+            if (value == null || timeZoneInfo == null)
             {
                 return null;
             }
@@ -93,7 +93,7 @@ namespace Nox.OData.Serializers
             return ConvertUnsupportedPrimitives(value, timeZoneInfo);
         }
 
-        internal static object ConvertUnsupportedPrimitives(object value, TimeZoneInfo timeZoneInfo)
+        internal static object? ConvertUnsupportedPrimitives(object value, TimeZoneInfo timeZoneInfo)
         {
             if (value != null)
             {

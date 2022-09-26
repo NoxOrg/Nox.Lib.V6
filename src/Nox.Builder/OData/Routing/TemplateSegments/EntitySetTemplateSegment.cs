@@ -24,7 +24,7 @@ namespace Nox.OData.Routing
 
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            if (!context.RouteValues.TryGetValue("entityset", out object classname))
+            if (!context.RouteValues.TryGetValue("entityset", out object? classname))
             {
                 return false;
             }

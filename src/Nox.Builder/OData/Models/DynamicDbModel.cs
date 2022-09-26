@@ -6,9 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
-using Nox.Dynamic;
 using Nox.Dynamic.Dto;
-using Nox.OData.Extensions;
+using Nox.Dynamic.Services;
+using Nox.Dynamic.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -26,7 +26,7 @@ namespace Nox.OData.Models
 
         private readonly Dictionary<string, DynamicDbEntity> _dynamicDbEntities = new();
 
-        private string _connectionString;
+        private string? _connectionString;
 
         public DynamicDbModel(IConfiguration config, ILogger<DynamicDbModel> logger)
         {
@@ -65,12 +65,12 @@ namespace Nox.OData.Models
                     Name = entityName,
                     PluralName = pluralName,
                     TypeBuilder = typeBuilder,
-                    Type = t,
+                    Type = t!,
                     Entity = entity,
-                    DbContextGetCollectionMethod = dbContextGetCollectionMethod.MakeGenericMethod(t),
-                    DbContextGetSingleResultMethod = dbContextGetSingleResultMethod.MakeGenericMethod(t),
-                    DbContextGetObjectPropertyMethod = dbContextGetObjectPropertyMethod.MakeGenericMethod(t),
-                    DbContextGetNavigationMethod = dbContextGetNavigationMethod.MakeGenericMethod(t)
+                    DbContextGetCollectionMethod = dbContextGetCollectionMethod.MakeGenericMethod(t!),
+                    DbContextGetSingleResultMethod = dbContextGetSingleResultMethod.MakeGenericMethod(t!),
+                    DbContextGetObjectPropertyMethod = dbContextGetObjectPropertyMethod.MakeGenericMethod(t!),
+                    DbContextGetNavigationMethod = dbContextGetNavigationMethod.MakeGenericMethod(t!)
                 };
             }
 
@@ -78,7 +78,7 @@ namespace Nox.OData.Models
 
         }
 
-        public string GetDatabaseConnectionString() => _connectionString;
+        public string GetDatabaseConnectionString() => _connectionString!;
 
         public ModelBuilder ConfigureDbContextModel(ModelBuilder modelBuilder)
         {
@@ -107,7 +107,9 @@ namespace Nox.OData.Models
 
         public IQueryable GetDynamicCollection(DbContext context, string dbSetName)
         {
-            return _dynamicDbEntities[dbSetName].DbContextGetCollectionMethod.Invoke(context, null) as IQueryable;
+            var q = _dynamicDbEntities[dbSetName].DbContextGetCollectionMethod.Invoke(context, null) as IQueryable;
+
+            return q!;
         }
 
         public object GetDynamicSingleResult(DbContext context, string dbSetName, object id)
@@ -116,7 +118,7 @@ namespace Nox.OData.Models
 
             var ret = _dynamicDbEntities[dbSetName].DbContextGetSingleResultMethod.Invoke(context, parameters);
 
-            return ret;
+            return ret!;
         }
         public object GetDynamicObjectProperty(DbContext context, string dbSetName, object id, string propName)
         {
@@ -124,7 +126,7 @@ namespace Nox.OData.Models
 
             var ret = _dynamicDbEntities[dbSetName].DbContextGetObjectPropertyMethod.Invoke(context, parameters);
 
-            return ret;
+            return ret!;
         }
 
         public object GetDynamicNavigation(DbContext context, string dbSetName, object id, string navName)
@@ -133,7 +135,7 @@ namespace Nox.OData.Models
 
             var ret = _dynamicDbEntities[dbSetName].DbContextGetNavigationMethod.Invoke(context, parameters);
 
-            return ret;
+            return ret!;
         }
 
         private Dictionary<string, (Entity Entity, TypeBuilder TypeBuilder)> GetTablesAndTypeBuilders()
@@ -160,7 +162,7 @@ namespace Nox.OData.Models
 
             var dynamicTypes = new Dictionary<string, (Entity Entity, TypeBuilder TypeBuilder)>();
 
-            foreach (var (key,entity) in entities)
+            foreach (var (_,entity) in entities)
             {
                 var entityName = entity.Name.TrimStart('_');
 

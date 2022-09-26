@@ -24,7 +24,7 @@ namespace Nox.OData.Routing
 
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            if (!context.RouteValues.TryGetValue("navigation", out object navigationNameObj))
+            if (!context.RouteValues.TryGetValue("navigation", out object? navigationNameObj))
             {
                 return false;
             }

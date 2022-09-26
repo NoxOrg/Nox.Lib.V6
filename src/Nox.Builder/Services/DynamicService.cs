@@ -6,7 +6,7 @@ using Nox.Dynamic.Migrations.Providers;
 using System.Collections.ObjectModel;
 using YamlDotNet.Serialization;
 
-namespace Nox.Dynamic
+namespace Nox.Dynamic.Services
 {
     public class DynamicService
     {
@@ -36,7 +36,7 @@ namespace Nox.Dynamic
         public async Task<bool> ExecuteDataLoadersAsync()
         {
             _logger.LogInformation("Executing data load tasks");
-            
+
             if (_service.Database is not null)
             {
                 var loaderProvider = new SqlServerLoaderProvider(_configuration, _logger);
@@ -52,7 +52,7 @@ namespace Nox.Dynamic
         public IReadOnlyDictionary<string, Entity> Entities => new ReadOnlyDictionary<string, Entity>(_service.Entities);
 
         public string? DatabaseConnectionString() => _service.Database.ConnectionString;
-        
+
 
         public class Builder
         {
@@ -144,7 +144,7 @@ namespace Nox.Dynamic
 
             private string ReadDefinitionFile(string fileName)
             {
-                _logger.LogInformation("Reading definition from {fileName}", fileName.Replace('\\','/'));
+                _logger.LogInformation("Reading definition from {fileName}", fileName.Replace('\\', '/'));
 
                 return File.ReadAllText(fileName);
             }

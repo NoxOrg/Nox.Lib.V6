@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Nox.Dynamic;
+using Nox.Dynamic.Services;
 using Spectre.Console.Cli;
 using System;
 using System.Collections.Generic;

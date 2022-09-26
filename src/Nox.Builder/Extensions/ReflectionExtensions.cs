@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace Nox.OData.Extensions
+namespace Nox.Dynamic.Extensions
 {
     public static class ReflectionExtensions
     {

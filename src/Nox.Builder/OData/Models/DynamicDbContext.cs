@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Nox.OData.Extensions;
-using System.Linq;
+using Nox.Dynamic.Extensions;
 
 namespace Nox.OData.Models
 {
@@ -10,19 +9,13 @@ namespace Nox.OData.Models
     {
         private readonly DynamicDbModel _dynamicDbModel;
 
-        private readonly IConfiguration _config;
-
-        public DynamicDbContext()  {}
-
         public DynamicDbContext(
             DbContextOptions<DynamicDbContext> options,
-            DynamicDbModel dynamicDbModel,
-            IConfiguration config
+            DynamicDbModel dynamicDbModel
         )
             : base(options)
         {
             _dynamicDbModel = dynamicDbModel;
-            _config = config;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -45,22 +38,22 @@ namespace Nox.OData.Models
         // Methods for Controller access
         public IQueryable GetDynamicCollection(string dbSetName)
         {
-            return _dynamicDbModel?.GetDynamicCollection(this, dbSetName);
+            return _dynamicDbModel?.GetDynamicCollection(this, dbSetName)!;
         }
 
         public object GetDynamicSingleResult(string dbSetName, object id)
         {
-            return _dynamicDbModel?.GetDynamicSingleResult(this, dbSetName, id);
+            return _dynamicDbModel?.GetDynamicSingleResult(this, dbSetName, id)!;
         }
 
         public object GetDynamicObjectProperty(string dbSetName, object id, string propName)
         {
-            return _dynamicDbModel?.GetDynamicObjectProperty(this, dbSetName, id, propName);
+            return _dynamicDbModel?.GetDynamicObjectProperty(this, dbSetName, id, propName)!;
         }
 
         public object GetDynamicNavigation(string dbSetName, object id, string navName)
         {
-            return _dynamicDbModel?.GetDynamicNavigation(this, dbSetName, id, navName);
+            return _dynamicDbModel?.GetDynamicNavigation(this, dbSetName, id, navName)!;
         }
 
         // Stronly typed methods for model callback
