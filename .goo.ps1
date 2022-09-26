@@ -35,6 +35,22 @@ $script:DefaultEnvironment      = 'Development'
 
 $script:DockerContainerName     = 'nox'
 
+$script:DbServer                = '127.0.0.1'
+$script:DbPort                  = '1433'
+$script:DbName                  = 'nox'
+$script:MasterDbName            = 'master'
+$script:DbUser                  = 'sa'
+$script:DbPassword              = 'Developer*123'
+
+$script:DbConnectionstring = (
+    "Server=$script:DbServer,$script:DbPort;" +
+    "Database=$script:DbName;" + 
+    "User ID=$script:DbUser;" +
+    "Password=$script:DbPassword;" + 
+    "Integrated Security=false;" +
+    "Connection Timeout=120;" +
+    "Application Name=$script:SolutionName;" 
+)
 
 <# --- SET YOUR PROJECT'S ENVIRONMENT VARIABLES HERE --- #>
 
@@ -119,6 +135,11 @@ $goo.Command.Add( 'env', { param($dbEnvironment,$dbInstance)
     $goo.Console.WriteLine( "environment variables" )
     $goo.Console.WriteLine( "=====================" )
     Get-ChildItem -Path Env: | Sort-Object -Property Name | Out-Host
+
+    $goo.Console.WriteLine( "dotnet user-secrets" )
+    $goo.Console.WriteLine( "===================" )
+    $goo.Console.WriteLine() 
+    $goo.Command.RunExternal('dotnet',"user-secrets list --project $script:ProjectFile")
 })
 
 # command: goo setenv <env> | Sets local environment to <env> environment
@@ -137,8 +158,15 @@ $goo.Command.Add( 'dev', {
 
 # command: goo run | Run the console application
 $goo.Command.Add( 'run', {
+    $goo.Command.Run( 'waitfordb' )
     $goo.Command.RunExternal('dotnet','run',$script:ProjectFolder)
 })
+
+# command: goo sql <query> | Executes a query on your local SQL server container
+$goo.Command.Add( 'sql', { param( $sql )
+    $goo.Sql.Query( $script:DbConnectionstring, $sql )
+})
+
 
 # command: goo feature <name> | Creates a new feature branch from your main git branch
 $goo.Command.Add( 'feature', { param( $featureName )
@@ -169,6 +197,21 @@ $goo.Command.Add( 'main', { param( $featureName )
     $goo.Git.CheckoutMain()
 })
 
+$goo.Command.Add( 'waitfordb', {
+    $masterConnectionString = (
+        "Server=$script:DbServer,$script:DbPort;" +
+        "Database=$script:MasterDbName;" + 
+        "User ID=$script:DbUser;" +
+        "Password=$script:DbPassword;" + 
+        "Integrated Security=false;" +
+        "Connection Timeout=120;" +
+        "Application Name=$script:SolutionName;" 
+    )
+    while (-not $goo.Sql.TestConnection( $masterConnectionString )){
+        $goo.Console.WriteInfo('Waiting for docker SQL database to be ready to accept connections...')
+        $goo.Sleep(10)
+    }
+})
 
 <# --- START GOO EXECUTION --- #>
 
