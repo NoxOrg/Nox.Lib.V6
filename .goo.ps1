@@ -28,8 +28,8 @@ $script:RootFolder       = (Get-Location).Path
 $script:SourceFolder            = '.\src'
 $script:SolutionFolder          = $script:SourceFolder
 $script:SolutionFile            = "$script:SolutionFolder\Nox.sln"
-$script:ProjectFolder           = "$script:SourceFolder\Nox.Cli"
-$script:ProjectFile             = "$script:ProjectFolder\Nox.Cli.csproj"
+$script:ProjectFolder           = "$script:SourceFolder\My.Api"
+$script:ProjectFile             = "$script:ProjectFolder\My.Api.csproj"
 
 $script:DefaultEnvironment      = 'Development'
 

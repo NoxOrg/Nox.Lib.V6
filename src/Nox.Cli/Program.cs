@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Nox.Cli.Commands;
 using Nox.Cli.Services;
 using Nox.Dynamic;
-using NoxConsole.Configuration;
+using Nox.Dynamic.Configuration;
 using Serilog;
 using Spectre.Console.Cli;
 
@@ -29,7 +29,7 @@ internal class Program
 
         });
 
-        return app.Run(args); 
+        return await app.RunAsync(args); 
 
     }
 

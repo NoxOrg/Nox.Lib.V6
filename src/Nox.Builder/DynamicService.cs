@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Nox.Dynamic.Dto;
 using Nox.Dynamic.Loaders.Providers;
 using Nox.Dynamic.Migrations.Providers;
+using System.Collections.ObjectModel;
 using YamlDotNet.Serialization;
 
 namespace Nox.Dynamic
@@ -47,6 +48,11 @@ namespace Nox.Dynamic
 
             return false;
         }
+
+        public IReadOnlyDictionary<string, Entity> Entities => new ReadOnlyDictionary<string, Entity>(_service.Entities);
+
+        public string? DatabaseConnectionString() => _service.Database.ConnectionString;
+        
 
         public class Builder
         {

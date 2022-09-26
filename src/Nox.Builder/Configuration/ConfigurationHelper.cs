@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
 
-namespace NoxConsole.Configuration;
+namespace Nox.Dynamic.Configuration;
 
 public class ConfigurationHelper
 {
@@ -32,7 +32,7 @@ public class ConfigurationHelper
 
     }
 
-    private static bool IsDevelopment()
+    public static bool IsDevelopment()
     {
         var env = Environment.GetEnvironmentVariable("ENVIRONMENT");
 
