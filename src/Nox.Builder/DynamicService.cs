@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Nox.Dynamic.Dto;
 using Nox.Dynamic.Loaders.Providers;
 using Nox.Dynamic.Migrations.Providers;
@@ -11,26 +12,40 @@ namespace Nox.Dynamic
 
         private IConfiguration _configuration = null!;
 
+        private ILogger _logger = null!;
+
         private Service _service = null!;
 
-        public void ValidateDatabaseSchema()
+        public async Task<bool> ValidateDatabaseSchemaAsync()
         {
+            _logger.LogInformation("Validating the database schema");
+
             if (_service.Database is not null)
             {
-                var migrationProvider = new SqlServerMigrationProvider(_configuration);
+                var migrationProvider = new SqlServerMigrationProvider(_configuration, _logger);
 
-                migrationProvider.ValidateDatabaseSchema(_service.Database, _service.Entities);
+                return await migrationProvider.ValidateDatabaseSchemaAsync(_service);
             }
+
+            _logger.LogWarning("No database settings found in service definition");
+
+            return false;
         }
 
-        public void ExecuteDataLoaders()
+        public async Task<bool> ExecuteDataLoadersAsync()
         {
+            _logger.LogInformation("Executing data load tasks");
+            
             if (_service.Database is not null)
             {
-                var loaderProvider = new SqlServerLoaderProvider(_configuration);
+                var loaderProvider = new SqlServerLoaderProvider(_configuration, _logger);
 
-                loaderProvider.ExecuteLoaders(_service.Database, _service.Loaders, _service.Entities);
+                return await loaderProvider.ExecuteLoadersAsync(_service);
             }
+
+            _logger.LogWarning("No database settings found in service definition");
+
+            return false;
         }
 
         public class Builder
@@ -48,6 +63,9 @@ namespace Nox.Dynamic
             private readonly DynamicService _dynamicService;
 
             private readonly IDeserializer _deserializer;
+
+            private ILogger _logger = null!;
+
 
             public Builder()
             {
@@ -78,6 +96,15 @@ namespace Nox.Dynamic
                 return this;
             }
 
+            public Builder WithLogger(ILogger logger)
+            {
+                _dynamicService._logger = logger;
+
+                _logger = logger;
+
+                return this;
+            }
+
             public DynamicService Build()
             {
                 return _dynamicService;
@@ -89,7 +116,7 @@ namespace Nox.Dynamic
                 return Directory
                     .EnumerateFiles(rootFolder, SERVICE_DEFINITION_PATTERN, SearchOption.AllDirectories)
                     .Take(1)
-                    .Select(f => _deserializer.Deserialize<Service>(File.ReadAllText(f)))
+                    .Select(f => _deserializer.Deserialize<Service>(ReadDefinitionFile(f)))
                     .First();
             }
 
@@ -97,7 +124,7 @@ namespace Nox.Dynamic
             {
                 return Directory
                     .EnumerateFiles(rootFolder, ENTITITY_DEFINITION_PATTERN, SearchOption.AllDirectories)
-                    .Select(f => _deserializer.Deserialize<Entity>(File.ReadAllText(f)))
+                    .Select(f => _deserializer.Deserialize<Entity>(ReadDefinitionFile(f)))
                     .ToList();
             }
 
@@ -105,8 +132,15 @@ namespace Nox.Dynamic
             {
                 return Directory
                     .EnumerateFiles(rootFolder, LOADER_DEFINITION_PATTERN, SearchOption.AllDirectories)
-                    .Select(f => _deserializer.Deserialize<Loader>(File.ReadAllText(f)))
+                    .Select(f => _deserializer.Deserialize<Loader>(ReadDefinitionFile(f)))
                     .ToList();
+            }
+
+            private string ReadDefinitionFile(string fileName)
+            {
+                _logger.LogInformation("Reading definition from {fileName}", fileName.Replace('\\','/'));
+
+                return File.ReadAllText(fileName);
             }
 
         }

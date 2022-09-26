@@ -1,7 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Nox.Dynamic.Dto;
 using System.Data;
 using System.Data.SqlClient;
+using System.Reflection;
+using System.Security.AccessControl;
 using System.Text;
 
 namespace Nox.Dynamic.Migrations.Providers
@@ -11,29 +14,34 @@ namespace Nox.Dynamic.Migrations.Providers
 
         private readonly IConfiguration _configuration;
 
-        public SqlServerMigrationProvider(IConfiguration configuration)
+        private readonly ILogger _logger;
+
+        public SqlServerMigrationProvider(IConfiguration configuration, ILogger logger)
         {
             _configuration = configuration;
+            _logger = logger;
         }
 
-        public void ValidateDatabaseSchema(ServiceDatabase dbDefinition, Dictionary<string,Entity> entities)
+        public async Task<bool> ValidateDatabaseSchemaAsync(Service service)
         {
-            var masterConnectionString = ConnectionString(dbDefinition, "master");
+            var masterConnectionString = ConnectionString(service.Database, "master");
             
             using (var connection = new SqlConnection(masterConnectionString))
             {
-                connection.Open();
-                EnsureDatabaseExists(connection, dbDefinition.Name);
+                await connection.OpenAsync();
+                await EnsureDatabaseExists(connection, service.Database.Name);
             }
 
-            var connectionString = ConnectionString(dbDefinition);
+            var connectionString = ConnectionString(service.Database);
             using (var connection = new SqlConnection(connectionString))
             {
-                connection.Open();
-                ValidateTables(connection, entities);
+                await connection.OpenAsync();
+                await ValidateTables(connection, service.Entities);
             }
 
-            dbDefinition.ConnectionString = connectionString;
+            service.Database.ConnectionString = connectionString;
+
+            return true;
         }
 
         private static string ConnectionString(ServiceDatabase dbDefinition, string? db = null)
@@ -51,84 +59,79 @@ namespace Nox.Dynamic.Migrations.Providers
             return csb.ConnectionString;
         }
 
-        private static void EnsureDatabaseExists(SqlConnection connection, string databaseName)
+        private async Task EnsureDatabaseExists(SqlConnection connection, string databaseName)
         {
-            if (!CheckDatabaseExists(connection, databaseName))
+            if (!await CheckDatabaseExists(connection, databaseName))
             {
-                CreateDatabase(connection, databaseName);
-                UseDatabase(connection, databaseName);
-                CreateMetaSchema(connection);
+                await CreateDatabase(connection, databaseName);
+                await UseDatabase(connection, databaseName);
+                await CreateMetaSchema(connection);
             }
         }
 
-        private static bool CheckDatabaseExists(SqlConnection connection, string databaseName)
+        private async Task<bool> CheckDatabaseExists(SqlConnection connection, string databaseName)
         {
+            _logger.LogInformation("Checking if database {databaseName} exists", databaseName);
+
             var qry = $"SELECT COUNT(*) FROM master.dbo.sysdatabases WHERE name = @database";
 
             using var cmd = new SqlCommand(qry, connection);
 
             cmd.Parameters.Add("@database", System.Data.SqlDbType.NVarChar).Value = databaseName;
 
-            return Convert.ToInt32(cmd.ExecuteScalar()) == 1;
+            return Convert.ToInt32(await cmd.ExecuteScalarAsync()) == 1;
         }
 
-        private static void CreateDatabase(SqlConnection connection, string databaseName)
+        private async Task CreateDatabase(SqlConnection connection, string databaseName)
         {
+            _logger.LogInformation("Creating database {databaseName}", databaseName);
+
             var qry = $"CREATE DATABASE [{databaseName}];";
 
             using var cmd = new SqlCommand(qry, connection);
 
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
-        private static void UseDatabase(SqlConnection connection, string databaseName)
+
+        private async Task UseDatabase(SqlConnection connection, string databaseName)
         {
+            _logger.LogInformation("Setting current database to {databaseName}", databaseName);
+
             var qry = $"USE [{databaseName}];";
 
             using var cmd = new SqlCommand(qry, connection);
 
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
 
-        private static void CreateMetaSchema(SqlConnection connection)
+        private async Task CreateMetaSchema(SqlConnection connection)
         {
+            _logger.LogInformation("Creating schema [meta]");
+
             var qry = $"CREATE SCHEMA [meta];";
 
             using var cmd = new SqlCommand(qry, connection);
 
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
 
-        private static void ValidateTables(SqlConnection connection, Dictionary<string, Entity> entities)
+        private async Task ValidateTables(SqlConnection connection, Dictionary<string, Entity> entities)
         {
             AddRelationshipProperties(entities);
 
             foreach (var (_,entity) in entities)
             {
-                EnsureTableExists(connection, entity);
+                await EnsureTableExists(connection, entity);
             }
 
-            var mergeState = new Entity()
-            {
-                Name = "LastDataMergedState",
-                Description = "Tracks state between data merge oprations",
-                Schema = "meta",
-                Table = "LastDataMergedState",
-                Properties = new()
-                {
-                    new() { Name = "Id", Type = "int", IsPrimaryKey = true, IsAutoNumber = true },
-                    new() { Name = "Loader", Type = "string", MaxWidth = 64 },
-                    new() { Name = "Property", Type = "string", MaxWidth = 64 },
-                    new() { Name = "LastDateLoaded", Type = "datetime" },
-                }
-
-            };
-
-            EnsureTableExists(connection, mergeState);
+            await EnsureMetadataTablesExist(connection);
 
         }
 
-        private static void AddRelationshipProperties(Dictionary<string, Entity> entities)
+        private void AddRelationshipProperties(Dictionary<string, Entity> entities)
         {
+            _logger.LogInformation("Resolving entity relationships");
+
             foreach (var (name,entity) in entities)
             {
                 entity.Table ??= name;
@@ -144,6 +147,9 @@ namespace Nox.Dynamic.Migrations.Providers
                     var fkName = parentPK.Name.StartsWith(parentEntity.Name, StringComparison.OrdinalIgnoreCase) 
                         ? parentPK.Name
                         : $"{parentEntity.Name}{parentPK.Name}" ;
+
+                    _logger.LogInformation("...resolving relationship {child}({childFk}) -> {parent}({parentPk})", 
+                        entity.Name, fkName, parentEntity.Name, parentPK.Name );
 
                     entity.Properties.Add(new Property()
                     {
@@ -166,16 +172,79 @@ namespace Nox.Dynamic.Migrations.Providers
             }
         }
 
-        private static void EnsureTableExists(SqlConnection connection, Entity entity)
+        private async Task EnsureMetadataTablesExist(SqlConnection connection)
         {
-            if (!CheckTableExists(connection, entity))
+            var metaClasses = from t in Assembly.GetExecutingAssembly().GetTypes()
+                    where t.IsClass && t.Namespace == "Nox.Dynamic.Dto"
+                    select t;
+
+            foreach (var metaClass in metaClasses)
             {
-                CreateTable(connection, entity);
+                var metadataTable = new Entity()
+                {
+                    Name = metaClass.Name,
+                    Description = "Metadata table",
+                    Schema = "meta",
+                    Table = metaClass.Name,
+                    Properties = new()
+                    {
+                        new() { Name = "Id", Type = "int", IsPrimaryKey = true, IsAutoNumber = true },
+                    }
+                };
+
+                _logger.LogInformation("Creating storage for metadata {meta}", metaClass.Name);
+
+                AddClassProperties(metadataTable.Properties, metaClass);
+
+                await EnsureTableExists(connection, metadataTable);
+
+            }
+
+
+
+
+        }
+
+        private void AddClassProperties(List<Property> properties, Type metaClass)
+        {
+            var classProperties = metaClass.GetProperties();
+            foreach (var prop in classProperties)
+            {
+                /*
+                if (prop.PropertyType.Name.StartsWith("List`"))
+                {
+                    continue;
+                }
+                */
+
+                var p = new Property() { 
+                    Name = prop.Name,
+                    Type = prop.PropertyType.Name,
+                    IsRequired = true,
+                };
+
+                if (prop.PropertyType.IsGenericType && prop.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
+                    p.IsRequired = false;
+                }
+
+                properties.Add(p);
+            }
+
+        }
+
+        private async Task EnsureTableExists(SqlConnection connection, Entity entity)
+        {
+            if (!await CheckTableExists(connection, entity))
+            {
+                await CreateTable(connection, entity);
             }
         }
 
-        private static bool CheckTableExists(SqlConnection connection, Entity entity)
+        private async Task<bool> CheckTableExists(SqlConnection connection, Entity entity)
         {
+            _logger.LogInformation("Checking table {schemaAndTableName} exists", $"[{entity.Schema}].[{entity.Table}]");
+
             var qry = $"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = @schemaname AND TABLE_NAME = @tablename";
 
             using var cmd = new SqlCommand(qry, connection);
@@ -184,11 +253,13 @@ namespace Nox.Dynamic.Migrations.Providers
 
             cmd.Parameters.Add("@tablename", System.Data.SqlDbType.NVarChar).Value = entity.Table;
 
-            return Convert.ToInt32(cmd.ExecuteScalar()) == 1;
+            return Convert.ToInt32(await cmd.ExecuteScalarAsync()) == 1;
         }
 
-        private static void CreateTable(SqlConnection connection, Entity entity)
+        private async Task CreateTable(SqlConnection connection, Entity entity)
         {
+            _logger.LogInformation("...creating table {schemaAndTableName}", $"[{entity.Schema}].[{entity.Table}]");
+
             var sqlCode = new StringBuilder();
 
             sqlCode.Append( $"CREATE TABLE [{entity.Schema}].[{entity.Table}] (");
@@ -216,7 +287,7 @@ namespace Nox.Dynamic.Migrations.Providers
 
             using var cmdCreate = new SqlCommand(qryCreate, connection);
 
-            cmdCreate.ExecuteNonQuery();
+            await cmdCreate.ExecuteNonQueryAsync();
         }
 
         private static string MapToSqlType(Property prop)
@@ -235,7 +306,8 @@ namespace Nox.Dynamic.Migrations.Providers
                 "object"    => "sql_variant",
                 "url"       => "varchar(2048)",
                 "email"     => "varchar(320)",
-                _ => propType
+                "int"       => "int",
+                _ => "nvarchar(max)"
             };
         }
 

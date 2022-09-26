@@ -11,7 +11,6 @@ namespace Nox.Dynamic.Dto
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
-        public Type ClrType { get; set; } = typeof(string);
         public bool IsPrimaryKey { get; set; } = false;
         public bool IsAutoNumber { get; set; } = false;
         public bool IsForeignKey { get; set; } = false;

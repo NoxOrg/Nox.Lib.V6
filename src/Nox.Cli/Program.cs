@@ -1,6 +1,13 @@
 ﻿
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Nox.Cli.Commands;
+using Nox.Cli.Services;
 using Nox.Dynamic;
+using NoxConsole.Configuration;
+using Serilog;
+using Spectre.Console.Cli;
 
 internal class Program
 {
@@ -9,34 +16,50 @@ internal class Program
     public static async Task<int> Main(string[] args)
     {
 
-        var builder = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            .AddEnvironmentVariables();
+        var hostBuilder = CreateHostBuilder(args);
+        var registrar = new TypeRegistrar(hostBuilder);
+        var app = new CommandApp(registrar);
 
-        if (IsDevelopment())
+        app.Configure(config =>
         {
-            builder.AddUserSecrets<Program>();
-        }
+            // Register available commands
+            config.AddCommand<SyncCommand>("sync")
+                .WithDescription("Builds database and syncs data.")
+                .WithExample(new[] { "sync" });
 
-        Configuration = builder.Build();
+        });
 
-        var dynamicService = new DynamicService.Builder()
-            .WithConfiguration(Configuration)
-            .FromRootFolder(Configuration["DefinitionRootPath"])
-            .Build();
-
-        dynamicService.ValidateDatabaseSchema();
-
-        dynamicService.ExecuteDataLoaders();
-
-        await Task.Delay(1);
-
-        return 0;
+        return app.Run(args); 
 
     }
 
-    private static bool IsDevelopment() =>
-        (Environment.GetEnvironmentVariable("ENVIRONMENT")?.StartsWith("dev", StringComparison.OrdinalIgnoreCase) ?? false);
+    public static IHostBuilder CreateHostBuilder(string[] args)
+    {
+        // App Configuration
+
+        Configuration = ConfigurationHelper.GetApplicationConfiguration(args);
+
+        // Logger
+
+        ILogger logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(Configuration)
+            .CreateLogger();
+
+        Log.Logger = logger;
+
+        // HostBuilder
+
+        var hostBuilder = Host
+            .CreateDefaultBuilder(args)
+            .ConfigureServices((hostContext, services) =>
+            {
+                services.AddSingleton(Configuration);
+            })
+            .UseSerilog();
+
+        return hostBuilder;
+    }
+
 
 }
 
