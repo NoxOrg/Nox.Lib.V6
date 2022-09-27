@@ -1,4 +1,4 @@
-namespace Nox.Api
+namespace My.Api
 {
     public class WeatherForecast
     {

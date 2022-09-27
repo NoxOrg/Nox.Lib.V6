@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace Nox.Api.Controllers
+namespace My.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
