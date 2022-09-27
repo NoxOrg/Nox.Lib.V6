@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Nox.OData.Routing
+namespace Nox.Dynamic.OData.Routing
 {
     public class PropertyTemplateSegment : ODataSegmentTemplate
     {

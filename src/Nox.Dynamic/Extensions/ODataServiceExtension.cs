@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Nox.OData.Models;
-using Nox.OData.Routing;
+using Nox.Dynamic.OData.Models;
+using Nox.Dynamic.OData.Routing;
 
 namespace Nox.Dynamic.Extensions
 {

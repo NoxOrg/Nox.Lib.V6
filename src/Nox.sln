@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nox.Cli", "Nox.Cli\Nox.Cli.csproj", "{4DC036B3-EE95-4436-8B22-46E5FA67DFD4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nox.Dynamic", "Nox.Builder\Nox.Dynamic.csproj", "{E9748362-64C3-4F5B-ACF9-82495DF4B924}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nox.Dynamic", "Nox.Dynamic\Nox.Dynamic.csproj", "{E9748362-64C3-4F5B-ACF9-82495DF4B924}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "My.Api", "My.Api\My.Api.csproj", "{D7A453F1-57AC-4CE9-8946-21714C1CFEEE}"
 EndProject

@@ -13,11 +13,11 @@ using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.OData.UriParser;
-using Nox.OData.Models;
+using Nox.Dynamic.OData.Models;
 using System.Reflection;
 using System.Text.Json;
 
-namespace Nox.OData.Controllers
+namespace Nox.Dynamic.OData.Controllers
 {
     public class ODataController : Microsoft.AspNetCore.OData.Routing.Controllers.ODataController
     {

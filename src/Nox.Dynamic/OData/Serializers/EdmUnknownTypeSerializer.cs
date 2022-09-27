@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
-using Nox.OData.Serializers.Helpers;
+using Nox.Dynamic.OData.Serializers.Helpers;
 using System;
 using System.Text.Json;
 
-namespace Nox.OData.Serializers
+namespace Nox.Dynamic.OData.Serializers
 {
     public class EdmUnknownTypeSerializer : ODataEdmTypeSerializer
     {

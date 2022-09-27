@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Nox.OData.Serializers.Helpers
+namespace Nox.Dynamic.OData.Serializers.Helpers
 {
     internal static class TimeZoneInfoHelper
     {

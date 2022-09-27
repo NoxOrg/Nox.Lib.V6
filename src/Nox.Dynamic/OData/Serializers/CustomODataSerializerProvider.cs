@@ -3,7 +3,7 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using System;
 
-namespace Nox.OData.Serializers
+namespace Nox.Dynamic.OData.Serializers
 {
     public class CustomODataSerializerProvider : ODataSerializerProvider
     {

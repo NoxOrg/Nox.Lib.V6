@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nox.Builder\Nox.Dynamic.csproj" />
+    <ProjectReference Include="..\Nox.Dynamic\Nox.Dynamic.csproj" />
   </ItemGroup>
 
 </Project>

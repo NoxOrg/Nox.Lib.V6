@@ -5,7 +5,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UserSecretsId>c85db8f6-e4ba-47a2-beb2-7cc33455348a</UserSecretsId>
+	<PackageId>Nox.Dynamic</PackageId>
+	<Version>1.0.0</Version>
+	<Authors>Andre Sharpe</Authors>
+	<Company>Creations Unlimited</Company>
   </PropertyGroup>
+	
 
   <ItemGroup>
     <PackageReference Include="Humanizer.Core" Version="2.14.1" />

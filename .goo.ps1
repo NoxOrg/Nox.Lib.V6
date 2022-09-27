@@ -30,6 +30,7 @@ $script:SolutionFolder          = $script:SourceFolder
 $script:SolutionFile            = "$script:SolutionFolder\Nox.sln"
 $script:ProjectFolder           = "$script:SourceFolder\My.Api"
 $script:ProjectFile             = "$script:ProjectFolder\My.Api.csproj"
+$script:LibFolder               = "$script:SourceFolder\Nox.Dynamic"
 
 $script:DefaultEnvironment      = 'Development'
 
@@ -195,6 +196,16 @@ $goo.Command.Add( 'pr', {
 # command: goo main | Checks out the main branch and prunes features removed at origin
 $goo.Command.Add( 'main', { param( $featureName )
     $goo.Git.CheckoutMain()
+})
+
+# command: goo main | Checks out the main branch and prunes features removed at origin
+$goo.Command.Add( 'publish', { 
+    $goo.Console.WriteInfo("Packing solution...")
+    $goo.Command.RunExternal('dotnet','pack /clp:ErrorsOnly --configuration Release', $script:LibFolder)
+    $goo.StopIfError("Failed to pack solution. (Release)")
+    $goo.Command.RunExternal('dotnet',"nuget push ./bin/Release/Nox.Dynamic.1.0.0.nupkg --api-key $Env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json", $script:LibFolder)
+    $goo.StopIfError("Failed to publish library to nuget. (Release)")
+
 })
 
 $goo.Command.Add( 'waitfordb', {

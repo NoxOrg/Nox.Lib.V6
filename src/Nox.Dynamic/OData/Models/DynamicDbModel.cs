@@ -15,7 +15,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text.Json;
 
-namespace Nox.OData.Models
+namespace Nox.Dynamic.OData.Models
 {
     public class DynamicDbModel
     {

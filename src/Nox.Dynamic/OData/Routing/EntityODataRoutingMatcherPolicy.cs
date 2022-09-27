@@ -14,13 +14,13 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using Nox.OData.Models;
+using Nox.Dynamic.OData.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Nox.OData.Routing
+namespace Nox.Dynamic.OData.Routing
 {
     /// <summary>
     /// Defines a policy that applies behaviors to the OData Uri matcher.

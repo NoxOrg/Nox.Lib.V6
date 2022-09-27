@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Nox.Dynamic.Extensions;
 using System.Text.Json;
 
-namespace Nox.OData.Models
+namespace Nox.Dynamic.OData.Models
 {
     public partial class DynamicDbContext : DbContext
     {

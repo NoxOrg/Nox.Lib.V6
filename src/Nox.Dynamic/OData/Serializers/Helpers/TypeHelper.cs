@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Reflection;
 
-namespace Nox.OData.Serializers.Helpers
+namespace Nox.Dynamic.OData.Serializers.Helpers
 {
     internal static class TypeHelper
     {

@@ -3,7 +3,7 @@ using System;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace Nox.OData.Models
+namespace Nox.Dynamic.OData.Models
 {
     public class DynamicDbEntity
     {

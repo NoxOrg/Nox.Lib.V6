@@ -13,9 +13,9 @@ using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
-using Nox.OData.Serializers;
+using Nox.Dynamic.OData.Serializers;
 
-namespace Nox.OData.Routing
+namespace Nox.Dynamic.OData.Routing
 {
     public class EntityODataRoutingApplicationModelProvider : IApplicationModelProvider
     {
