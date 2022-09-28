@@ -10,7 +10,7 @@ Schedule:
   Start: Daily at 2am UTC
 
 LoadStrategy: 
-  Type: DropAndCreate
+  Type: DropAndLoad
 
 Target:
   Entity: PlatformTenant
