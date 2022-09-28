@@ -136,8 +136,6 @@ namespace Nox.Dynamic.Migrations.Providers
             {
                 entity.Table ??= name;
         
-                entity.Schema ??= "dbo";
-
                 foreach (var parent in entity.RelatedParents)
                 {
                     var parentEntity = entities[parent];
@@ -294,19 +292,36 @@ namespace Nox.Dynamic.Migrations.Providers
         {
             var propType = prop.Type?.ToLower() ?? "string";
             var propWidth = prop.MaxWidth < 1 ? "max" : prop.MaxWidth.ToString();
+            var propPrecision = prop.Precision.ToString();
+
+           //     "real" => typeof(Single),
+           //     "float" => typeof(Single),
+           //     "bigreal" => typeof(Double),
+           //     "bigfloat" => typeof(Double),
 
             return propType switch
             {
                 "string"    => prop.IsUnicode ? $"nvarchar({propWidth})" : $"varchar({propWidth})",
+                "varchar"   => $"varchar({propWidth})",
+                "nvarchar"  => $"nvarchar({propWidth})",
+                "url"       => "varchar(2048)",
+                "email"     => "varchar(320)",
                 "char"      => prop.IsUnicode ? $"nchar({propWidth})" : $"char({propWidth})",
-                "date"      => "datetime2",
+                "guid"      => "guid",
+                "date"      => "date",
                 "datetime"  => "datetime2",
+                "time"      => "time",
+                "timespan"  => "timespan",
                 "bool"      => "bit",
                 "boolean"   => "bit",
                 "object"    => "sql_variant",
-                "url"       => "varchar(2048)",
-                "email"     => "varchar(320)",
                 "int"       => "int",
+                "uint"      => "uint",
+                "bigint"    => "bigint",
+                "smallint"  => "smallint",
+                "decimal"   => $"decimal({propWidth},{propPrecision})",
+                "money"     => $"decimal({propWidth},{propPrecision})",
+                "smallmoney"=> $"decimal({propWidth},{propPrecision})",
                 _ => "nvarchar(max)"
             };
         }

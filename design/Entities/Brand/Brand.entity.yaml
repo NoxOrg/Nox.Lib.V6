@@ -1,0 +1,61 @@
+﻿#
+# Brand entity definition
+#
+
+Name: Brand
+Description: Workplace brands
+PluralName: Brands
+Table: Brand
+Schema: dbo
+
+RelatedParents: [PlatformTenant]
+
+Properties:
+
+  - Name: Id
+    Description: The brand's unique identifier 
+    IsPrimaryKey: true
+    Type: int
+    CanFilter: true
+    CanSort: true
+
+  - Name: Name
+    Description: The name of the brand
+    IsRequired: true
+    Type: string
+    MaxWidth: 128
+    CanFilter: true
+    CanSort: true
+
+  - Name: ShortName
+    Description: The short name of the brand
+    IsRequired: true
+    Type: string
+    MaxWidth: 32
+    CanFilter: true
+    CanSort: true
+
+  - Name: Logo_1024x1024_Url
+    Description: Internet location of image file for square image of the brand's logo
+    Type: url
+
+  - Name: Logo_1024x768_Url
+    Description: Internet location of SVG file for 4:3 image of the brand's logo
+    Type: url
+
+  - Name: WebsiteUrl
+    Description: The website for the brand
+    Type: url
+
+  - Name: CustomerPortalUrl
+    Description: The website for the brand
+    Type: url
+
+  - Name: AndroidAppUrl
+    Description: The website for the brand
+    Type: url
+
+  - Name: AppleAppUrl
+    Description: The website for the brand
+    Type: url
+

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Nox.Dynamic.Dto;
 using System.Data.SqlClient;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Nox.Dynamic.Loaders.Providers
 {
@@ -180,7 +181,11 @@ namespace Nox.Dynamic.Loaders.Providers
 
             var newLastMergeDateTimeStamp = new Dictionary<string, (DateTime LastMergeDateTimeStamp, bool Updated)>();
 
-            var sb = new StringBuilder($"{loaderSource.Query} WHERE 1=0");
+            var containsWhere = Regex.IsMatch(loaderSource.Query, @"\s+WHERE\s+", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+
+            var query = containsWhere ? $"SELECT * FROM ({loaderSource.Query}) AS [tmp] WHERE 1=0" : $"{loaderSource.Query} WHERE 1=0"; 
+
+            var sb = new StringBuilder(query);
 
             foreach (var dateColumn in loader.LoadStrategy.Columns)
             {
@@ -191,7 +196,9 @@ namespace Nox.Dynamic.Loaders.Providers
                 newLastMergeDateTimeStamp[dateColumn] = new() { LastMergeDateTimeStamp=lastMergeDateTimeStamp, Updated = false };
             }
 
-            using var sourceCommand = new SqlCommand(sb.ToString(), connectionSource);
+            var finalQuery = sb.ToString();
+
+            using var sourceCommand = new SqlCommand(finalQuery, connectionSource);
 
             var reader = await sourceCommand.ExecuteReaderAsync();
 

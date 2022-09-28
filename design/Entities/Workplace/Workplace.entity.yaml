@@ -1,0 +1,39 @@
+﻿#
+# Workplace entity definition
+#
+
+Name: Workplace
+Description: Information on places where people can work
+PluralName: Workplaces
+
+RelatedParents: [Brand,Country]
+
+Properties:
+
+  - Name: Id
+    Description: The Workplace's unique identifier 
+    IsPrimaryKey: true
+    Type: int
+    CanFilter: true
+    CanSort: true
+
+  - Name: Name
+    Description: The name of the Workplace
+    IsRequired: true
+    Type: string
+    MaxWidth: 128
+    CanFilter: true
+    CanSort: true
+
+  - Name: Latitude
+    Description: The the north–south position of the workplace's point on the surface of the Earth
+    Type: decimal
+    MaxWidth: 18
+    Precision: 15
+
+  - Name: Longitude
+    Description: The the east-west position of the workplace's point on the surface of the Earth
+    Type: decimal
+    MaxWidth: 18
+    Precision: 15
+

@@ -22,6 +22,7 @@ namespace Nox.Dynamic.Dto
         public int MaxWidth { get; set; } = 512;
         public int MinValue { get; set; } = int.MinValue;
         public int MaxValue { get; set; } = int.MaxValue;
+        public int Precision { get; set; } = 2;
         public object Default { get; set; } = string.Empty;
 
         public Type NetDataType()
@@ -34,6 +35,7 @@ namespace Nox.Dynamic.Dto
                 "varchar" => typeof(String),
                 "nvarchar" => typeof(String),
                 "char" => typeof(String),
+                "guid" => typeof(Guid),
                 "url" => typeof(String),
                 "email" => typeof(String),
                 "date" => typeof(DateOnly),
