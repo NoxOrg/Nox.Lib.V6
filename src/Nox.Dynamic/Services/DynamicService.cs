@@ -163,6 +163,8 @@ namespace Nox.Dynamic.Services
 
                 var databases = GetServiceDatabasesFromDefinition();
 
+                // populate variables from application config
+
                 var variables = databases
                     .Where(d => string.IsNullOrEmpty(d.ConnectionString))
                     .Where(d => !string.IsNullOrEmpty(d.ConnectionVariable))
@@ -170,30 +172,47 @@ namespace Nox.Dynamic.Services
                     .ToHashSet()
                     .ToDictionary(v => v, v => config[v], StringComparer.OrdinalIgnoreCase);
 
+                // try nox key vault otherwise
+
+                TryAddMissingConfigsFromKeyVault(vaultUri, variables);
+
+                foreach (var db in databases)
+                {
+                    ResolveConnectionString(db, variables);
+                }
+
+            }
+
+            private void TryAddMissingConfigsFromKeyVault(string vaultUri, Dictionary<string, string> variables)
+            {
                 var azureServiceTokenProvider = new AzureServiceTokenProvider();
 
                 var keyVault = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+
+                try
+                {
+                    var test = keyVault.GetSecretAsync(vaultUri, "Test").GetAwaiter().GetResult().Value;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning("...unable to connect to key vault because [{msg}]", ex.Message);
+                    return;
+                }
 
                 foreach (var key in variables.Keys)
                 {
 
                     if (variables[key] == null)
                     {
-                        _logger.LogInformation("...Resolving variable [{key}] from secrets vault {vault}", key, vaultUri);
+                        _logger.LogInformation("...Resolving ConnectionVariable [{key}] from secrets vault {vault}", key, vaultUri);
                         variables[key] = keyVault.GetSecretAsync(vaultUri, key.Replace(":", "--")).GetAwaiter().GetResult().Value;
                     }
                     else
                     {
-                        _logger.LogInformation("...Resolving variable [{key}] from app configuration", key);
+                        _logger.LogInformation("...Resolving ConnectionVariable [{key}] from app configuration", key);
                     }
 
                 }
-
-                foreach(var db in databases)
-                {
-                    ResolveConnectionString(db, variables);
-                }
-
             }
 
             private IList<ServiceDatabase> GetServiceDatabasesFromDefinition()
