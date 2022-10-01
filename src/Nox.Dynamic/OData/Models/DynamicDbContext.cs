@@ -8,11 +8,11 @@ namespace Nox.Dynamic.OData.Models
 {
     public partial class DynamicDbContext : DbContext
     {
-        private readonly DynamicDbModel _dynamicDbModel;
+        private readonly DynamicModel _dynamicDbModel;
 
         public DynamicDbContext(
             DbContextOptions<DynamicDbContext> options,
-            DynamicDbModel dynamicDbModel
+            DynamicModel dynamicDbModel
         )
             : base(options)
         {

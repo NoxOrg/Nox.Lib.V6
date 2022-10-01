@@ -17,11 +17,11 @@ using System.Text.Json;
 
 namespace Nox.Dynamic.OData.Models
 {
-    public class DynamicDbModel
+    public class DynamicModel
     {
         private readonly IConfiguration _config;
 
-        private readonly ILogger<DynamicDbModel> _logger;
+        private readonly ILogger<DynamicModel> _logger;
 
         private readonly IEdmModel _edmModel;
 
@@ -29,7 +29,7 @@ namespace Nox.Dynamic.OData.Models
 
         private string? _connectionString;
 
-        public DynamicDbModel(IConfiguration config, ILogger<DynamicDbModel> logger)
+        public DynamicModel(IConfiguration config, ILogger<DynamicModel> logger)
         {
             _config = config;
 
@@ -156,7 +156,7 @@ namespace Nox.Dynamic.OData.Models
             var dynamicService = new DynamicService.Builder()
                 .WithLogger(_logger)
                 .WithConfiguration(_config)
-                .FromRootFolder(_config["DefinitionRootPath"])
+                .FromRootFolder(_config["Nox:DefinitionRootPath"])
                 .Build();
 
             dynamicService.ValidateDatabaseSchemaAsync().Wait();

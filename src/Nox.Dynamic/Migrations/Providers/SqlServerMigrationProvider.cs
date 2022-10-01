@@ -12,19 +12,16 @@ namespace Nox.Dynamic.Migrations.Providers
     internal class SqlServerMigrationProvider
     {
 
-        private readonly IConfiguration _configuration;
-
         private readonly ILogger _logger;
 
-        public SqlServerMigrationProvider(IConfiguration configuration, ILogger logger)
+        public SqlServerMigrationProvider(ILogger logger)
         {
-            _configuration = configuration;
             _logger = logger;
         }
 
         public async Task<bool> ValidateDatabaseSchemaAsync(Service service)
         {
-            var masterConnectionString = ConnectionString(service.Database, "master");
+            var masterConnectionString = ConnectionStringToMaster(service.Database);
             
             using (var connection = new SqlConnection(masterConnectionString))
             {
@@ -32,28 +29,21 @@ namespace Nox.Dynamic.Migrations.Providers
                 await EnsureDatabaseExists(connection, service.Database.Name);
             }
 
-            var connectionString = ConnectionString(service.Database);
+            var connectionString = service.Database.ConnectionString;
             using (var connection = new SqlConnection(connectionString))
             {
                 await connection.OpenAsync();
                 await ValidateTables(connection, service.Entities);
             }
 
-            service.Database.ConnectionString = connectionString;
-
             return true;
         }
 
-        private static string ConnectionString(ServiceDatabase dbDefinition, string? db = null)
+        private static string ConnectionStringToMaster(ServiceDatabase dbDefinition)
         {
-            db ??= dbDefinition.Name;
-
-            var csb = new SqlConnectionStringBuilder(dbDefinition.Options)
+            var csb = new SqlConnectionStringBuilder(dbDefinition.ConnectionString)
             {
-                DataSource = dbDefinition.Server,
-                UserID = dbDefinition.User,
-                Password = dbDefinition.Password,
-                InitialCatalog = db
+                InitialCatalog = "master"
             };
 
             return csb.ConnectionString;

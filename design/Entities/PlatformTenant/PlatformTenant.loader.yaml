@@ -17,7 +17,7 @@ Target:
 
 Sources:
   - ConnectionVariable: ConnectionString:MasterDataSource
-    DatabaseProvider: SqlServer
+    Provider: SqlServer
     MinimumExpectedRecords: 2
     Query: >-
       SELECT 1 AS [Id], 'International Workplace Group (IWG) PLC' AS [Name]

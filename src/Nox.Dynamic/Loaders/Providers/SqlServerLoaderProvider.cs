@@ -10,14 +10,10 @@ namespace Nox.Dynamic.Loaders.Providers
     internal class SqlServerLoaderProvider
     {
 
-        private readonly IConfiguration _configuration;
-
         private readonly ILogger _logger;
 
-        public SqlServerLoaderProvider(IConfiguration configuration, ILogger logger)
+        public SqlServerLoaderProvider(ILogger logger)
         {
-            _configuration = configuration;
-
             _logger = logger;
         }
 
@@ -47,7 +43,7 @@ namespace Nox.Dynamic.Loaders.Providers
             return true;
         }
 
-        private async Task UpdateMetaDataTables(SqlConnection connectionTarget, Service service)
+        private static async Task UpdateMetaDataTables(SqlConnection connectionTarget, Service service)
         {
             var type = service.GetType();
             var table = $"[meta].[{type.Name}]";
@@ -73,11 +69,9 @@ namespace Nox.Dynamic.Loaders.Providers
         {
             foreach (var source in loader.Sources)
             {
-                var sourceConnectionString = _configuration[source.ConnectionVariable];
-
-                if (sourceConnectionString is not null)
+                if (source.ConnectionString is not null)
                 {
-                    using var connectionSource = new SqlConnection(sourceConnectionString);
+                    using var connectionSource = new SqlConnection(source.ConnectionString);
                     
                     await connectionSource.OpenAsync();
 
@@ -189,7 +183,7 @@ namespace Nox.Dynamic.Loaders.Providers
 
             foreach (var dateColumn in loader.LoadStrategy.Columns)
             {
-                var lastMergeDateTimeStamp = await GetLastMergeDateTimeStamp(connectionTarget, entity, loader.Name, dateColumn);
+                var lastMergeDateTimeStamp = await GetLastMergeDateTimeStamp(connectionTarget, loader.Name, dateColumn);
 
                 sb.Append($" OR ([{dateColumn}] IS NOT NULL AND [{dateColumn}] > '{lastMergeDateTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}')");
 
@@ -286,7 +280,7 @@ namespace Nox.Dynamic.Loaders.Providers
             {
                 if (updated)
                 {
-                    await SetLastMergeDateTimeStamp(connectionTarget, entity, loader.Name, dateColumn, lastMergeDateTimeStamp);
+                    await SetLastMergeDateTimeStamp(connectionTarget, loader.Name, dateColumn, lastMergeDateTimeStamp);
                 }
             }
 
@@ -294,9 +288,9 @@ namespace Nox.Dynamic.Loaders.Providers
 
         }
 
-        private async Task<DateTime> GetLastMergeDateTimeStamp(SqlConnection connectionTarget, Entity entity, string loaderName, string dateColumn)
+        private static async Task<DateTime> GetLastMergeDateTimeStamp(SqlConnection connectionTarget, string loaderName, string dateColumn)
         {
-            DateTime lastMergeDateTime = new DateTime(1900,1,1);
+            var lastMergeDateTime = new DateTime(1900,1,1);
 
             using var findCommand = new SqlCommand(
                 @$"SELECT [LastDateLoaded] FROM [meta].[{Constants.Database.MergeStateTable}] 
@@ -327,7 +321,7 @@ namespace Nox.Dynamic.Loaders.Providers
             return (DateTime)result;
         }
 
-        private async Task<bool> SetLastMergeDateTimeStamp(SqlConnection connectionTarget, Entity entity, string loaderName, string dateColumn, DateTime lastMergeDateTime)
+        private async Task<bool> SetLastMergeDateTimeStamp(SqlConnection connectionTarget, string loaderName, string dateColumn, DateTime lastMergeDateTime)
         {
 
             _logger.LogInformation("...setting last merge date for {loaderName}.{dateColumn} to {lastMergeDateTime}", loaderName, dateColumn, lastMergeDateTime);

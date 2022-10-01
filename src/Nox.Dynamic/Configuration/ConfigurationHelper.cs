@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
 
 namespace Nox.Dynamic.Configuration;

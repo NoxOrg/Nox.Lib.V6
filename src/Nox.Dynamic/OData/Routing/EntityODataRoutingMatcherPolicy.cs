@@ -29,10 +29,10 @@ namespace Nox.Dynamic.OData.Routing
     {
         private readonly IODataTemplateTranslator _translator;
 
-        private readonly DynamicDbModel _dynamicDbModel;
+        private readonly DynamicModel _dynamicDbModel;
 
         public EntityODataRoutingMatcherPolicy(IODataTemplateTranslator translator,
-            DynamicDbModel dynamicDbModel)
+            DynamicModel dynamicDbModel)
         {
             _translator = translator;
             _dynamicDbModel = dynamicDbModel;

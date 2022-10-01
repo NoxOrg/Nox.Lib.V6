@@ -22,7 +22,7 @@ Target:
 
 Sources:
   - ConnectionVariable: ConnectionString:MasterDataSource
-    DatabaseProvider: SqlServer
+    Provider: SqlServer
     MinimumExpectedRecords: 160
     Query: >-
       SELECT [CurrencyID] AS [Id]

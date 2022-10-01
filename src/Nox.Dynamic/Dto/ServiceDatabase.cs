@@ -9,5 +9,7 @@
         public string Password { get; set; } = "password";
         public string Options { get; set; } = "";
         public string? ConnectionString { get; set; }
+        public string? ConnectionVariable { get; set; }
+
     }
 }

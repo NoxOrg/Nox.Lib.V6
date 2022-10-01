@@ -10,6 +10,7 @@ namespace Nox.Dynamic.Dto
     {
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public string KeyVaultUri { get; set; } = "https://we-key-Nox-02.vault.azure.net/";
         public ServiceDatabase Database { get; set; } = new();
         public Dictionary<string,Entity> Entities { get; set; } = null!;
         public Dictionary<string,Loader> Loaders { get; set; } = null!;

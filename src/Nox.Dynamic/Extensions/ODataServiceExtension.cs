@@ -22,7 +22,7 @@ namespace Nox.Dynamic.Extensions
                 .Select().Filter().OrderBy().Count().Expand().SkipToken().SetMaxTop(100)
             );
 
-            services.AddSingleton<DynamicDbModel>();
+            services.AddSingleton<DynamicModel>();
 
             services.AddDbContext<DynamicDbContext>();
 

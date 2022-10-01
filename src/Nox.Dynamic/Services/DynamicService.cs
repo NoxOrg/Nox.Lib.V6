@@ -5,6 +5,9 @@ using Nox.Dynamic.Loaders.Providers;
 using Nox.Dynamic.Migrations.Providers;
 using System.Collections.ObjectModel;
 using YamlDotNet.Serialization;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Azure.KeyVault;
+using System.Data.SqlClient;
 
 namespace Nox.Dynamic.Services
 {
@@ -23,7 +26,7 @@ namespace Nox.Dynamic.Services
 
             if (_service.Database is not null)
             {
-                var migrationProvider = new SqlServerMigrationProvider(_configuration, _logger);
+                var migrationProvider = new SqlServerMigrationProvider(_logger);
 
                 return await migrationProvider.ValidateDatabaseSchemaAsync(_service);
             }
@@ -39,7 +42,7 @@ namespace Nox.Dynamic.Services
 
             if (_service.Database is not null)
             {
-                var loaderProvider = new SqlServerLoaderProvider(_configuration, _logger);
+                var loaderProvider = new SqlServerLoaderProvider(_logger);
 
                 return await loaderProvider.ExecuteLoadersAsync(_service);
             }
@@ -71,7 +74,6 @@ namespace Nox.Dynamic.Services
             private readonly IDeserializer _deserializer;
 
             private ILogger _logger = null!;
-
 
             public Builder()
             {
@@ -113,6 +115,8 @@ namespace Nox.Dynamic.Services
 
             public DynamicService Build()
             {
+                ResolveAllConnectionStrings();
+
                 return _dynamicService;
             }
 
@@ -148,6 +152,100 @@ namespace Nox.Dynamic.Services
 
                 return File.ReadAllText(fileName);
             }
+
+            private void ResolveAllConnectionStrings()
+            {
+                _logger.LogInformation("Resolving all connection strings...");
+
+                var config = _dynamicService._configuration;
+
+                var vaultUri = _dynamicService._service.KeyVaultUri;
+
+                var databases = GetServiceDatabasesFromDefinition();
+
+                var variables = databases
+                    .Where(d => string.IsNullOrEmpty(d.ConnectionString))
+                    .Where(d => !string.IsNullOrEmpty(d.ConnectionVariable))
+                    .Select(d => d.ConnectionVariable ?? "")
+                    .ToHashSet()
+                    .ToDictionary(v => v, v => config[v], StringComparer.OrdinalIgnoreCase);
+
+                var azureServiceTokenProvider = new AzureServiceTokenProvider();
+
+                var keyVault = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+
+                foreach (var key in variables.Keys)
+                {
+
+                    if (variables[key] == null)
+                    {
+                        _logger.LogInformation("...Resolving variable [{key}] from secrets vault {vault}", key, vaultUri);
+                        variables[key] = keyVault.GetSecretAsync(vaultUri, key.Replace(":", "--")).GetAwaiter().GetResult().Value;
+                    }
+                    else
+                    {
+                        _logger.LogInformation("...Resolving variable [{key}] from app configuration", key);
+                    }
+
+                }
+
+                foreach(var db in databases)
+                {
+                    ResolveConnectionString(db, variables);
+                }
+
+            }
+
+            private IList<ServiceDatabase> GetServiceDatabasesFromDefinition()
+            {
+                var serviceDatabases = new List<ServiceDatabase>();
+
+                serviceDatabases.Add(_dynamicService._service.Database);
+
+                foreach (var kvp in _dynamicService._service.Loaders)
+                {
+                    foreach (var db in kvp.Value.Sources)
+                    {
+                        serviceDatabases.Add(db);
+                    }
+                }
+
+                return serviceDatabases;
+            }
+
+            private void ResolveConnectionString(ServiceDatabase serviceDb, IDictionary<string,string> variables)
+            {
+                if (!string.IsNullOrEmpty(serviceDb.ConnectionString))
+                {
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(serviceDb.ConnectionVariable))
+                {
+                    var connectionString = variables[serviceDb.ConnectionVariable];
+
+                    if (!string.IsNullOrEmpty(connectionString))
+                    {
+                        serviceDb.ConnectionString = connectionString;
+                        return;
+                    }
+
+                }
+
+                var csb = new SqlConnectionStringBuilder(serviceDb.Options)
+                {
+                    DataSource = serviceDb.Server,
+                    UserID = serviceDb.User,
+                    Password = serviceDb.Password,
+                    InitialCatalog = serviceDb.Name
+                };
+
+                serviceDb.ConnectionString = csb.ConnectionString;
+
+                return;
+
+            }
+
 
         }
 

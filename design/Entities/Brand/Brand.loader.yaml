@@ -23,7 +23,7 @@ Target:
 
 Sources:
   - ConnectionVariable: ConnectionString:MasterDataSource
-    DatabaseProvider: SqlServer
+    Provider: SqlServer
     MinimumExpectedRecords: 30 
     Query: >-
       SELECT 
