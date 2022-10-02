@@ -10,7 +10,7 @@ namespace Nox.Dynamic.Dto
     {
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public string Type { get; set; } = string.Empty;
+        public string Type { get; set; } = "string";
         public bool IsPrimaryKey { get; set; } = false;
         public bool IsAutoNumber { get; set; } = false;
         public bool IsForeignKey { get; set; } = false;
@@ -23,7 +23,7 @@ namespace Nox.Dynamic.Dto
         public int MinValue { get; set; } = int.MinValue;
         public int MaxValue { get; set; } = int.MaxValue;
         public int Precision { get; set; } = 2;
-        public object Default { get; set; } = string.Empty;
+        public object? Default { get; set; }
 
         public Type NetDataType()
         {

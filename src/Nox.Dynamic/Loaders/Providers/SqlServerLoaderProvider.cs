@@ -173,7 +173,7 @@ namespace Nox.Dynamic.Loaders.Providers
             Loader loader)
         {
 
-            var newLastMergeDateTimeStamp = new Dictionary<string, (DateTime LastMergeDateTimeStamp, bool Updated)>();
+            var newLastMergeDateTimeStamp = new Dictionary<string, (DateTimeOffset LastMergeDateTimeStamp, bool Updated)>();
 
             var containsWhere = Regex.IsMatch(loaderSource.Query, @"\s+WHERE\s+", RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
@@ -185,7 +185,7 @@ namespace Nox.Dynamic.Loaders.Providers
             {
                 var lastMergeDateTimeStamp = await GetLastMergeDateTimeStamp(connectionTarget, loader.Name, dateColumn);
 
-                sb.Append($" OR ([{dateColumn}] IS NOT NULL AND [{dateColumn}] > '{lastMergeDateTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}')");
+                sb.Append($" OR ([{dateColumn}] IS NOT NULL AND [{dateColumn}] > '{lastMergeDateTimeStamp:yyyy-MM-dd HH:mm:ss.fff}')");
 
                 newLastMergeDateTimeStamp[dateColumn] = new() { LastMergeDateTimeStamp=lastMergeDateTimeStamp, Updated = false };
             }
@@ -247,8 +247,10 @@ namespace Nox.Dynamic.Loaders.Providers
                         var dateValue = reader[dateColumn];
     
                         if (dateValue == DBNull.Value) continue;
-    
-                        var date = (DateTime)dateValue;
+
+                        // TODO: Check if it is DateTime or DateTimeOffset and cast appropriately
+
+                        var date = new DateTimeOffset((DateTime)dateValue,new TimeSpan());
     
                         if (date > lastMergeDateTimeStamp)
                         {
@@ -288,9 +290,9 @@ namespace Nox.Dynamic.Loaders.Providers
 
         }
 
-        private static async Task<DateTime> GetLastMergeDateTimeStamp(SqlConnection connectionTarget, string loaderName, string dateColumn)
+        private static async Task<DateTimeOffset> GetLastMergeDateTimeStamp(SqlConnection connectionTarget, string loaderName, string dateColumn)
         {
-            var lastMergeDateTime = new DateTime(1900,1,1);
+            var lastMergeDateTime = new DateTimeOffset(1900,1,1,0,0,0,new TimeSpan());
 
             using var findCommand = new SqlCommand(
                 @$"SELECT [LastDateLoaded] FROM [meta].[{Constants.Database.MergeStateTable}] 
@@ -318,10 +320,11 @@ namespace Nox.Dynamic.Loaders.Providers
                 return lastMergeDateTime;
             }
 
-            return (DateTime)result;
+            return (DateTimeOffset)result;
         }
 
-        private async Task<bool> SetLastMergeDateTimeStamp(SqlConnection connectionTarget, string loaderName, string dateColumn, DateTime lastMergeDateTime)
+        private async Task<bool> SetLastMergeDateTimeStamp(SqlConnection connectionTarget, string loaderName, 
+            string dateColumn, DateTimeOffset lastMergeDateTime)
         {
 
             _logger.LogInformation("...setting last merge date for {loaderName}.{dateColumn} to {lastMergeDateTime}", loaderName, dateColumn, lastMergeDateTime);

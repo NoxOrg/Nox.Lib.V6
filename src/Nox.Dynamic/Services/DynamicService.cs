@@ -8,6 +8,7 @@ using YamlDotNet.Serialization;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.KeyVault;
 using System.Data.SqlClient;
+using Nox.Dynamic.Exceptions;
 
 namespace Nox.Dynamic.Services
 {
@@ -19,6 +20,14 @@ namespace Nox.Dynamic.Services
         private ILogger _logger = null!;
 
         private Service _service = null!;
+        public IReadOnlyDictionary<string, Entity> Entities => new ReadOnlyDictionary<string, Entity>(_service.Entities);
+
+        public IReadOnlyDictionary<string, Api> Apis => new ReadOnlyDictionary<string, Api>(
+            _service.Apis.Values.ToDictionary(x => x.Name, x => x)
+        );
+
+        public string? DatabaseConnectionString() => _service.Database.ConnectionString;
+
 
         public async Task<bool> ValidateDatabaseSchemaAsync()
         {
@@ -52,11 +61,6 @@ namespace Nox.Dynamic.Services
             return false;
         }
 
-        public IReadOnlyDictionary<string, Entity> Entities => new ReadOnlyDictionary<string, Entity>(_service.Entities);
-
-        public string? DatabaseConnectionString() => _service.Database.ConnectionString;
-
-
         public class Builder
         {
             // Constants
@@ -66,6 +70,8 @@ namespace Nox.Dynamic.Services
             private const string ENTITITY_DEFINITION_PATTERN = @"*.entity.yaml";
 
             private const string LOADER_DEFINITION_PATTERN = @"*.loader.yaml";
+            
+            private const string API_DEFINITION_PATTERN = @"*.api.yaml";
 
             // Class def
 
@@ -90,6 +96,9 @@ namespace Nox.Dynamic.Services
                     .ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
 
                 service.Loaders = ReadLoaderDefinitionsFromFolder(rootFolder)
+                    .ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
+
+                service.Apis = ReadApiDefinitionsFromFolder(rootFolder)
                     .ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
 
                 _dynamicService._service = service;
@@ -146,6 +155,14 @@ namespace Nox.Dynamic.Services
                     .ToList();
             }
 
+            private List<Api> ReadApiDefinitionsFromFolder(string rootFolder)
+            {
+                return Directory
+                    .EnumerateFiles(rootFolder, API_DEFINITION_PATTERN, SearchOption.AllDirectories)
+                    .Select(f => _deserializer.Deserialize<Api>(ReadDefinitionFile(f)))
+                    .ToList();
+            }
+
             private string ReadDefinitionFile(string fileName)
             {
                 _logger.LogInformation("Reading definition from {fileName}", fileName.Replace('\\', '/'));
@@ -172,9 +189,21 @@ namespace Nox.Dynamic.Services
                     .ToHashSet()
                     .ToDictionary(v => v, v => config[v], StringComparer.OrdinalIgnoreCase);
 
-                // try nox key vault otherwise
+                // try key vault where app configuration is missing 
+                if (variables.Any(v => v.Value == null))
+                {
+                    TryAddMissingConfigsFromKeyVault(vaultUri, variables);
+                }
 
-                TryAddMissingConfigsFromKeyVault(vaultUri, variables);
+                if (variables.Any(v => v.Value == null))
+                {
+                    var variableNames = string.Join( ',', variables
+                        .Where(v => v.Value == null)
+                        .Select(v => v.Key)
+                        .ToArray()
+                    );
+                    throw new ConfigurationNotFoundException(variableNames);
+                }
 
                 foreach (var db in databases)
                 {
@@ -217,9 +246,10 @@ namespace Nox.Dynamic.Services
 
             private IList<ServiceDatabase> GetServiceDatabasesFromDefinition()
             {
-                var serviceDatabases = new List<ServiceDatabase>();
-
-                serviceDatabases.Add(_dynamicService._service.Database);
+                var serviceDatabases = new List<ServiceDatabase>
+                {
+                    _dynamicService._service.Database
+                };
 
                 foreach (var kvp in _dynamicService._service.Loaders)
                 {
@@ -232,7 +262,7 @@ namespace Nox.Dynamic.Services
                 return serviceDatabases;
             }
 
-            private void ResolveConnectionString(ServiceDatabase serviceDb, IDictionary<string,string> variables)
+            private static void ResolveConnectionString(ServiceDatabase serviceDb, IDictionary<string,string> variables)
             {
                 if (!string.IsNullOrEmpty(serviceDb.ConnectionString))
                 {

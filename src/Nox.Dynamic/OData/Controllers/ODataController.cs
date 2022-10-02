@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.OData.UriParser;
 using Nox.Dynamic.OData.Models;
 using System.Reflection;
@@ -92,7 +91,7 @@ namespace Nox.Dynamic.OData.Controllers
             }
             catch (TargetInvocationException)
             {
-                return new ConflictODataResult("Entity with supplied key already exists.");
+                return new ConflictODataResult("Entity with the specified key already exists.");
             }
 
         }

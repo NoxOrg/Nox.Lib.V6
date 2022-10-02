@@ -27,13 +27,15 @@ namespace Nox.Dynamic.OData.Models
 
         private readonly Dictionary<string, DynamicDbEntity> _dynamicDbEntities = new();
 
-        private string? _connectionString;
+        private readonly DynamicService _dynamicService;
 
         public DynamicModel(IConfiguration config, ILogger<DynamicModel> logger)
         {
             _config = config;
 
             _logger = logger;
+
+            _dynamicService = GetDynamicService();
 
             var builder = new ODataConventionModelBuilder();
 
@@ -83,7 +85,7 @@ namespace Nox.Dynamic.OData.Models
 
         }
 
-        public string GetDatabaseConnectionString() => _connectionString!;
+        public string GetDatabaseConnectionString() => _dynamicService.DatabaseConnectionString() ?? "";
 
         public ModelBuilder ConfigureDbContextModel(ModelBuilder modelBuilder)
         {
@@ -151,7 +153,10 @@ namespace Nox.Dynamic.OData.Models
 
             return ret!;
         }
-        private Dictionary<string, (Entity Entity, TypeBuilder TypeBuilder)> GetTablesAndTypeBuilders()
+
+        public DynamicService Configuration => _dynamicService;
+
+        private DynamicService GetDynamicService()
         {
             var dynamicService = new DynamicService.Builder()
                 .WithLogger(_logger)
@@ -159,13 +164,16 @@ namespace Nox.Dynamic.OData.Models
                 .FromRootFolder(_config["Nox:DefinitionRootPath"])
                 .Build();
 
-            dynamicService.ValidateDatabaseSchemaAsync().Wait();
+            dynamicService.ValidateDatabaseSchemaAsync().GetAwaiter().GetResult();
 
-            dynamicService.ExecuteDataLoadersAsync().Wait();
+            dynamicService.ExecuteDataLoadersAsync().GetAwaiter().GetResult();
+            
+            return dynamicService;
+        }
 
-            _connectionString = dynamicService.DatabaseConnectionString();
-
-            var entities = dynamicService.Entities;
+        private Dictionary<string, (Entity Entity, TypeBuilder TypeBuilder)> GetTablesAndTypeBuilders()
+        {
+            var entities = _dynamicService.Entities;
 
             var aName = new AssemblyName("DynamicPoco");
 

@@ -193,7 +193,7 @@ namespace Nox.Dynamic.Migrations.Providers
 
         }
 
-        private void AddClassProperties(List<Property> properties, Type metaClass)
+        private static void AddClassProperties(List<Property> properties, Type metaClass)
         {
             var classProperties = metaClass.GetProperties();
             foreach (var prop in classProperties)
@@ -299,7 +299,7 @@ namespace Nox.Dynamic.Migrations.Providers
                 "char"      => prop.IsUnicode ? $"nchar({propWidth})" : $"char({propWidth})",
                 "guid"      => "guid",
                 "date"      => "date",
-                "datetime"  => "datetime2",
+                "datetime"  => "datetimeoffset",
                 "time"      => "time",
                 "timespan"  => "timespan",
                 "bool"      => "bit",

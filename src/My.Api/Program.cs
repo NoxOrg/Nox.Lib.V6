@@ -23,11 +23,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseNox();
+
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+
 
 
 
