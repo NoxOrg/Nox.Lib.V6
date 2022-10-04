@@ -7,28 +7,28 @@ Description: Workplace entity controller and endpoints
 
 Routes:
 
-  - Name: Currencies
+  - Name: Workplaces
     HttpVerb: GET
-    Description: Returns all currencies
-    TargetUrl: odata/Currencies
+    Description: Returns all workplaces
+    TargetUrl: odata/Workplaces
     Responses:
       - Type: Workplace
         IsCollection: true 
     
-  - Name: Currencies/{Id}
+  - Name: Workplace/{Id}
     HttpVerb: GET
-    Description: Returns a specific currency
+    Description: Returns a specific workplace
     Parameters:
       - Name: Id
         Type: int
-    TargetUrl: odata/Currencies({Id})
+    TargetUrl: odata/Workplaces({Id})
     Responses:
       - Type: Workplace
         IsCollection: false
 
-  - Name: CurrenciesWithPagination
+  - Name: WorkplacesWithPagination
     HttpVerb: GET
-    Description: Returns a specific currency
+    Description: Returns workplaces with pagination
     Parameters:
       - Name: PageNumber
         Type: int
@@ -36,7 +36,7 @@ Routes:
       - Name: PageSize
         Type: int
         Default: 20
-    TargetUrl: odata/Currencies?$skip={PageNumber}&$top={PageSize}
+    TargetUrl: odata/Workplaces?$skip={PageNumber}&$top={PageSize}
     Responses:
       - Type: Workplace
         IsCollection: true 

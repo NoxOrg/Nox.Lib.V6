@@ -10,7 +10,7 @@ Schema: dbo
 
 RelatedParents: [Currency]
 
-Properties:
+Attributes:
 
   - Name: Id
     Description: The country's unique identifier 
@@ -64,3 +64,4 @@ Properties:
   - Name: FlagSVG_4x3_Url
     Description: Internet location of SVG file for 4:3 image of the country's flag
     Type: url
+

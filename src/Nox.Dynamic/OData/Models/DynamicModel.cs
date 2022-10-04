@@ -1,6 +1,4 @@
 ﻿using Humanizer;
-using Humanizer.Inflections;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -9,11 +7,10 @@ using Microsoft.OData.ModelBuilder;
 using Nox.Dynamic.Dto;
 using Nox.Dynamic.Services;
 using Nox.Dynamic.Extensions;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text.Json;
+using Nox.Dynamic.Models;
 
 namespace Nox.Dynamic.OData.Models
 {
@@ -97,11 +94,52 @@ namespace Nox.Dynamic.OData.Models
 
                     // Modelvalue.Value field is an 'object' - needs new design for eg. Postgress
 
-                    value.Entity.Properties.Where(c => c.Type.ToLower().Equals("object")).ToList().ForEach(
-                        c => b.Property(c.Name).HasColumnType("sql_variant")
+                    foreach(var attr in value.Entity.Attributes)
+                    {
+                        var prop = b.Property(attr.Name);
+
+                        if (attr.Type.Equals("object"))
+                        {
+                            prop.HasColumnType("sql_variant");
+                        }
+
+                        if (attr.MaxWidth > 0 && attr.Precision > 0)
+                        {
+                            prop.HasPrecision(attr.MaxWidth,attr.Precision);
+                        }
+
+                        if (attr.MaxWidth > 0 && attr.Precision == 0)
+                        {
+                            prop.HasMaxLength(attr.MaxWidth);
+                        }
+
+                        if (attr.IsRequired)
+                        {
+                            prop.IsRequired();
+                        }
+
+                        if (attr.IsUnicode)
+                        {
+                            prop.IsUnicode();
+                        }
+
+                        if (attr.MaxWidth > 0 && (attr.MinWidth == attr.MaxWidth))
+                        {
+                            prop.IsFixedLength();
+                        }
+
+                    }
+
+                    value.Entity.Attributes.Where(c => c.Precision > 0 && c.MaxWidth > 0).ToList().ForEach(
+                        c => b.Property(c.Name).HasPrecision(c.MaxWidth,c.Precision)
+                    );
+
+                    value.Entity.Attributes.Where(c => c.MaxWidth > 0).ToList().ForEach(
+                        c => b.Property(c.Name).HasPrecision(c.MaxWidth, c.Precision)
                     );
 
                 });
+
             }
 
             return modelBuilder;
@@ -191,7 +229,7 @@ namespace Nox.Dynamic.OData.Models
 
                 tb.AddInterfaceImplementation(typeof(IDynamicEntity));
 
-                foreach (var col in entity.Properties)
+                foreach (var col in entity.Attributes)
                 {
                     tb.AddPublicGetSetProperty(col.Name, col.NetDataType());
                 }
@@ -206,7 +244,7 @@ namespace Nox.Dynamic.OData.Models
 
                 var tb = dynamicTypes[entityName].TypeBuilder;
 
-                foreach (var col in entity.Properties)
+                foreach (var col in entity.Attributes)
                 {
                     if (col.Name.Equals("Id")) continue;
 

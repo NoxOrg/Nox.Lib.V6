@@ -65,13 +65,13 @@ namespace Nox.Dynamic.Services
         {
             // Constants
 
-            private const string SERVICE_DEFINITION_PATTERN = @"*.service.yaml";
+            private const string SERVICE_DEFINITION_PATTERN = @"*.service.nox.yaml";
 
-            private const string ENTITITY_DEFINITION_PATTERN = @"*.entity.yaml";
+            private const string ENTITITY_DEFINITION_PATTERN = @"*.entity.nox.yaml";
 
-            private const string LOADER_DEFINITION_PATTERN = @"*.loader.yaml";
+            private const string LOADER_DEFINITION_PATTERN = @"*.loader.nox.yaml";
             
-            private const string API_DEFINITION_PATTERN = @"*.api.yaml";
+            private const string API_DEFINITION_PATTERN = @"*.api.nox.yaml";
 
             // Class def
 

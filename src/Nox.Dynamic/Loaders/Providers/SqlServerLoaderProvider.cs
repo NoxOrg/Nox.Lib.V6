@@ -140,7 +140,7 @@ namespace Nox.Dynamic.Loaders.Providers
 
             bulkCopy.SqlRowsCopied += (sender,e) => _logger.LogInformation("...bulk copying {count} records", e.RowsCopied);
 
-            var targetColumns = entity.Properties.Select(p => p.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var targetColumns = entity.Attributes.Select(p => p.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
             foreach(var col in (await reader.GetColumnSchemaAsync()).Select(c => c.ColumnName))
             {
@@ -202,9 +202,9 @@ namespace Nox.Dynamic.Loaders.Providers
                 return false;
             }
 
-            var primaryKeyProp = entity.Properties.Where(p => p.IsPrimaryKey).First();
+            var primaryKeyProp = entity.Attributes.Where(p => p.IsPrimaryKey).First();
 
-            var targetColumns = entity.Properties.Select(p => p.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var targetColumns = entity.Attributes.Select(p => p.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
             var matchingSourceColumns = (await reader.GetColumnSchemaAsync()).Select(c => c.ColumnName).Where(c => targetColumns.Contains(c)).ToArray();
 

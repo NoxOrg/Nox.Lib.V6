@@ -8,7 +8,7 @@ PluralName: Workplaces
 
 RelatedParents: [Brand,Country]
 
-Properties:
+Attributes:
 
   - Name: Id
     Description: The Workplace's unique identifier 
@@ -36,4 +36,28 @@ Properties:
     Type: decimal
     MaxWidth: 18
     Precision: 15
+
+  - Name: OpeningTime
+    Description: The opening time for the workplace
+    Type: time
+    Default: '08:30'
+    DefaultFromParents: [AdministrativeArea,Country]
+
+  - Name: ClosingTime
+    Description: The closing time for the workplace
+    Type: time
+    Default: '17:30'
+    DefaultFromParents: [AdministrativeArea,Country]
+
+  - Name: Is24Hour
+    Type: bool
+    Formula: AND(OpeningTime="00:00:00",ClosingTime="23:59:59")
+
+  - Name: IsPublicHoliday
+    Description: Is it a public holiday
+    Type: bool
+    Default: false
+    DefaultFromParents: [AdministrativeArea,Country]
+    IsTemporalOnly: true
+
 

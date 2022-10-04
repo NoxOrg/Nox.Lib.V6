@@ -8,7 +8,7 @@ PluralName: Currencies
 Table: Currency
 Schema: dbo
 
-Properties:
+Attributes:
 
   - Name: Id
     Description: The currency's unique identifier 

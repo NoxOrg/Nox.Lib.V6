@@ -130,7 +130,7 @@ namespace Nox.Dynamic.Migrations.Providers
                 {
                     var parentEntity = entities[parent];
                     
-                    var parentPK = parentEntity.Properties.Where(p => p.IsPrimaryKey).First();
+                    var parentPK = parentEntity.Attributes.Where(p => p.IsPrimaryKey).First();
                     
                     var fkName = parentPK.Name.StartsWith(parentEntity.Name, StringComparison.OrdinalIgnoreCase) 
                         ? parentPK.Name
@@ -139,7 +139,7 @@ namespace Nox.Dynamic.Migrations.Providers
                     _logger.LogInformation("...resolving relationship {child}({childFk}) -> {parent}({parentPk})", 
                         entity.Name, fkName, parentEntity.Name, parentPK.Name );
 
-                    entity.Properties.Add(new Property()
+                    entity.Attributes.Add(new EntityAttribute()
                     {
                         Name = fkName,
                         Type = parentPK.Type,
@@ -174,7 +174,7 @@ namespace Nox.Dynamic.Migrations.Providers
                     Description = "Metadata table",
                     Schema = "meta",
                     Table = metaClass.Name,
-                    Properties = new()
+                    Attributes = new()
                     {
                         new() { Name = "Id", Type = "int", IsPrimaryKey = true, IsAutoNumber = true },
                     }
@@ -182,7 +182,7 @@ namespace Nox.Dynamic.Migrations.Providers
 
                 _logger.LogInformation("Creating storage for metadata {meta}", metaClass.Name);
 
-                AddClassProperties(metadataTable.Properties, metaClass);
+                AddClassProperties(metadataTable.Attributes, metaClass);
 
                 await EnsureTableExists(connection, metadataTable);
 
@@ -193,7 +193,7 @@ namespace Nox.Dynamic.Migrations.Providers
 
         }
 
-        private static void AddClassProperties(List<Property> properties, Type metaClass)
+        private static void AddClassProperties(List<EntityAttribute> properties, Type metaClass)
         {
             var classProperties = metaClass.GetProperties();
             foreach (var prop in classProperties)
@@ -205,7 +205,7 @@ namespace Nox.Dynamic.Migrations.Providers
                 }
                 */
 
-                var p = new Property() { 
+                var p = new EntityAttribute() { 
                     Name = prop.Name,
                     Type = prop.PropertyType.Name,
                     IsRequired = true,
@@ -254,7 +254,7 @@ namespace Nox.Dynamic.Migrations.Providers
 
             var fieldPK = string.Empty;
 
-            foreach (var prop in entity.Properties)
+            foreach (var prop in entity.Attributes)
             {
                 var fieldName = prop.Name;
                 var fieldSqlType = MapToSqlType(prop);
@@ -278,7 +278,7 @@ namespace Nox.Dynamic.Migrations.Providers
             await cmdCreate.ExecuteNonQueryAsync();
         }
 
-        private static string MapToSqlType(Property prop)
+        private static string MapToSqlType(EntityAttribute prop)
         {
             var propType = prop.Type?.ToLower() ?? "string";
             var propWidth = prop.MaxWidth < 1 ? "max" : prop.MaxWidth.ToString();

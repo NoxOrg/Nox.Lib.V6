@@ -1,4 +1,4 @@
-﻿namespace Nox.Dynamic.OData.Models
+﻿namespace Nox.Dynamic.Models
 {
     public interface IDynamicEntity  {}
 

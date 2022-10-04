@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nox.Dynamic.Dto
 {
-    public class Property
+    public class EntityAttribute
     {
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
@@ -16,6 +16,7 @@ namespace Nox.Dynamic.Dto
         public bool IsForeignKey { get; set; } = false;
         public bool IsRequired { get; set; } = false;
         public bool IsUnicode { get; set; } = true;
+        public bool IsTemporalOnly { get; set; } = false;
         public bool CanFilter { get; set; } = false;
         public bool CanSort { get; set; } = false;
         public int MinWidth { get; set; } = 0;
@@ -24,6 +25,10 @@ namespace Nox.Dynamic.Dto
         public int MaxValue { get; set; } = int.MaxValue;
         public int Precision { get; set; } = 2;
         public object? Default { get; set; }
+        public string[] DefaultFromParents { get; set; } = Array.Empty<string>();
+        public string Formula { get; set; } = string.Empty;
+
+
 
         public Type NetDataType()
         {
@@ -38,10 +43,10 @@ namespace Nox.Dynamic.Dto
                 "guid" => typeof(Guid),
                 "url" => typeof(String),
                 "email" => typeof(String),
-                "date" => typeof(DateOnly),
-                "time" => typeof(TimeOnly),
+                "date" => typeof(DateTime),
+                "time" => typeof(DateTime),
                 "timespan" => typeof(TimeSpan),
-                "datetime" => typeof(DateTime),
+                "datetime" => typeof(DateTimeOffset),
                 "bool" => typeof(Boolean),
                 "boolean" => typeof(Boolean),
                 "object" => typeof(Object),

@@ -14,6 +14,7 @@ namespace Nox.Dynamic.Dto
         public string Table { get; set; } = null!;
         public string Schema { get; set; } = "dbo";
         public List<string> RelatedParents { get; set; } = Enumerable.Empty<string>().ToList();
-        public List<Property> Properties { get; set; } = Enumerable.Empty<Property>().ToList();
+        public List<EntityAttribute> Attributes { get; set; } = Enumerable.Empty<EntityAttribute>().ToList();
+
     }
 }

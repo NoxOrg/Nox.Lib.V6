@@ -5,7 +5,7 @@
 Name: PlatformTenant
 Description: Tenants of the platform
 
-Properties:
+Attributes:
 
   - Name: Id
     Description: The platform tenant's unique identifier 

@@ -3,6 +3,6 @@
     internal class LoaderLoadStrategy
     {
         public string Type { get; set; } = string.Empty;
-        public string[] Columns { get; set; } = new string[0];
+        public string[] Columns { get; set; } = Array.Empty<string>();
     }
 }

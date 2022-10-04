@@ -10,7 +10,7 @@ Schema: dbo
 
 RelatedParents: [PlatformTenant]
 
-Properties:
+Attributes:
 
   - Name: Id
     Description: The brand's unique identifier 
