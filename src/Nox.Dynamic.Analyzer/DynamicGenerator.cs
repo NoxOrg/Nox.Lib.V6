@@ -97,7 +97,7 @@ namespace SourceGenerator
                 "varchar" => "string",
                 "nvarchar" => "string",
                 "char" => "string",
-                "guid" => "guid",
+                "guid" => "Guid",
                 "url" => "string",
                 "email" => "string",
                 "date" => "DateTime",
