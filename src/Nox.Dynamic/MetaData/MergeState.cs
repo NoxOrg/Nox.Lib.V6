@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nox.Dynamic.Dto
+namespace Nox.Dynamic.MetaData
 {
-    internal class MergeState
+    public sealed class MergeState : MetaBase
     {
         public string Loader { get; set; } = String.Empty;
         public string Property { get; set; } = String.Empty;
-        public DateTime LastDateLoaded { get; set; }
+        public DateTimeOffset LastDateLoaded { get; set; }
             
     }
 }

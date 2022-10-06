@@ -1,6 +1,6 @@
-﻿namespace Nox.Dynamic.Dto
+﻿namespace Nox.Dynamic.MetaData
 {
-    internal class LoaderScheduleRetryPolicy
+    public sealed class LoaderScheduleRetryPolicy : MetaBase
     {
         public int Limit { get; set; } = 5;
         public int DelaySeconds { get; set; } = 60;

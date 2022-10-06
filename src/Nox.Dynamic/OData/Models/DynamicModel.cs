@@ -4,13 +4,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
-using Nox.Dynamic.Dto;
+using Nox.Dynamic.MetaData;
 using Nox.Dynamic.Services;
 using Nox.Dynamic.Extensions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text.Json;
 using Nox.Dynamic.Models;
+using Nox.Dynamic.ExtendedAttributes;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Nox.Dynamic.OData.Models
 {
@@ -80,42 +82,59 @@ namespace Nox.Dynamic.OData.Models
 
             _edmModel = builder.GetEdmModel();
 
+            var dbContext = new DynamicDbContext(this);
+           
+            dbContext.ValidateSchema(_dynamicService);
+
         }
 
         public string GetDatabaseConnectionString() => _dynamicService.DatabaseConnectionString() ?? "";
 
         public ModelBuilder ConfigureDbContextModel(ModelBuilder modelBuilder)
         {
-            foreach (var (key,value) in _dynamicDbEntities)
+            foreach (var (key,entity) in _dynamicDbEntities)
             {
-                modelBuilder.Entity(value.Type, b => {
+                modelBuilder.Entity(entity.Type, b => {
 
-                    b.ToTable(value.Entity.Name);
+                    b.ToTable(entity.Entity.Table, entity.Entity.Schema);
 
-                    // Modelvalue.Value field is an 'object' - needs new design for eg. Postgress
-
-                    foreach(var attr in value.Entity.Attributes)
+                    foreach(var attr in entity.Entity.Attributes)
                     {
                         var prop = b.Property(attr.Name);
 
-                        if (attr.Type.Equals("object"))
-                        {
-                            prop.HasColumnType("sql_variant");
-                        }
+                        var netType = attr.NetDataType();
 
-                        if (attr.MaxWidth > 0 && attr.Precision > 0)
-                        {
-                            prop.HasPrecision(attr.MaxWidth,attr.Precision);
-                        }
+                        prop.HasColumnType(attr.MapToSqlServerType());
 
-                        if (attr.MaxWidth > 0 && attr.Precision == 0)
+                        if (netType.Equals(typeof(string)))
                         {
                             prop.HasMaxLength(attr.MaxWidth);
                         }
 
-                        if (attr.IsRequired)
+                        else if (attr.IsDateTimeType())
                         {
-                            prop.IsRequired();
+                            // don't set Maxwidth, throw's error on db create
+                        }
+
+                        else if (attr.MaxWidth > 0 && attr.Precision > 0)
+                        {
+                            prop.HasPrecision(attr.MaxWidth, attr.Precision);
+                        }
+
+                        try
+                        {
+                            prop.IsRequired(attr.IsRequired);
+                        }
+                        catch { }
+
+                        if (attr.IsPrimaryKey)
+                        {
+                            b.HasKey( new string[] { attr.Name });
+
+                            if (!attr.IsAutoNumber)
+                            {
+                                prop.ValueGeneratedNever();
+                            }
                         }
 
                         if (attr.IsUnicode)
@@ -123,27 +142,68 @@ namespace Nox.Dynamic.OData.Models
                             prop.IsUnicode();
                         }
 
-                        if (attr.MaxWidth > 0 && (attr.MinWidth == attr.MaxWidth))
+                        if (attr.MinWidth == attr.MaxWidth)
                         {
                             prop.IsFixedLength();
                         }
 
                     }
 
-                    value.Entity.Attributes.Where(c => c.Precision > 0 && c.MaxWidth > 0).ToList().ForEach(
-                        c => b.Property(c.Name).HasPrecision(c.MaxWidth,c.Precision)
-                    );
-
-                    value.Entity.Attributes.Where(c => c.MaxWidth > 0).ToList().ForEach(
-                        c => b.Property(c.Name).HasPrecision(c.MaxWidth, c.Precision)
-                    );
-
                 });
+
+                AddMetadataFromNamespace(modelBuilder, typeof(Service), "meta");
+
+                AddMetadataFromNamespace(modelBuilder, typeof(XtendedAttributeValue), "dbo");
+
 
             }
 
             return modelBuilder;
         }
+
+        private static void AddMetadataFromNamespace(ModelBuilder modelBuilder, Type typeInNamespace, string schema)
+        {
+
+            var nsTypes = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => t.IsClass && t.IsSealed && t.Namespace == typeInNamespace.Namespace);
+
+            foreach (var metaType in nsTypes)
+            {
+                modelBuilder.Entity(metaType, b =>
+                {
+                    b.ToTable(metaType.Name, schema);
+
+                    var entityTypes = modelBuilder.Model.GetEntityTypes();
+
+                    var properties = entityTypes
+                        .First(e => e.ClrType.Name == metaType.Name)
+                        .ClrType
+                        .GetProperties();
+
+                    
+                    foreach (var prop in properties)
+                    {
+                        if (prop.GetCustomAttributes(typeof(NotMappedAttribute), false).Length > 0)
+                            continue;
+
+                        var typeString = prop.PropertyType.Name.ToLower();
+
+                        if ("|object|list`1|string[]|".Contains($"|{typeString}|"))
+                        {
+                            b.Property(prop.Name).HasColumnType("sql_variant");
+                            continue;
+                        }
+
+                        if (prop.Name == "Name" && typeString == "string")
+                        {
+                            b.Property(prop.Name).HasMaxLength(128);
+                            continue;
+                        }
+                    }
+                });
+            }
+        }
+
 
         public IEdmModel GetEdmModel()
         {
@@ -202,10 +262,6 @@ namespace Nox.Dynamic.OData.Models
                 .FromRootFolder(_config["Nox:DefinitionRootPath"])
                 .Build();
 
-            dynamicService.ValidateDatabaseSchemaAsync().GetAwaiter().GetResult();
-
-            dynamicService.ExecuteDataLoadersAsync().GetAwaiter().GetResult();
-            
             return dynamicService;
         }
 
@@ -223,9 +279,7 @@ namespace Nox.Dynamic.OData.Models
 
             foreach (var (_,entity) in entities)
             {
-                var entityName = entity.Name.TrimStart('_');
-
-                TypeBuilder tb = mb.DefineType(entityName, TypeAttributes.Public, null);
+                TypeBuilder tb = mb.DefineType(entity.Name, TypeAttributes.Public, null);
 
                 tb.AddInterfaceImplementation(typeof(IDynamicEntity));
 
@@ -234,31 +288,25 @@ namespace Nox.Dynamic.OData.Models
                     tb.AddPublicGetSetProperty(col.Name, col.NetDataType());
                 }
 
-                dynamicTypes.Add(entityName, (entity, tb));
+                dynamicTypes.Add(entity.Name, (entity, tb));
 
             }
 
             foreach (var (key, entity) in entities)
             {
-                var entityName = entity.Name.TrimStart('_');
-
-                var tb = dynamicTypes[entityName].TypeBuilder;
+                var tb = dynamicTypes[entity.Name].TypeBuilder;
 
                 foreach (var col in entity.Attributes)
                 {
-                    if (col.Name.Equals("Id")) continue;
+                    foreach (var relatedEntityName in entity.RelatedParents)
+                    {
+                        var relatedTb = dynamicTypes[relatedEntityName].TypeBuilder;
 
-                    if (!col.Name.EndsWith("Id")) continue;
+                        tb.AddPublicGetSetProperty(relatedEntityName, relatedTb);
 
-                    var relatedEntityName = col.Name[..^2];
+                        relatedTb.AddPublicGetSetPropertyAsList(entity.PluralName, tb);
+                    }
 
-                    if (relatedEntityName.Equals("Entity")) continue; // Compound PK (ModelEntityId+EntityId). Skip for now..
-
-                    var relatedTb = dynamicTypes[relatedEntityName].TypeBuilder;
-
-                    tb.AddPublicGetSetProperty(relatedEntityName, relatedTb);
-
-                    relatedTb.AddPublicGetSetPropertyAsList(entity.PluralName ?? entityName.Pluralize(), tb);
                 }
             }
 

@@ -1,4 +1,4 @@
-﻿using Nox.Dynamic.Dto;
+﻿using Nox.Dynamic.MetaData;
 using System;
 using System.Reflection;
 using System.Reflection.Emit;

@@ -1,6 +1,6 @@
-﻿namespace Nox.Dynamic.Dto
+﻿namespace Nox.Dynamic.MetaData
 {
-    internal class ServiceDatabase
+    public sealed class LoaderSource : MetaBase, IServiceDatabase
     {
         public string Name { get; set; } = string.Empty;
         public string Provider { get; set; } = "SqlServer";
@@ -10,6 +10,7 @@
         public string Options { get; set; } = "";
         public string? ConnectionString { get; set; }
         public string? ConnectionVariable { get; set; }
-
+        public string Query { get; set; } = string.Empty;
+        public int MinimumExpectedRecords { get; set; } = 0;
     }
 }

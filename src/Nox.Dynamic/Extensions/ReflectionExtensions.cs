@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -9,10 +8,11 @@ namespace Nox.Dynamic.Extensions
     {
         public static FieldBuilder AddPublicGetSetPropertyAsList(this TypeBuilder tb, string propertyName, Type listType)
         {
-            return AddPublicGetSetProperty(tb, propertyName, typeof(List<>).MakeGenericType(new[] { listType }));
+            return AddPublicGetSetProperty(tb, propertyName, typeof(Collection<>).MakeGenericType(new[] { listType }));
         }
 
-        public static FieldBuilder AddPublicGetSetProperty(this TypeBuilder tb, string propertyName, Type propertyType)
+        public static FieldBuilder AddPublicGetSetProperty(this TypeBuilder tb, 
+            string propertyName, Type propertyType)
         {
             var getSetAttr = MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig;
 

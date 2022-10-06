@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
-using Nox.Dynamic.Dto;
+using Nox.Dynamic.MetaData;
 using Nox.Dynamic.OData.Models;
 using System.Dynamic;
 using System.Text.Json;

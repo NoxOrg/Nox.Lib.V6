@@ -37,8 +37,6 @@ namespace Nox.Cli.Commands
                 .FromRootFolder(_configuration["DefinitionRootPath"])
                 .Build();
 
-            _ = await dynamicService.ValidateDatabaseSchemaAsync();
-
             _ = await dynamicService.ExecuteDataLoadersAsync();
 
             return 1;

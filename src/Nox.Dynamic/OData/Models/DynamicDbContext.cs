@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Nox.Dynamic.Extensions;
+using Nox.Dynamic.Services;
 using System.Text.Json;
 
 namespace Nox.Dynamic.OData.Models
@@ -19,6 +20,11 @@ namespace Nox.Dynamic.OData.Models
             _dynamicDbModel = dynamicDbModel;
         }
 
+        public DynamicDbContext(DynamicModel dynamicDbModel)
+        {
+            _dynamicDbModel = dynamicDbModel;
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -30,11 +36,17 @@ namespace Nox.Dynamic.OData.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             _dynamicDbModel?.ConfigureDbContextModel(modelBuilder);
-
-            OnModelCreatingPartial(modelBuilder);
         }
 
-        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+        // Db Creating and Seeding
+        public void ValidateSchema(DynamicService dynamicService)
+        {
+
+            Database.EnsureCreated();
+
+            dynamicService.ExecuteDataLoadersAsync().GetAwaiter().GetResult();
+        }
+
 
         // Methods for Controller access
         public IQueryable GetDynamicCollection(string dbSetName)
@@ -62,7 +74,7 @@ namespace Nox.Dynamic.OData.Models
             return _dynamicDbModel?.PostDynamicObject(this, dbSetName, obj)!;
         }
 
-        // Stronly typed methods for model callback
+        // Strongly typed methods for model callback
 
         public IQueryable<T> GetDynamicTypedCollection<T>() where T : class
         {

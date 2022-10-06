@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Nox.Dynamic.Dto;
+using Nox.Dynamic.MetaData;
 using System.Data.SqlClient;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -23,7 +23,7 @@ namespace Nox.Dynamic.Loaders.Providers
 
             var loaders = service.Loaders;
 
-            var entities = service.Entities;
+            var entities = service.Entities.ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
 
             var connectionString = dbDefinition.ConnectionString!;
 
@@ -31,40 +31,15 @@ namespace Nox.Dynamic.Loaders.Providers
 
             await connection.OpenAsync();
 
-            foreach (var (_,loader) in loaders)
+            foreach (var loader in loaders)
             {
                 var entity = entities[loader.Target.Entity];
                 
                 await LoadDataFromSource(connection, loader, entity);
             }
 
-            await UpdateMetaDataTables(connection, service);
-
             return true;
         }
-
-        private static async Task UpdateMetaDataTables(SqlConnection connectionTarget, Service service)
-        {
-            var type = service.GetType();
-            var table = $"[meta].[{type.Name}]";
-            var props = type.GetProperties();
-
-            var columns = string.Join(',', props.Select(p => $"[{p.Name}]").ToArray());
-            var valuePrarams = string.Join(',', props.Select(p => $"@{p.Name}").ToArray());
-
-            var sql = @$"INSERT INTO {table} ({columns}) VALUES ({valuePrarams});";
-
-            using var metaCommand = new SqlCommand(sql, connectionTarget);
-
-            foreach (var p in props)
-            {
-                metaCommand.Parameters.AddWithValue($"@{p.Name}", p.GetValue(service)?.ToString());
-            }
-
-            await metaCommand.ExecuteNonQueryAsync();
-
-        }
-
         private async Task LoadDataFromSource(SqlConnection connectionTarget, Loader loader, Entity entity)
         {
             foreach (var source in loader.Sources)
@@ -100,7 +75,9 @@ namespace Nox.Dynamic.Loaders.Providers
 
         private static async Task TruncateTargetTable(SqlConnection connectionTarget, Entity entity)
         {
-            using var targetCommand = new SqlCommand($"TRUNCATE TABLE [{entity.Schema}].[{entity.Table}];", connectionTarget);
+            var sql = $"DELETE FROM [{entity.Schema}].[{entity.Table}];";
+
+            using var targetCommand = new SqlCommand(sql, connectionTarget);
 
             await targetCommand.ExecuteNonQueryAsync();
         }
@@ -276,6 +253,7 @@ namespace Nox.Dynamic.Loaders.Providers
             catch (SqlException)
             {
                 await transaction.RollbackAsync();
+                throw;
             }
 
             foreach (var (dateColumn, (lastMergeDateTimeStamp, updated)) in newLastMergeDateTimeStamp)

@@ -1,6 +1,6 @@
-﻿namespace Nox.Dynamic.Dto
+﻿namespace Nox.Dynamic.MetaData
 {
-    internal class LoaderSchedule
+    public sealed class LoaderSchedule : MetaBase
     {
         public string Start { get; set; } = string.Empty;
         public LoaderScheduleRetryPolicy Retry { get; set; } = new();
