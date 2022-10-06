@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Nox.Dynamic.Dto;
+﻿using Microsoft.Extensions.Logging;
 using System.Data;
 using System.Data.SqlClient;
 using System.Reflection;
-using System.Security.AccessControl;
 using System.Text;
+using Nox.Dynamic.Dto;
+using Nox.Dynamic.ExtendedAttributes;
 
 namespace Nox.Dynamic.Migrations.Providers
 {
@@ -162,34 +161,51 @@ namespace Nox.Dynamic.Migrations.Providers
 
         private async Task EnsureMetadataTablesExist(SqlConnection connection)
         {
-            var metaClasses = from t in Assembly.GetExecutingAssembly().GetTypes()
-                    where t.IsClass && t.Namespace == "Nox.Dynamic.Dto"
-                    select t;
+            var dtoNamespace = typeof(Service).Namespace;
 
-            foreach (var metaClass in metaClasses)
+            var dto = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => t.IsClass && t.Namespace == dtoNamespace);
+
+            foreach (var type in dto)
             {
-                var metadataTable = new Entity()
-                {
-                    Name = metaClass.Name,
-                    Description = "Metadata table",
-                    Schema = "meta",
-                    Table = metaClass.Name,
-                    Attributes = new()
-                    {
-                        new() { Name = "Id", Type = "int", IsPrimaryKey = true, IsAutoNumber = true },
-                    }
-                };
+                _logger.LogInformation("Creating storage for metadata {meta}", type.Name);
 
-                _logger.LogInformation("Creating storage for metadata {meta}", metaClass.Name);
+                await EnsureTableExists(connection, CreateEntityFromClass(type, schema: "meta"));
+            }
 
-                AddClassProperties(metadataTable.Attributes, metaClass);
+            var eavNamespace = typeof(XtendedAttributeValue).Namespace;
 
-                await EnsureTableExists(connection, metadataTable);
+            var eav = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => t.IsClass && t.IsSealed && t.Namespace == "Nox.Dynamic.ExtendedAttributes");
 
+            foreach (var type in eav)
+            {
+                _logger.LogInformation("Creating storage for extended attributes {eav}", type.Name);
+
+                await EnsureTableExists(connection, CreateEntityFromClass(type, schema: "dbo"));
             }
 
 
+        }
 
+        private static Entity CreateEntityFromClass(Type metaClass, string schema)
+        {
+
+            var metadataTable = new Entity()
+            {
+                Name = metaClass.Name,
+                Description = "Metadata table",
+                Schema = schema,
+                Table = metaClass.Name,
+                Attributes = new()
+                {
+                    new() { Name = "Id", Type = "int", IsPrimaryKey = true, IsAutoNumber = true },
+                }
+            };
+
+            AddClassProperties(metadataTable.Attributes, metaClass);
+
+            return metadataTable;
 
         }
 
@@ -297,7 +313,7 @@ namespace Nox.Dynamic.Migrations.Providers
                 "url"       => "varchar(2048)",
                 "email"     => "varchar(320)",
                 "char"      => prop.IsUnicode ? $"nchar({propWidth})" : $"char({propWidth})",
-                "guid"      => "guid",
+                "guid"      => "uniqueidentifier",
                 "date"      => "date",
                 "datetime"  => "datetimeoffset",
                 "time"      => "time",

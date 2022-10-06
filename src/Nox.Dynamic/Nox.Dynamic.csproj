@@ -28,4 +28,10 @@
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="OData\Commands\" />
+	  <Folder Include="OData\Queries\" />
+	  <Folder Include="OData\Notifications\" />
+	</ItemGroup>
+
 </Project>
