@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nox.Dynamic.ExtendedAttributes
 {
-    internal sealed class XtendedAttributeValue_datetime : XtendedAttributeValue
+    public sealed class XtendedAttributeValue_datetime : XtendedAttributeValue
     {
         public DateTimeOffset? Value { get; set; }
     }

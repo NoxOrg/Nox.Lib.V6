@@ -29,7 +29,10 @@ namespace Nox.Dynamic.OData.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(_dynamicDbModel.GetDatabaseConnectionString());
+                var provider = _dynamicDbModel.GetDatabaseProvider();
+
+                provider.ConfigureDbContext(optionsBuilder);
+
             }
         }
 
@@ -37,16 +40,6 @@ namespace Nox.Dynamic.OData.Models
         {
             _dynamicDbModel?.ConfigureDbContextModel(modelBuilder);
         }
-
-        // Db Creating and Seeding
-        public void ValidateSchema(DynamicService dynamicService)
-        {
-
-            Database.EnsureCreated();
-
-            dynamicService.ExecuteDataLoadersAsync().GetAwaiter().GetResult();
-        }
-
 
         // Methods for Controller access
         public IQueryable GetDynamicCollection(string dbSetName)

@@ -9,6 +9,7 @@
         string Password { get; set; }
         string Provider { get; set; }
         string Server { get; set; }
+        public int Port { get; set; }
         string User { get; set; }
     }
 }

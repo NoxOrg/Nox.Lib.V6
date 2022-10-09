@@ -8,7 +8,7 @@ using Nox.Dynamic.OData.Routing;
 
 namespace Nox.Dynamic.Extensions
 {
-    public static class ODataServiceExtension
+    public static class ServiceCollectionExtension
     {
 
         public static IServiceCollection AddNox(this IServiceCollection services)

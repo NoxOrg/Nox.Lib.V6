@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nox.Dynamic.ExtendedAttributes
 {
-    internal sealed class XtendedAttributeValue_object : XtendedAttributeValue
+    public sealed class XtendedAttributeValue_object : XtendedAttributeValue
     {
         public string? Value { get; set; } // json
     }

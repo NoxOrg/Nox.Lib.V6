@@ -459,3 +459,4 @@ $RECYCLE.BIN/
 
 **/dist
 **/sql-db
+**/.docker-data

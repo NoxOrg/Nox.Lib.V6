@@ -13,10 +13,9 @@ using Nox.Dynamic.ExtendedAttributes;
 
 namespace Nox.Dynamic.Services
 {
+
     public class DynamicService
     {
-
-        private IConfiguration _configuration = null!;
 
         private ILogger _logger = null!;
 
@@ -28,17 +27,19 @@ namespace Nox.Dynamic.Services
             _service.Apis.ToDictionary(x => x.Name, x => x)
         );
 
-        public string? DatabaseConnectionString() => _service.Database.ConnectionString;
+        public ServiceDatabase ServiceDatabase => _service.Database;
+
+        public string KeyVaultUri => _service.KeyVaultUri;
+
+        public IReadOnlyCollection<Loader> Loaders => new ReadOnlyCollection<Loader>( _service.Loaders.ToList() );
 
         public async Task<bool> ExecuteDataLoadersAsync()
         {
             _logger.LogInformation("Executing data load tasks");
 
-            if (_service.Database is not null)
-            {
-                var loaderProvider = new SqlServerLoaderProvider(_logger);
-
-                return await loaderProvider.ExecuteLoadersAsync(_service);
+            if (_service.Database?.DatabaseProvider is not null)
+            {   
+                return await _service.Database.DatabaseProvider.LoadData(_service, _logger);
             }
 
             _logger.LogWarning("No database settings found in service definition");
@@ -55,7 +56,7 @@ namespace Nox.Dynamic.Services
             private const string ENTITITY_DEFINITION_PATTERN = @"*.entity.nox.yaml";
 
             private const string LOADER_DEFINITION_PATTERN = @"*.loader.nox.yaml";
-            
+
             private const string API_DEFINITION_PATTERN = @"*.api.nox.yaml";
 
             // Class def
@@ -65,6 +66,8 @@ namespace Nox.Dynamic.Services
             private readonly IDeserializer _deserializer;
 
             private ILogger _logger = null!;
+
+            private IConfiguration _configuration = null!;
 
             public Builder()
             {
@@ -83,16 +86,7 @@ namespace Nox.Dynamic.Services
 
                 service.Apis = ReadApiDefinitionsFromFolder(rootFolder);
 
-                service.Validate();
-
                 _dynamicService._service = service;
-
-                return this;
-            }
-
-            public Builder WithConfiguration(IConfiguration configuration)
-            {
-                _dynamicService._configuration = configuration;
 
                 return this;
             }
@@ -106,10 +100,17 @@ namespace Nox.Dynamic.Services
                 return this;
             }
 
+            public Builder WithConfiguration(IConfiguration configuration)
+            {
+                _configuration = configuration;
+
+                return this;
+            }
+
             public DynamicService Build()
             {
-                ResolveAllConnectionStrings();
 
+                _dynamicService._service.Validate( GetConfigurationVariables() );
 
                 return _dynamicService;
             }
@@ -119,7 +120,12 @@ namespace Nox.Dynamic.Services
                 return Directory
                     .EnumerateFiles(rootFolder, SERVICE_DEFINITION_PATTERN, SearchOption.AllDirectories)
                     .Take(1)
-                    .Select(f => _deserializer.Deserialize<Service>(ReadDefinitionFile(f)))
+                    .Select(f => { 
+                        var service = _deserializer.Deserialize<Service>(ReadDefinitionFile(f)); 
+                        service.DefinitionFileName = Path.GetFullPath(f); 
+                        service.Database.DefinitionFileName = Path.GetFullPath(f);
+                        return service; 
+                    })
                     .First();
             }
 
@@ -127,7 +133,12 @@ namespace Nox.Dynamic.Services
             {
                 return Directory
                     .EnumerateFiles(rootFolder, ENTITITY_DEFINITION_PATTERN, SearchOption.AllDirectories)
-                    .Select(f => _deserializer.Deserialize<Entity>(ReadDefinitionFile(f)))
+                    .Select(f => {
+                        var entity = _deserializer.Deserialize<Entity>(ReadDefinitionFile(f));
+                        entity.DefinitionFileName = Path.GetFullPath(f);
+                        entity.Attributes.ToList().ForEach(a => {a.DefinitionFileName = Path.GetFullPath(f); });
+                        return entity;
+                    })
                     .ToList();
             }
 
@@ -135,7 +146,12 @@ namespace Nox.Dynamic.Services
             {
                 return Directory
                     .EnumerateFiles(rootFolder, LOADER_DEFINITION_PATTERN, SearchOption.AllDirectories)
-                    .Select(f => _deserializer.Deserialize<Loader>(ReadDefinitionFile(f)))
+                    .Select(f => {
+                        var loader = _deserializer.Deserialize<Loader>(ReadDefinitionFile(f));
+                        loader.DefinitionFileName = Path.GetFullPath(f);
+                        loader.Sources.ToList().ForEach(s => {s.DefinitionFileName = Path.GetFullPath(f); });
+                        return loader;
+                    })
                     .ToList();
             }
 
@@ -143,9 +159,14 @@ namespace Nox.Dynamic.Services
             {
                 return Directory
                     .EnumerateFiles(rootFolder, API_DEFINITION_PATTERN, SearchOption.AllDirectories)
-                    .Select(f => _deserializer.Deserialize<Api>(ReadDefinitionFile(f)))
+                    .Select(f => {
+                        var api = _deserializer.Deserialize<Api>(ReadDefinitionFile(f));
+                        api.DefinitionFileName = Path.GetFullPath(f);
+                        return api;
+                    })
                     .ToList();
             }
+
 
             private string ReadDefinitionFile(string fileName)
             {
@@ -154,13 +175,9 @@ namespace Nox.Dynamic.Services
                 return File.ReadAllText(fileName);
             }
 
-            private void ResolveAllConnectionStrings()
+            private IReadOnlyDictionary<string,string> GetConfigurationVariables()
             {
-                _logger.LogInformation("Resolving all connection strings...");
-
-                var config = _dynamicService._configuration;
-
-                var vaultUri = _dynamicService._service.KeyVaultUri;
+                _logger.LogInformation("Resolving all configuration variables...");
 
                 var databases = GetServiceDatabasesFromDefinition();
 
@@ -171,17 +188,17 @@ namespace Nox.Dynamic.Services
                     .Where(d => !string.IsNullOrEmpty(d.ConnectionVariable))
                     .Select(d => d.ConnectionVariable ?? "")
                     .ToHashSet()
-                    .ToDictionary(v => v, v => config[v], StringComparer.OrdinalIgnoreCase);
+                    .ToDictionary(v => v, v => _configuration[v], StringComparer.OrdinalIgnoreCase);
 
                 // try key vault where app configuration is missing 
                 if (variables.Any(v => v.Value == null))
                 {
-                    TryAddMissingConfigsFromKeyVault(vaultUri, variables);
+                    TryAddMissingConfigsFromKeyVault(_dynamicService._service.KeyVaultUri, variables);
                 }
 
                 if (variables.Any(v => v.Value == null))
                 {
-                    var variableNames = string.Join( ',', variables
+                    var variableNames = string.Join(',', variables
                         .Where(v => v.Value == null)
                         .Select(v => v.Key)
                         .ToArray()
@@ -189,10 +206,7 @@ namespace Nox.Dynamic.Services
                     throw new ConfigurationNotFoundException(variableNames);
                 }
 
-                foreach (IServiceDatabase db in databases)
-                {
-                    ResolveConnectionString(db, variables);
-                }
+                return variables;
 
             }
 
@@ -244,39 +258,6 @@ namespace Nox.Dynamic.Services
                 }
 
                 return serviceDatabases;
-            }
-
-            private static void ResolveConnectionString(IServiceDatabase serviceDb, IDictionary<string,string> variables)
-            {
-                if (!string.IsNullOrEmpty(serviceDb.ConnectionString))
-                {
-                    return;
-                }
-
-                if (!string.IsNullOrEmpty(serviceDb.ConnectionVariable))
-                {
-                    var connectionString = variables[serviceDb.ConnectionVariable];
-
-                    if (!string.IsNullOrEmpty(connectionString))
-                    {
-                        serviceDb.ConnectionString = connectionString;
-                        return;
-                    }
-
-                }
-
-                var csb = new SqlConnectionStringBuilder(serviceDb.Options)
-                {
-                    DataSource = serviceDb.Server,
-                    UserID = serviceDb.User,
-                    Password = serviceDb.Password,
-                    InitialCatalog = serviceDb.Name
-                };
-
-                serviceDb.ConnectionString = csb.ConnectionString;
-
-                return;
-
             }
         }
     }

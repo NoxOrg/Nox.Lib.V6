@@ -1,4 +1,6 @@
-﻿namespace Nox.Dynamic.MetaData
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Nox.Dynamic.MetaData
 {
     public sealed class ApiRouteParameter : MetaBase
     {

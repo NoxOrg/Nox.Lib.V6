@@ -13,6 +13,7 @@ using System.Text.Json;
 using Nox.Dynamic.Models;
 using Nox.Dynamic.ExtendedAttributes;
 using System.ComponentModel.DataAnnotations.Schema;
+using Nox.Dynamic.DatabaseProviders;
 
 namespace Nox.Dynamic.OData.Models
 {
@@ -28,13 +29,21 @@ namespace Nox.Dynamic.OData.Models
 
         private readonly DynamicService _dynamicService;
 
+        private readonly IDatabaseProvider _databaseProvider;
+
         public DynamicModel(IConfiguration config, ILogger<DynamicModel> logger)
         {
             _config = config;
 
             _logger = logger;
 
-            _dynamicService = GetDynamicService();
+            _dynamicService = new DynamicService.Builder()
+                .WithLogger(_logger)
+                .WithConfiguration(_config)
+                .FromRootFolder(_config["Nox:DefinitionRootPath"])
+                .Build();
+
+            _databaseProvider = _dynamicService.ServiceDatabase.DatabaseProvider!;
 
             var builder = new ODataConventionModelBuilder();
 
@@ -82,13 +91,19 @@ namespace Nox.Dynamic.OData.Models
 
             _edmModel = builder.GetEdmModel();
 
+            // Check database
+
             var dbContext = new DynamicDbContext(this);
-           
-            dbContext.ValidateSchema(_dynamicService);
+
+            var model = dbContext.Model;
+
+            dbContext.Database.EnsureCreated();
+
+            _dynamicService.ExecuteDataLoadersAsync().GetAwaiter().GetResult();
 
         }
 
-        public string GetDatabaseConnectionString() => _dynamicService.DatabaseConnectionString() ?? "";
+        public IDatabaseProvider GetDatabaseProvider() => _databaseProvider;
 
         public ModelBuilder ConfigureDbContextModel(ModelBuilder modelBuilder)
         {
@@ -104,7 +119,7 @@ namespace Nox.Dynamic.OData.Models
 
                         var netType = attr.NetDataType();
 
-                        prop.HasColumnType(attr.MapToSqlServerType());
+                        prop.HasColumnType(_databaseProvider.ToDatabaseColumnType(attr));
 
                         if (netType.Equals(typeof(string)))
                         {
@@ -151,21 +166,21 @@ namespace Nox.Dynamic.OData.Models
 
                 });
 
-                AddMetadataFromNamespace(modelBuilder, typeof(Service), "meta");
-
-                AddMetadataFromNamespace(modelBuilder, typeof(XtendedAttributeValue), "dbo");
-
-
             }
+
+            AddMetadataFromNamespace(modelBuilder, typeof(Service), "meta");
+
+            AddMetadataFromNamespace(modelBuilder, typeof(XtendedAttributeValue), "dbo");
 
             return modelBuilder;
         }
 
-        private static void AddMetadataFromNamespace(ModelBuilder modelBuilder, Type typeInNamespace, string schema)
+        private void AddMetadataFromNamespace(ModelBuilder modelBuilder, Type typeInNamespace, string schema)
         {
 
             var nsTypes = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(t => t.IsClass && t.IsSealed && t.Namespace == typeInNamespace.Namespace);
+                .Where(t => t.Namespace == typeInNamespace.Namespace)
+                .Where(t => t.IsClass && t.IsSealed && t.IsPublic);
 
             foreach (var metaType in nsTypes)
             {
@@ -188,16 +203,19 @@ namespace Nox.Dynamic.OData.Models
 
                         var typeString = prop.PropertyType.Name.ToLower();
 
-                        if ("|object|list`1|string[]|".Contains($"|{typeString}|"))
-                        {
-                            b.Property(prop.Name).HasColumnType("sql_variant");
-                            continue;
-                        }
-
                         if (prop.Name == "Name" && typeString == "string")
                         {
                             b.Property(prop.Name).HasMaxLength(128);
-                            continue;
+                        }
+                        else if (typeString == "decimal")
+                        {
+                            b.Property(prop.Name).HasPrecision(9,6);
+                        }
+                        else if (typeString == "object")
+                        {
+                            b.Property(prop.Name)
+                            .HasColumnType(_databaseProvider
+                            .ToDatabaseColumnType( new EntityAttribute() {Type = "object"} ));
                         }
                     }
                 });
@@ -253,17 +271,6 @@ namespace Nox.Dynamic.OData.Models
         }
 
         public DynamicService Configuration => _dynamicService;
-
-        private DynamicService GetDynamicService()
-        {
-            var dynamicService = new DynamicService.Builder()
-                .WithLogger(_logger)
-                .WithConfiguration(_config)
-                .FromRootFolder(_config["Nox:DefinitionRootPath"])
-                .Build();
-
-            return dynamicService;
-        }
 
         private Dictionary<string, (Entity Entity, TypeBuilder TypeBuilder)> GetTablesAndTypeBuilders()
         {

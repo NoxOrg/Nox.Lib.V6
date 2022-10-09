@@ -1,7 +1,8 @@
 version: '3.7'
 
 services:
-  db:
+  sqlserver:
+    container_name: sqlserver_container
     image: "mcr.microsoft.com/azure-sql-edge:latest"
     ports:
       - "1433:1433"
@@ -10,4 +11,18 @@ services:
       ACCEPT_EULA: "Y"
       MSSQL_PID: "Developer"
     volumes:
-      - ./sql-db/mssql:/var/opt/mssql
+      - ./.docker-data/sqlserver:/var/opt/mssql/data
+      
+  postgres:
+    container_name: postgres_container
+    image: postgres:14-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: WorkplaceService
+      POSTGRES_USER: "sa"
+      POSTGRES_PASSWORD: "Developer*123"
+      PGDATA: ./data
+    ports:
+      - "54320:5432"
+    volumes:
+      - ./.docker-data/postgres:/var/lib/postgresql/data

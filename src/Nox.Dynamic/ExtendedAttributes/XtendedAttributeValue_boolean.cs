@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nox.Dynamic.ExtendedAttributes
 {
-    internal sealed class XtendedAttributeValue_boolean : XtendedAttributeValue
+    public sealed class XtendedAttributeValue_boolean : XtendedAttributeValue
     {
         public bool? Value { get; set; }
     }

@@ -1,16 +1,12 @@
-﻿namespace Nox.Dynamic.MetaData
+﻿namespace Nox.Dynamic.MetaData;
+
+public sealed class LoaderSource : DatabaseBase
 {
-    public sealed class LoaderSource : MetaBase, IServiceDatabase
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Provider { get; set; } = "SqlServer";
-        public string Server { get; set; } = "localhost";
-        public string User { get; set; } = "user";
-        public string Password { get; set; } = "password";
-        public string Options { get; set; } = "";
-        public string? ConnectionString { get; set; }
-        public string? ConnectionVariable { get; set; }
-        public string Query { get; set; } = string.Empty;
-        public int MinimumExpectedRecords { get; set; } = 0;
-    }
+    public string Query { get; set; } = string.Empty;
+    public int MinimumExpectedRecords { get; set; } = 0;
+}
+
+internal class LoaderSourceValidator : DatabaseValidator
+{
+    public LoaderSourceValidator(ServiceValidationInfo info) : base(info) { }
 }
