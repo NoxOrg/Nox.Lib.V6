@@ -10,6 +10,7 @@ using System.Data.SqlClient;
 using Nox.Dynamic.Exceptions;
 using System.Reflection;
 using Nox.Dynamic.ExtendedAttributes;
+using ETLBoxOffice.LicenseManager;
 
 namespace Nox.Dynamic.Services
 {
@@ -190,6 +191,8 @@ namespace Nox.Dynamic.Services
                     .ToHashSet()
                     .ToDictionary(v => v, v => _configuration[v], StringComparer.OrdinalIgnoreCase);
 
+                variables.Add("EtlBox:LicenseKey", _configuration["EtlBox:LicenseKey"]);
+
                 // try key vault where app configuration is missing 
                 if (variables.Any(v => v.Value == null))
                 {
@@ -231,12 +234,12 @@ namespace Nox.Dynamic.Services
 
                     if (variables[key] == null)
                     {
-                        _logger.LogInformation("...Resolving ConnectionVariable [{key}] from secrets vault {vault}", key, vaultUri);
+                        _logger.LogInformation("...Resolving variable [{key}] from secrets vault {vault}", key, vaultUri);
                         variables[key] = keyVault.GetSecretAsync(vaultUri, key.Replace(":", "--")).GetAwaiter().GetResult().Value;
                     }
                     else
                     {
-                        _logger.LogInformation("...Resolving ConnectionVariable [{key}] from app configuration", key);
+                        _logger.LogInformation("...Resolving variable [{key}] from app configuration", key);
                     }
 
                 }

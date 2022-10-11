@@ -14,8 +14,12 @@ public sealed class Entity : MetaBase
     public string Table { get; set; } = null!;
     public string Schema { get; set; } = "dbo";
     [NotMapped]
-    public string[] RelatedParents { get; set; } = Array.Empty<string>();
-    public string RelatedParentsJson { get => string.Join('|',RelatedParents.ToArray()); set => RelatedParents = value.Split('|'); }
+    public List<string> RelatedParents { get; set; } = new();
+    [NotMapped]
+    public List<string> RelatedChildren { get; set; } = new();
+    public string RelatedParentsJson { get => string.Join('|',RelatedParents.ToArray()); set => RelatedParents = value.Split('|').ToList(); }
+    public string RelatedChildrenJson { get => string.Join('|',RelatedChildren.ToArray()); set => RelatedChildren = value.Split('|').ToList(); }
+    public int SortOrder { get; set; }
     public ICollection<EntityAttribute> Attributes { get; set; } = new Collection<EntityAttribute>();
 
     public bool ApplyDefaults()

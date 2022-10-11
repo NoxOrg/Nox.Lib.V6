@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using ETLBoxOffice.LicenseManager;
+using FluentValidation;
 using FluentValidation.Results;
 using System;
 using System.Collections.Generic;
@@ -19,13 +20,15 @@ public sealed class Service : MetaBase
     public ICollection<Loader> Loaders { get; set; } = null!;
     public ICollection<Api> Apis { get; set; } = null!;
 
-    public void Validate(IReadOnlyDictionary<string,string> configurationVariales)
+    public void Validate(IReadOnlyDictionary<string,string> configurationVariables)
     {
-        var validationInfo = new ServiceValidationInfo(Name,configurationVariales);
+        var validationInfo = new ServiceValidationInfo(Name,configurationVariables);
 
         var validator = new ServiceValidator(validationInfo);
 
         validator.ValidateAndThrow(this);
+
+        LicenseCheck.LicenseKey = configurationVariables["EtlBox:LicenseKey"];
 
     }
 }
@@ -45,6 +48,8 @@ internal class ServiceValidator : AbstractValidator<Service>
 
         RuleFor(service => service.Database)
             .SetValidator(new ServiceDatabaseValidator(info));
+
+        // TODO: Calc SortOrder for entities
 
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ETLBox.Connection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Nox.Dynamic.Loaders.Providers;
 using Nox.Dynamic.MetaData;
@@ -15,7 +16,10 @@ namespace Nox.Dynamic.DatabaseProviders
     {
         private readonly string _connectionString;
 
+        private readonly IConnectionManager _connectionManager;
+
         public string ConnectionString => _connectionString;
+        public IConnectionManager ConnectionManager => _connectionManager;
 
         public PostgresDatabaseProvider(IServiceDatabase serviceDb, string applicationName)
         {
@@ -41,12 +45,21 @@ namespace Nox.Dynamic.DatabaseProviders
 
             _connectionString = serviceDb.ConnectionString = csb.ToString();
 
+            _connectionManager = new PostgresConnectionManager(_connectionString);
+
         }
 
         public void ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseNpgsql(_connectionString);
         }
+
+        public string ToTableNameForSql(Entity entity)
+        {
+            return $"\"{entity.Schema}\".\"{entity.Table}\"";
+        }
+
+
 
         public string ToDatabaseColumnType(EntityAttribute entityAttribute)
         {
@@ -89,6 +102,7 @@ namespace Nox.Dynamic.DatabaseProviders
 
         public async Task<bool> LoadData(Service service, ILogger logger)
         {
+            // TODO: This is now the common loader and needs to replace the postgres and sql 
             var loaderProvider = new PostgresLoaderProvider(logger);
 
             return await loaderProvider.ExecuteLoadersAsync(service);
