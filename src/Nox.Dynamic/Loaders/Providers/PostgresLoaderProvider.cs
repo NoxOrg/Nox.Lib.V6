@@ -18,7 +18,7 @@ using System.Text.RegularExpressions;
 
 namespace Nox.Dynamic.Loaders.Providers;
 
-internal class PostgresLoaderProvider
+internal class PostgresLoaderProvider // LoaderExecuter
 {
 
     private readonly ILogger _logger;
@@ -29,7 +29,7 @@ internal class PostgresLoaderProvider
         _logger = logger; 
     }
 
-    public async Task<bool> ExecuteLoadersAsync(Service service)
+    public async Task<bool> ExecuteLoadersAsync(Service service) //ExecuteAsync
     {
         var destinationDbProvider = service.Database.DatabaseProvider!;
 
@@ -220,16 +220,35 @@ internal class PostgresLoaderProvider
     {
         var newLastMergeDateTimeStamp = new Dictionary<string, (DateTimeOffset LastMergeDateTimeStamp, bool Updated)>();
 
-        var containsWhere = Regex.IsMatch(loaderSource.Query, @"\s+WHERE\s+", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        //var containsWhere = Regex.IsMatch(loaderSource.Query, @"\s+WHERE\s+", RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
-        var query = containsWhere ? $"SELECT * FROM ({loaderSource.Query}) AS [tmp] WHERE 1=0" : $"{loaderSource.Query} WHERE 1=0";
+        //int pFrom = loaderSource.Query.IndexOf("SELECT", StringComparison.InvariantCultureIgnoreCase) + "SELECT".Length;
+        //int pTo = loaderSource.Query.IndexOf("FROM", StringComparison.InvariantCultureIgnoreCase);
+
+
+        //var loaderColumns = loaderSource.Query.Substring(pFrom, pTo - pFrom).Split(',').ToList();
+
+        //var selectColumns = new List<string>();
+        //foreach (var loaderColumn in loaderColumns)
+        //{
+        //    if(loaderColumn.Contains("AS", StringComparison.InvariantCultureIgnoreCase))
+        //    {
+        //        var index = loaderColumn.IndexOf("AS", StringComparison.InvariantCultureIgnoreCase) + "AS".Length;
+        //        selectColumns.Add(loaderColumn.Substring(index));
+        //        continue;
+        //    }
+        //    selectColumns.Add(loaderColumn);
+        //}
+
+
+        var query = $"SELECT {string.Join(',', entity.Attributes.Where(a => a.IsMappedAttribute).Select(a => a.Name))}  FROM ({loaderSource.Query}) AS [tmp] WHERE 1=0";
 
         var sb = new StringBuilder(query);
         var lastMergeDateTimeStamp = DateTimeOffset.MinValue;
 
         foreach (var dateColumn in loader.LoadStrategy.Columns)
         {
-            lastMergeDateTimeStamp = await GetLastMergeDateTimeStampAsync(metaDbConnection, loader.Name, dateColumn);
+            lastMergeDateTimeStamp = GetLastMergeDateTimeStampAsync(destinationDb, loader.Name, dateColumn);
 
             sb.Append($" OR ([{dateColumn}] IS NOT NULL AND [{dateColumn}] > '{lastMergeDateTimeStamp:yyyy-MM-dd HH:mm:ss.fff}')");
 
@@ -249,7 +268,7 @@ internal class PostgresLoaderProvider
         destination.MergeProperties.IdColumns = 
             entity.Attributes.Where(a => a.IsPrimaryKey).Select(o => new IdColumn() { IdPropertyName = o.Name }).ToArray();
         destination.MergeProperties.CompareColumns = 
-            entity.Attributes.Where(a => !a.IsPrimaryKey).Select(o => new CompareColumn() { ComparePropertyName = o.Name }).ToArray();
+            entity.Attributes.Where(a => !a.IsPrimaryKey && a.IsMappedAttribute).Select(o => new CompareColumn() { ComparePropertyName = o.Name }).ToArray();
 
         destination.CacheMode = ETLBox.DataFlow.Transformations.CacheMode.Partial;
         destination.MergeMode = MergeMode.InsertsAndUpdates;
@@ -310,7 +329,7 @@ internal class PostgresLoaderProvider
 
         foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
         {
-            await SetLastMergeDateTimeStamp(metaDbConnection, loader.Name, dateColumn, timeStamp);
+            SetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, timeStamp);
         }
 
 
@@ -414,9 +433,15 @@ internal class PostgresLoaderProvider
     }
 
 
-    private static async Task<DateTimeOffset> GetLastMergeDateTimeStampAsync(NpgsqlConnection metaDbConnection, string loaderName, string dateColumn)
+    private DateTimeOffset GetLastMergeDateTimeStampAsync(IConnectionManager destinationDb, string loaderName, string dateColumn)
     {
-         var lastMergeDateTime = new DateTimeOffset(1900, 1, 1, 0, 0, 0, new TimeSpan());
+        var lastMergeDateTime = new DateTimeOffset(1900, 1, 1, 0, 0, 0, new TimeSpan());
+
+        var destination = new DbDestination()
+        {
+            ConnectionManager = destinationDb,
+            TableName = Constants.Database.MergeStateTable,
+        };  
 
         var findQuery = new Query(
                 $"meta.{Constants.Database.MergeStateTable}")
@@ -424,15 +449,13 @@ internal class PostgresLoaderProvider
                 .Where("Loader", loaderName)
                 .Select("LastDateLoaded");
 
-        using var findCommand = new NpgsqlCommand(_compiler.Compile(findQuery).ToString(), metaDbConnection);
+        var findSql =_compiler.Compile(findQuery).ToString();
 
-
-        using (var reader = findCommand.ExecuteReader())
+        object? resultDate = null;
+        SqlTask.ExecuteReader(destinationDb, findSql, r => resultDate = r);
+        if (resultDate is not null)
         {
-            if (reader.Read())
-            {
-                return reader.GetFieldValue<DateTimeOffset>(0);
-            }
+            return new  DateTimeOffset((DateTime)resultDate);
         }
 
         var insertQuery = new Query($"meta.{Constants.Database.MergeStateTable}").AsInsert(
@@ -443,15 +466,15 @@ internal class PostgresLoaderProvider
             LastDateLoaded = lastMergeDateTime
         });
 
-        using var insertCommand = new NpgsqlCommand(_compiler.Compile(insertQuery).ToString(), metaDbConnection);
-        await insertCommand.ExecuteNonQueryAsync();
+        var insertSql = _compiler.Compile(insertQuery).ToString();
 
+        SqlTask.ExecuteNonQuery(destinationDb, insertSql);
 
         return lastMergeDateTime;
 
     }
 
-    private async Task<bool> SetLastMergeDateTimeStamp(NpgsqlConnection metaDbConnection, string loaderName,
+    private bool SetLastMergeDateTimeStamp(IConnectionManager destinationDb, string loaderName,
         string dateColumn, DateTimeOffset lastMergeDateTime)
     {
 
@@ -466,9 +489,9 @@ internal class PostgresLoaderProvider
                LastDateLoaded = lastMergeDateTime
            });
 
-        using var updateCommand = new NpgsqlCommand(_compiler.Compile(updateQuery).ToString(), metaDbConnection);
-
-        var result = await updateCommand.ExecuteNonQueryAsync();
+        var updateSql = _compiler.Compile(updateQuery).ToString();
+    
+        var result = SqlTask.ExecuteNonQuery(destinationDb, updateSql);
 
         return result == 1;
     }

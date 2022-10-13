@@ -31,6 +31,7 @@ public sealed class EntityAttribute : MetaBase
     public string[] DefaultFromParents { get; set; } = Array.Empty<string>();
     public string DefaultFromParentsJson { get => string.Join('|', DefaultFromParents.ToArray()); set => DefaultFromParents = value.Split('|'); }
     public string Formula { get; set; } = string.Empty;
+    public bool IsMappedAttribute => (string.IsNullOrEmpty(Formula) && !DefaultFromParents.Any());
 
 
     public bool ApplyDefaults()

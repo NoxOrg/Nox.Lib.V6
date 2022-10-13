@@ -8,9 +8,8 @@ using System.Threading.Tasks;
 
 namespace Nox.Dynamic.MetaData
 {
-    public class MetaBase: MergeableRow
+    public class MetaBase
     {
-        [IdColumn]
         public int Id { get; set; }
 
         [NotMapped]

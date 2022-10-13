@@ -27,12 +27,12 @@ Attributes:
     CanFilter: true
     CanSort: true
 
-  - Name: LocalName
-    Description: The country's local name in local a language
-    Type: string
-    MaxWidth: 128
-    CanFilter: true
-    CanSort: true
+  #- Name: LocalName
+    #Description: The country's local name in local a language
+    #Type: string
+    #MaxWidth: 128
+    #CanFilter: true
+    #CanSort: true
 
   - Name: ISO_Alpha2
     Description: The country's official ISO 3166 alpha-2 code
@@ -57,11 +57,11 @@ Attributes:
     MinValue: 1
     MaxValue: 999
 
-  - Name: FlagSVG_1x1_Url
-    Description: Internet location of SVG file for square image of the country's flag
-    Type: url
+  #- Name: FlagSVG_1x1_Url
+    #Description: Internet location of SVG file for square image of the country's flag
+    #Type: url
 
-  - Name: FlagSVG_4x3_Url
-    Description: Internet location of SVG file for 4:3 image of the country's flag
-    Type: url
+  #- Name: FlagSVG_4x3_Url
+    #Description: Internet location of SVG file for 4:3 image of the country's flag
+    #Type: url
 
