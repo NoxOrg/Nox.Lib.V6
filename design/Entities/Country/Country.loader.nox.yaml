@@ -14,7 +14,8 @@ Schedule:
     DoubleDelayLimit: 5
 
 LoadStrategy: 
-  Type: DropAndLoad
+  Type: MergeNew
+  Columns: [CreateDate,EditDate]
 
 Target:
   Entity: Country
@@ -31,5 +32,7 @@ Sources:
           ,[CountryCodeISO3Alpha] AS [ISO_Alpha3]
           ,[CountryISONumber] AS [ISO_Numeric]
           ,[CurrencyID] AS [CurrencyId]
+          ,[CreateDate]
+          ,[EditDate]
       FROM dbo.Country WITH (NOLOCK)
 

@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 /* TODO: Lakkana
 2. Add a SqlKata compiler to Nox.....IDatabaseProvider : implement for sqlserver and postgres
-1. Finish the PostgresLoaderProvider as AbandonedMutexException generic loader using sqlkata
+1. Finish the PostgresLoaderProvider as a generic loader using sqlkata
 3. Move sortorder setting to validation of Service.cs in MetaData
 */
 
