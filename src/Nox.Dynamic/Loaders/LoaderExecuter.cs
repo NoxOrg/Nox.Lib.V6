@@ -1,41 +1,32 @@
 ﻿using ETLBox.Connection;
-using ETLBox.ControlFlow;
 using ETLBox.ControlFlow.Tasks;
 using ETLBox.DataFlow;
 using ETLBox.DataFlow.Connectors;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Nox.Dynamic.DatabaseProviders;
 using Nox.Dynamic.MetaData;
-using Npgsql;
 using SqlKata;
 using SqlKata.Compilers;
 using SqlKata.Execution;
-using System.Data.SqlClient;
 using System.Dynamic;
 using System.Text;
-using System.Text.RegularExpressions;
 
-namespace Nox.Dynamic.Loaders.Providers;
+namespace Nox.Dynamic.Loaders;
 
-internal class PostgresLoaderProvider // LoaderExecuter
+internal class LoaderExecuter
 {
 
     private readonly ILogger _logger;
     private static readonly PostgresCompiler _compiler = new PostgresCompiler();
 
-    public PostgresLoaderProvider(ILogger logger)
+    public LoaderExecuter(ILogger logger)
     {
-        _logger = logger; 
+        _logger = logger;
     }
 
-    public async Task<bool> ExecuteLoadersAsync(Service service) //ExecuteAsync
+    public async Task<bool> ExecuteAsync(Service service)
     {
         var destinationDbProvider = service.Database.DatabaseProvider!;
-
-        using var metaDbConnection = new NpgsqlConnection(service.Database.DatabaseProvider!.ConnectionString);
-
-        await metaDbConnection.OpenAsync();
 
         var loaders = service.Loaders;
 
@@ -46,14 +37,14 @@ internal class PostgresLoaderProvider // LoaderExecuter
         //foreach (var loader in LoadersSortedByDependancy(loaders, entities))
         //{
         //    var entity = entities[loader.Target.Entity];
-                
+
         //    await LoadDataFromSource(destinationDbProvider, loader, entity);
         //}
 
         foreach (var entity in sortedEntities)
         {
             var loader = loaders.First(l => l.Target.Entity == entity.Name);
-            await LoadDataFromSource(destinationDbProvider, metaDbConnection, loader, entity);
+            await LoadDataFromSource(destinationDbProvider, loader, entity);
         }
 
         return true;
@@ -87,7 +78,7 @@ internal class PostgresLoaderProvider // LoaderExecuter
         }
 
         // rough sort
-        entities.Sort((entity1, entity2) => 
+        entities.Sort((entity1, entity2) =>
             entity1.RelatedParents.Count.CompareTo(entity2.RelatedParents.Count));
 
         // heirachy sort to place entities in dependency order
@@ -138,7 +129,7 @@ internal class PostgresLoaderProvider // LoaderExecuter
     }
 
 
-    private async Task LoadDataFromSource(IDatabaseProvider destinationDbProvider, NpgsqlConnection metaDbConnection,
+    private async Task LoadDataFromSource(IDatabaseProvider destinationDbProvider,
         Loader loader, Entity entity)
     {
         var destinationDb = destinationDbProvider.ConnectionManager;
@@ -156,15 +147,15 @@ internal class PostgresLoaderProvider // LoaderExecuter
                 {
                     case "dropandload":
                         _logger.LogInformation("Dropping and loading data for entity {entity}...", entity.Name);
-                            
+
                         await DropAndLoadData(sourceDb, destinationDb, loaderSource, destinationTable);
-                                                      
+
                         break;
 
                     case "mergenew":
                         _logger.LogInformation("Merging new data for entity {entity}...", entity.Name);
 
-                        await MergeNewData(sourceDb, destinationDb, metaDbConnection, loaderSource, loader, destinationTable, entity);
+                        await MergeNewData(sourceDb, destinationDb, loaderSource, loader, destinationTable, entity);
 
                         break;
 
@@ -180,8 +171,8 @@ internal class PostgresLoaderProvider // LoaderExecuter
     }
 
     private async Task DropAndLoadData(
-        IConnectionManager sourceDb, 
-        IConnectionManager destinationDb, 
+        IConnectionManager sourceDb,
+        IConnectionManager destinationDb,
         LoaderSource loaderSource, string destinationTable)
     {
         var source = new DbSource()
@@ -201,7 +192,7 @@ internal class PostgresLoaderProvider // LoaderExecuter
         SqlTask.ExecuteNonQuery(destinationDb, $"DELETE FROM {destinationTable};");
 
         await Network.ExecuteAsync(source);
-    
+
         int rowCount = RowCountTask.Count(destinationDb, destinationTable);
 
         _logger.LogInformation("...copied {rowCount} records", rowCount);
@@ -210,36 +201,14 @@ internal class PostgresLoaderProvider // LoaderExecuter
 
     private async Task<bool> MergeNewData(
         IConnectionManager sourceDb,
-        IConnectionManager destinationDb, 
-        NpgsqlConnection metaDbConnection,
+        IConnectionManager destinationDb,
 
         LoaderSource loaderSource,
         Loader loader,
-        string destinationTable, 
+        string destinationTable,
         Entity entity)
     {
         var newLastMergeDateTimeStamp = new Dictionary<string, (DateTimeOffset LastMergeDateTimeStamp, bool Updated)>();
-
-        //var containsWhere = Regex.IsMatch(loaderSource.Query, @"\s+WHERE\s+", RegexOptions.IgnoreCase | RegexOptions.Singleline);
-
-        //int pFrom = loaderSource.Query.IndexOf("SELECT", StringComparison.InvariantCultureIgnoreCase) + "SELECT".Length;
-        //int pTo = loaderSource.Query.IndexOf("FROM", StringComparison.InvariantCultureIgnoreCase);
-
-
-        //var loaderColumns = loaderSource.Query.Substring(pFrom, pTo - pFrom).Split(',').ToList();
-
-        //var selectColumns = new List<string>();
-        //foreach (var loaderColumn in loaderColumns)
-        //{
-        //    if(loaderColumn.Contains("AS", StringComparison.InvariantCultureIgnoreCase))
-        //    {
-        //        var index = loaderColumn.IndexOf("AS", StringComparison.InvariantCultureIgnoreCase) + "AS".Length;
-        //        selectColumns.Add(loaderColumn.Substring(index));
-        //        continue;
-        //    }
-        //    selectColumns.Add(loaderColumn);
-        //}
-
 
         var query = $"SELECT {string.Join(',', entity.Attributes.Where(a => a.IsMappedAttribute).Select(a => a.Name))}  FROM ({loaderSource.Query}) AS [tmp] WHERE 1=0";
 
@@ -265,9 +234,9 @@ internal class PostgresLoaderProvider // LoaderExecuter
 
         var destination = new DbMerge(destinationDb, destinationTable);
 
-        destination.MergeProperties.IdColumns = 
+        destination.MergeProperties.IdColumns =
             entity.Attributes.Where(a => a.IsPrimaryKey).Select(o => new IdColumn() { IdPropertyName = o.Name }).ToArray();
-        destination.MergeProperties.CompareColumns = 
+        destination.MergeProperties.CompareColumns =
             entity.Attributes.Where(a => !a.IsPrimaryKey && a.IsMappedAttribute).Select(o => new CompareColumn() { ComparePropertyName = o.Name }).ToArray();
 
         destination.CacheMode = ETLBox.DataFlow.Transformations.CacheMode.Partial;
@@ -281,7 +250,8 @@ internal class PostgresLoaderProvider // LoaderExecuter
         int updates = 0;
         int nochanges = 0;
 
-        analatics.WriteAction = (row, _) => {
+        analatics.WriteAction = (row, _) =>
+        {
             dynamic r = row as ExpandoObject;
             if (r.ChangeAction == ChangeAction.Insert)
             {
@@ -298,21 +268,20 @@ internal class PostgresLoaderProvider // LoaderExecuter
         };
 
         destination.LinkTo(analatics);
-      
 
         try
         {
             await Network.ExecuteAsync(source);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             _logger.LogCritical("Failed to run Merge for Entity {entity} at {lastMergeDateTimeStamp}", entity.Name, lastMergeDateTimeStamp);
             _logger.LogError(ex.Message);
         }
 
-        if (inserts==0 && updates == 0)
-        {          
-            if(nochanges>0)
+        if (inserts == 0 && updates == 0)
+        {
+            if (nochanges > 0)
             {
                 _logger.LogInformation(
                     "{nochanges} records found but no change found to merge, last merge at: {lastMergeDateTimeStamp}", nochanges, lastMergeDateTimeStamp);
@@ -331,103 +300,6 @@ internal class PostgresLoaderProvider // LoaderExecuter
         {
             SetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, timeStamp);
         }
-
-
-        //using var sourceCommand = new NpgsqlCommand(finalQuery, connectionSource);
-
-        //var reader = await sourceCommand.ExecuteReaderAsync();
-
-        //if (!reader.HasRows)
-        //{
-        //    _logger.LogInformation("...no changes found to merge");
-        //    return false;
-        //}
-
-        //var primaryKeyProp = entity.Attributes.Where(p => p.IsPrimaryKey).First();
-
-        //var targetColumns = entity.Attributes.Select(p => p.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        //var matchingSourceColumns = (await reader.GetColumnSchemaAsync()).Select(c => c.ColumnName).Where(c => targetColumns.Contains(c)).ToArray();
-
-        //var matchingSourceColumsSql = string.Join(',', matchingSourceColumns);
-
-        //var sourceInsertParameters = String.Join(',', matchingSourceColumns.Select(c => $"@{c}").ToArray());
-
-        //var sourceUpdateParameters = String.Join(',', matchingSourceColumns.Where(c => !c.Equals(primaryKeyProp.Name)).Select(c => $"[{c}]=@{c}").ToArray());
-
-        //var matchedCount = matchingSourceColumns.Length;
-
-        //var upsertSql = $@"
-        //    UPDATE [{entity.Schema}].[{entity.Table}] WITH (UPDLOCK, SERIALIZABLE) 
-        //        SET {sourceUpdateParameters} 
-        //        WHERE [{primaryKeyProp.Name}]=@{primaryKeyProp.Name};
-
-        //    IF @@ROWCOUNT = 0
-        //    BEGIN
-        //        INSERT INTO [{entity.Schema}].[{entity.Table}] ({matchingSourceColumsSql}) VALUES ({sourceInsertParameters})
-        //    END
-        //";
-
-        //using var transaction = await connectionTarget.BeginTransactionAsync() as NpgsqlTransaction;
-
-        //if (transaction is null)
-        //{
-        //    return false;
-        //}
-
-        //try
-        //{
-        //    using var cmdUpsert = new NpgsqlCommand(upsertSql, connectionTarget, transaction);
-
-        //    var recordsUpserted = 0;
-
-        //    while (await reader.ReadAsync())
-        //    {
-        //        foreach (var (dateColumn, (lastMergeDateTimeStamp, updated)) in newLastMergeDateTimeStamp)
-        //        {
-        //            var dateValue = reader[dateColumn];
-
-        //            if (dateValue == DBNull.Value) continue;
-
-        //            // TODO: Check if it is DateTime or DateTimeOffset and cast appropriately
-
-        //            var date = new DateTimeOffset((DateTime)dateValue, new TimeSpan());
-
-        //            if (date > lastMergeDateTimeStamp)
-        //            {
-        //                newLastMergeDateTimeStamp[dateColumn] = new() { LastMergeDateTimeStamp = date, Updated = true };
-        //            }
-        //        }
-
-        //        cmdUpsert.Parameters.Clear();
-
-        //        foreach (var columnName in matchingSourceColumns)
-        //        {
-        //            cmdUpsert.Parameters.AddWithValue($"@{columnName}", reader[columnName]);
-        //        }
-
-        //        recordsUpserted += await cmdUpsert.ExecuteNonQueryAsync();
-
-        //    }
-
-        //    await transaction.CommitAsync();
-
-        //    _logger.LogInformation("...updated {count} records", recordsUpserted);
-        //}
-        //catch (NpgsqlException)
-        //{
-        //    await transaction.RollbackAsync();
-        //    throw;
-        //}
-
-        //foreach (var (dateColumn, (lastMergeDateTimeStamp, updated)) in newLastMergeDateTimeStamp)
-        //{
-        //    if (updated)
-        //    {
-        //        await SetLastMergeDateTimeStamp(metaDbConnection, loader.Name, dateColumn, lastMergeDateTimeStamp);
-        //    }
-        //}
-
         return true;
 
     }
@@ -441,7 +313,7 @@ internal class PostgresLoaderProvider // LoaderExecuter
         {
             ConnectionManager = destinationDb,
             TableName = Constants.Database.MergeStateTable,
-        };  
+        };
 
         var findQuery = new Query(
                 $"meta.{Constants.Database.MergeStateTable}")
@@ -449,13 +321,13 @@ internal class PostgresLoaderProvider // LoaderExecuter
                 .Where("Loader", loaderName)
                 .Select("LastDateLoaded");
 
-        var findSql =_compiler.Compile(findQuery).ToString();
+        var findSql = _compiler.Compile(findQuery).ToString();
 
         object? resultDate = null;
         SqlTask.ExecuteReader(destinationDb, findSql, r => resultDate = r);
         if (resultDate is not null)
         {
-            return new  DateTimeOffset((DateTime)resultDate);
+            return new DateTimeOffset((DateTime)resultDate);
         }
 
         var insertQuery = new Query($"meta.{Constants.Database.MergeStateTable}").AsInsert(
@@ -480,17 +352,17 @@ internal class PostgresLoaderProvider // LoaderExecuter
 
         _logger.LogInformation("...setting last merge date for {loaderName}.{dateColumn} to {lastMergeDateTime}", loaderName, dateColumn, lastMergeDateTime);
 
-         var updateQuery = new Query($"meta.{Constants.Database.MergeStateTable}")
-           .Where("Property", dateColumn)
-           .Where("Loader", loaderName)
-           .AsUpdate(
-           new
-           {
-               LastDateLoaded = lastMergeDateTime
-           });
+        var updateQuery = new Query($"meta.{Constants.Database.MergeStateTable}")
+          .Where("Property", dateColumn)
+          .Where("Loader", loaderName)
+          .AsUpdate(
+          new
+          {
+              LastDateLoaded = lastMergeDateTime
+          });
 
         var updateSql = _compiler.Compile(updateQuery).ToString();
-    
+
         var result = SqlTask.ExecuteNonQuery(destinationDb, updateSql);
 
         return result == 1;

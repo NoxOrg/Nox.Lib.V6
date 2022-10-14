@@ -1,16 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Nox.Dynamic.MetaData;
-using Nox.Dynamic.Loaders.Providers;
 using System.Collections.ObjectModel;
 using YamlDotNet.Serialization;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.KeyVault;
-using System.Data.SqlClient;
 using Nox.Dynamic.Exceptions;
-using System.Reflection;
-using Nox.Dynamic.ExtendedAttributes;
-using ETLBoxOffice.LicenseManager;
 
 namespace Nox.Dynamic.Services
 {

@@ -1,7 +1,7 @@
 ﻿using ETLBox.Connection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Nox.Dynamic.Loaders.Providers;
+using Nox.Dynamic.Loaders;
 using Nox.Dynamic.MetaData;
 using Npgsql;
 using System;
@@ -102,10 +102,9 @@ namespace Nox.Dynamic.DatabaseProviders
 
         public async Task<bool> LoadData(Service service, ILogger logger)
         {
-            // TODO: This is now the common loader and needs to replace the postgres and sql 
-            var loaderProvider = new PostgresLoaderProvider(logger);
+            var loaderProvider = new LoaderExecuter(logger);
 
-            return await loaderProvider.ExecuteLoadersAsync(service);
+            return await loaderProvider.ExecuteAsync(service);
         }
 
     }
