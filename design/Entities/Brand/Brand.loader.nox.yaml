@@ -30,11 +30,11 @@ Sources:
            [BrandID] AS [Id]
           ,[BrandName] AS [Name]
           ,[BrandShortName] AS [ShortName]
-          , CASE
-              WHEN [CorporateVentureId] = 50 THEN 2
-              ELSE 1
-            END
-            AS [PlatformTenantId]
+          --, CASE
+              --WHEN [CorporateVentureId] = 50 THEN 2
+              --ELSE 1
+            --END
+            --AS [PlatformTenantId]
           ,[BrandLogo] AS [Logo_1024x1024_Url]
           ,[BrandLogo] AS [Logo_1024x768_Url]
           ,[WebsiteUrl]

@@ -5,6 +5,8 @@
 Name: Workplace
 Description: Information on places where people can work
 PluralName: Workplaces
+Table: Workplace
+Schema: dbo
 
 RelatedParents: [Brand,Country]
 
@@ -37,29 +39,37 @@ Attributes:
     MaxWidth: 18
     Precision: 15
 
-  - Name: OpeningTime
-    Description: The opening time for the workplace
-    Type: time
-    IsRequired: false
-    Default: '08:30'
-    DefaultFromParents: [AdministrativeArea,Country]
+  - Name: CountryId
+    Description: The country ISO code
+    Type: int
 
-  - Name: ClosingTime
-    Description: The closing time for the workplace
-    Type: time
-    IsRequired: false
-    Default: '17:30'
-    DefaultFromParents: [AdministrativeArea,Country]
+  - Name: BrandId
+    Description: The Brand code
+    Type: int
 
-  - Name: Is24Hour
-    Type: bool
-    Formula: AND(OpeningTime="00:00:00",ClosingTime="23:59:59")
+  #- Name: OpeningTime
+    #Description: The opening time for the workplace
+    #Type: time
+    #IsRequired: false
+    #Default: '08:30'
+    #DefaultFromParents: [AdministrativeArea,Country]
 
-  - Name: IsPublicHoliday
-    Description: Is it a public holiday
-    Type: bool
-    Default: false
-    DefaultFromParents: [AdministrativeArea,Country]
-    IsTemporalOnly: true
+  #- Name: ClosingTime
+    #Description: The closing time for the workplace
+    #Type: time
+    #IsRequired: false
+    #Default: '17:30'
+    #DefaultFromParents: [AdministrativeArea,Country]
+
+  #- Name: Is24Hour
+    #Type: bool
+    #Formula: AND(OpeningTime="00:00:00",ClosingTime="23:59:59")
+
+  #- Name: IsPublicHoliday
+    #Description: Is it a public holiday
+    #Type: bool
+    #Default: false
+    #DefaultFromParents: [AdministrativeArea,Country]
+    #IsTemporalOnly: true
 
 

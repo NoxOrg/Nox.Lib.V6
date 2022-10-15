@@ -34,6 +34,6 @@ Sources:
               ,[BrandID] AS [BrandId]
               ,[Centre].[CreateDate] AS [CreateDate]
               ,[Centre].[EditDate] AS [EditDate]
-      FROM 		  [TitanProduction].[dbo].[Centre] WITH (NOLOCK)
-      LEFT JOIN	[Country] ON [Country].[CountryID]=[Centre].[CountryID]
+      FROM 		  dbo.[Centre] WITH (NOLOCK)
+      LEFT JOIN	dbo.[Country] ON [Country].[CountryID]=[Centre].[CountryID]
       WHERE 		[Centre].[IsCurrentVersion]=1

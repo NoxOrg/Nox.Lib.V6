@@ -1,14 +1,9 @@
 ﻿using ETLBox.Connection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Nox.Dynamic.Loaders.Providers;
+using Nox.Dynamic.Loaders;
 using Nox.Dynamic.MetaData;
-using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nox.Dynamic.DatabaseProviders
 {
@@ -99,9 +94,9 @@ namespace Nox.Dynamic.DatabaseProviders
 
         public async Task<bool> LoadData(Service service, ILogger logger)
         {
-            var loaderProvider = new SqlServerLoaderProvider(logger);
+            var loaderProvider = new LoaderExecuter(logger);
 
-            return await loaderProvider.ExecuteLoadersAsync(service);
+            return await loaderProvider.ExecuteAsync(service);
         }
 
     }
