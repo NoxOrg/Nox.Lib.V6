@@ -44,8 +44,11 @@ internal class LoaderExecuter
 
         foreach (var entity in sortedEntities)
         {
-            var loader = loaders.First(l => l.Target.Entity == entity.Name);
-            await LoadDataFromSource(destinationDbProvider, loader, entity, compiler);
+            var entityLoaders = loaders.Where(l => l.Target.Entity == entity.Name);
+            foreach (var loader in entityLoaders)
+            {
+                await LoadDataFromSource(destinationDbProvider, loader, entity, compiler);
+            }
         }
 
         return true;
