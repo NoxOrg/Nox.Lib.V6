@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Nox.Dynamic.Loaders;
 using Nox.Dynamic.MetaData;
 using Npgsql;
+using SqlKata.Compilers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,9 @@ namespace Nox.Dynamic.DatabaseProviders
 
         public string ConnectionString => _connectionString;
         public IConnectionManager ConnectionManager => _connectionManager;
+
+        public Compiler SqlCompiler => new PostgresCompiler();
+
 
         public PostgresDatabaseProvider(IServiceDatabase serviceDb, string applicationName)
         {

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Nox.Dynamic.MetaData;
+using SqlKata.Compilers;
 
 namespace Nox.Dynamic.DatabaseProviders
 {
@@ -10,6 +11,8 @@ namespace Nox.Dynamic.DatabaseProviders
         public string ConnectionString { get; }
 
         public IConnectionManager ConnectionManager { get; }
+
+        public Compiler SqlCompiler { get; }
 
         public void ConfigureDbContext(DbContextOptionsBuilder optionsBuilder);
 

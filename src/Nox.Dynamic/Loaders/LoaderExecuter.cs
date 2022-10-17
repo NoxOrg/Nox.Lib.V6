@@ -17,7 +17,6 @@ internal class LoaderExecuter
 {
 
     private readonly ILogger _logger;
-    private static readonly PostgresCompiler _compiler = new PostgresCompiler();
 
     public LoaderExecuter(ILogger logger)
     {
@@ -27,6 +26,8 @@ internal class LoaderExecuter
     public async Task<bool> ExecuteAsync(Service service)
     {
         var destinationDbProvider = service.Database.DatabaseProvider!;
+
+        var compiler = destinationDbProvider.SqlCompiler;
 
         var loaders = service.Loaders;
 
@@ -44,7 +45,7 @@ internal class LoaderExecuter
         foreach (var entity in sortedEntities)
         {
             var loader = loaders.First(l => l.Target.Entity == entity.Name);
-            await LoadDataFromSource(destinationDbProvider, loader, entity);
+            await LoadDataFromSource(destinationDbProvider, loader, entity, compiler);
         }
 
         return true;
@@ -130,7 +131,7 @@ internal class LoaderExecuter
 
 
     private async Task LoadDataFromSource(IDatabaseProvider destinationDbProvider,
-        Loader loader, Entity entity)
+        Loader loader, Entity entity, Compiler compiler)
     {
         var destinationDb = destinationDbProvider.ConnectionManager;
         var destinationTable = destinationDbProvider.ToTableNameForSql(entity);
@@ -155,7 +156,7 @@ internal class LoaderExecuter
                     case "mergenew":
                         _logger.LogInformation("Merging new data for entity {entity}...", entity.Name);
 
-                        await MergeNewData(sourceDb, destinationDb, loaderSource, loader, destinationTable, entity);
+                        await MergeNewData(sourceDb, destinationDb, loaderSource, loader, destinationTable, entity, compiler);
 
                         break;
 
@@ -206,7 +207,8 @@ internal class LoaderExecuter
         LoaderSource loaderSource,
         Loader loader,
         string destinationTable,
-        Entity entity)
+        Entity entity,
+        Compiler compiler)
     {
         var newLastMergeDateTimeStamp = new Dictionary<string, (DateTimeOffset LastMergeDateTimeStamp, bool Updated)>();
 
@@ -217,7 +219,7 @@ internal class LoaderExecuter
 
         foreach (var dateColumn in loader.LoadStrategy.Columns)
         {
-            lastMergeDateTimeStamp = GetLastMergeDateTimeStampAsync(destinationDb, loader.Name, dateColumn);
+            lastMergeDateTimeStamp = GetLastMergeDateTimeStampAsync(destinationDb, loader.Name, dateColumn, compiler);
 
             sb.Append($" OR ([{dateColumn}] IS NOT NULL AND [{dateColumn}] > '{lastMergeDateTimeStamp:yyyy-MM-dd HH:mm:ss.fff}')");
 
@@ -298,14 +300,14 @@ internal class LoaderExecuter
 
         foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
         {
-            SetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, timeStamp);
+            SetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, timeStamp, compiler);
         }
         return true;
 
     }
 
 
-    private DateTimeOffset GetLastMergeDateTimeStampAsync(IConnectionManager destinationDb, string loaderName, string dateColumn)
+    private DateTimeOffset GetLastMergeDateTimeStampAsync(IConnectionManager destinationDb, string loaderName, string dateColumn, Compiler compiler)
     {
         var lastMergeDateTime = new DateTimeOffset(1900, 1, 1, 0, 0, 0, new TimeSpan());
 
@@ -321,7 +323,7 @@ internal class LoaderExecuter
                 .Where("Loader", loaderName)
                 .Select("LastDateLoaded");
 
-        var findSql = _compiler.Compile(findQuery).ToString();
+        var findSql = compiler.Compile(findQuery).ToString();
 
         object? resultDate = null;
         SqlTask.ExecuteReader(destinationDb, findSql, r => resultDate = r);
@@ -338,7 +340,7 @@ internal class LoaderExecuter
             LastDateLoaded = lastMergeDateTime
         });
 
-        var insertSql = _compiler.Compile(insertQuery).ToString();
+        var insertSql = compiler.Compile(insertQuery).ToString();
 
         SqlTask.ExecuteNonQuery(destinationDb, insertSql);
 
@@ -347,7 +349,7 @@ internal class LoaderExecuter
     }
 
     private bool SetLastMergeDateTimeStamp(IConnectionManager destinationDb, string loaderName,
-        string dateColumn, DateTimeOffset lastMergeDateTime)
+        string dateColumn, DateTimeOffset lastMergeDateTime, Compiler compiler)
     {
 
         _logger.LogInformation("...setting last merge date for {loaderName}.{dateColumn} to {lastMergeDateTime}", loaderName, dateColumn, lastMergeDateTime);
@@ -361,7 +363,7 @@ internal class LoaderExecuter
               LastDateLoaded = lastMergeDateTime
           });
 
-        var updateSql = _compiler.Compile(updateQuery).ToString();
+        var updateSql = compiler.Compile(updateQuery).ToString();
 
         var result = SqlTask.ExecuteNonQuery(destinationDb, updateSql);
 

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Nox.Dynamic.Loaders;
 using Nox.Dynamic.MetaData;
+using SqlKata.Compilers;
 using System.Data.SqlClient;
 
 namespace Nox.Dynamic.DatabaseProviders
@@ -17,6 +18,8 @@ namespace Nox.Dynamic.DatabaseProviders
         public string ConnectionString => _connectionString;
         
         public IConnectionManager ConnectionManager => _connectionManager;
+
+        public Compiler SqlCompiler => new SqlServerCompiler();
 
         public SqlServerDatabaseProvider(IServiceDatabase serviceDb, string applicationName)
         {
