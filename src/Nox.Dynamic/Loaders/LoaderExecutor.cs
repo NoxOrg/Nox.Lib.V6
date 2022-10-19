@@ -137,7 +137,7 @@ internal class LoaderExecutor
         Compiler sourceSqlCompiler,
         Compiler destinationSqlCompiler)
     {
-        var newLastMergeDateTimeStamp = new Dictionary<string, (DateTimeOffset LastMergeDateTimeStamp, bool Updated)>();
+        var newLastMergeDateTimeStamp = new Dictionary<string, (DateTime LastMergeDateTimeStamp, bool Updated)>();
 
         var targetColumns = entity.Attributes.Where(a => a.IsMappedAttribute).Select(a => a.Name)
                 .Concat(entity.RelatedParents.Select(p => p + "Id"))
@@ -147,13 +147,13 @@ internal class LoaderExecutor
         var query = new Query().FromRaw($"({loaderSource.Query}) AS tmp")
             .Select(targetColumns);
 
-        var lastMergeDateTimeStamp = DateTimeOffset.MinValue;
+        var lastMergeDateTimeStamp = DateTime.MinValue;
 
         foreach (var dateColumn in loader.LoadStrategy.Columns)
         {
             lastMergeDateTimeStamp = GetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, destinationSqlCompiler);
 
-            if (!lastMergeDateTimeStamp.Equals(DateTimeOffset.MinValue))
+            if (!lastMergeDateTimeStamp.Equals(DateTime.MinValue))
             {
                 query = query.Where(
                     q => q.WhereNotNull(dateColumn).Where(dateColumn, ">", lastMergeDateTimeStamp)
@@ -209,15 +209,24 @@ internal class LoaderExecutor
         analatics.WriteAction = (row, _) =>
         {
             dynamic r = row as ExpandoObject;
+            IDictionary<string, object?> d = new Dictionary<string, object?>(row);
+
             if (r.ChangeAction == ChangeAction.Insert)
             {
                 inserts++;
                 foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
                 {
-                    if (r[dateColumn].HasValue && r[dateColumn] > newLastMergeDateTimeStamp[dateColumn].LastMergeDateTimeStamp)
+
+                    if (d[dateColumn] != null)
                     {
-                        newLastMergeDateTimeStamp[dateColumn].LastMergeDateTimeStamp = r[dateColumn];
-                        newLastMergeDateTimeStamp[dateColumn].Updated = true;
+                        var fieldValue = (DateTime)d[dateColumn]!;
+                        if (fieldValue > newLastMergeDateTimeStamp[dateColumn].LastMergeDateTimeStamp)
+                        {
+                            var changeEntry = newLastMergeDateTimeStamp[dateColumn];
+                            changeEntry.LastMergeDateTimeStamp = fieldValue;
+                            changeEntry.Updated = true;
+                            newLastMergeDateTimeStamp[dateColumn] = changeEntry;
+                        }
                     }
                 }
 
@@ -225,6 +234,21 @@ internal class LoaderExecutor
             else if (r.ChangeAction == ChangeAction.Update)
             {
                 updates++;
+                foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
+                {
+
+                    if (d[dateColumn] != null)
+                    {
+                        var fieldValue = (DateTime)d[dateColumn]!;
+                        if (fieldValue > newLastMergeDateTimeStamp[dateColumn].LastMergeDateTimeStamp)
+                        {
+                            var changeEntry = newLastMergeDateTimeStamp[dateColumn];
+                            changeEntry.LastMergeDateTimeStamp = fieldValue;
+                            changeEntry.Updated = true;
+                            newLastMergeDateTimeStamp[dateColumn] = changeEntry;
+                        }
+                    }
+                }
             }
             else if (r.ChangeAction == ChangeAction.Exists)
             {
@@ -263,16 +287,19 @@ internal class LoaderExecutor
 
         foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
         {
-            SetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, timeStamp, destinationSqlCompiler);
+            if (updated)
+            {
+                SetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, timeStamp, destinationSqlCompiler);
+            }
         }
         return true;
 
     }
 
 
-    private DateTimeOffset GetLastMergeDateTimeStamp(IConnectionManager destinationDb, string loaderName, string dateColumn, Compiler compiler)
+    private DateTime GetLastMergeDateTimeStamp(IConnectionManager destinationDb, string loaderName, string dateColumn, Compiler compiler)
     {
-        var lastMergeDateTime = DateTimeOffset.MinValue;
+        var lastMergeDateTime = DateTime.MinValue;
 
         var destination = new DbDestination()
         {
@@ -284,7 +311,7 @@ internal class LoaderExecutor
                 $"meta.{Constants.Database.MergeStateTable}")
                 .Where("Property", dateColumn)
                 .Where("Loader", loaderName)
-                .Select("LastDateLoaded");
+                .Select("LastDateLoadedUtc");
 
         var findSql = compiler.Compile(findQuery).ToString();
 
@@ -292,7 +319,7 @@ internal class LoaderExecutor
         SqlTask.ExecuteReader(destinationDb, findSql, r => resultDate = r);
         if (resultDate is not null)
         {
-            return new DateTimeOffset((DateTime)resultDate);
+            return (DateTime)resultDate;
         }
 
         var insertQuery = new Query($"meta.{Constants.Database.MergeStateTable}").AsInsert(
@@ -300,7 +327,7 @@ internal class LoaderExecutor
         {
             Loader = loaderName,
             Property = dateColumn,
-            LastDateLoaded = lastMergeDateTime
+            LastDateLoadedUtc = lastMergeDateTime
         });
 
         var insertSql = compiler.Compile(insertQuery).ToString();
@@ -312,7 +339,7 @@ internal class LoaderExecutor
     }
 
     private bool SetLastMergeDateTimeStamp(IConnectionManager destinationDb, string loaderName,
-        string dateColumn, DateTimeOffset lastMergeDateTime, Compiler compiler)
+        string dateColumn, DateTime lastMergeDateTime, Compiler compiler)
     {
 
         _logger.LogInformation("...setting last merge date for {loaderName}.{dateColumn} to {lastMergeDateTime}", loaderName, dateColumn, lastMergeDateTime);
@@ -323,7 +350,7 @@ internal class LoaderExecutor
           .AsUpdate(
           new
           {
-              LastDateLoaded = lastMergeDateTime
+              LastDateLoadedUtc = lastMergeDateTime
           });
 
         var updateSql = compiler.Compile(updateQuery).ToString();

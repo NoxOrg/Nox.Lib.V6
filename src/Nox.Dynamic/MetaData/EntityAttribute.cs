@@ -42,6 +42,9 @@ public sealed class EntityAttribute : MetaBase
 
         Type = Type.ToLower();
 
+        if(IsPrimaryKey)
+            IsRequired = true;
+
         return true;
     }
 
@@ -49,9 +52,7 @@ public sealed class EntityAttribute : MetaBase
 
     public Type NetDataType()
     {
-        var propType = Type?.ToLower() ?? "string";
-
-        return propType switch
+        return Type switch
         {
             "string" => typeof(String),
             "varchar" => typeof(String),

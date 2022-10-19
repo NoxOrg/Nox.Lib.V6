@@ -10,7 +10,7 @@ namespace Nox.Dynamic.MetaData
     {
         public string Loader { get; set; } = String.Empty;
         public string Property { get; set; } = String.Empty;
-        public DateTimeOffset LastDateLoaded { get; set; }
+        public DateTime LastDateLoadedUtc { get; set; }
             
     }
 }
