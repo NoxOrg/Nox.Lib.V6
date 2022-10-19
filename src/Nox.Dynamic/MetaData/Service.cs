@@ -28,9 +28,79 @@ public sealed class Service : MetaBase
 
         validator.ValidateAndThrow(this);
 
+        SortEntitiesByDependancy();
+
+        // for loaders 
         LicenseCheck.LicenseKey = configurationVariables["EtlBox:LicenseKey"];
 
     }
+
+    
+    private ICollection<Entity> SortEntitiesByDependancy()
+    {
+        var entities = Entities.ToList();
+
+        foreach (var entity in entities)
+        {
+            foreach (var parent in entity.RelatedParents)
+            {
+                entities
+                    .First(x => x.Name.Equals(parent, StringComparison.OrdinalIgnoreCase))
+                    .RelatedChildren
+                    .Add(entity.Name);
+            }
+        }
+
+        // Rough sort entities by parent count
+
+        entities.Sort((entity1, entity2) =>
+            entity1.RelatedParents.Count.CompareTo(entity2.RelatedParents.Count));
+
+        // heirachy sort to place entities in dependency order
+
+        var i = 0;
+        var sortedEntities = new List<Entity>();
+        while (entities.Count > 0)
+        {
+            var count = CountParentsInSortedEntities(entities, sortedEntities, i);
+
+            if (count == entities[i].RelatedParents.Count)
+            {
+                sortedEntities.Add(entities[i]);
+                entities.RemoveAt(i);
+                i = 0;
+            }
+            else
+            {
+                if (++i >= entities.Count)
+                {
+                    i = 0;
+                }
+            }
+        }
+
+        i = 1;
+        sortedEntities.ForEach(e => e.SortOrder = i++);
+
+        return sortedEntities;
+
+    }
+
+    private static int CountParentsInSortedEntities(
+            IList<Entity> unsortedEntities,
+            IList<Entity> sortedEntities,
+            int iteration)
+    {
+        var result = 0;
+
+        foreach (string p in unsortedEntities[iteration].RelatedParents)
+        {
+            result += sortedEntities.Count(x => x.Name.Equals(p));
+        }
+
+        return result;
+    }
+
 }
 
 internal class ServiceValidator : AbstractValidator<Service>

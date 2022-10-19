@@ -15,11 +15,13 @@ namespace Nox.Dynamic.DatabaseProviders
 
         private readonly IConnectionManager _connectionManager;
 
+        private readonly Compiler _sqlCompiler;
+
         public string ConnectionString => _connectionString;
         
         public IConnectionManager ConnectionManager => _connectionManager;
 
-        public Compiler SqlCompiler => new SqlServerCompiler();
+        public Compiler SqlCompiler => _sqlCompiler;
 
         public SqlServerDatabaseProvider(IServiceDatabase serviceDb, string applicationName)
         {
@@ -45,6 +47,8 @@ namespace Nox.Dynamic.DatabaseProviders
             _connectionString = serviceDb.ConnectionString = csb.ToString();
 
             _connectionManager = new SqlConnectionManager(_connectionString);
+
+            _sqlCompiler = new SqlServerCompiler();
         }
 
         public void ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
@@ -97,7 +101,7 @@ namespace Nox.Dynamic.DatabaseProviders
 
         public async Task<bool> LoadData(Service service, ILogger logger)
         {
-            var loaderProvider = new LoaderExecuter(logger);
+            var loaderProvider = new LoaderExecutor(logger);
 
             return await loaderProvider.ExecuteAsync(service);
         }

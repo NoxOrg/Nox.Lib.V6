@@ -1,4 +1,5 @@
 ﻿using ETLBox.Connection;
+using ETLBox.ControlFlow;
 using ETLBox.ControlFlow.Tasks;
 using ETLBox.DataFlow;
 using ETLBox.DataFlow.Connectors;
@@ -13,164 +14,87 @@ using System.Text;
 
 namespace Nox.Dynamic.Loaders;
 
-internal class LoaderExecuter
+internal class LoaderExecutor
 {
 
     private readonly ILogger _logger;
 
-    public LoaderExecuter(ILogger logger)
+    public LoaderExecutor(ILogger logger)
     {
         _logger = logger;
     }
 
     public async Task<bool> ExecuteAsync(Service service)
     {
-        var destinationDbProvider = service.Database.DatabaseProvider!;
+        ETLBox.Logging.Logging.LogInstance = _logger;
 
-        var compiler = destinationDbProvider.SqlCompiler;
+        var destinationDbProvider = service.Database.DatabaseProvider!;
 
         var loaders = service.Loaders;
 
         var entities = service.Entities.ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
 
-        var sortedEntities = EntitiesSortedByDependancy(entities);
+        var sortedLoaders = loaders.OrderBy(l => entities[l.Target.Entity].SortOrder).ToList();
 
-        //foreach (var loader in LoadersSortedByDependancy(loaders, entities))
-        //{
-        //    var entity = entities[loader.Target.Entity];
-
-        //    await LoadDataFromSource(destinationDbProvider, loader, entity);
-        //}
-
-        foreach (var entity in sortedEntities)
+        foreach (var loader in sortedLoaders)
         {
-            var entityLoaders = loaders.Where(l => l.Target.Entity == entity.Name);
-            foreach (var loader in entityLoaders)
-            {
-                await LoadDataFromSource(destinationDbProvider, loader, entity, compiler);
-            }
+            await LoadDataFromSource(destinationDbProvider, loader, entities[loader.Target.Entity]);
         }
 
         return true;
     }
 
 
-    private ICollection<Loader> LoadersSortedByDependancy(
-        ICollection<Loader> loaders,
-        IDictionary<string, Entity> entitiesDictionary)
-    {
-        return loaders.OrderBy(l => entitiesDictionary[l.Target.Entity].SortOrder).ToList();
-    }
-
-
-    // TODO: Move to Service.cs
-    // Note to Andre: Parked since we still need a better way to manage the sort at Drop and Load. >>>>> backlog  :(
-    private ICollection<Entity> EntitiesSortedByDependancy(
-        IDictionary<string, Entity> entitiesDictionary)
-    {
-        var entities = entitiesDictionary.Values.ToList();
-
-        foreach (var entity in entities)
-        {
-            foreach (var parent in entity.RelatedParents)
-            {
-                entities
-                    .First(x => x.Name.Equals(parent, StringComparison.OrdinalIgnoreCase))
-                    .RelatedChildren
-                    .Add(entity.Name);
-            }
-        }
-
-        // rough sort
-        entities.Sort((entity1, entity2) =>
-            entity1.RelatedParents.Count.CompareTo(entity2.RelatedParents.Count));
-
-        // heirachy sort to place entities in dependency order
-        var i = 0;
-        var sortedEntities = new List<Entity>();
-        while (entities.Count > 0)
-        {
-            var count = CountParentsInSortedEntities(entities, sortedEntities, i);
-
-            if (count == entities[i].RelatedParents.Count)
-            {
-                sortedEntities.Add(entities[i]);
-                entities.RemoveAt(i);
-                i = 0;
-            }
-            else
-            {
-                if (++i >= entities.Count)
-                {
-                    i = 0;
-                }
-            }
-        }
-
-        i = 1;
-        foreach (var e in sortedEntities)
-        {
-            e.SortOrder = i++;
-        }
-
-        return sortedEntities;
-
-    }
-
-    private static int CountParentsInSortedEntities(
-            List<Entity> unsortedEntities,
-            List<Entity> sortedEntities,
-            int iteration)
-    {
-        var result = 0;
-
-        foreach (string p in unsortedEntities[iteration].RelatedParents)
-        {
-            result += sortedEntities.Count(x => x.Name.Equals(p));
-        }
-
-        return result;
-    }
-
-
     private async Task LoadDataFromSource(IDatabaseProvider destinationDbProvider,
-        Loader loader, Entity entity, Compiler compiler)
+        Loader loader, Entity entity)
     {
         var destinationDb = destinationDbProvider.ConnectionManager;
+
         var destinationTable = destinationDbProvider.ToTableNameForSql(entity);
+
+        var destinationSqlCompiler = destinationDbProvider.SqlCompiler;
 
         foreach (var loaderSource in loader.Sources)
         {
-            if (loaderSource.DatabaseProvider is not null)
+            if (loaderSource.DatabaseProvider is null)
             {
-                var sourceDb = loaderSource.DatabaseProvider.ConnectionManager;
-
-                var loadStrategy = loader.LoadStrategy.Type.Trim().ToLower();
-
-                switch (loadStrategy)
-                {
-                    case "dropandload":
-                        _logger.LogInformation("Dropping and loading data for entity {entity}...", entity.Name);
-
-                        await DropAndLoadData(sourceDb, destinationDb, loaderSource, destinationTable);
-
-                        break;
-
-                    case "mergenew":
-                        _logger.LogInformation("Merging new data for entity {entity}...", entity.Name);
-
-                        await MergeNewData(sourceDb, destinationDb, loaderSource, loader, destinationTable, entity, compiler);
-
-                        break;
-
-                    default:
-
-                        await Task.Delay(1);
-
-                        break;
-
-                };
+                continue;
             }
+
+            var sourceDb = loaderSource.DatabaseProvider.ConnectionManager;
+
+
+            var sourceSqlCompiler = loaderSource.DatabaseProvider.SqlCompiler!;
+
+            var loadStrategy = loader.LoadStrategy.Type.Trim().ToLower();
+
+            switch (loadStrategy)
+            {
+                case "dropandload":
+                    _logger.LogInformation("Dropping and loading data for entity {entity}...", entity.Name);
+
+                    await DropAndLoadData(sourceDb, destinationDb, loaderSource, destinationTable);
+
+                    break;
+
+                case "mergenew":
+                    _logger.LogInformation("Merging new data for entity {entity}...", entity.Name);
+
+                    await MergeNewData(sourceDb, destinationDb, 
+                        loaderSource, loader, destinationTable, entity, 
+                        sourceSqlCompiler, destinationSqlCompiler);
+
+                    break;
+
+                default:
+
+                    _logger.LogError("Unsupported load strategy '{loadStrategy}' in loader '{loaderName}'.",
+                        loader.LoadStrategy.Type, loader.Name);
+
+                    break;
+
+            };
+            
         }
     }
 
@@ -206,46 +130,73 @@ internal class LoaderExecuter
     private async Task<bool> MergeNewData(
         IConnectionManager sourceDb,
         IConnectionManager destinationDb,
-
         LoaderSource loaderSource,
         Loader loader,
         string destinationTable,
         Entity entity,
-        Compiler compiler)
+        Compiler sourceSqlCompiler,
+        Compiler destinationSqlCompiler)
     {
         var newLastMergeDateTimeStamp = new Dictionary<string, (DateTimeOffset LastMergeDateTimeStamp, bool Updated)>();
 
-        var query = $"SELECT {string.Join(',', entity.Attributes.Where(a => a.IsMappedAttribute).Select(a => a.Name))}  FROM ({loaderSource.Query}) AS [tmp] WHERE 1=0";
+        var targetColumns = entity.Attributes.Where(a => a.IsMappedAttribute).Select(a => a.Name)
+                .Concat(entity.RelatedParents.Select(p => p + "Id"))
+                .Concat(loader.LoadStrategy.Columns.Select(c => c))
+                .ToArray();
 
-        var sb = new StringBuilder(query);
+        var query = new Query().FromRaw($"({loaderSource.Query}) AS tmp")
+            .Select(targetColumns);
+
         var lastMergeDateTimeStamp = DateTimeOffset.MinValue;
 
         foreach (var dateColumn in loader.LoadStrategy.Columns)
         {
-            lastMergeDateTimeStamp = GetLastMergeDateTimeStampAsync(destinationDb, loader.Name, dateColumn, compiler);
+            lastMergeDateTimeStamp = GetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, destinationSqlCompiler);
 
-            sb.Append($" OR ([{dateColumn}] IS NOT NULL AND [{dateColumn}] > '{lastMergeDateTimeStamp:yyyy-MM-dd HH:mm:ss.fff}')");
+            if (!lastMergeDateTimeStamp.Equals(DateTimeOffset.MinValue))
+            {
+                query = query.Where(
+                    q => q.WhereNotNull(dateColumn).Where(dateColumn, ">", lastMergeDateTimeStamp)
+                );
+            }
 
             newLastMergeDateTimeStamp[dateColumn] = new() { LastMergeDateTimeStamp = lastMergeDateTimeStamp, Updated = false };
         }
 
-        var finalQuery = sb.ToString();
+        var compiledQuery = sourceSqlCompiler.Compile(query);
+
+        var finalQuerySql = compiledQuery.Sql;
+        
+        var finalQueryParams = compiledQuery.NamedBindings.Select(nb => new QueryParameter(nb.Key,nb.Value));
 
         var source = new DbSource()
         {
             ConnectionManager = sourceDb,
-            Sql = finalQuery,
+            Sql = finalQuerySql,
+            SqlParameter = finalQueryParams,
         };
 
-        var destination = new DbMerge(destinationDb, destinationTable);
-
+        var destination = new DbMerge(destinationDb, destinationTable)
+        {
+            CacheMode = ETLBox.DataFlow.Transformations.CacheMode.Partial,
+            MergeMode = MergeMode.InsertsAndUpdates,
+        };
+        
         destination.MergeProperties.IdColumns =
-            entity.Attributes.Where(a => a.IsPrimaryKey).Select(o => new IdColumn() { IdPropertyName = o.Name }).ToArray();
+            targetColumns
+            .Skip(0)
+            .Take(1)
+            .Select(colName => new IdColumn() { IdPropertyName = colName })
+            .ToArray();
+        
         destination.MergeProperties.CompareColumns =
-            entity.Attributes.Where(a => !a.IsPrimaryKey && a.IsMappedAttribute).Select(o => new CompareColumn() { ComparePropertyName = o.Name }).ToArray();
+            targetColumns
+            .Skip(1)
+            .Take(targetColumns.Length - 1 - loader.LoadStrategy.Columns.Length)
+            .Select(colName => new CompareColumn() { ComparePropertyName = colName })
+            .ToArray();
 
-        destination.CacheMode = ETLBox.DataFlow.Transformations.CacheMode.Partial;
-        destination.MergeMode = MergeMode.InsertsAndUpdates;
+        // TODO: We are not extracting and storing the MAX of the dates retrieved.
 
         source.LinkTo(destination);
 
@@ -261,6 +212,15 @@ internal class LoaderExecuter
             if (r.ChangeAction == ChangeAction.Insert)
             {
                 inserts++;
+                foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
+                {
+                    if (r[dateColumn].HasValue && r[dateColumn] > newLastMergeDateTimeStamp[dateColumn].LastMergeDateTimeStamp)
+                    {
+                        newLastMergeDateTimeStamp[dateColumn].LastMergeDateTimeStamp = r[dateColumn];
+                        newLastMergeDateTimeStamp[dateColumn].Updated = true;
+                    }
+                }
+
             }
             else if (r.ChangeAction == ChangeAction.Update)
             {
@@ -303,16 +263,16 @@ internal class LoaderExecuter
 
         foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
         {
-            SetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, timeStamp, compiler);
+            SetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, timeStamp, destinationSqlCompiler);
         }
         return true;
 
     }
 
 
-    private DateTimeOffset GetLastMergeDateTimeStampAsync(IConnectionManager destinationDb, string loaderName, string dateColumn, Compiler compiler)
+    private DateTimeOffset GetLastMergeDateTimeStamp(IConnectionManager destinationDb, string loaderName, string dateColumn, Compiler compiler)
     {
-        var lastMergeDateTime = new DateTimeOffset(1900, 1, 1, 0, 0, 0, new TimeSpan());
+        var lastMergeDateTime = DateTimeOffset.MinValue;
 
         var destination = new DbDestination()
         {

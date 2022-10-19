@@ -19,10 +19,11 @@ namespace Nox.Dynamic.DatabaseProviders
 
         private readonly IConnectionManager _connectionManager;
 
+        private readonly Compiler _sqlCompiler;
+
         public string ConnectionString => _connectionString;
         public IConnectionManager ConnectionManager => _connectionManager;
-
-        public Compiler SqlCompiler => new PostgresCompiler();
+        public Compiler SqlCompiler => _sqlCompiler;
 
 
         public PostgresDatabaseProvider(IServiceDatabase serviceDb, string applicationName)
@@ -51,6 +52,7 @@ namespace Nox.Dynamic.DatabaseProviders
 
             _connectionManager = new PostgresConnectionManager(_connectionString);
 
+            _sqlCompiler = new PostgresCompiler();
         }
 
         public void ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
@@ -106,7 +108,7 @@ namespace Nox.Dynamic.DatabaseProviders
 
         public async Task<bool> LoadData(Service service, ILogger logger)
         {
-            var loaderProvider = new LoaderExecuter(logger);
+            var loaderProvider = new LoaderExecutor(logger);
 
             return await loaderProvider.ExecuteAsync(service);
         }

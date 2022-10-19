@@ -30,8 +30,8 @@ Sources:
               ,[CentreName] AS [Name]
               ,[Latitude]
               ,[Longitude]
-              ,[Country].[CountryISONumber] AS [CountryId]
               ,[BrandID] AS [BrandId]
+              ,[Country].[CountryISONumber] AS [CountryId]
               ,[Centre].[CreateDate] AS [CreateDate]
               ,[Centre].[EditDate] AS [EditDate]
       FROM 		  dbo.[Centre] WITH (NOLOCK)

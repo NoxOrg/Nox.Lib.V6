@@ -4,7 +4,7 @@
 
 Name: PlatformTenantLoader
 
-Description: Loads brand data 
+Description: Loads platform tenant data 
 
 Schedule:
   Start: Daily at 2am UTC

@@ -39,14 +39,6 @@ Attributes:
     MaxWidth: 18
     Precision: 15
 
-  - Name: CountryId
-    Description: The country ISO code
-    Type: int
-
-  - Name: BrandId
-    Description: The Brand code
-    Type: int
-
   #- Name: OpeningTime
     #Description: The opening time for the workplace
     #Type: time
