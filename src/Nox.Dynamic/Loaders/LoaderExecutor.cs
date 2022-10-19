@@ -26,7 +26,7 @@ internal class LoaderExecutor
 
     public async Task<bool> ExecuteAsync(Service service)
     {
-        ETLBox.Logging.Logging.LogInstance = _logger;
+        // ETLBox.Logging.Logging.LogInstance = _logger;
 
         var destinationDbProvider = service.Database.DatabaseProvider!;
 
