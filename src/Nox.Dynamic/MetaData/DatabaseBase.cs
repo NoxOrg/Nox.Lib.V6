@@ -36,7 +36,7 @@ public class DatabaseBase : MetaBase, IServiceDatabase
         switch (Provider)
         {
             case "sqlserver":
-                if (Port == 0) Port = 1443;
+                if (Port == 0) Port = 1433;
                 DatabaseProvider = new SqlServerDatabaseProvider(this, info.ServiceName);
                 break;
 
