@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <UserSecretsId>c85db8f6-e4ba-47a2-beb2-7cc33455348a</UserSecretsId>
 	<PackageId>Nox.Dynamic</PackageId>
-	<Version>1.0.2</Version>
+	<Version>1.0.3</Version>
 	<Authors>Andre Sharpe</Authors>
 	<Company>Creations Unlimited</Company>
   </PropertyGroup>
