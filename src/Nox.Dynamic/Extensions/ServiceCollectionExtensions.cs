@@ -13,7 +13,7 @@ using System.Configuration;
 
 namespace Nox.Dynamic.Extensions
 {
-    public static class ServiceCollectionExtension
+    public static class ServiceCollectionExtensions
     {
 
         public static IServiceCollection AddNox(this IServiceCollection services)

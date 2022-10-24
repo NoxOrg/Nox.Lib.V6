@@ -136,7 +136,7 @@ namespace Nox.Dynamic.DatabaseProviders
         {
             configuration.UsePostgreSqlStorage(_connectionString, new PostgreSqlStorageOptions
             {
-                SchemaName = "cron",
+                SchemaName = "jobs",
                 PrepareSchemaIfNecessary = true,
             });
             return configuration;

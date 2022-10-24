@@ -30,6 +30,8 @@ namespace Nox.Dynamic.Services
 
         public string Name => _service.Name;
 
+        public Service Service => _service;
+
         public ServiceDatabase ServiceDatabase => _service.Database;
 
         public string KeyVaultUri => _service.KeyVaultUri;
@@ -41,7 +43,8 @@ namespace Nox.Dynamic.Services
         public DynamicService(ILogger<DynamicService> logger, DynamicModel dynamicModel)
         {
             _logger = logger;
-            _service = dynamicModel.GetDynamicService()._service;
+
+            _service = dynamicModel.GetDynamicService().Service;
         }
 
         public async Task<bool> ExecuteDataLoadersAsync()

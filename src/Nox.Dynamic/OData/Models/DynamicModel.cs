@@ -98,8 +98,12 @@ namespace Nox.Dynamic.OData.Models
 
             var model = dbContext.Model;
 
-            dbContext.Database.EnsureCreated();
+            if (dbContext.Database.EnsureCreated())
+            {
+                dbContext.Add(_dynamicService.Service);
 
+                dbContext.SaveChanges();
+            }
 
         }
 
@@ -107,9 +111,15 @@ namespace Nox.Dynamic.OData.Models
         {
             // run once
 
-            _dynamicService.ExecuteDataLoadersAsync().GetAwaiter().GetResult();
+            foreach (var loader in _dynamicService.Loaders)
+            {
+                if (loader.Schedule.RunOnStartup)
+                {
+                    _dynamicService.ExecuteDataLoadersAsync().GetAwaiter().GetResult();
+                }
+            }
 
-            // setup recurring
+            // setup recurring jobs based on cron schedule
 
             foreach (var loader in _dynamicService.Loaders)
             {

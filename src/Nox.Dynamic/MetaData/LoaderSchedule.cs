@@ -7,6 +7,7 @@ namespace Nox.Dynamic.MetaData
         public string Start { get; set; } = string.Empty;
         public string CronExpression { get; set; } = string.Empty;
         public LoaderScheduleRetryPolicy Retry { get; set; } = new();
+        public bool RunOnStartup { get; set; } = true; 
 
         public bool ApplyDefaults()
         {

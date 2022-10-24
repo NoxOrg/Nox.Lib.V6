@@ -1,13 +1,8 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Hangfire;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
 using Nox.Dynamic.MetaData;
 using Nox.Dynamic.OData.Models;
-using System.Dynamic;
-using System.Text.Json;
 
 namespace Nox.Dynamic.Extensions;
 
@@ -111,19 +106,6 @@ public class DynamicApiMiddleware
         await _next(context);
     }
 
-}
-
-public static class RequestNoxMiddlewareExtensions
-{
-    public static IApplicationBuilder UseNox(
-        this IApplicationBuilder builder)
-    {
-        builder.UseMiddleware<DynamicApiMiddleware>().UseRouting();
-
-        builder.UseHangfireDashboard("/cron");
-
-        return builder;
-    }
 }
 
 internal class RouteMatcher

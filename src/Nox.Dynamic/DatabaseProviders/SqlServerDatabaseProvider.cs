@@ -131,7 +131,7 @@ namespace Nox.Dynamic.DatabaseProviders
                 QueuePollInterval = TimeSpan.Zero,
                 UseRecommendedIsolationLevel = true,
                 DisableGlobalLocks = true,
-                SchemaName = "cron",
+                SchemaName = "jobs",
                 PrepareSchemaIfNecessary = true,
             });
             return configuration;
