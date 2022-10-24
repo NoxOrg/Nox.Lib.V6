@@ -32,7 +32,6 @@ namespace Nox.Dynamic.OData.Models
                 var provider = _dynamicDbModel.GetDatabaseProvider();
 
                 provider.ConfigureDbContext(optionsBuilder);
-
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Humanizer;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,6 +18,13 @@ public sealed class Loader : MetaBase
     public LoaderTarget Target { get; set; } = new();
     public ICollection<LoaderSource> Sources { get; set; } = new Collection<LoaderSource>();
 
+    public bool ApplyDefaults()
+    {
+        Schedule.ApplyDefaults();
+
+        return true;
+    }
+
 }
 
 internal class LoaderValidator : AbstractValidator<Loader>
@@ -27,6 +35,10 @@ internal class LoaderValidator : AbstractValidator<Loader>
         RuleFor(loader => loader.Name)
             .NotEmpty()
             .WithMessage(loader => $"[{info.ServiceName}] The data loader name must be specified in {loader.DefinitionFileName}");
+
+        RuleFor(loader => loader.ApplyDefaults())
+            .NotEqual(false)
+            .WithMessage(loader => $"[{info.ServiceName}] Defaults could not be applied to lader defined in {loader.DefinitionFileName}");
 
         RuleForEach(loader => loader.Sources)
             .SetValidator(new LoaderSourceValidator(info));
