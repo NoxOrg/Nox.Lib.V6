@@ -14,6 +14,7 @@ using Nox.Dynamic.Models;
 using Nox.Dynamic.ExtendedAttributes;
 using System.ComponentModel.DataAnnotations.Schema;
 using Nox.Dynamic.DatabaseProviders;
+using Hangfire;
 
 namespace Nox.Dynamic.OData.Models
 {
@@ -99,11 +100,31 @@ namespace Nox.Dynamic.OData.Models
 
             dbContext.Database.EnsureCreated();
 
+
+        }
+
+        public void SetupRecurringLoaderTasks()
+        {
+            // run once
+
             _dynamicService.ExecuteDataLoadersAsync().GetAwaiter().GetResult();
+
+            // setup recurring
+
+            foreach (var loader in _dynamicService.Loaders)
+            {
+                RecurringJob.AddOrUpdate(
+                    $"{_dynamicService.Name}.{loader.Name}", 
+                    () => _dynamicService.ExecuteDataLoader(loader,_databaseProvider),
+                    loader.Schedule.CronExpression
+                );
+            }
 
         }
 
         public IDatabaseProvider GetDatabaseProvider() => _databaseProvider;
+
+        public DynamicService GetDynamicService() => _dynamicService;
 
         public ModelBuilder ConfigureDbContextModel(ModelBuilder modelBuilder)
         {

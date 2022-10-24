@@ -1,4 +1,5 @@
 ﻿using ETLBox.Connection;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Nox.Dynamic.MetaData;
@@ -20,6 +21,7 @@ namespace Nox.Dynamic.DatabaseProviders
 
         public string ToDatabaseColumnType(EntityAttribute entityAttribute);
 
-        public Task<bool> LoadData(Service service, ILogger logger);
+        public IGlobalConfiguration ConfigureHangfire(IGlobalConfiguration configuration);
+
     }
 }

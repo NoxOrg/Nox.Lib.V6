@@ -1,7 +1,7 @@
 ﻿using ETLBox.Connection;
+using Hangfire;
+using Hangfire.SqlServer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Nox.Dynamic.Loaders;
 using Nox.Dynamic.MetaData;
 using SqlKata.Compilers;
 using System.Data.SqlClient;
@@ -11,13 +11,18 @@ namespace Nox.Dynamic.DatabaseProviders
     internal class SqlServerDatabaseProvider : IDatabaseProvider
     {
 
-        private readonly string _connectionString;
-
-        private readonly IConnectionManager _connectionManager;
+        private string _connectionString;
+        
+        private IConnectionManager _connectionManager;
 
         private readonly Compiler _sqlCompiler;
 
-        public string ConnectionString => _connectionString;
+        public string ConnectionString
+        {
+            get { return _connectionString; }
+         
+            set { SetConnectionString(value); }
+        }
         
         public IConnectionManager ConnectionManager => _connectionManager;
 
@@ -25,30 +30,48 @@ namespace Nox.Dynamic.DatabaseProviders
 
         public SqlServerDatabaseProvider(IServiceDatabase serviceDb, string applicationName)
         {
-            SqlConnectionStringBuilder csb;
 
-            if (string.IsNullOrEmpty(serviceDb.ConnectionString))
+
+            if (serviceDb != null)
             {
-                csb = new SqlConnectionStringBuilder(serviceDb.Options)
+                SqlConnectionStringBuilder csb;
+
+                if (string.IsNullOrEmpty(serviceDb.ConnectionString))
                 {
-                    DataSource = $"{serviceDb.Server},{serviceDb.Port}",
-                    UserID = serviceDb.User,
-                    Password = serviceDb.Password,
-                    InitialCatalog = serviceDb.Name,
-                };
-             }
+                    csb = new SqlConnectionStringBuilder(serviceDb.Options)
+                    {
+                        DataSource = $"{serviceDb.Server},{serviceDb.Port}",
+                        UserID = serviceDb.User,
+                        Password = serviceDb.Password,
+                        InitialCatalog = serviceDb.Name,
+                    };
+                }
+                else
+                {
+                    csb = new SqlConnectionStringBuilder(serviceDb.ConnectionString);
+                }
+
+                csb.ApplicationName = applicationName;
+
+                _connectionString = serviceDb.ConnectionString = csb.ToString();
+
+                _connectionManager = new SqlConnectionManager(_connectionString);
+            }
             else
             {
-                csb = new SqlConnectionStringBuilder(serviceDb.ConnectionString);
+                _connectionString = "";
+
+                _connectionManager = new SqlConnectionManager();
             }
 
-            csb.ApplicationName = applicationName;
-
-            _connectionString = serviceDb.ConnectionString = csb.ToString();
-
-            _connectionManager = new SqlConnectionManager(_connectionString);
-
             _sqlCompiler = new SqlServerCompiler();
+        }
+
+        private void SetConnectionString(string connectionString)
+        {
+            _connectionString = connectionString;
+
+            _connectionManager = new SqlConnectionManager(connectionString);
         }
 
         public void ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
@@ -99,12 +122,19 @@ namespace Nox.Dynamic.DatabaseProviders
             };
         }
 
-        public async Task<bool> LoadData(Service service, ILogger logger)
+        public IGlobalConfiguration ConfigureHangfire(IGlobalConfiguration configuration)
         {
-            var loaderProvider = new LoaderExecutor(logger);
-
-            return await loaderProvider.ExecuteAsync(service);
+            configuration.UseSqlServerStorage(_connectionString, new SqlServerStorageOptions
+            {
+                CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                QueuePollInterval = TimeSpan.Zero,
+                UseRecommendedIsolationLevel = true,
+                DisableGlobalLocks = true,
+                SchemaName = "cron",
+                PrepareSchemaIfNecessary = true,
+            });
+            return configuration;
         }
-
     }
 }

@@ -6,6 +6,10 @@ using YamlDotNet.Serialization;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.KeyVault;
 using Nox.Dynamic.Exceptions;
+using Microsoft.Identity.Client;
+using Nox.Dynamic.Loaders;
+using Microsoft.EntityFrameworkCore.Storage;
+using Nox.Dynamic.OData.Models;
 
 namespace Nox.Dynamic.Services
 {
@@ -16,6 +20,7 @@ namespace Nox.Dynamic.Services
         private ILogger _logger = null!;
 
         private Service _service = null!;
+
         public IReadOnlyDictionary<string, Entity> Entities => new ReadOnlyDictionary<string, Entity>(
             _service.Entities.ToDictionary(x => x.Name, x => x));
 
@@ -23,24 +28,39 @@ namespace Nox.Dynamic.Services
             _service.Apis.ToDictionary(x => x.Name, x => x)
         );
 
+        public string Name => _service.Name;
+
         public ServiceDatabase ServiceDatabase => _service.Database;
 
         public string KeyVaultUri => _service.KeyVaultUri;
 
         public IReadOnlyCollection<Loader> Loaders => new ReadOnlyCollection<Loader>( _service.Loaders.ToList() );
 
+        private DynamicService() {}
+
+        public DynamicService(ILogger<DynamicService> logger, DynamicModel dynamicModel)
+        {
+            _logger = logger;
+            _service = dynamicModel.GetDynamicService()._service;
+        }
+
         public async Task<bool> ExecuteDataLoadersAsync()
         {
             _logger.LogInformation("Executing data load tasks");
 
-            if (_service.Database?.DatabaseProvider is not null)
-            {   
-                return await _service.Database.DatabaseProvider.LoadData(_service, _logger);
-            }
+            var loaderProvider = new LoaderExecutor(_logger);
 
-            _logger.LogWarning("No database settings found in service definition");
+            return await loaderProvider.ExecuteAsync(_service);
 
-            return false;
+        }
+
+        public void ExecuteDataLoader(Loader loader, DatabaseProviders.IDatabaseProvider destinationDbProvider)
+        {
+            var loaderProvider = new LoaderExecutor(_logger);
+
+            var entity = _service.Entities.First(e => e.Name == loader.Target.Entity);
+
+            loaderProvider.ExecuteLoader(loader, destinationDbProvider, entity);
         }
 
         public class Builder

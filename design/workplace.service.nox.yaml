@@ -8,11 +8,11 @@ Description: Workplace Microservice
 
 Database:
   Name: Workplace
-  Provider: SqlServer
-  #Provider: Postgres
-  #Port: 54320
+  #Provider: SqlServer
+  #Options: Trusted_Connection=no;connection timeout=120;
+  Provider: Postgres
+  Port: 54320
   Server: localhost
   User: sa
   Password: Developer*123
-  Options: Trusted_Connection=no;connection timeout=120;
   

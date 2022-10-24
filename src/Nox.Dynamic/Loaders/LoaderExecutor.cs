@@ -44,6 +44,11 @@ internal class LoaderExecutor
         return true;
     }
 
+    public void ExecuteLoader(
+        Loader loader, IDatabaseProvider destinationDbProvider, Entity entity)
+    {
+        LoadDataFromSource(destinationDbProvider, loader, entity).GetAwaiter().GetResult();
+    }
 
     private async Task LoadDataFromSource(IDatabaseProvider destinationDbProvider,
         Loader loader, Entity entity)

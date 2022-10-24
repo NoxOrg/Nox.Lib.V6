@@ -7,7 +7,7 @@ Name: CurrencyLoader
 Description: Loads currency data 
 
 Schedule:
-  Start: Daily at 2am UTC
+  Start: Every 2 minutes
   Retry:
     Limit: 10
     DelaySeconds: 60

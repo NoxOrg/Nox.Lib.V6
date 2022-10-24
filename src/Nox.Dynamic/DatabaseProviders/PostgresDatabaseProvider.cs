@@ -1,6 +1,9 @@
 ﻿using ETLBox.Connection;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver.Core.Configuration;
 using Nox.Dynamic.Loaders;
 using Nox.Dynamic.MetaData;
 using Npgsql;
@@ -15,44 +18,67 @@ namespace Nox.Dynamic.DatabaseProviders
 {
     internal class PostgresDatabaseProvider : IDatabaseProvider
     {
-        private readonly string _connectionString;
+        private string _connectionString;
 
-        private readonly IConnectionManager _connectionManager;
+        private IConnectionManager _connectionManager;
 
         private readonly Compiler _sqlCompiler;
 
-        public string ConnectionString => _connectionString;
         public IConnectionManager ConnectionManager => _connectionManager;
         public Compiler SqlCompiler => _sqlCompiler;
+        public string ConnectionString
+        {
+            get { return _connectionString; }
+
+            set { SetConnectionString(value); }
+        }
+
 
 
         public PostgresDatabaseProvider(IServiceDatabase serviceDb, string applicationName)
         {
-            NpgsqlConnectionStringBuilder csb;
-
-            if (string.IsNullOrEmpty(serviceDb.ConnectionString))
+            if (serviceDb != null)
             {
-                csb = new NpgsqlConnectionStringBuilder(serviceDb.Options)
+                NpgsqlConnectionStringBuilder csb;
+
+                if (string.IsNullOrEmpty(serviceDb.ConnectionString))
                 {
-                    Host = serviceDb.Server,
-                    Port = serviceDb.Port,
-                    Username = serviceDb.User,
-                    Password = serviceDb.Password,
-                    Database = serviceDb.Name,
-                };
+                    csb = new NpgsqlConnectionStringBuilder(serviceDb.Options)
+                    {
+                        Host = serviceDb.Server,
+                        Port = serviceDb.Port,
+                        Username = serviceDb.User,
+                        Password = serviceDb.Password,
+                        Database = serviceDb.Name,
+                    };
+                }
+                else
+                {
+                    csb = new NpgsqlConnectionStringBuilder(serviceDb.ConnectionString);
+                }
+
+                csb.ApplicationName = applicationName;
+
+                _connectionString = serviceDb.ConnectionString = csb.ToString();
+
+                _connectionManager = new PostgresConnectionManager(_connectionString);
+
             }
             else
             {
-                csb = new NpgsqlConnectionStringBuilder(serviceDb.ConnectionString);
+                _connectionString = "";
+
+                _connectionManager = new PostgresConnectionManager();
             }
 
-            csb.ApplicationName = applicationName;
-
-            _connectionString = serviceDb.ConnectionString = csb.ToString();
-
-            _connectionManager = new PostgresConnectionManager(_connectionString);
-
             _sqlCompiler = new PostgresCompiler();
+        }
+
+        private void SetConnectionString(string connectionString)
+        {
+            _connectionString = connectionString;
+
+            _connectionManager = new PostgresConnectionManager(connectionString);
         }
 
         public void ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
@@ -106,12 +132,14 @@ namespace Nox.Dynamic.DatabaseProviders
             };
         }
 
-        public async Task<bool> LoadData(Service service, ILogger logger)
+        public IGlobalConfiguration ConfigureHangfire(IGlobalConfiguration configuration)
         {
-            var loaderProvider = new LoaderExecutor(logger);
-
-            return await loaderProvider.ExecuteAsync(service);
+            configuration.UsePostgreSqlStorage(_connectionString, new PostgreSqlStorageOptions
+            {
+                SchemaName = "cron",
+                PrepareSchemaIfNecessary = true,
+            });
+            return configuration;
         }
-
     }
 }

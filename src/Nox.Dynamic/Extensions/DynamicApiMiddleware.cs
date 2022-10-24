@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Google.Protobuf.WellKnownTypes;
+using Hangfire;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
@@ -116,7 +118,11 @@ public static class RequestNoxMiddlewareExtensions
     public static IApplicationBuilder UseNox(
         this IApplicationBuilder builder)
     {
-        return builder.UseMiddleware<DynamicApiMiddleware>().UseRouting();
+        builder.UseMiddleware<DynamicApiMiddleware>().UseRouting();
+
+        builder.UseHangfireDashboard("/cron");
+
+        return builder;
     }
 }
 
