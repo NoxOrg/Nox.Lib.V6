@@ -3,14 +3,14 @@ using ETLBox.ControlFlow;
 using ETLBox.ControlFlow.Tasks;
 using ETLBox.DataFlow;
 using ETLBox.DataFlow.Connectors;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 using Nox.Dynamic.DatabaseProviders;
 using Nox.Dynamic.MetaData;
+using Nox.Dynamic.Services;
 using SqlKata;
 using SqlKata.Compilers;
-using SqlKata.Execution;
 using System.Dynamic;
-using System.Text;
 
 namespace Nox.Dynamic.Loaders;
 
@@ -18,10 +18,14 @@ internal class LoaderExecutor : ILoaderExecutor
 {
 
     private readonly ILogger<LoaderExecutor> _logger;
-
-    public LoaderExecutor(ILogger<LoaderExecutor> logger)
+    
+    private readonly IBus _bus;
+    
+    public LoaderExecutor(ILogger<LoaderExecutor> logger, IBus bus)
     {
         _logger = logger;
+        
+        _bus = bus;       
     }
 
     public async Task<bool> ExecuteAsync(Service service)
@@ -46,6 +50,12 @@ internal class LoaderExecutor : ILoaderExecutor
         Loader loader, IDatabaseProvider destinationDbProvider, Entity entity)
     {
         // ETLBox.Logging.Logging.LogInstance = _logger;
+
+        // Hack to accomodate Hangfire bug with collection initialization
+        // (zero length List and Array comes back with single blank entry!
+
+        entity.ApplyDefaults();
+        entity.Attributes.ToList().ForEach(a => a.ApplyDefaults());
 
         await LoadDataFromSource(destinationDbProvider, loader, entity);
 
@@ -95,8 +105,7 @@ internal class LoaderExecutor : ILoaderExecutor
 
                 default:
 
-                    _logger.LogError("Unsupported load strategy '{loadStrategy}' in loader '{loaderName}'.",
-                        loader.LoadStrategy.Type, loader.Name);
+                    _logger.LogError("{message}",$"Unsupported load strategy '{loader.LoadStrategy.Type}' in loader '{loader.Name}'.");
 
                     break;
 
@@ -146,7 +155,7 @@ internal class LoaderExecutor : ILoaderExecutor
     {
         var newLastMergeDateTimeStamp = new Dictionary<string, (DateTime LastMergeDateTimeStamp, bool Updated)>();
 
-        var targetColumns = entity.Attributes.Where(a => a.IsMappedAttribute).Select(a => a.Name)
+        var targetColumns = entity.Attributes.Where(a => a.IsMappedAttribute()).Select(a => a.Name)
                 .Concat(entity.RelatedParents.Select(p => p + "Id"))
                 .Concat(loader.LoadStrategy.Columns.Select(c => c))
                 .ToArray();
@@ -203,8 +212,6 @@ internal class LoaderExecutor : ILoaderExecutor
             .Select(colName => new CompareColumn() { ComparePropertyName = colName })
             .ToArray();
 
-        // TODO: We are not extracting and storing the MAX of the dates retrieved.
-
         source.LinkTo(destination);
 
         var analatics = new CustomDestination();
@@ -213,14 +220,18 @@ internal class LoaderExecutor : ILoaderExecutor
         int updates = 0;
         int nochanges = 0;
 
-        analatics.WriteAction = (row, _) =>
+        analatics.WriteAction = async (row, _) =>
         {
-            dynamic r = row as ExpandoObject;
+            dynamic r = row;
+
             IDictionary<string, object?> d = new Dictionary<string, object?>(row);
 
             if (r.ChangeAction == ChangeAction.Insert)
             {
                 inserts++;
+
+                await _bus.Publish(new LoaderInsertMessage() { Value = row });
+
                 foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
                 {
 
@@ -241,6 +252,9 @@ internal class LoaderExecutor : ILoaderExecutor
             else if (r.ChangeAction == ChangeAction.Update)
             {
                 updates++;
+
+                await _bus.Publish(new LoaderUpdateMessage() { Value = row });
+
                 foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
                 {
 
@@ -272,7 +286,7 @@ internal class LoaderExecutor : ILoaderExecutor
         catch (Exception ex)
         {
             _logger.LogCritical("Failed to run Merge for Entity {entity} at {lastMergeDateTimeStamp}", entity.Name, lastMergeDateTimeStamp);
-            _logger.LogError(ex.Message);
+            _logger.LogError("{message}", ex.Message);
         }
 
         if (inserts == 0 && updates == 0)
@@ -303,8 +317,7 @@ internal class LoaderExecutor : ILoaderExecutor
 
     }
 
-
-    private DateTime GetLastMergeDateTimeStamp(IConnectionManager destinationDb, string loaderName, string dateColumn, Compiler compiler)
+    private static DateTime GetLastMergeDateTimeStamp(IConnectionManager destinationDb, string loaderName, string dateColumn, Compiler compiler)
     {
         var lastMergeDateTime = DateTime.MinValue;
 

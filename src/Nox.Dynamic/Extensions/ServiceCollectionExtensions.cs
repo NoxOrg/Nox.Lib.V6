@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Hangfire.PostgreSql;
 using Hangfire.SqlServer;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.Routing;
@@ -8,10 +9,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Nox.Dynamic.DatabaseProviders;
 using Nox.Dynamic.Loaders;
+using Nox.Dynamic.MessageBus;
 using Nox.Dynamic.OData.Models;
 using Nox.Dynamic.OData.Routing;
 using Nox.Dynamic.Services;
 using System.Configuration;
+using System.Reflection;
 using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace Nox.Dynamic.Extensions
@@ -23,6 +26,8 @@ namespace Nox.Dynamic.Extensions
         {
             services.AddDynamicDefinitionFeature();
 
+            services.AddMessageBusFeature();
+
             services.AddDynamicODataFeature();
 
             services.AddHangfireFeature();
@@ -30,18 +35,7 @@ namespace Nox.Dynamic.Extensions
             return services;
         }
 
-        public static IServiceCollection AddHangfireFeature(this IServiceCollection services)
-        {
-            // hangfire feature
-
-            services.AddHangfire( (services,configuration) => ConfigureHangfire(configuration, services));
-
-            services.AddHangfireServer();
-
-            return services;
-        }
-
-        private static IServiceCollection AddDynamicDefinitionFeature(this IServiceCollection services)
+        public static IServiceCollection AddDynamicDefinitionFeature(this IServiceCollection services)
         {
             services.AddSingleton<ILoaderExecutor, LoaderExecutor>();
 
@@ -50,26 +44,41 @@ namespace Nox.Dynamic.Extensions
             return services;
         }
 
-
-        private static IGlobalConfiguration ConfigureHangfire(IGlobalConfiguration configuration, IServiceProvider services)
+        public static IServiceCollection AddMessageBusFeature(this IServiceCollection services)
         {
+            services.AddMassTransit(x =>
+            {
+                x.SetKebabCaseEndpointNameFormatter();
 
-            configuration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings();
+                // By default, sagas are in-memory, but should be changed to a durable
+                // saga repository.
+                x.SetInMemorySagaRepositoryProvider();
 
-            var model = services.GetRequiredService<DynamicModel>();
-            var dbProvider = model.GetDatabaseProvider();
+                var entryAssembly = Assembly.GetEntryAssembly();
+                var noxAssembly = Assembly.GetExecutingAssembly();
 
-            dbProvider.ConfigureHangfire(configuration);
+                x.AddConsumers(entryAssembly,noxAssembly);
+                x.AddSagaStateMachines(entryAssembly);
+                x.AddSagas(entryAssembly);
+                x.AddActivities(entryAssembly);
 
-            model.SetupRecurringLoaderTasks();
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host("localhost", "/", h => {
+                        h.Username("guest");
+                        h.Password("guest");
+                    });
 
-            return configuration;
+                    cfg.ConfigureEndpoints(context);
+                });
+            });
+
+            services.AddHostedService<HeartbeatWorker>();
+
+            return services;
         }
 
-        public static IServiceCollection AddDynamicODataFeature(this IServiceCollection services)
+        static IServiceCollection AddDynamicODataFeature(this IServiceCollection services)
         {
             services.AddControllers().AddOData(options => options
                 .Select().Filter().OrderBy().Count().Expand().SkipToken().SetMaxTop(100)
@@ -88,5 +97,33 @@ namespace Nox.Dynamic.Extensions
             return services;
         }
 
+        public static IServiceCollection AddHangfireFeature(this IServiceCollection services)
+        {
+            // hangfire feature
+
+            services.AddHangfire((services, configuration) => ConfigureHangfire(configuration, services));
+
+            services.AddHangfireServer();
+
+            return services;
+        }
+
+        private static IGlobalConfiguration ConfigureHangfire(IGlobalConfiguration configuration, IServiceProvider services)
+        {
+
+            configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings();
+
+            var model = services.GetRequiredService<DynamicModel>();
+            var dbProvider = model.GetDatabaseProvider();
+
+            dbProvider.ConfigureHangfire(configuration);
+
+            model.SetupRecurringLoaderTasks();
+
+            return configuration;
+        }
     }
 }

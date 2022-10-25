@@ -33,6 +33,10 @@ public sealed class Entity : MetaBase
         if (string.IsNullOrWhiteSpace(Schema))
             Schema = "dbo";
 
+        RelatedChildren = RelatedChildren.Where(x => x.Trim().Length > 0).ToList();
+
+        RelatedParents = RelatedParents.Where(x => x.Trim().Length > 0).ToList();
+
         return true;
     }
 }

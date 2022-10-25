@@ -128,21 +128,19 @@ internal class ServiceValidator : AbstractValidator<Service>
         RuleFor(service => service.Database)
             .SetValidator(new ServiceDatabaseValidator(info));
 
-        // TODO: Calc SortOrder for entities
-
     }
 }
 
 internal class ServiceValidationInfo
 {
     public string ServiceName { get; private set; }
-    public IReadOnlyDictionary<string,string> ConfigurationValiables { get; private set; }
+    public IReadOnlyDictionary<string,string> ConfigurationVariables { get; private set; }
 
-    public ServiceValidationInfo(string serviceName, IReadOnlyDictionary<string, string> configurationVariales)
+    public ServiceValidationInfo(string serviceName, IReadOnlyDictionary<string, string> configurationVariables)
     {
         ServiceName = serviceName;
 
-        ConfigurationValiables = configurationVariales;
+        ConfigurationVariables = configurationVariables;
     }
 }
 

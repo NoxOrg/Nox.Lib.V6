@@ -26,3 +26,10 @@ services:
       - "54320:5432"
     volumes:
       - ./.docker-data/postgres:/var/lib/postgresql/data
+
+  rabbitmq:
+      container_name: rabbitmq_container
+      image: masstransit/rabbitmq:latest
+      ports:
+        - "5672:5672"
+        - "15672:15672"

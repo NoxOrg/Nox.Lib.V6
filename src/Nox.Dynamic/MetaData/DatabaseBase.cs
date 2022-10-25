@@ -27,7 +27,7 @@ public class DatabaseBase : MetaBase, IServiceDatabase
         {
             if (!string.IsNullOrEmpty(ConnectionVariable))
             {
-                ConnectionString = info.ConfigurationValiables[ConnectionVariable];
+                ConnectionString = info.ConfigurationVariables[ConnectionVariable];
             }
         }
 

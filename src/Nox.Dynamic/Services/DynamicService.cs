@@ -70,7 +70,7 @@ namespace Nox.Dynamic.Services
 
         public async Task<bool> ExecuteDataLoaderAsync(Loader loader, DatabaseProviders.IDatabaseProvider destinationDbProvider)
         {
-            var entity = _service.Entities.First(e => e.Name == loader.Target.Entity);
+            var entity = _service.Entities.First(e => e.Name.Equals(loader.Target.Entity, StringComparison.OrdinalIgnoreCase));
 
             return await _loaderExector.ExecuteLoaderAsync(loader, destinationDbProvider, entity);
         }

@@ -28,10 +28,11 @@ public sealed class EntityAttribute : MetaBase
     public int Precision { get; set; } = 2;
     public object? Default { get; set; }
     [NotMapped]
-    public string[] DefaultFromParents { get; set; } = Array.Empty<string>();
+    public string[] DefaultFromParents { get ; set; } = Array.Empty<string>();
     public string DefaultFromParentsJson { get => string.Join('|', DefaultFromParents.ToArray()); set => DefaultFromParents = value.Split('|'); }
     public string Formula { get; set; } = string.Empty;
-    public bool IsMappedAttribute => (string.IsNullOrEmpty(Formula) && !DefaultFromParents.Any());
+
+    public bool IsMappedAttribute() => (string.IsNullOrEmpty(Formula) && !DefaultFromParents.Any());
 
 
     public bool ApplyDefaults()
@@ -44,6 +45,8 @@ public sealed class EntityAttribute : MetaBase
 
         if(IsPrimaryKey)
             IsRequired = true;
+
+        DefaultFromParents = DefaultFromParents.Where(p => p.Trim().Length > 0).ToArray();
 
         return true;
     }
