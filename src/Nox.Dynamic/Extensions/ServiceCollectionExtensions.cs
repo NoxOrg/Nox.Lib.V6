@@ -57,10 +57,10 @@ namespace Nox.Dynamic.Extensions
                 var entryAssembly = Assembly.GetEntryAssembly();
                 var noxAssembly = Assembly.GetExecutingAssembly();
 
-                x.AddConsumers(entryAssembly,noxAssembly);
-                x.AddSagaStateMachines(entryAssembly);
-                x.AddSagas(entryAssembly);
-                x.AddActivities(entryAssembly);
+                x.AddConsumers(entryAssembly, noxAssembly);
+                x.AddSagaStateMachines(entryAssembly, noxAssembly);
+                x.AddSagas(entryAssembly, noxAssembly);
+                x.AddActivities(entryAssembly, noxAssembly);
 
                 x.UsingRabbitMq((context, cfg) =>
                 {

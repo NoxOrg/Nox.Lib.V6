@@ -2,5 +2,5 @@
 
 public class LoaderUpdateMessage
 {
-    public object Value = null!;
+    public IDictionary<string, object?> Value { get; set; } = null!;
 }

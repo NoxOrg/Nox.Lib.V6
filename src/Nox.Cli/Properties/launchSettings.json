@@ -2,7 +2,7 @@
   "profiles": {
     "Nox.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "sync",
+      "commandLineArgs": "listen",
       "workingDirectory": "$(ProjectDir)"
     }
   }

@@ -11,36 +11,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nox.Cli.Commands
+namespace Nox.Cli.Commands;
+
+public class SyncCommand : AsyncCommand<SyncCommand.Settings>
 {
-    public class SyncCommand : AsyncCommand<SyncCommand.Settings>
+    private readonly ILogger<DynamicService> _logger;
+
+    private readonly IConfiguration _configuration;
+
+    private readonly ILoaderExecutor _loaderExecutor;
+
+    public class Settings : CommandSettings
     {
-        private readonly ILogger<DynamicService> _logger;
+    }
 
-        private readonly IConfiguration _configuration;
+    public SyncCommand(ILogger<DynamicService> logger, IConfiguration configuration, ILoaderExecutor loaderExecutor)
+    {
+        _logger = logger;
+        
+        _configuration = configuration;
+        
+        _loaderExecutor = loaderExecutor;
+    }
 
-        private readonly ILoaderExecutor _loaderExecutor;
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    {
+        var dynamicService = new DynamicService(_logger, _configuration, _loaderExecutor);
 
-        public class Settings : CommandSettings
-        {
-        }
+        _ = await dynamicService.ExecuteDataLoadersAsync();
 
-        public SyncCommand(ILogger<DynamicService> logger, IConfiguration configuration, ILoaderExecutor loaderExecutor)
-        {
-            _logger = logger;
-            
-            _configuration = configuration;
-            
-            _loaderExecutor = loaderExecutor;
-        }
-
-        public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
-        {
-            var dynamicService = new DynamicService(_logger, _configuration, _loaderExecutor);
-
-            _ = await dynamicService.ExecuteDataLoadersAsync();
-
-            return 1;
-        }
+        return 1;
     }
 }
