@@ -15,3 +15,10 @@ Database:
   Server: localhost
   User: sa
   Password: Developer*123
+
+MessageBus:
+  Name: WorkplaceMessaging
+  Provider: AzureServiceBus
+  ConnectionVariable: ConnectionString:AzureServiceBus
+  #Provider: RabbitMQ
+  #ConnectionString: rabbitmq://guest:guest@localhost/

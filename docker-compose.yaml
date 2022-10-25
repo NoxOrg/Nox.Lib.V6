@@ -18,7 +18,7 @@ services:
     image: postgres:14-alpine
     restart: always
     environment:
-      POSTGRES_DB: WorkplaceService
+      POSTGRES_DB: Workplace
       POSTGRES_USER: "sa"
       POSTGRES_PASSWORD: "Developer*123"
       PGDATA: ./data

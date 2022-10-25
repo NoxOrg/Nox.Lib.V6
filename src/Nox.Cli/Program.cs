@@ -15,7 +15,7 @@ using System.Reflection;
 
 internal class Program
 {
-    private static IConfiguration Configuration { get; set; } = null!;
+    private static IConfiguration _configuration { get; set; } = null!;
 
     public static async Task<int> Main(string[] args)
     {
@@ -51,12 +51,12 @@ internal class Program
     {
         // App Configuration
 
-        Configuration = ConfigurationHelper.GetApplicationConfiguration(args);
+        _configuration = ConfigurationHelper.GetNoxConfiguration(args)!;
 
         // Logger
 
         ILogger logger = new LoggerConfiguration()
-            .ReadFrom.Configuration(Configuration)
+            .ReadFrom.Configuration(_configuration)
             .CreateLogger();
 
         Log.Logger = logger;
@@ -67,23 +67,9 @@ internal class Program
             .CreateDefaultBuilder(args)
             .ConfigureServices((hostContext, services) =>
             {
-                services.AddSingleton(Configuration);
-
-                services.AddMassTransit(x =>
-                {
-                    x.SetKebabCaseEndpointNameFormatter();
-                    x.AddConsumers(Assembly.GetExecutingAssembly());
-                    x.UsingRabbitMq((context, cfg) =>
-                    {
-                        cfg.Host("localhost", "/", h =>
-                        {
-                            h.Username("guest");
-                            h.Password("guest");
-                        });
-
-                        cfg.ConfigureEndpoints(context);
-                    });
-                });
+                services.AddSingleton(_configuration);
+                services.AddDynamicDefinitionFeature();
+                services.AddMessageBusFeature(_configuration);           
             })
             .UseSerilog();
 

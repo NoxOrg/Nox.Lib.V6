@@ -6,11 +6,8 @@ using YamlDotNet.Serialization;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.KeyVault;
 using Nox.Dynamic.Exceptions;
-using Microsoft.Identity.Client;
 using Nox.Dynamic.Loaders;
-using Microsoft.EntityFrameworkCore.Storage;
-using Nox.Dynamic.OData.Models;
-using static Org.BouncyCastle.Math.EC.ECCurve;
+using Nox.Dynamic.Constants;
 
 namespace Nox.Dynamic.Services
 {
@@ -79,13 +76,7 @@ namespace Nox.Dynamic.Services
         {
             // Constants
 
-            private const string SERVICE_DEFINITION_PATTERN = @"*.service.nox.yaml";
 
-            private const string ENTITITY_DEFINITION_PATTERN = @"*.entity.nox.yaml";
-
-            private const string LOADER_DEFINITION_PATTERN = @"*.loader.nox.yaml";
-
-            private const string API_DEFINITION_PATTERN = @"*.api.nox.yaml";
 
             // Class def
 
@@ -147,7 +138,7 @@ namespace Nox.Dynamic.Services
             private Service ReadServiceDefinitionsFromFolder(string rootFolder)
             {
                 return Directory
-                    .EnumerateFiles(rootFolder, SERVICE_DEFINITION_PATTERN, SearchOption.AllDirectories)
+                    .EnumerateFiles(rootFolder, DefinitionFilePattern.SERVICE_DEFINITION_PATTERN, SearchOption.AllDirectories)
                     .Take(1)
                     .Select(f =>
                     {
@@ -162,7 +153,7 @@ namespace Nox.Dynamic.Services
             private List<Entity> ReadEntityDefinitionsFromFolder(string rootFolder)
             {
                 return Directory
-                    .EnumerateFiles(rootFolder, ENTITITY_DEFINITION_PATTERN, SearchOption.AllDirectories)
+                    .EnumerateFiles(rootFolder, DefinitionFilePattern.ENTITITY_DEFINITION_PATTERN, SearchOption.AllDirectories)
                     .Select(f =>
                     {
                         var entity = _deserializer.Deserialize<Entity>(ReadDefinitionFile(f));
@@ -176,7 +167,7 @@ namespace Nox.Dynamic.Services
             private List<Loader> ReadLoaderDefinitionsFromFolder(string rootFolder)
             {
                 return Directory
-                    .EnumerateFiles(rootFolder, LOADER_DEFINITION_PATTERN, SearchOption.AllDirectories)
+                    .EnumerateFiles(rootFolder, DefinitionFilePattern.LOADER_DEFINITION_PATTERN, SearchOption.AllDirectories)
                     .Select(f =>
                     {
                         var loader = _deserializer.Deserialize<Loader>(ReadDefinitionFile(f));
@@ -190,7 +181,7 @@ namespace Nox.Dynamic.Services
             private List<Api> ReadApiDefinitionsFromFolder(string rootFolder)
             {
                 return Directory
-                    .EnumerateFiles(rootFolder, API_DEFINITION_PATTERN, SearchOption.AllDirectories)
+                    .EnumerateFiles(rootFolder, DefinitionFilePattern.API_DEFINITION_PATTERN, SearchOption.AllDirectories)
                     .Select(f =>
                     {
                         var api = _deserializer.Deserialize<Api>(ReadDefinitionFile(f));
@@ -222,6 +213,13 @@ namespace Nox.Dynamic.Services
                     .Select(d => d.ConnectionVariable ?? "")
                     .ToHashSet()
                     .ToDictionary(v => v, v => _configuration[v], StringComparer.OrdinalIgnoreCase);
+
+                if (string.IsNullOrEmpty(_service.MessageBus.ConnectionString) && !
+                    string.IsNullOrEmpty(_service.MessageBus.ConnectionVariable))
+                {
+                    variables.Add(_service.MessageBus.ConnectionVariable,
+                        _configuration[_service.MessageBus.ConnectionVariable]);
+                }
 
                 variables.Add("EtlBox:LicenseKey", _configuration["EtlBox:LicenseKey"]);
 

@@ -1,32 +1,36 @@
 ﻿using Hangfire;
-using Hangfire.PostgreSql;
-using Hangfire.SqlServer;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Nox.Dynamic.DatabaseProviders;
+using Nox.Dynamic.Configuration;
 using Nox.Dynamic.Loaders;
 using Nox.Dynamic.MessageBus;
 using Nox.Dynamic.OData.Models;
 using Nox.Dynamic.OData.Routing;
 using Nox.Dynamic.Services;
-using System.Configuration;
 using System.Reflection;
-using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace Nox.Dynamic.Extensions
 {
     public static class ServiceCollectionExtensions
     {
 
+        private static IConfiguration? _configuration = ConfigurationHelper.GetNoxConfiguration();
+
         public static IServiceCollection AddNox(this IServiceCollection services)
         {
+            if (_configuration == null)
+            {
+                throw new ConfigurationException("Could not load Nox configuration.");
+            }
+
             services.AddDynamicDefinitionFeature();
 
-            services.AddMessageBusFeature();
+            services.AddMessageBusFeature(_configuration);
 
             services.AddDynamicODataFeature();
 
@@ -44,33 +48,52 @@ namespace Nox.Dynamic.Extensions
             return services;
         }
 
-        public static IServiceCollection AddMessageBusFeature(this IServiceCollection services)
+        public static IServiceCollection AddMessageBusFeature(this IServiceCollection services, 
+            IConfiguration config)
         {
-            services.AddMassTransit(x =>
-            {
-                x.SetKebabCaseEndpointNameFormatter();
+            var provider = config["ServiceMessageBusProvider"];
+            var connectionString = config["ServiceMessageBusConnectionString"];
+            var connectionVariable = config["ServiceMessageBusConnectionVariable"];
 
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                connectionString = config[connectionVariable];
+            }
+
+            services.AddMassTransit(mt =>
+            {
+                mt.SetKebabCaseEndpointNameFormatter();
+                
                 // By default, sagas are in-memory, but should be changed to a durable
                 // saga repository.
-                x.SetInMemorySagaRepositoryProvider();
+                mt.SetInMemorySagaRepositoryProvider();
 
                 var entryAssembly = Assembly.GetEntryAssembly();
                 var noxAssembly = Assembly.GetExecutingAssembly();
 
-                x.AddConsumers(entryAssembly, noxAssembly);
-                x.AddSagaStateMachines(entryAssembly, noxAssembly);
-                x.AddSagas(entryAssembly, noxAssembly);
-                x.AddActivities(entryAssembly, noxAssembly);
+                mt.AddConsumers(entryAssembly, noxAssembly);
+                mt.AddSagaStateMachines(entryAssembly, noxAssembly);
+                mt.AddSagas(entryAssembly, noxAssembly);
+                mt.AddActivities(entryAssembly, noxAssembly);
 
-                x.UsingRabbitMq((context, cfg) =>
+                switch (provider)
                 {
-                    cfg.Host("localhost", "/", h => {
-                        h.Username("guest");
-                        h.Password("guest");
-                    });
+                    case "rabbitmq":
+                        mt.UsingRabbitMq((context, cfg) =>
+                        {
+                            cfg.Host(connectionString);
+                            cfg.ConfigureEndpoints(context);
+                        });
+                        break;
 
-                    cfg.ConfigureEndpoints(context);
-                });
+                    case "azureservicebus":
+                        mt.UsingAzureServiceBus((context, cfg) =>
+                        {
+                            cfg.Host(connectionString);
+                            cfg.ConfigureEndpoints(context);
+                        });
+                        break;
+                }
             });
 
             services.AddHostedService<HeartbeatWorker>();
