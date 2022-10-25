@@ -15,6 +15,7 @@ using Nox.Dynamic.ExtendedAttributes;
 using System.ComponentModel.DataAnnotations.Schema;
 using Nox.Dynamic.DatabaseProviders;
 using Hangfire;
+using Nox.Dynamic.Loaders;
 
 namespace Nox.Dynamic.OData.Models
 {
@@ -26,24 +27,28 @@ namespace Nox.Dynamic.OData.Models
 
         private readonly IEdmModel _edmModel;
 
-        private readonly Dictionary<string, DynamicDbEntity> _dynamicDbEntities = new();
+        private readonly IDynamicService _dynamicService;
 
-        private readonly DynamicService _dynamicService;
+        private readonly ILoaderExecutor _loaderExecutor;
 
         private readonly IDatabaseProvider _databaseProvider;
 
-        public DynamicModel(IConfiguration config, ILogger<DynamicModel> logger)
+        private readonly Dictionary<string, DynamicDbEntity> _dynamicDbEntities = new();
+
+
+
+        public DynamicModel(
+            IConfiguration config, ILogger<DynamicModel> logger, 
+            IDynamicService dynamicService, ILoaderExecutor loaderExecutor)
         {
             _config = config;
 
             _logger = logger;
 
-            _dynamicService = new DynamicService.Builder()
-                .WithLogger(_logger)
-                .WithConfiguration(_config)
-                .FromRootFolder(_config["Nox:DefinitionRootPath"])
-                .Build();
-
+            _loaderExecutor = loaderExecutor;
+            
+            _dynamicService = dynamicService;
+            
             _databaseProvider = _dynamicService.ServiceDatabase.DatabaseProvider!;
 
             var builder = new ODataConventionModelBuilder();
@@ -109,23 +114,22 @@ namespace Nox.Dynamic.OData.Models
 
         public void SetupRecurringLoaderTasks()
         {
-            // run once
-
-            foreach (var loader in _dynamicService.Loaders)
-            {
-                if (loader.Schedule.RunOnStartup)
-                {
-                    _dynamicService.ExecuteDataLoadersAsync().GetAwaiter().GetResult();
-                }
-            }
+            var executor = _loaderExecutor;
 
             // setup recurring jobs based on cron schedule
 
             foreach (var loader in _dynamicService.Loaders)
             {
+                var entity = _dynamicService.Entities[loader.Target.Entity];
+
+                if (loader.Schedule.RunOnStartup)
+                {
+                    executor.ExecuteLoaderAsync(loader, _databaseProvider, entity).GetAwaiter().GetResult();
+                }
+
                 RecurringJob.AddOrUpdate(
                     $"{_dynamicService.Name}.{loader.Name}", 
-                    () => _dynamicService.ExecuteDataLoader(loader,_databaseProvider),
+                    () => executor.ExecuteLoaderAsync(loader, _databaseProvider, entity),
                     loader.Schedule.CronExpression
                 );
             }
@@ -134,7 +138,7 @@ namespace Nox.Dynamic.OData.Models
 
         public IDatabaseProvider GetDatabaseProvider() => _databaseProvider;
 
-        public DynamicService GetDynamicService() => _dynamicService;
+        public IDynamicService GetDynamicService() => _dynamicService;
 
         public ModelBuilder ConfigureDbContextModel(ModelBuilder modelBuilder)
         {
@@ -301,7 +305,7 @@ namespace Nox.Dynamic.OData.Models
             return ret!;
         }
 
-        public DynamicService Configuration => _dynamicService;
+        public IDynamicService Configuration => _dynamicService;
 
         private Dictionary<string, (Entity Entity, TypeBuilder TypeBuilder)> GetTablesAndTypeBuilders()
         {

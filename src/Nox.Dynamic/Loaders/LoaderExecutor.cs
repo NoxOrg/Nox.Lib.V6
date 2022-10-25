@@ -14,12 +14,12 @@ using System.Text;
 
 namespace Nox.Dynamic.Loaders;
 
-internal class LoaderExecutor
+internal class LoaderExecutor : ILoaderExecutor
 {
 
-    private readonly ILogger _logger;
+    private readonly ILogger<LoaderExecutor> _logger;
 
-    public LoaderExecutor(ILogger logger)
+    public LoaderExecutor(ILogger<LoaderExecutor> logger)
     {
         _logger = logger;
     }
@@ -34,9 +34,7 @@ internal class LoaderExecutor
 
         var entities = service.Entities.ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
 
-        var sortedLoaders = loaders.OrderBy(l => entities[l.Target.Entity].SortOrder).ToList();
-
-        foreach (var loader in sortedLoaders)
+        foreach (var loader in loaders)
         {
             await LoadDataFromSource(destinationDbProvider, loader, entities[loader.Target.Entity]);
         }
@@ -44,10 +42,14 @@ internal class LoaderExecutor
         return true;
     }
 
-    public void ExecuteLoader(
+    public async Task<bool> ExecuteLoaderAsync(
         Loader loader, IDatabaseProvider destinationDbProvider, Entity entity)
     {
-        LoadDataFromSource(destinationDbProvider, loader, entity).GetAwaiter().GetResult();
+        // ETLBox.Logging.Logging.LogInstance = _logger;
+
+        await LoadDataFromSource(destinationDbProvider, loader, entity);
+
+        return true;
     }
 
     private async Task LoadDataFromSource(IDatabaseProvider destinationDbProvider,
@@ -85,8 +87,8 @@ internal class LoaderExecutor
                 case "mergenew":
                     _logger.LogInformation("Merging new data for entity {entity}...", entity.Name);
 
-                    await MergeNewData(sourceDb, destinationDb, 
-                        loaderSource, loader, destinationTable, entity, 
+                    await MergeNewData(sourceDb, destinationDb,
+                        loaderSource, loader, destinationTable, entity,
                         sourceSqlCompiler, destinationSqlCompiler);
 
                     break;
@@ -99,7 +101,7 @@ internal class LoaderExecutor
                     break;
 
             };
-            
+
         }
     }
 
@@ -171,8 +173,8 @@ internal class LoaderExecutor
         var compiledQuery = sourceSqlCompiler.Compile(query);
 
         var finalQuerySql = compiledQuery.Sql;
-        
-        var finalQueryParams = compiledQuery.NamedBindings.Select(nb => new QueryParameter(nb.Key,nb.Value));
+
+        var finalQueryParams = compiledQuery.NamedBindings.Select(nb => new QueryParameter(nb.Key, nb.Value));
 
         var source = new DbSource()
         {
@@ -186,14 +188,14 @@ internal class LoaderExecutor
             CacheMode = ETLBox.DataFlow.Transformations.CacheMode.Partial,
             MergeMode = MergeMode.InsertsAndUpdates,
         };
-        
+
         destination.MergeProperties.IdColumns =
             targetColumns
             .Skip(0)
             .Take(1)
             .Select(colName => new IdColumn() { IdPropertyName = colName })
             .ToArray();
-        
+
         destination.MergeProperties.CompareColumns =
             targetColumns
             .Skip(1)

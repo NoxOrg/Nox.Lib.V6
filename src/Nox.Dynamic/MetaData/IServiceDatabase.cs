@@ -1,6 +1,9 @@
-﻿namespace Nox.Dynamic.MetaData
+﻿
+using Nox.Dynamic.DatabaseProviders;
+
+namespace Nox.Dynamic.MetaData
 {
-    internal interface IServiceDatabase
+    public interface IServiceDatabase
     {
         string? ConnectionString { get; set; }
         string? ConnectionVariable { get; set; }
@@ -11,5 +14,7 @@
         string Server { get; set; }
         public int Port { get; set; }
         string User { get; set; }
+        public IDatabaseProvider? DatabaseProvider { get; set; }
+
     }
 }

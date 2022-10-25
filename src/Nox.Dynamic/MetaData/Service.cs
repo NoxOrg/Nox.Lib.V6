@@ -28,14 +28,23 @@ public sealed class Service : MetaBase
 
         validator.ValidateAndThrow(this);
 
-        SortEntitiesByDependancy();
+        Entities = SortEntitiesByDependancy();
+
+        Loaders = SortLoadersByEntitySortOrder();
 
         // for loaders 
         LicenseCheck.LicenseKey = configurationVariables["EtlBox:LicenseKey"];
 
     }
 
-    
+    private ICollection<Loader> SortLoadersByEntitySortOrder()
+    {
+        var entities = Entities.ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
+
+        return Loaders.OrderBy(l => entities[l.Target.Entity].SortOrder).ToList();
+    }
+
+
     private ICollection<Entity> SortEntitiesByDependancy()
     {
         var entities = Entities.ToList();

@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Nox.Dynamic.DatabaseProviders;
+using Nox.Dynamic.Loaders;
 using Nox.Dynamic.OData.Models;
 using Nox.Dynamic.OData.Routing;
+using Nox.Dynamic.Services;
 using System.Configuration;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace Nox.Dynamic.Extensions
 {
@@ -18,6 +21,8 @@ namespace Nox.Dynamic.Extensions
 
         public static IServiceCollection AddNox(this IServiceCollection services)
         {
+            services.AddDynamicDefinitionFeature();
+
             services.AddDynamicODataFeature();
 
             services.AddHangfireFeature();
@@ -35,6 +40,16 @@ namespace Nox.Dynamic.Extensions
 
             return services;
         }
+
+        private static IServiceCollection AddDynamicDefinitionFeature(this IServiceCollection services)
+        {
+            services.AddSingleton<ILoaderExecutor, LoaderExecutor>();
+
+            services.AddSingleton<IDynamicService, DynamicService>();
+
+            return services;
+        }
+
 
         private static IGlobalConfiguration ConfigureHangfire(IGlobalConfiguration configuration, IServiceProvider services)
         {
@@ -72,5 +87,6 @@ namespace Nox.Dynamic.Extensions
 
             return services;
         }
+
     }
 }

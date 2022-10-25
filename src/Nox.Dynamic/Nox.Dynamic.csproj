@@ -10,6 +10,18 @@
 	<Authors>Andre Sharpe</Authors>
 	<Company>Creations Unlimited</Company>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="OData\Commands\**" />
+    <Compile Remove="OData\Notifications\**" />
+    <Compile Remove="OData\Queries\**" />
+    <EmbeddedResource Remove="OData\Commands\**" />
+    <EmbeddedResource Remove="OData\Notifications\**" />
+    <EmbeddedResource Remove="OData\Queries\**" />
+    <None Remove="OData\Commands\**" />
+    <None Remove="OData\Notifications\**" />
+    <None Remove="OData\Queries\**" />
+  </ItemGroup>
 	
 
   <ItemGroup>
@@ -45,12 +57,6 @@
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="OData\Commands\" />
-	  <Folder Include="OData\Queries\" />
-	  <Folder Include="OData\Notifications\" />
 	</ItemGroup>
 
 </Project>

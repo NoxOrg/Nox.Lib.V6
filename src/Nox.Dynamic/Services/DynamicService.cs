@@ -10,16 +10,29 @@ using Microsoft.Identity.Client;
 using Nox.Dynamic.Loaders;
 using Microsoft.EntityFrameworkCore.Storage;
 using Nox.Dynamic.OData.Models;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace Nox.Dynamic.Services
 {
 
-    public class DynamicService
+    public class DynamicService : IDynamicService
     {
 
         private ILogger _logger = null!;
 
-        private Service _service = null!;
+        private readonly Service _service = null!;
+
+        private readonly IConfiguration _configuration = null!;
+
+        private readonly ILoaderExecutor _loaderExector;
+
+        public string Name => _service.Name;
+
+        public Service Service => _service;
+
+        public IServiceDatabase ServiceDatabase => _service.Database;
+
+        public string KeyVaultUri => _service.KeyVaultUri;
 
         public IReadOnlyDictionary<string, Entity> Entities => new ReadOnlyDictionary<string, Entity>(
             _service.Entities.ToDictionary(x => x.Name, x => x));
@@ -28,45 +41,41 @@ namespace Nox.Dynamic.Services
             _service.Apis.ToDictionary(x => x.Name, x => x)
         );
 
-        public string Name => _service.Name;
+        public IReadOnlyCollection<Loader> Loaders => new ReadOnlyCollection<Loader>(_service.Loaders.ToList());
 
-        public Service Service => _service;
 
-        public ServiceDatabase ServiceDatabase => _service.Database;
-
-        public string KeyVaultUri => _service.KeyVaultUri;
-
-        public IReadOnlyCollection<Loader> Loaders => new ReadOnlyCollection<Loader>( _service.Loaders.ToList() );
-
-        private DynamicService() {}
-
-        public DynamicService(ILogger<DynamicService> logger, DynamicModel dynamicModel)
+        public DynamicService(ILogger<DynamicService> logger, IConfiguration configuration, ILoaderExecutor loaderExector)
         {
             _logger = logger;
 
-            _service = dynamicModel.GetDynamicService().Service;
+            _configuration = configuration;
+
+            _loaderExector = loaderExector;
+
+            _service = new Configurator(this)
+                .WithLogger(_logger)
+                .WithConfiguration(_configuration)
+                .FromRootFolder(_configuration["Nox:DefinitionRootPath"])
+                .Configure();
+
         }
 
         public async Task<bool> ExecuteDataLoadersAsync()
         {
             _logger.LogInformation("Executing data load tasks");
 
-            var loaderProvider = new LoaderExecutor(_logger);
-
-            return await loaderProvider.ExecuteAsync(_service);
+            return await _loaderExector.ExecuteAsync(_service);
 
         }
 
-        public void ExecuteDataLoader(Loader loader, DatabaseProviders.IDatabaseProvider destinationDbProvider)
+        public async Task<bool> ExecuteDataLoaderAsync(Loader loader, DatabaseProviders.IDatabaseProvider destinationDbProvider)
         {
-            var loaderProvider = new LoaderExecutor(_logger);
-
             var entity = _service.Entities.First(e => e.Name == loader.Target.Entity);
 
-            loaderProvider.ExecuteLoader(loader, destinationDbProvider, entity);
+            return await _loaderExector.ExecuteLoaderAsync(loader, destinationDbProvider, entity);
         }
 
-        public class Builder
+        private class Configurator
         {
             // Constants
 
@@ -88,14 +97,16 @@ namespace Nox.Dynamic.Services
 
             private IConfiguration _configuration = null!;
 
-            public Builder()
+            private Service _service = null!;
+
+            public Configurator(DynamicService dynamicService)
             {
                 _deserializer = new DeserializerBuilder().Build();
 
-                _dynamicService = new DynamicService();
+                _dynamicService = dynamicService;
             }
 
-            public Builder FromRootFolder(string rootFolder)
+            public Configurator FromRootFolder(string rootFolder)
             {
                 var service = ReadServiceDefinitionsFromFolder(rootFolder);
 
@@ -105,12 +116,12 @@ namespace Nox.Dynamic.Services
 
                 service.Apis = ReadApiDefinitionsFromFolder(rootFolder);
 
-                _dynamicService._service = service;
+                _service = service;
 
                 return this;
             }
 
-            public Builder WithLogger(ILogger logger)
+            public Configurator WithLogger(ILogger logger)
             {
                 _dynamicService._logger = logger;
 
@@ -119,19 +130,18 @@ namespace Nox.Dynamic.Services
                 return this;
             }
 
-            public Builder WithConfiguration(IConfiguration configuration)
+            public Configurator WithConfiguration(IConfiguration configuration)
             {
                 _configuration = configuration;
 
                 return this;
             }
 
-            public DynamicService Build()
+            public Service Configure()
             {
+                _service.Validate(GetConfigurationVariables());
 
-                _dynamicService._service.Validate( GetConfigurationVariables() );
-
-                return _dynamicService;
+                return _service;
             }
 
             private Service ReadServiceDefinitionsFromFolder(string rootFolder)
@@ -139,11 +149,12 @@ namespace Nox.Dynamic.Services
                 return Directory
                     .EnumerateFiles(rootFolder, SERVICE_DEFINITION_PATTERN, SearchOption.AllDirectories)
                     .Take(1)
-                    .Select(f => { 
-                        var service = _deserializer.Deserialize<Service>(ReadDefinitionFile(f)); 
-                        service.DefinitionFileName = Path.GetFullPath(f); 
+                    .Select(f =>
+                    {
+                        var service = _deserializer.Deserialize<Service>(ReadDefinitionFile(f));
+                        service.DefinitionFileName = Path.GetFullPath(f);
                         service.Database.DefinitionFileName = Path.GetFullPath(f);
-                        return service; 
+                        return service;
                     })
                     .First();
             }
@@ -152,10 +163,11 @@ namespace Nox.Dynamic.Services
             {
                 return Directory
                     .EnumerateFiles(rootFolder, ENTITITY_DEFINITION_PATTERN, SearchOption.AllDirectories)
-                    .Select(f => {
+                    .Select(f =>
+                    {
                         var entity = _deserializer.Deserialize<Entity>(ReadDefinitionFile(f));
                         entity.DefinitionFileName = Path.GetFullPath(f);
-                        entity.Attributes.ToList().ForEach(a => {a.DefinitionFileName = Path.GetFullPath(f); });
+                        entity.Attributes.ToList().ForEach(a => { a.DefinitionFileName = Path.GetFullPath(f); });
                         return entity;
                     })
                     .ToList();
@@ -165,10 +177,11 @@ namespace Nox.Dynamic.Services
             {
                 return Directory
                     .EnumerateFiles(rootFolder, LOADER_DEFINITION_PATTERN, SearchOption.AllDirectories)
-                    .Select(f => {
+                    .Select(f =>
+                    {
                         var loader = _deserializer.Deserialize<Loader>(ReadDefinitionFile(f));
                         loader.DefinitionFileName = Path.GetFullPath(f);
-                        loader.Sources.ToList().ForEach(s => {s.DefinitionFileName = Path.GetFullPath(f); });
+                        loader.Sources.ToList().ForEach(s => { s.DefinitionFileName = Path.GetFullPath(f); });
                         return loader;
                     })
                     .ToList();
@@ -178,7 +191,8 @@ namespace Nox.Dynamic.Services
             {
                 return Directory
                     .EnumerateFiles(rootFolder, API_DEFINITION_PATTERN, SearchOption.AllDirectories)
-                    .Select(f => {
+                    .Select(f =>
+                    {
                         var api = _deserializer.Deserialize<Api>(ReadDefinitionFile(f));
                         api.DefinitionFileName = Path.GetFullPath(f);
                         return api;
@@ -194,7 +208,7 @@ namespace Nox.Dynamic.Services
                 return File.ReadAllText(fileName);
             }
 
-            private IReadOnlyDictionary<string,string> GetConfigurationVariables()
+            private IReadOnlyDictionary<string, string> GetConfigurationVariables()
             {
                 _logger.LogInformation("Resolving all configuration variables...");
 
@@ -214,7 +228,7 @@ namespace Nox.Dynamic.Services
                 // try key vault where app configuration is missing 
                 if (variables.Any(v => v.Value == null))
                 {
-                    TryAddMissingConfigsFromKeyVault(_dynamicService._service.KeyVaultUri, variables);
+                    TryAddMissingConfigsFromKeyVault(_service.KeyVaultUri, variables);
                 }
 
                 if (variables.Any(v => v.Value == null))
@@ -267,10 +281,10 @@ namespace Nox.Dynamic.Services
             {
                 var serviceDatabases = new List<IServiceDatabase>
                 {
-                    _dynamicService._service.Database
+                    _service.Database
                 };
 
-                foreach (var kvp in _dynamicService._service.Loaders)
+                foreach (var kvp in _service.Loaders)
                 {
                     foreach (var db in kvp.Sources)
                     {

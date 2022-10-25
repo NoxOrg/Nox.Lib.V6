@@ -6,6 +6,7 @@ using Nox.Cli.Commands;
 using Nox.Cli.Services;
 using Nox.Dynamic;
 using Nox.Dynamic.Configuration;
+using Nox.Dynamic.Extensions;
 using Serilog;
 using Spectre.Console.Cli;
 
