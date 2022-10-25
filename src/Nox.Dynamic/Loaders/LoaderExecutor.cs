@@ -220,7 +220,7 @@ internal class LoaderExecutor : ILoaderExecutor
         int updates = 0;
         int nochanges = 0;
 
-        analatics.WriteAction = async (row, _) =>
+        analatics.WriteAction = (row, _) =>
         {
             dynamic r = row;
 
@@ -230,7 +230,7 @@ internal class LoaderExecutor : ILoaderExecutor
             {
                 inserts++;
 
-                await _bus.Publish(new LoaderInsertMessage() { Value = row });
+                _bus.Publish(new LoaderInsertMessage() { Value = row }).GetAwaiter().GetResult();
 
                 foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
                 {
@@ -253,7 +253,7 @@ internal class LoaderExecutor : ILoaderExecutor
             {
                 updates++;
 
-                await _bus.Publish(new LoaderUpdateMessage() { Value = row });
+                _bus.Publish(new LoaderUpdateMessage() { Value = row }).GetAwaiter().GetResult();
 
                 foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
                 {
