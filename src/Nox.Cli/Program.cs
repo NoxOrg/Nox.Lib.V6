@@ -69,7 +69,7 @@ internal class Program
             {
                 services.AddSingleton(_configuration);
                 services.AddDynamicDefinitionFeature();
-                services.AddMessageBusFeature(_configuration);           
+                services.AddMessageBusFeature(_configuration, false);           
             })
             .UseSerilog();
 

@@ -19,7 +19,7 @@ namespace Nox.Dynamic.Extensions
     public static class ServiceCollectionExtensions
     {
 
-        private static IConfiguration? _configuration = ConfigurationHelper.GetNoxConfiguration();
+        private static readonly IConfiguration? _configuration = ConfigurationHelper.GetNoxConfiguration();
 
         public static IServiceCollection AddNox(this IServiceCollection services)
         {
@@ -49,7 +49,7 @@ namespace Nox.Dynamic.Extensions
         }
 
         public static IServiceCollection AddMessageBusFeature(this IServiceCollection services, 
-            IConfiguration config)
+            IConfiguration config, bool isServer = true)
         {
             var provider = config["ServiceMessageBusProvider"];
             var connectionString = config["ServiceMessageBusConnectionString"];
@@ -68,13 +68,22 @@ namespace Nox.Dynamic.Extensions
                 // saga repository.
                 mt.SetInMemorySagaRepositoryProvider();
 
-                var entryAssembly = Assembly.GetEntryAssembly();
-                var noxAssembly = Assembly.GetExecutingAssembly();
-
-                mt.AddConsumers(entryAssembly, noxAssembly);
-                mt.AddSagaStateMachines(entryAssembly, noxAssembly);
-                mt.AddSagas(entryAssembly, noxAssembly);
-                mt.AddActivities(entryAssembly, noxAssembly);
+                if (isServer)
+                {
+                    var noxAssembly = Assembly.GetExecutingAssembly();
+                    mt.AddConsumers(noxAssembly);
+                    mt.AddSagaStateMachines(noxAssembly);
+                    mt.AddSagas(noxAssembly);
+                    mt.AddActivities(noxAssembly);
+                }
+                else
+                {
+                    var entryAssembly = Assembly.GetEntryAssembly();
+                    mt.AddConsumers(entryAssembly);
+                    mt.AddSagaStateMachines(entryAssembly);
+                    mt.AddSagas(entryAssembly);
+                    mt.AddActivities(entryAssembly);
+                }
 
                 switch (provider)
                 {
@@ -96,7 +105,10 @@ namespace Nox.Dynamic.Extensions
                 }
             });
 
-            services.AddHostedService<HeartbeatWorker>();
+            if (isServer)
+            {
+                services.AddHostedService<HeartbeatWorker>();
+            }
 
             return services;
         }
