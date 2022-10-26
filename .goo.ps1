@@ -24,7 +24,7 @@ $goo = [Goo]::new($args)
 
 $script:SolutionName            = 'Nox'
 
-$script:RootFolder       = (Get-Location).Path
+$script:RootFolder              = (Get-Location).Path
 $script:SourceFolder            = '.\src'
 $script:SolutionFolder          = $script:SourceFolder
 $script:SolutionFile            = "$script:SolutionFolder\Nox.sln"
@@ -206,10 +206,11 @@ $goo.Command.Add( 'main', { param( $featureName )
 
 # command: goo pubish | Build and publish Nox.Dynamic nuget package
 $goo.Command.Add( 'publish', { 
-    $goo.Console.WriteInfo("Packing solution...")
+    $goo.Console.WriteInfo("Packing solution ($script:LibFolder)...")
     $goo.Command.RunExternal('dotnet','pack /clp:ErrorsOnly --configuration Release', $script:LibFolder)
     $goo.StopIfError("Failed to pack solution. (Release)")
-    $goo.Command.RunExternal('dotnet',"nuget push ./bin/Release/Nox.Dynamic.1.0.3.nupkg --api-key $Env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json", $script:LibFolder)
+    $nupkgFile = Get-ChildItem "$script:LibFolder\bin\Release\Nox.Dynamic.*.nupkg" | Sort-Object -Property LastWriteTime | Select-Object -Last 1
+    $goo.Command.RunExternal('dotnet',"nuget push $($nupkgFile.FullName) --api-key $Env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json", $script:LibFolder)
     $goo.StopIfError("Failed to publish library to nuget. (Release)")
 })
 
