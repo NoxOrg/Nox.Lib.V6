@@ -1,21 +1,16 @@
-﻿
-using DocumentFormat.OpenXml.InkML;
-using MassTransit;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Nox.Cli.Commands;
 using Nox.Cli.Services;
-using Nox.Dynamic;
 using Nox.Dynamic.Configuration;
 using Nox.Dynamic.Extensions;
 using Serilog;
 using Spectre.Console.Cli;
-using System.Reflection;
 
 internal class Program
 {
-    private static IConfiguration _configuration { get; set; } = null!;
+    private static IConfiguration Configuration { get; set; } = null!;
 
     public static async Task<int> Main(string[] args)
     {
@@ -51,12 +46,12 @@ internal class Program
     {
         // App Configuration
 
-        _configuration = ConfigurationHelper.GetNoxConfiguration(args)!;
+        Configuration = ConfigurationHelper.GetNoxConfiguration(args)!;
 
         // Logger
 
         ILogger logger = new LoggerConfiguration()
-            .ReadFrom.Configuration(_configuration)
+            .ReadFrom.Configuration(Configuration)
             .CreateLogger();
 
         Log.Logger = logger;
@@ -67,9 +62,9 @@ internal class Program
             .CreateDefaultBuilder(args)
             .ConfigureServices((hostContext, services) =>
             {
-                services.AddSingleton(_configuration);
+                services.AddSingleton(Configuration);
                 services.AddDynamicDefinitionFeature();
-                services.AddMessageBusFeature(_configuration, false);           
+                services.AddMessageBusFeature(Configuration, false);           
             })
             .UseSerilog();
 

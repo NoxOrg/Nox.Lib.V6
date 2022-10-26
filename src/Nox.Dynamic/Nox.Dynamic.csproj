@@ -36,17 +36,12 @@
   </ItemGroup>
 	
   <ItemGroup>
-    <PackageReference Include="ETLBox" Version="2.6.3" />
-    <PackageReference Include="ETLBox.Csv" Version="2.6.3" />
-    <PackageReference Include="ETLBox.EntityFramework" Version="2.6.3" />
-    <PackageReference Include="ETLBox.EntityFramework.MySql" Version="2.6.3" />
-    <PackageReference Include="ETLBox.EntityFramework.SqlServer" Version="2.6.3" />
-    <PackageReference Include="ETLBox.Excel" Version="2.6.3" />
-    <PackageReference Include="ETLBox.Json" Version="2.6.3" />
-    <PackageReference Include="ETLBox.MongoDb" Version="2.6.3" />
-    <PackageReference Include="ETLBox.Parquet" Version="2.6.3" />
-    <PackageReference Include="ETLBox.Postgres" Version="2.6.3" />
-    <PackageReference Include="ETLBox.SqlServer" Version="2.6.3" />
+    <PackageReference Include="Elasticsearch.Net" Version="7.17.5">
+      <TreatAsUsed>true</TreatAsUsed>
+    </PackageReference>
+    <PackageReference Include="ETLBox" Version="2.6.5" />
+    <PackageReference Include="ETLBox.Postgres" Version="2.6.5" />
+    <PackageReference Include="ETLBox.SqlServer" Version="2.6.5" />
     <PackageReference Include="FluentValidation" Version="11.2.2" />
     <PackageReference Include="Hangfire.AspNetCore" Version="1.7.31" />
     <PackageReference Include="Hangfire.PostgreSql" Version="1.9.9" />
@@ -56,14 +51,11 @@
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.11" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.10" />
     <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="3.1.24" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="Nox.Cron" Version="1.0.8" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
     <PackageReference Include="SqlKata" Version="2.4.0" />
-    <PackageReference Include="SqlKata.Execution" Version="2.4.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
     <PackageReference Include="YamlDotNet" Version="12.0.1" />
   </ItemGroup>
