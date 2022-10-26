@@ -5,11 +5,23 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UserSecretsId>c85db8f6-e4ba-47a2-beb2-7cc33455348a</UserSecretsId>
-	<PackageId>Nox.Dynamic</PackageId>
-	<Version>1.0.3</Version>
-	<Authors>Andre Sharpe</Authors>
-	<Company>Creations Unlimited</Company>
+	  <PackageId>Nox.Dynamic</PackageId>
+	  <Version>1.0.3</Version>
+  	<Authors>Andre Sharpe</Authors>
+  	<Company>Creations Unlimited</Company>
+    <PackageTags>Framework Dynamic Microservice</PackageTags>
+    <PackageProjectUrl>https://github.com/andresharpe/Nox</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>images\nox.png</PackageIcon>
+    <Description>
+      A framework for rapid Microservice and solution development for .Net 
+    </Description>
+
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\nox.png" Pack="true" Visible="false" PackagePath="images\nox.png" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="OData\Commands\**" />
@@ -23,7 +35,6 @@
     <None Remove="OData\Queries\**" />
   </ItemGroup>
 	
-
   <ItemGroup>
     <PackageReference Include="ETLBox" Version="2.6.3" />
     <PackageReference Include="ETLBox.Csv" Version="2.6.3" />
