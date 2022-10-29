@@ -31,6 +31,7 @@ $script:SolutionFile            = "$script:SolutionFolder\Nox.sln"
 $script:ProjectFolder           = "$script:SourceFolder\My.Api"
 $script:ProjectFile             = "$script:ProjectFolder\My.Api.csproj"
 $script:LibFolder               = "$script:SourceFolder\Nox.Dynamic"
+$script:CliFolder               = "$script:SourceFolder\Nox.Cli"
 
 $script:DefaultEnvironment      = 'Development'
 
@@ -167,6 +168,12 @@ $goo.Command.Add( 'dev', {
 $goo.Command.Add( 'run', {
     $goo.Command.Run( 'waitfordb' )
     $goo.Command.RunExternal('dotnet','run',$script:ProjectFolder)
+})
+
+# command: goo listen | View events being emmited from event source
+$goo.Command.Add( 'listen', {
+    $goo.Command.Run( 'waitfordb' )
+    $goo.Command.RunExternal('dotnet','run -- listen',$script:CliFolder)
 })
 
 # command: goo sql <query> | Executes a query on your local SQL server container
