@@ -1,16 +1,15 @@
 ﻿
-namespace Nox.Dynamic.ExtendedAttributes
-{
-    public class XtendedAttributeValue 
-    {
-        public int Id { get; set; }
-        public int EntityId { get; set; }
-        public Guid UId { get; set; }
-        public int EntityAttributeId { get; set; }
-        public DateTimeOffset AsAtDateTime { get; set; }
+namespace Nox.Data;
 
-    }
+public class XtendedAttributeValue 
+{
+    public int Id { get; set; }
+    public int EntityId { get; set; }
+    public Guid UId { get; set; }
+    public int EntityAttributeId { get; set; }
+    public DateTimeOffset AsAtDateTime { get; set; }
 }
+
 
 /*
 

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Nox;
 
-namespace Nox;
-
-public static class Database
+public static class DatabaseObject
 {
-    public const string MergeStateTable = "MergeState";
+    public const string MergeStateTableName = "MergeState";
 }

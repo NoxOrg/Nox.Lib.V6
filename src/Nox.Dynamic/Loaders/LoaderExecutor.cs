@@ -5,13 +5,11 @@ using ETLBox.DataFlow;
 using ETLBox.DataFlow.Connectors;
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using Nox;
 using Nox.Data;
-using Nox.Dynamic.DatabaseProviders;
 using Nox.Dynamic.MetaData;
-using Nox.Dynamic.Services;
 using SqlKata;
 using SqlKata.Compilers;
-using System.Dynamic;
 
 namespace Nox.Dynamic.Loaders;
 
@@ -325,11 +323,11 @@ public class LoaderExecutor : ILoaderExecutor
         var destination = new DbDestination()
         {
             ConnectionManager = destinationDb,
-            TableName = Constants.DatabaseObject.MergeStateTable,
+            TableName = DatabaseObject.MergeStateTableName,
         };
 
         var findQuery = new Query(
-                $"meta.{Constants.DatabaseObject.MergeStateTable}")
+                $"meta.{DatabaseObject.MergeStateTableName}")
                 .Where("Property", dateColumn)
                 .Where("Loader", loaderName)
                 .Select("LastDateLoadedUtc");
@@ -343,7 +341,7 @@ public class LoaderExecutor : ILoaderExecutor
             return (DateTime)resultDate;
         }
 
-        var insertQuery = new Query($"meta.{Constants.DatabaseObject.MergeStateTable}").AsInsert(
+        var insertQuery = new Query($"meta.{DatabaseObject.MergeStateTableName}").AsInsert(
         new
         {
             Loader = loaderName,
@@ -365,7 +363,7 @@ public class LoaderExecutor : ILoaderExecutor
 
         _logger.LogInformation("...setting last merge date for {loaderName}.{dateColumn} to {lastMergeDateTime}", loaderName, dateColumn, lastMergeDateTime);
 
-        var updateQuery = new Query($"meta.{Constants.DatabaseObject.MergeStateTable}")
+        var updateQuery = new Query($"meta.{DatabaseObject.MergeStateTableName}")
           .Where("Property", dateColumn)
           .Where("Loader", loaderName)
           .AsUpdate(
