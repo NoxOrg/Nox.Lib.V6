@@ -3,8 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Nox.Cli.Commands;
 using Nox.Cli.Services;
-using Nox.Dynamic.Configuration;
-using Nox.Dynamic.Extensions;
+using Nox.Configuration;
+using Nox.Extensions.DependencyInjection;
 using Serilog;
 using Spectre.Console.Cli;
 

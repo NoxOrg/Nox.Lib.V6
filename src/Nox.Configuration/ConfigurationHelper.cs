@@ -1,13 +1,12 @@
-﻿using MassTransit;
-using Microsoft.Azure.KeyVault;
+﻿using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
-using Nox.Dynamic.Constants;
-using Nox.Dynamic.MetaData;
 using System.Diagnostics;
 using YamlDotNet.Serialization;
+using ETLBoxOffice.LicenseManager;
+using Nox.Configuration.Models;
 
-namespace Nox.Dynamic.Configuration;
+namespace Nox.Configuration;
 
 public class ConfigurationHelper
 {
@@ -29,36 +28,36 @@ public class ConfigurationHelper
             throw new ConfigurationException("Could not find 'Nox:DefinitionRootPath' in environment or appsettings.json");
         }
         
-        var deserializer = new DeserializerBuilder().Build();
+        var deserializer = new DeserializerBuilder()
+            .IgnoreUnmatchedProperties()
+            .Build();
 
         var path = Path.GetFullPath(config["Nox:DefinitionRootPath"]);
 
         var service = Directory
-            .EnumerateFiles(path, DefinitionFilePattern.SERVICE_DEFINITION_PATTERN, SearchOption.AllDirectories)
+            .EnumerateFiles(path, FileExtension.ServiceDefinition, SearchOption.AllDirectories)
             .Take(1)
             .Select(f =>
             {
-                var svc = deserializer.Deserialize<Service>(File.ReadAllText(f));
-                svc.DefinitionFileName = Path.GetFullPath(f);
-                svc.Database.DefinitionFileName = Path.GetFullPath(f);
+                var svc = deserializer.Deserialize<ServiceBase>(File.ReadAllText(f));
                 return svc;
             })
             .FirstOrDefault();
 
         if (service == null)
         {
-            throw new ConfigurationException($"Could not find file matching '{DefinitionFilePattern.SERVICE_DEFINITION_PATTERN}' in '{path}'");
+            throw new ConfigurationException($"Could not find file matching '{FileExtension.ServiceDefinition}' in '{path}'");
         }
 
         var keys = new[] {
-            "ConnectionString--AzureServiceBus",
-            "ConnectionString--MasterDataSource",
-            "XECurrency--ApiPassword",
-            "XECurrency--ApiUser",
-            "EtlBox--LicenseKey",
+            "ConnectionString:AzureServiceBus",
+            "ConnectionString:MasterDataSource",
+            "XECurrency:ApiPassword",
+            "XECurrency:ApiUser",
+            "EtlBox:LicenseKey",
         };
 
-        var secrets = GetSecrets(service.KeyVaultUri, keys);
+        var secrets = GetSecrets(service.KeyVaultUri, keys).GetAwaiter().GetResult();
         
         if (secrets == null)
         {
@@ -71,10 +70,12 @@ public class ConfigurationHelper
 
         configBuilder.AddInMemoryCollection(secrets);
 
+        LicenseCheck.LicenseKey = secrets.First(s => s.Key.Equals("EtlBox:LicenseKey")).Value;
+
         return configBuilder.Build();
     }
 
-    private static IList<KeyValuePair<string,string>>? GetSecrets(string keyVaultUri, string[] keys)
+    private static async Task<IList<KeyValuePair<string,string>>?> GetSecrets(string keyVaultUri, string[] keys)
     {
         var secrets = new List<KeyValuePair<string,string>>();
 
@@ -86,8 +87,8 @@ public class ConfigurationHelper
         {
             foreach (var key in keys)
             {
-                var value = keyVault.GetSecretAsync(keyVaultUri, key).GetAwaiter().GetResult().Value;
-                secrets.Add(new KeyValuePair<string, string>(key.Replace("--",":"), value ?? ""));
+                var secret = await keyVault.GetSecretAsync(keyVaultUri, key.Replace(":", "--"));
+                secrets.Add(new KeyValuePair<string, string>(key, secret.Value ?? ""));
             }
         }
         catch (Exception ex) 

@@ -1,5 +1,4 @@
-﻿using ETLBoxOffice.LicenseManager;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
 using System;
 using System.Collections.Generic;
@@ -14,16 +13,16 @@ public sealed class Service : MetaBase
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string KeyVaultUri { get; set; } = "https://we-key-Nox-02.vault.azure.net/";
+    public string KeyVaultUri { get; set; } = KeyVault.DefaultKeyVaultUri;
     public ServiceDatabase Database { get; set; } = new();
     public ServiceMessageBus MessageBus { get; set; } = new();
     public ICollection<Entity> Entities { get; set; } = null!;
     public ICollection<Loader> Loaders { get; set; } = null!;
     public ICollection<Api> Apis { get; set; } = null!;
 
-    public void Validate(IReadOnlyDictionary<string,string> configurationVariables)
+    public void Validate(IReadOnlyDictionary<string, string> configurationVariables)
     {
-        var validationInfo = new ServiceValidationInfo(Name,configurationVariables);
+        var validationInfo = new ServiceValidationInfo(Name, configurationVariables);
 
         var validator = new ServiceValidator(validationInfo);
 
@@ -32,9 +31,6 @@ public sealed class Service : MetaBase
         Entities = SortEntitiesByDependancy();
 
         Loaders = SortLoadersByEntitySortOrder();
-
-        // for loaders 
-        LicenseCheck.LicenseKey = configurationVariables["EtlBox:LicenseKey"];
 
     }
 

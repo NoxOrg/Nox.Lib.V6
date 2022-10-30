@@ -138,7 +138,7 @@ namespace Nox.Dynamic.Services
             private Service ReadServiceDefinitionsFromFolder(string rootFolder)
             {
                 return Directory
-                    .EnumerateFiles(rootFolder, DefinitionFilePattern.SERVICE_DEFINITION_PATTERN, SearchOption.AllDirectories)
+                    .EnumerateFiles(rootFolder, FileExtension.ServiceDefinition, SearchOption.AllDirectories)
                     .Take(1)
                     .Select(f =>
                     {
@@ -153,7 +153,7 @@ namespace Nox.Dynamic.Services
             private List<Entity> ReadEntityDefinitionsFromFolder(string rootFolder)
             {
                 return Directory
-                    .EnumerateFiles(rootFolder, DefinitionFilePattern.ENTITITY_DEFINITION_PATTERN, SearchOption.AllDirectories)
+                    .EnumerateFiles(rootFolder, FileExtension.EntityDefinition, SearchOption.AllDirectories)
                     .Select(f =>
                     {
                         var entity = _deserializer.Deserialize<Entity>(ReadDefinitionFile(f));
@@ -167,7 +167,7 @@ namespace Nox.Dynamic.Services
             private List<Loader> ReadLoaderDefinitionsFromFolder(string rootFolder)
             {
                 return Directory
-                    .EnumerateFiles(rootFolder, DefinitionFilePattern.LOADER_DEFINITION_PATTERN, SearchOption.AllDirectories)
+                    .EnumerateFiles(rootFolder, FileExtension.LoaderDefinition, SearchOption.AllDirectories)
                     .Select(f =>
                     {
                         var loader = _deserializer.Deserialize<Loader>(ReadDefinitionFile(f));
@@ -181,7 +181,7 @@ namespace Nox.Dynamic.Services
             private List<Api> ReadApiDefinitionsFromFolder(string rootFolder)
             {
                 return Directory
-                    .EnumerateFiles(rootFolder, DefinitionFilePattern.API_DEFINITION_PATTERN, SearchOption.AllDirectories)
+                    .EnumerateFiles(rootFolder, FileExtension.ApiDefinition, SearchOption.AllDirectories)
                     .Select(f =>
                     {
                         var api = _deserializer.Deserialize<Api>(ReadDefinitionFile(f));

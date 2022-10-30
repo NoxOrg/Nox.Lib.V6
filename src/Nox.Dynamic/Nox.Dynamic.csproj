@@ -5,40 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UserSecretsId>c85db8f6-e4ba-47a2-beb2-7cc33455348a</UserSecretsId>
-	  <PackageId>Nox.Dynamic</PackageId>
-	  <Version>1.0.4</Version>
-  	<Authors>Andre Sharpe</Authors>
-  	<Company>Creations Unlimited</Company>
-    <PackageTags>Framework Dynamic Microservice</PackageTags>
-    <PackageProjectUrl>https://github.com/andresharpe/Nox</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>images\nox.png</PackageIcon>
-    <Description>
-      A framework for rapid Microservice and solution development for .Net 
-    </Description>
-
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="..\..\nox.png" Pack="true" Visible="false" PackagePath="images\nox.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="OData\Commands\**" />
-    <Compile Remove="OData\Notifications\**" />
-    <Compile Remove="OData\Queries\**" />
-    <EmbeddedResource Remove="OData\Commands\**" />
-    <EmbeddedResource Remove="OData\Notifications\**" />
-    <EmbeddedResource Remove="OData\Queries\**" />
-    <None Remove="OData\Commands\**" />
-    <None Remove="OData\Notifications\**" />
-    <None Remove="OData\Queries\**" />
-  </ItemGroup>
 	
   <ItemGroup>
-    <PackageReference Include="Elasticsearch.Net" Version="7.17.5">
-      <TreatAsUsed>true</TreatAsUsed>
-    </PackageReference>
     <PackageReference Include="ETLBox" Version="2.6.5" />
     <PackageReference Include="ETLBox.Postgres" Version="2.6.5" />
     <PackageReference Include="ETLBox.SqlServer" Version="2.6.5" />
@@ -62,6 +31,14 @@
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Configuration\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Nox.Abstractions\Nox.Abstractions.csproj" />
 	</ItemGroup>
 
 </Project>

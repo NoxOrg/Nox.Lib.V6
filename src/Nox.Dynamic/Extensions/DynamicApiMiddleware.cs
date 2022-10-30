@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Routing.Template;
 using Nox.Dynamic.MetaData;
 using Nox.Dynamic.OData.Models;
 
-namespace Nox.Dynamic.Extensions;
+namespace Nox.Extensions.DependencyInjection;
 
 public class DynamicApiMiddleware
 {

@@ -1,9 +1,9 @@
 ﻿using Hangfire;
 using Microsoft.AspNetCore.Builder;
 
-namespace Nox.Dynamic.Extensions;
+namespace Nox.Extensions.DependencyInjection;
 
-public static class ApplicationBuilderExtensions
+public static class NoxApplicationBuilderExtensions
 {
     public static IApplicationBuilder UseNox(
         this IApplicationBuilder builder)

@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nox.Dynamic\Nox.Dynamic.csproj" />
+    <ProjectReference Include="..\Nox\Nox.csproj" />
   </ItemGroup>
 
   <ItemGroup>

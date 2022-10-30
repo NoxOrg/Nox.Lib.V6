@@ -14,7 +14,7 @@ using System.Dynamic;
 
 namespace Nox.Dynamic.Loaders;
 
-internal class LoaderExecutor : ILoaderExecutor
+public class LoaderExecutor : ILoaderExecutor
 {
 
     private readonly ILogger<LoaderExecutor> _logger;

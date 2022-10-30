@@ -25,7 +25,7 @@ namespace Nox.Dynamic.OData.Routing
     /// <summary>
     /// Defines a policy that applies behaviors to the OData Uri matcher.
     /// </summary>
-    internal class EntityODataRoutingMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
+    public class EntityODataRoutingMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
     {
         private readonly IODataTemplateTranslator _translator;
 
