@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nox.Dynamic.Constants
 {
-    internal static class Database
+    internal static class DatabaseObject
     {
         public const string MergeStateTable = "MergeState";
     }

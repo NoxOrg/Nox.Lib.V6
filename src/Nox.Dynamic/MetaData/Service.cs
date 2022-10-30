@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using Nox.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -109,7 +110,7 @@ public sealed class Service : MetaBase
 
 }
 
-internal class ServiceValidator : AbstractValidator<Service>
+public class ServiceValidator : AbstractValidator<Service>
 {
     public ServiceValidator(ServiceValidationInfo info)
     {
@@ -128,16 +129,4 @@ internal class ServiceValidator : AbstractValidator<Service>
     }
 }
 
-internal class ServiceValidationInfo
-{
-    public string ServiceName { get; private set; }
-    public IReadOnlyDictionary<string,string> ConfigurationVariables { get; private set; }
-
-    public ServiceValidationInfo(string serviceName, IReadOnlyDictionary<string, string> configurationVariables)
-    {
-        ServiceName = serviceName;
-
-        ConfigurationVariables = configurationVariables;
-    }
-}
 

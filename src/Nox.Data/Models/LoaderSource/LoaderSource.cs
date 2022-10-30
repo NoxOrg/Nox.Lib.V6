@@ -1,4 +1,4 @@
-﻿namespace Nox.Dynamic.MetaData;
+﻿namespace Nox.Data;
 
 public sealed class LoaderSource : DatabaseBase
 {
@@ -6,7 +6,7 @@ public sealed class LoaderSource : DatabaseBase
     public int MinimumExpectedRecords { get; set; } = 0;
 }
 
-internal class LoaderSourceValidator : DatabaseValidator
+public class LoaderSourceValidator : DatabaseValidator
 {
     public LoaderSourceValidator(ServiceValidationInfo info) : base(info) { }
 }

@@ -1,9 +1,9 @@
 ﻿
-namespace Nox.Dynamic.MetaData;
+namespace Nox.Data;
 
 public sealed class ServiceDatabase : DatabaseBase, IServiceDatabase  {}
 
-internal class ServiceDatabaseValidator : DatabaseValidator
+public class ServiceDatabaseValidator : DatabaseValidator
 {
     public ServiceDatabaseValidator(ServiceValidationInfo info) : base(info) { }
 }

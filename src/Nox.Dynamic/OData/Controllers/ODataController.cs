@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.UriParser;
-using Nox.Dynamic.OData.Models;
 using System.Reflection;
 using System.Text.Json;
 
@@ -21,13 +20,11 @@ namespace Nox.Dynamic.OData.Controllers
     public class ODataController : Microsoft.AspNetCore.OData.Routing.Controllers.ODataController
     {
 
-        private readonly DynamicDbContext _context;
+        private readonly IDynamicDbContext _context;
 
-        public ODataController(DynamicDbContext context)
+        public ODataController(IDynamicDbContext context)
         {
             _context = context;
-
-            _context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         private static string GetEntitySetName(HttpRequest request) =>
@@ -85,7 +82,7 @@ namespace Nox.Dynamic.OData.Controllers
             {
                 var entitySetName = GetEntitySetName(Request);
 
-                var obj = _context.PostDynamicObject(entitySetName, data)!;
+                var obj = _context.PostDynamicObject(entitySetName, data.GetRawText())!;
 
                 return Created(obj);
             }

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using Nox.Data;
 using Nox.Dynamic.OData.Models;
 using System;
 using System.Collections.Generic;
@@ -29,10 +30,10 @@ namespace Nox.Dynamic.OData.Routing
     {
         private readonly IODataTemplateTranslator _translator;
 
-        private readonly DynamicModel _dynamicDbModel;
+        private readonly IDynamicModel _dynamicDbModel;
 
         public EntityODataRoutingMatcherPolicy(IODataTemplateTranslator translator,
-            DynamicModel dynamicDbModel)
+            IDynamicModel dynamicDbModel)
         {
             _translator = translator;
             _dynamicDbModel = dynamicDbModel;

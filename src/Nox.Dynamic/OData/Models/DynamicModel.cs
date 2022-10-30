@@ -16,10 +16,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Nox.Dynamic.DatabaseProviders;
 using Hangfire;
 using Nox.Dynamic.Loaders;
+using Nox.Data;
 
 namespace Nox.Dynamic.OData.Models
 {
-    public class DynamicModel
+    public class DynamicModel : IDynamicModel
     {
         private readonly IConfiguration _config;
 
@@ -38,7 +39,7 @@ namespace Nox.Dynamic.OData.Models
 
 
         public DynamicModel(
-            IConfiguration config, ILogger<DynamicModel> logger, 
+            IConfiguration config, ILogger<DynamicModel> logger,
             IDynamicService dynamicService, ILoaderExecutor loaderExecutor)
         {
             _config = config;
@@ -46,29 +47,29 @@ namespace Nox.Dynamic.OData.Models
             _logger = logger;
 
             _loaderExecutor = loaderExecutor;
-            
+
             _dynamicService = dynamicService;
-            
+
             _databaseProvider = _dynamicService.ServiceDatabase.DatabaseProvider!;
 
             var builder = new ODataConventionModelBuilder();
 
-            var methods = typeof(DynamicDbContext).GetMethods();
+            var methods = typeof(IDynamicDbContext).GetMethods();
 
-            var dbContextGetCollectionMethod = 
-                methods.First(m => m.Name == nameof(DynamicDbContext.GetDynamicTypedCollection));
+            var dbContextGetCollectionMethod =
+                methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedCollection));
 
-            var dbContextGetSingleResultMethod = 
-                methods.First(m => m.Name == nameof(DynamicDbContext.GetDynamicTypedSingleResult));
+            var dbContextGetSingleResultMethod =
+                methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedSingleResult));
 
             var dbContextGetObjectPropertyMethod =
-                methods.First(m => m.Name == nameof(DynamicDbContext.GetDynamicTypedObjectProperty));
+                methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedObjectProperty));
 
             var dbContextGetNavigationMethod =
-                methods.First(m => m.Name == nameof(DynamicDbContext.GetDynamicTypedNavigation));
+                methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedNavigation));
 
             var dbContextPostMethod =
-                methods.First(m => m.Name == nameof(DynamicDbContext.PostDynamicTypedObject));
+                methods.First(m => m.Name == nameof(IDynamicDbContext.PostDynamicTypedObject));
 
             foreach (var (entityName, (entity, typeBuilder)) in GetTablesAndTypeBuilders())
             {
@@ -129,7 +130,7 @@ namespace Nox.Dynamic.OData.Models
                 }
 
                 RecurringJob.AddOrUpdate(
-                    $"{_dynamicService.Name}.{loader.Name}", 
+                    $"{_dynamicService.Name}.{loader.Name}",
                     () => executor.ExecuteLoaderAsync(loader, _databaseProvider, entity),
                     loader.Schedule.CronExpression
                 );
@@ -143,13 +144,14 @@ namespace Nox.Dynamic.OData.Models
 
         public ModelBuilder ConfigureDbContextModel(ModelBuilder modelBuilder)
         {
-            foreach (var (key,entity) in _dynamicDbEntities)
+            foreach (var (key, entity) in _dynamicDbEntities)
             {
-                modelBuilder.Entity(entity.Type, b => {
+                modelBuilder.Entity(entity.Type, b =>
+                {
 
                     b.ToTable(entity.Entity.Table, entity.Entity.Schema);
 
-                    foreach(var attr in entity.Entity.Attributes)
+                    foreach (var attr in entity.Entity.Attributes)
                     {
                         var prop = b.Property(attr.Name);
 
@@ -180,7 +182,7 @@ namespace Nox.Dynamic.OData.Models
 
                         if (attr.IsPrimaryKey)
                         {
-                            b.HasKey( new string[] { attr.Name });
+                            b.HasKey(new string[] { attr.Name });
 
                             if (!attr.IsAutoNumber)
                             {
@@ -204,18 +206,25 @@ namespace Nox.Dynamic.OData.Models
 
             }
 
-            AddMetadataFromNamespace(modelBuilder, typeof(Service), "meta");
+            AddMetadataFromNamespace(modelBuilder, typeof(MetaBase), "meta");
+
+            AddMetadataFromNamespace(modelBuilder, typeof(ModelBase), "meta");
+
+            AddMetadataFromNamespace(modelBuilder, typeof(DatabaseBase), "meta");
 
             AddMetadataFromNamespace(modelBuilder, typeof(XtendedAttributeValue), "dbo");
 
             return modelBuilder;
         }
 
-        private void AddMetadataFromNamespace(ModelBuilder modelBuilder, Type typeInNamespace, string schema)
+        private void AddMetadataFromNamespace(ModelBuilder modelBuilder, Type baseType, string schema)
         {
+            var assemblyToScan = Assembly.GetAssembly(baseType);
 
-            var nsTypes = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(t => t.Namespace == typeInNamespace.Namespace)
+            if (assemblyToScan == null) return;
+
+            var nsTypes = assemblyToScan.GetTypes()
+                .Where(t => t.IsSubclassOf(baseType))
                 .Where(t => t.IsClass && t.IsSealed && t.IsPublic);
 
             foreach (var metaType in nsTypes)
@@ -231,7 +240,7 @@ namespace Nox.Dynamic.OData.Models
                         .ClrType
                         .GetProperties();
 
-                    
+
                     foreach (var prop in properties)
                     {
                         if (prop.GetCustomAttributes(typeof(NotMappedAttribute), false).Length > 0)
@@ -245,13 +254,14 @@ namespace Nox.Dynamic.OData.Models
                         }
                         else if (typeString == "decimal")
                         {
-                            b.Property(prop.Name).HasPrecision(9,6);
+                            b.Property(prop.Name).HasPrecision(9, 6);
                         }
                         else if (typeString == "object")
                         {
                             b.Property(prop.Name)
                             .HasColumnType(_databaseProvider
-                            .ToDatabaseColumnType( new EntityAttribute() {Type = "object"} ));
+                                .ToDatabaseColumnType(new EntityAttribute() { Type = "object" })
+                            );
                         }
                     }
                 });
@@ -297,16 +307,14 @@ namespace Nox.Dynamic.OData.Models
             return ret!;
         }
 
-        public object PostDynamicObject(DbContext context, string dbSetName, JsonElement obj)
+        public object PostDynamicObject(DbContext context, string dbSetName, string json)
         {
-            var parameters = new object[] { obj };
+            var parameters = new object[] { json };
 
             var ret = _dynamicDbEntities[dbSetName].DbContextPostMethod.Invoke(context, parameters);
 
             return ret!;
         }
-
-        public IDynamicService Configuration => _dynamicService;
 
         private Dictionary<string, (Entity Entity, TypeBuilder TypeBuilder)> GetTablesAndTypeBuilders()
         {
@@ -320,7 +328,7 @@ namespace Nox.Dynamic.OData.Models
 
             var dynamicTypes = new Dictionary<string, (Entity Entity, TypeBuilder TypeBuilder)>();
 
-            foreach (var (_,entity) in entities)
+            foreach (var (_, entity) in entities)
             {
                 TypeBuilder tb = mb.DefineType(entity.Name, TypeAttributes.Public, null);
 

@@ -1,28 +1,29 @@
 ﻿using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Nox.Dynamic.Extensions;
-using Nox.Dynamic.Services;
 using System.Text.Json;
 
-namespace Nox.Dynamic.OData.Models
+namespace Nox.Data
 {
-    public partial class DynamicDbContext : DbContext
+    public partial class DynamicDbContext : DbContext, IDynamicDbContext
     {
-        private readonly DynamicModel _dynamicDbModel;
+        private readonly IDynamicModel _dynamicDbModel;
 
         public DynamicDbContext(
             DbContextOptions<DynamicDbContext> options,
-            DynamicModel dynamicDbModel
+            IDynamicModel dynamicDbModel
         )
             : base(options)
         {
             _dynamicDbModel = dynamicDbModel;
+
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
-        public DynamicDbContext(DynamicModel dynamicDbModel)
+        public DynamicDbContext(IDynamicModel dynamicDbModel)
         {
             _dynamicDbModel = dynamicDbModel;
+
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -33,6 +34,7 @@ namespace Nox.Dynamic.OData.Models
 
                 provider.ConfigureDbContext(optionsBuilder);
             }
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -61,9 +63,9 @@ namespace Nox.Dynamic.OData.Models
             return _dynamicDbModel?.GetDynamicNavigation(this, dbSetName, id, navName)!;
         }
 
-        public object PostDynamicObject(string dbSetName, JsonElement obj)
+        public object PostDynamicObject(string dbSetName, string json)
         {
-            return _dynamicDbModel?.PostDynamicObject(this, dbSetName, obj)!;
+            return _dynamicDbModel?.PostDynamicObject(this, dbSetName, json)!;
         }
 
         // Strongly typed methods for model callback
@@ -73,7 +75,7 @@ namespace Nox.Dynamic.OData.Models
             return Set<T>();
         }
 
-        public SingleResult<T> GetDynamicTypedSingleResult<T>(object id) where T : class
+        public object GetDynamicTypedSingleResult<T>(object id) where T : class
         {
             var collection = GetDynamicTypedCollection<T>();
 
@@ -81,36 +83,36 @@ namespace Nox.Dynamic.OData.Models
 
             var result = collection.Where(whereLambda);
 
-            return SingleResult.Create(result);
+            var obj = SingleResult.Create(result)!;
+
+            return obj;
         }
 
         public object GetDynamicTypedObjectProperty<T>(object id, string propName) where T : class
         {
-            var whereResult = GetDynamicTypedSingleResult<T>(id);
+            var whereResult = GetDynamicTypedSingleResult<T>(id) as SingleResult<T>;
 
             var selectPropertyExpression = propName.GetPropertyValueExpression<T>();
 
-            var result = whereResult.Queryable.Select(selectPropertyExpression);
+            var result = whereResult!.Queryable.Select(selectPropertyExpression);
 
             return result.Single();
         }
 
         public object GetDynamicTypedNavigation<T>(object id, string navName) where T : class
         {
-            var whereResult = GetDynamicTypedSingleResult<T>(id);
+            var whereResult = GetDynamicTypedSingleResult<T>(id) as SingleResult<T>;
 
             var selectPropertyExpression = navName.GetPropertyValueExpression<T>();
 
-            var result = whereResult.Queryable.Include(navName).Select(selectPropertyExpression);
+            var result = whereResult!.Queryable.Include(navName).Select(selectPropertyExpression);
 
             return result.Single();
         }
 
-        public object PostDynamicTypedObject<T>(JsonElement obj) where T : class
+        public object PostDynamicTypedObject<T>(string json) where T : class
         {
             var repo = Set<T>();
-            
-            var json = obj.GetRawText();
 
             var tObj = JsonSerializer.Deserialize<T>(json);
 

@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Nox.Configuration\Nox.Configuration.csproj" />
+    <ProjectReference Include="..\Nox.Data\Nox.Data.csproj" />
     <ProjectReference Include="..\Nox.Dynamic\Nox.Dynamic.csproj" />
   </ItemGroup>
 

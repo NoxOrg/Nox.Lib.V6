@@ -1,10 +1,9 @@
 ﻿using FluentValidation;
-using Nox.Dynamic.DatabaseProviders;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Nox.Dynamic.MetaData;
+namespace Nox.Data;
 
-public class DatabaseBase : MetaBase, IServiceDatabase
+public class DatabaseBase : ModelBase, IServiceDatabase
 {
     public string Name { get; set; } = string.Empty;
     public string Provider { get; set; } = string.Empty;
@@ -54,7 +53,7 @@ public class DatabaseBase : MetaBase, IServiceDatabase
     }
 }
 
-internal class DatabaseValidator : AbstractValidator<DatabaseBase>
+public class DatabaseValidator : AbstractValidator<DatabaseBase>
 {
     public DatabaseValidator(ServiceValidationInfo info)
     {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Nox.Dynamic.MetaData
 {
-    public class MetaBase
+    public class MetaBase : IModelBase
     {
         public int Id { get; set; }
 

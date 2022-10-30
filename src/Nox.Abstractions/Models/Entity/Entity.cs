@@ -4,9 +4,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
 
-namespace Nox.Dynamic.MetaData;
+namespace Nox;
 
-public sealed class Entity : MetaBase
+public sealed class Entity : ModelBase, IEntity
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
@@ -41,7 +41,7 @@ public sealed class Entity : MetaBase
     }
 }
 
-internal class EntityValidator : AbstractValidator<Entity>
+public class EntityValidator : AbstractValidator<IEntity>
 {
     public EntityValidator(ServiceValidationInfo info)
     {

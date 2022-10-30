@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
+using Nox.Data;
 using Nox.Dynamic.OData.Models;
 using Nox.Dynamic.OData.Serializers;
 
@@ -22,11 +23,11 @@ namespace Nox.Dynamic.OData.Routing
     {
         private const string ROUTE_PREFIX = "odata";
 
-        private readonly DynamicModel _model;
+        private readonly IDynamicModel _model;
 
         public EntityODataRoutingApplicationModelProvider(
             IOptions<ODataOptions> options,
-            DynamicModel model)
+            IDynamicModel model)
         {
             options.Value.AddRouteComponents(ROUTE_PREFIX, EdmCoreModel.Instance, builder => builder.AddSingleton<IODataSerializerProvider, CustomODataSerializerProvider>());
 

@@ -1,7 +1,7 @@
 ﻿
 namespace Nox;
 
-public class FileExtension
+public static class FileExtension
 {
     public const string ServiceDefinition = @"*.service.nox.yaml";
 

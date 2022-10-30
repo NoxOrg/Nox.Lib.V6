@@ -7,7 +7,7 @@ using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.KeyVault;
 using Nox.Dynamic.Exceptions;
 using Nox.Dynamic.Loaders;
-using Nox.Dynamic.Constants;
+using Nox.Data;
 
 namespace Nox.Dynamic.Services
 {
@@ -65,7 +65,7 @@ namespace Nox.Dynamic.Services
 
         }
 
-        public async Task<bool> ExecuteDataLoaderAsync(Loader loader, DatabaseProviders.IDatabaseProvider destinationDbProvider)
+        public async Task<bool> ExecuteDataLoaderAsync(Loader loader, IDatabaseProvider destinationDbProvider)
         {
             var entity = _service.Entities.First(e => e.Name.Equals(loader.Target.Entity, StringComparison.OrdinalIgnoreCase));
 

@@ -1,4 +1,5 @@
-﻿using Nox.Dynamic.DatabaseProviders;
+﻿using Nox.Data;
+using Nox.Dynamic.DatabaseProviders;
 using Nox.Dynamic.MetaData;
 
 namespace Nox.Dynamic.Loaders

@@ -2,13 +2,13 @@
 using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
-using Nox.Dynamic.MetaData;
+using Nox.Data;
 using Npgsql;
 using SqlKata.Compilers;
 
-namespace Nox.Dynamic.DatabaseProviders
+namespace Nox.Data
 {
-    internal class PostgresDatabaseProvider : IDatabaseProvider
+    public class PostgresDatabaseProvider : IDatabaseProvider
     {
         private string _connectionString;
 
@@ -25,7 +25,7 @@ namespace Nox.Dynamic.DatabaseProviders
             set { SetConnectionString(value); }
         }
 
-
+        public string Name => "postgres";
 
         public PostgresDatabaseProvider(IServiceDatabase serviceDb, string applicationName)
         {
@@ -73,19 +73,18 @@ namespace Nox.Dynamic.DatabaseProviders
             _connectionManager = new PostgresConnectionManager(connectionString);
         }
 
-        public void ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
+        public DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql(_connectionString);
+            return optionsBuilder.UseNpgsql(_connectionString);
         }
 
-        public string ToTableNameForSql(Entity entity)
+        public string ToTableNameForSql(IEntity entity)
         {
             return $"\"{entity.Schema}\".\"{entity.Table}\"";
         }
 
 
-
-        public string ToDatabaseColumnType(EntityAttribute entityAttribute)
+        public string ToDatabaseColumnType(IEntityAttribute entityAttribute)
         {
             var propType = entityAttribute.Type?.ToLower() ?? "string";
             var propWidth = entityAttribute.MaxWidth < 1 ? "max" : entityAttribute.MaxWidth.ToString();
@@ -124,7 +123,7 @@ namespace Nox.Dynamic.DatabaseProviders
             };
         }
 
-        public IGlobalConfiguration ConfigureHangfire(IGlobalConfiguration configuration)
+        public IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration)
         {
             configuration.UsePostgreSqlStorage(_connectionString, new PostgreSqlStorageOptions
             {

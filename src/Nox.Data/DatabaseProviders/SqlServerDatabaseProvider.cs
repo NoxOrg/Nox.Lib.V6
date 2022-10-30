@@ -2,13 +2,12 @@
 using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.EntityFrameworkCore;
-using Nox.Dynamic.MetaData;
 using SqlKata.Compilers;
 using System.Data.SqlClient;
 
-namespace Nox.Dynamic.DatabaseProviders
+namespace Nox.Data
 {
-    internal class SqlServerDatabaseProvider : IDatabaseProvider
+    public class SqlServerDatabaseProvider : IDatabaseProvider
     {
 
         private string _connectionString;
@@ -24,6 +23,8 @@ namespace Nox.Dynamic.DatabaseProviders
             set { SetConnectionString(value); }
         }
         
+        public string Name => "sqlserver";
+
         public IConnectionManager ConnectionManager => _connectionManager;
 
         public Compiler SqlCompiler => _sqlCompiler;
@@ -74,17 +75,17 @@ namespace Nox.Dynamic.DatabaseProviders
             _connectionManager = new SqlConnectionManager(connectionString);
         }
 
-        public void ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
+        public DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(_connectionString);
+            return optionsBuilder.UseSqlServer(_connectionString);
         }
 
-        public string ToTableNameForSql(Entity entity)
+        public string ToTableNameForSql(IEntity entity)
         {
             return $"[{entity.Schema}].[{entity.Table}]";
         }
 
-        public string ToDatabaseColumnType(EntityAttribute entityAttribute)
+        public string ToDatabaseColumnType(IEntityAttribute entityAttribute)
         {
             var propType = entityAttribute.Type?.ToLower() ?? "string";
             var propWidth = entityAttribute.MaxWidth < 1 ? "max" : entityAttribute.MaxWidth.ToString();
@@ -122,7 +123,7 @@ namespace Nox.Dynamic.DatabaseProviders
             };
         }
 
-        public IGlobalConfiguration ConfigureHangfire(IGlobalConfiguration configuration)
+        public IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration)
         {
             configuration.UseSqlServerStorage(_connectionString, new SqlServerStorageOptions
             {

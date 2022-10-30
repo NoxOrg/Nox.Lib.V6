@@ -7,11 +7,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Nox.Configuration;
+using Nox.Data;
 using Nox.Dynamic.Loaders;
 using Nox.Dynamic.MessageBus;
 using Nox.Dynamic.OData.Models;
 using Nox.Dynamic.OData.Routing;
 using Nox.Dynamic.Services;
+using Nox.Dynamic.DatabaseProviders;
 using System.Reflection;
 
 namespace Nox.Extensions.DependencyInjection;
@@ -32,9 +34,11 @@ public static class NoxServiceCollectionExtensions
 
         services.AddMessageBusFeature(_configuration);
 
+        services.AddDynamicDbContextFeature();
+
         services.AddDynamicODataFeature();
 
-        services.AddJobsFeature();
+        services.AddJobSchedulerFeature();
 
         return services;
     }
@@ -44,6 +48,15 @@ public static class NoxServiceCollectionExtensions
         services.AddSingleton<ILoaderExecutor, LoaderExecutor>();
 
         services.AddSingleton<IDynamicService, DynamicService>();
+
+        services.AddSingleton<IDynamicModel, DynamicModel>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddDynamicDbContextFeature(this IServiceCollection services)
+    {
+        services.AddDbContext<IDynamicDbContext, DynamicDbContext>();
 
         return services;
     }
@@ -119,10 +132,6 @@ public static class NoxServiceCollectionExtensions
             .Select().Filter().OrderBy().Count().Expand().SkipToken().SetMaxTop(100)
         );
 
-        services.AddSingleton<DynamicModel>();
-
-        services.AddDbContext<DynamicDbContext>();
-
         services.TryAddEnumerable(
             ServiceDescriptor.Transient<IApplicationModelProvider, EntityODataRoutingApplicationModelProvider>());
 
@@ -132,18 +141,18 @@ public static class NoxServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddJobsFeature(this IServiceCollection services)
+    public static IServiceCollection AddJobSchedulerFeature(this IServiceCollection services)
     {
         // hangfire feature
 
-        services.AddHangfire((services, configuration) => ConfigureHangfire(configuration, services));
+        services.AddHangfire((services, configuration) => ConfigureJobScheduler(configuration, services));
 
         services.AddHangfireServer();
 
         return services;
     }
 
-    private static IGlobalConfiguration ConfigureHangfire(IGlobalConfiguration configuration, IServiceProvider services)
+    private static IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration, IServiceProvider services)
     {
 
         configuration
@@ -151,10 +160,11 @@ public static class NoxServiceCollectionExtensions
             .UseSimpleAssemblyNameTypeSerializer()
             .UseRecommendedSerializerSettings();
 
-        var model = services.GetRequiredService<DynamicModel>();
+        var model = services.GetRequiredService<IDynamicModel>();
+
         var dbProvider = model.GetDatabaseProvider();
 
-        dbProvider.ConfigureHangfire(configuration);
+        dbProvider.ConfigureJobScheduler(configuration);
 
         model.SetupRecurringLoaderTasks();
 

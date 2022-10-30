@@ -1,7 +1,5 @@
 ﻿
-using Nox.Dynamic.DatabaseProviders;
-
-namespace Nox.Dynamic.MetaData
+namespace Nox.Data
 {
     public interface IServiceDatabase
     {

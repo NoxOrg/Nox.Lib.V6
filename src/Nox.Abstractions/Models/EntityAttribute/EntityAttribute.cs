@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nox.Dynamic.MetaData;
+namespace Nox;
 
-public sealed class EntityAttribute : MetaBase
+public sealed class EntityAttribute : ModelBase, IEntityAttribute
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
@@ -28,7 +28,7 @@ public sealed class EntityAttribute : MetaBase
     public int Precision { get; set; } = 2;
     public object? Default { get; set; }
     [NotMapped]
-    public string[] DefaultFromParents { get ; set; } = Array.Empty<string>();
+    public string[] DefaultFromParents { get; set; } = Array.Empty<string>();
     public string DefaultFromParentsJson { get => string.Join('|', DefaultFromParents.ToArray()); set => DefaultFromParents = value.Split('|'); }
     public string Formula { get; set; } = string.Empty;
 
@@ -43,7 +43,7 @@ public sealed class EntityAttribute : MetaBase
 
         Type = Type.ToLower();
 
-        if(IsPrimaryKey)
+        if (IsPrimaryKey)
             IsRequired = true;
 
         DefaultFromParents = DefaultFromParents.Where(p => p.Trim().Length > 0).ToArray();
@@ -88,7 +88,7 @@ public sealed class EntityAttribute : MetaBase
     }
 }
 
-internal class EntityAttributeValidator : AbstractValidator<EntityAttribute>
+public class EntityAttributeValidator : AbstractValidator<IEntityAttribute>
 {
     public EntityAttributeValidator(ServiceValidationInfo info)
     {

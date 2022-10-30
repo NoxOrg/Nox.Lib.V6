@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
+using Nox.Data;
 using Nox.Dynamic.MetaData;
 using Nox.Dynamic.OData.Models;
+using Nox.Dynamic.Services;
 
 namespace Nox.Extensions.DependencyInjection;
 
@@ -16,11 +18,11 @@ public class DynamicApiMiddleware
 
     private readonly List<RouteMatcher> _matchers = new();
 
-    public DynamicApiMiddleware(RequestDelegate next, DynamicModel model)
+    public DynamicApiMiddleware(RequestDelegate next, IDynamicService service)
     {
         _next = next;
 
-        foreach (var api in model.Configuration.Apis.Values)
+        foreach (var api in service.Apis.Values)
         {
             foreach (var route in api.Routes)
             {
