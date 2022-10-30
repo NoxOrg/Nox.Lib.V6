@@ -38,8 +38,4 @@
 	  <ProjectReference Include="..\Nox.Data\Nox.Data.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="DatabaseProviders\" />
-	</ItemGroup>
-
 </Project>
