@@ -14,17 +14,9 @@ public class MessageBusBase : MetaBase, IServiceMessageBus
     [NotMapped]
     public IMessageBusProvider? MessageBusProvider { get; set; }
 
-    internal virtual bool ApplyDefaults(ServiceValidationInfo info)
+    internal virtual bool ApplyDefaults()
     {
         var isValid = true;
-
-        if (string.IsNullOrEmpty(ConnectionString))
-        {
-            if (!string.IsNullOrEmpty(ConnectionVariable))
-            {
-                ConnectionString = info.ConfigurationVariables[ConnectionVariable];
-            }
-        }
 
         Provider = Provider.Trim().ToLower();
 
@@ -49,12 +41,12 @@ public class MessageBusBase : MetaBase, IServiceMessageBus
 
 internal class MessageBusValidator : AbstractValidator<MessageBusBase>
 {
-    public MessageBusValidator(ServiceValidationInfo info)
+    public MessageBusValidator()
     {
 
-        RuleFor(mb => mb.ApplyDefaults(info))
+        RuleFor(mb => mb.ApplyDefaults())
             .NotEqual(false)
-            .WithMessage(mb => $"[{info.ServiceName}] MessageBus provider '{mb.Provider}' defined in {mb.DefinitionFileName} is not supported");
+            .WithMessage(mb => $"MessageBus provider '{mb.Provider}' defined in {mb.DefinitionFileName} is not supported");
 
     }
 }

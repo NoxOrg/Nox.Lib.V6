@@ -90,20 +90,20 @@ public sealed class EntityAttribute : ModelBase, IEntityAttribute
 
 public class EntityAttributeValidator : AbstractValidator<IEntityAttribute>
 {
-    public EntityAttributeValidator(ServiceValidationInfo info)
+    public EntityAttributeValidator()
     {
 
         RuleFor(attribute => attribute.Name)
             .NotEmpty()
-            .WithMessage(attribute => $"[{info.ServiceName}] The attribute name must be specified in {attribute.DefinitionFileName}");
+            .WithMessage(attribute => $"The attribute name must be specified in {attribute.DefinitionFileName}");
 
         RuleFor(attribute => attribute.Type)
             .NotEmpty()
-            .WithMessage(attribute => $"[{info.ServiceName}] Attribute '{attribute.Name}' has no type defined in {attribute.DefinitionFileName}");
+            .WithMessage(attribute => $"Attribute '{attribute.Name}' has no type defined in {attribute.DefinitionFileName}");
 
         RuleFor(attribute => attribute.ApplyDefaults())
             .NotEqual(false)
-            .WithMessage(attribute => $"[{info.ServiceName}] Defaults could not be applied to attributes defined in {attribute.DefinitionFileName}");
+            .WithMessage(attribute => $"Defaults could not be applied to attributes defined in {attribute.DefinitionFileName}");
 
     }
 }

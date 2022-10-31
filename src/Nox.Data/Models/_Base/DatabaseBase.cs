@@ -18,17 +18,9 @@ public class DatabaseBase : ModelBase, IServiceDatabase
     [NotMapped]
     public IDatabaseProvider? DatabaseProvider { get; set; }
 
-    internal virtual bool ApplyDefaults(ServiceValidationInfo info)
+    internal virtual bool ApplyDefaults()
     {
         var isValid = true;
-
-        if (string.IsNullOrEmpty(ConnectionString))
-        {
-            if (!string.IsNullOrEmpty(ConnectionVariable))
-            {
-                ConnectionString = info.ConfigurationVariables[ConnectionVariable];
-            }
-        }
 
         Provider = Provider.Trim().ToLower();
 
@@ -36,12 +28,10 @@ public class DatabaseBase : ModelBase, IServiceDatabase
         {
             case "sqlserver":
                 if (Port == 0) Port = 1433;
-                DatabaseProvider = new SqlServerDatabaseProvider(this, info.ServiceName);
                 break;
 
             case "postgres":
                 if (Port == 0) Port = 5432;
-                DatabaseProvider = new PostgresDatabaseProvider(this, info.ServiceName);
                 break;
 
             default:
@@ -55,12 +45,12 @@ public class DatabaseBase : ModelBase, IServiceDatabase
 
 public class DatabaseValidator : AbstractValidator<DatabaseBase>
 {
-    public DatabaseValidator(ServiceValidationInfo info)
+    public DatabaseValidator()
     {
 
-        RuleFor(db => db.ApplyDefaults(info))
+        RuleFor(db => db.ApplyDefaults())
             .NotEqual(false)
-            .WithMessage(db => $"[{info.ServiceName}] Database provider '{db.Provider}' defined in {db.DefinitionFileName} is not supported");
+            .WithMessage(db => $"Database provider '{db.Provider}' defined in {db.DefinitionFileName} is not supported");
 
     }
 }

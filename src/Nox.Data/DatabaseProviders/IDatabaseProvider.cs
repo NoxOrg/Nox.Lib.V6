@@ -11,6 +11,7 @@ namespace Nox.Data
         public string ConnectionString { get; }
         public IConnectionManager ConnectionManager { get; }
         public Compiler SqlCompiler { get; }
+        public void ConfigureServiceDatabase(IServiceDatabase serviceDb, string applicationName);
         public DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder);
         public IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration);
         public string ToDatabaseColumnType(IEntityAttribute entityAttribute);

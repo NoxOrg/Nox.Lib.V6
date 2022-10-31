@@ -5,5 +5,5 @@ public sealed class ServiceDatabase : DatabaseBase, IServiceDatabase  {}
 
 public class ServiceDatabaseValidator : DatabaseValidator
 {
-    public ServiceDatabaseValidator(ServiceValidationInfo info) : base(info) { }
+    public ServiceDatabaseValidator() : base() { }
 }

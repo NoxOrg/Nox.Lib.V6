@@ -10,11 +10,11 @@ namespace Nox.Data
 {
     public class PostgresDatabaseProvider : IDatabaseProvider
     {
-        private string _connectionString;
+        private string _connectionString = string.Empty;
 
-        private IConnectionManager _connectionManager;
+        private readonly IConnectionManager _connectionManager = new PostgresConnectionManager();
 
-        private readonly Compiler _sqlCompiler;
+        private readonly Compiler _sqlCompiler = new PostgresCompiler();
 
         public IConnectionManager ConnectionManager => _connectionManager;
         public Compiler SqlCompiler => _sqlCompiler;
@@ -27,50 +27,39 @@ namespace Nox.Data
 
         public string Name => "postgres";
 
-        public PostgresDatabaseProvider(IServiceDatabase serviceDb, string applicationName)
+        public void ConfigureServiceDatabase(IServiceDatabase serviceDb, string applicationName)
         {
-            if (serviceDb != null)
+            NpgsqlConnectionStringBuilder csb;
+
+            if (string.IsNullOrEmpty(serviceDb.ConnectionString))
             {
-                NpgsqlConnectionStringBuilder csb;
-
-                if (string.IsNullOrEmpty(serviceDb.ConnectionString))
+                csb = new NpgsqlConnectionStringBuilder(serviceDb.Options)
                 {
-                    csb = new NpgsqlConnectionStringBuilder(serviceDb.Options)
-                    {
-                        Host = serviceDb.Server,
-                        Port = serviceDb.Port,
-                        Username = serviceDb.User,
-                        Password = serviceDb.Password,
-                        Database = serviceDb.Name,
-                    };
-                }
-                else
-                {
-                    csb = new NpgsqlConnectionStringBuilder(serviceDb.ConnectionString);
-                }
-
-                csb.ApplicationName = applicationName;
-
-                _connectionString = serviceDb.ConnectionString = csb.ToString();
-
-                _connectionManager = new PostgresConnectionManager(_connectionString);
-
+                    Host = serviceDb.Server,
+                    Port = serviceDb.Port,
+                    Username = serviceDb.User,
+                    Password = serviceDb.Password,
+                    Database = serviceDb.Name,
+                };
             }
             else
             {
-                _connectionString = "";
-
-                _connectionManager = new PostgresConnectionManager();
+                csb = new NpgsqlConnectionStringBuilder(serviceDb.ConnectionString);
             }
 
-            _sqlCompiler = new PostgresCompiler();
+            csb.ApplicationName = applicationName;
+
+            serviceDb.ConnectionString = csb.ToString();
+
+            SetConnectionString(serviceDb.ConnectionString);
+
         }
 
         private void SetConnectionString(string connectionString)
         {
             _connectionString = connectionString;
 
-            _connectionManager = new PostgresConnectionManager(connectionString);
+            _connectionManager.ConnectionString = new PostgresConnectionString(connectionString);
         }
 
         public DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)

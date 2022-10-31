@@ -10,11 +10,11 @@ namespace Nox.Data
     public class SqlServerDatabaseProvider : IDatabaseProvider
     {
 
-        private string _connectionString;
+        private string _connectionString = string.Empty;
         
-        private IConnectionManager _connectionManager;
+        private readonly IConnectionManager _connectionManager = new SqlConnectionManager();
 
-        private readonly Compiler _sqlCompiler;
+        private readonly Compiler _sqlCompiler = new SqlServerCompiler();
 
         public string ConnectionString
         {
@@ -22,57 +22,44 @@ namespace Nox.Data
          
             set { SetConnectionString(value); }
         }
-        
+
         public string Name => "sqlserver";
 
         public IConnectionManager ConnectionManager => _connectionManager;
 
         public Compiler SqlCompiler => _sqlCompiler;
 
-        public SqlServerDatabaseProvider(IServiceDatabase serviceDb, string applicationName)
+        public void ConfigureServiceDatabase(IServiceDatabase serviceDb, string applicationName)
         {
+            SqlConnectionStringBuilder csb;
 
-
-            if (serviceDb != null)
+            if (string.IsNullOrEmpty(serviceDb.ConnectionString))
             {
-                SqlConnectionStringBuilder csb;
-
-                if (string.IsNullOrEmpty(serviceDb.ConnectionString))
+                csb = new SqlConnectionStringBuilder(serviceDb.Options)
                 {
-                    csb = new SqlConnectionStringBuilder(serviceDb.Options)
-                    {
-                        DataSource = $"{serviceDb.Server},{serviceDb.Port}",
-                        UserID = serviceDb.User,
-                        Password = serviceDb.Password,
-                        InitialCatalog = serviceDb.Name,
-                    };
-                }
-                else
-                {
-                    csb = new SqlConnectionStringBuilder(serviceDb.ConnectionString);
-                }
-
-                csb.ApplicationName = applicationName;
-
-                _connectionString = serviceDb.ConnectionString = csb.ToString();
-
-                _connectionManager = new SqlConnectionManager(_connectionString);
+                    DataSource = $"{serviceDb.Server},{serviceDb.Port}",
+                    UserID = serviceDb.User,
+                    Password = serviceDb.Password,
+                    InitialCatalog = serviceDb.Name,
+                };
             }
             else
             {
-                _connectionString = "";
-
-                _connectionManager = new SqlConnectionManager();
+                csb = new SqlConnectionStringBuilder(serviceDb.ConnectionString);
             }
 
-            _sqlCompiler = new SqlServerCompiler();
+            csb.ApplicationName = applicationName;
+
+            serviceDb.ConnectionString = csb.ToString();
+
+            SetConnectionString(serviceDb.ConnectionString);
         }
 
         private void SetConnectionString(string connectionString)
         {
             _connectionString = connectionString;
 
-            _connectionManager = new SqlConnectionManager(connectionString);
+            _connectionManager.ConnectionString = new SqlConnectionString(_connectionString);
         }
 
         public DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)

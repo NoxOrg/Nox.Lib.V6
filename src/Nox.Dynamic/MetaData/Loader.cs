@@ -24,19 +24,19 @@ public sealed class Loader : MetaBase
 
 internal class LoaderValidator : AbstractValidator<Loader>
 {
-    public LoaderValidator(ServiceValidationInfo info)
+    public LoaderValidator()
     {
 
         RuleFor(loader => loader.Name)
             .NotEmpty()
-            .WithMessage(loader => $"[{info.ServiceName}] The data loader name must be specified in {loader.DefinitionFileName}");
+            .WithMessage(loader => $"The data loader name must be specified in {loader.DefinitionFileName}");
 
         RuleFor(loader => loader.ApplyDefaults())
             .NotEqual(false)
-            .WithMessage(loader => $"[{info.ServiceName}] Defaults could not be applied to lader defined in {loader.DefinitionFileName}");
+            .WithMessage(loader => $"Defaults could not be applied to lader defined in {loader.DefinitionFileName}");
 
         RuleForEach(loader => loader.Sources)
-            .SetValidator(new LoaderSourceValidator(info));
+            .SetValidator(new LoaderSourceValidator());
 
     }
 }

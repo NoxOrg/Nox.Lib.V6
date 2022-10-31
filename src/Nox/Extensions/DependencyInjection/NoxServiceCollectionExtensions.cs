@@ -30,6 +30,8 @@ public static class NoxServiceCollectionExtensions
             throw new ConfigurationException("Could not load Nox configuration.");
         }
 
+        services.AddDatabaseProviderFactory();
+
         services.AddDynamicDefinitionFeature();
 
         services.AddMessageBusFeature(_configuration);

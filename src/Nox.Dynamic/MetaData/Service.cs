@@ -21,11 +21,10 @@ public sealed class Service : MetaBase
     public ICollection<Loader> Loaders { get; set; } = null!;
     public ICollection<Api> Apis { get; set; } = null!;
 
-    public void Validate(IReadOnlyDictionary<string, string> configurationVariables)
+    public void Validate()
     {
-        var validationInfo = new ServiceValidationInfo(Name, configurationVariables);
 
-        var validator = new ServiceValidator(validationInfo);
+        var validator = new ServiceValidator();
 
         validator.ValidateAndThrow(this);
 
@@ -112,19 +111,19 @@ public sealed class Service : MetaBase
 
 public class ServiceValidator : AbstractValidator<Service>
 {
-    public ServiceValidator(ServiceValidationInfo info)
+    public ServiceValidator()
     {
         RuleForEach(service => service.Entities)
-            .SetValidator(new EntityValidator(info));
+            .SetValidator(new EntityValidator());
 
         RuleForEach(service => service.Loaders)
-            .SetValidator(new LoaderValidator(info));
+            .SetValidator(new LoaderValidator());
 
         RuleForEach(service => service.Apis)
-            .SetValidator(new ApiValidator(info));
+            .SetValidator(new ApiValidator());
 
         RuleFor(service => service.Database)
-            .SetValidator(new ServiceDatabaseValidator(info));
+            .SetValidator(new ServiceDatabaseValidator());
 
     }
 }

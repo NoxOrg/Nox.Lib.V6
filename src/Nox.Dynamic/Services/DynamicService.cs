@@ -23,6 +23,8 @@ namespace Nox.Dynamic.Services
 
         private readonly ILoaderExecutor _loaderExector;
 
+        private readonly IDatabaseProviderFactory _factory;
+
         public string Name => _service.Name;
 
         public Service Service => _service;
@@ -41,7 +43,10 @@ namespace Nox.Dynamic.Services
         public IReadOnlyCollection<Loader> Loaders => new ReadOnlyCollection<Loader>(_service.Loaders.ToList());
 
 
-        public DynamicService(ILogger<DynamicService> logger, IConfiguration configuration, ILoaderExecutor loaderExector)
+        public DynamicService(ILogger<DynamicService> logger, 
+            IConfiguration configuration, 
+            ILoaderExecutor loaderExector, 
+            IDatabaseProviderFactory factory)
         {
             _logger = logger;
 
@@ -49,9 +54,12 @@ namespace Nox.Dynamic.Services
 
             _loaderExector = loaderExector;
 
+            _factory = factory;
+
             _service = new Configurator(this)
                 .WithLogger(_logger)
                 .WithConfiguration(_configuration)
+                .WithDatabaseProviderFactory(_factory)
                 .FromRootFolder(_configuration["Nox:DefinitionRootPath"])
                 .Configure();
 
@@ -74,10 +82,6 @@ namespace Nox.Dynamic.Services
 
         private class Configurator
         {
-            // Constants
-
-
-
             // Class def
 
             private readonly DynamicService _dynamicService;
@@ -87,6 +91,8 @@ namespace Nox.Dynamic.Services
             private ILogger _logger = null!;
 
             private IConfiguration _configuration = null!;
+
+            private IDatabaseProviderFactory _factory = null!;
 
             private Service _service = null!;
 
@@ -128,9 +134,26 @@ namespace Nox.Dynamic.Services
                 return this;
             }
 
+            public Configurator WithDatabaseProviderFactory(IDatabaseProviderFactory factory)
+            {
+                _factory = factory;
+
+                return this;
+            }
+
             public Service Configure()
             {
-                _service.Validate(GetConfigurationVariables());
+
+                var serviceDatabases = GetServiceDatabasesFromDefinition();
+                var configVariables = ResolveConfigurationVariables(serviceDatabases);
+
+                _service.Validate();
+
+                serviceDatabases.ToList().ForEach(db =>
+                {
+                    db.DatabaseProvider = _factory.Create(db.Provider);
+                    db.DatabaseProvider.ConfigureServiceDatabase(db,_service.Name);
+                });
 
                 return _service;
             }
@@ -199,23 +222,23 @@ namespace Nox.Dynamic.Services
                 return File.ReadAllText(fileName);
             }
 
-            private IReadOnlyDictionary<string, string> GetConfigurationVariables()
+            private IReadOnlyDictionary<string, string> ResolveConfigurationVariables(IList<IServiceDatabase> serviceDatabases)
             {
                 _logger.LogInformation("Resolving all configuration variables...");
 
-                var databases = GetServiceDatabasesFromDefinition();
-
                 // populate variables from application config
 
-                var variables = databases
+                var databases = serviceDatabases
                     .Where(d => string.IsNullOrEmpty(d.ConnectionString))
-                    .Where(d => !string.IsNullOrEmpty(d.ConnectionVariable))
-                    .Select(d => d.ConnectionVariable ?? "")
+                    .Where(d => !string.IsNullOrEmpty(d.ConnectionVariable));
+
+                var variables = databases
+                    .Select(d => d.ConnectionVariable!)
                     .ToHashSet()
                     .ToDictionary(v => v, v => _configuration[v], StringComparer.OrdinalIgnoreCase);
 
-                if (string.IsNullOrEmpty(_service.MessageBus.ConnectionString) && !
-                    string.IsNullOrEmpty(_service.MessageBus.ConnectionVariable))
+                if (string.IsNullOrEmpty(_service.MessageBus.ConnectionString) && 
+                    !string.IsNullOrEmpty(_service.MessageBus.ConnectionVariable))
                 {
                     variables.Add(_service.MessageBus.ConnectionVariable,
                         _configuration[_service.MessageBus.ConnectionVariable]);
@@ -237,6 +260,16 @@ namespace Nox.Dynamic.Services
                         .ToArray()
                     );
                     throw new ConfigurationNotFoundException(variableNames);
+                }
+
+                databases.ToList().ForEach(db =>
+                    db.ConnectionString = variables[db.ConnectionVariable!]
+                );
+
+                if (string.IsNullOrEmpty(_service.MessageBus.ConnectionString) && 
+                    !string.IsNullOrEmpty(_service.MessageBus.ConnectionVariable))
+                {
+                    _service.MessageBus.ConnectionString = variables[_service.MessageBus.ConnectionVariable!];
                 }
 
                 return variables;

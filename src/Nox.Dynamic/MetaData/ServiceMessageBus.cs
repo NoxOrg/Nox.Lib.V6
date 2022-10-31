@@ -7,5 +7,5 @@ public sealed class ServiceMessageBus : MessageBusBase, IServiceMessageBus { }
 
 internal class ServiceMessageBusValidator : MessageBusValidator
 {
-    public ServiceMessageBusValidator(ServiceValidationInfo info) : base(info) { }
+    public ServiceMessageBusValidator() : base() { }
 }

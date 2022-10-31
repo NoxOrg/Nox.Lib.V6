@@ -43,23 +43,23 @@ public sealed class Entity : ModelBase, IEntity
 
 public class EntityValidator : AbstractValidator<IEntity>
 {
-    public EntityValidator(ServiceValidationInfo info)
+    public EntityValidator()
     {
 
         RuleFor(entity => entity.Name)
             .NotEmpty()
-            .WithMessage(entity => $"[{info.ServiceName}] The entity's name must be specified in {entity.DefinitionFileName}");
+            .WithMessage(entity => $"The entity's name must be specified in {entity.DefinitionFileName}");
 
         RuleFor(entity => entity.ApplyDefaults())
             .NotEqual(false)
-            .WithMessage(entity => $"[{info.ServiceName}] Defaults could not be applied to entity defined in {entity.DefinitionFileName}");
+            .WithMessage(entity => $"Defaults could not be applied to entity defined in {entity.DefinitionFileName}");
 
         RuleFor(entity => entity.Attributes)
             .NotEmpty()
-            .WithMessage(entity => $"[{info.ServiceName}] The entity must have at least one property defined in {entity.DefinitionFileName}");
+            .WithMessage(entity => $"The entity must have at least one property defined in {entity.DefinitionFileName}");
 
         RuleForEach(entity => entity.Attributes)
-            .SetValidator(new EntityAttributeValidator(info));
+            .SetValidator(new EntityAttributeValidator());
 
     }
 }

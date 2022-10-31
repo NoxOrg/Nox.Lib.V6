@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Nox.Cli.Commands;
 using Nox.Cli.Services;
 using Nox.Configuration;
+using Nox.Data;
 using Nox.Extensions.DependencyInjection;
 using Serilog;
 using Spectre.Console.Cli;
@@ -63,6 +64,7 @@ internal class Program
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddSingleton(Configuration);
+                services.AddDatabaseProviderFactory();
                 services.AddDynamicDefinitionFeature();
                 services.AddMessageBusFeature(Configuration, false);           
             })

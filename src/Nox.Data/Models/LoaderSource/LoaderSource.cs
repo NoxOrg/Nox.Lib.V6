@@ -8,5 +8,5 @@ public sealed class LoaderSource : DatabaseBase
 
 public class LoaderSourceValidator : DatabaseValidator
 {
-    public LoaderSourceValidator(ServiceValidationInfo info) : base(info) { }
+    public LoaderSourceValidator() : base() { }
 }
