@@ -101,6 +101,8 @@ namespace Nox.Dynamic.OData.Models
 
             var model = dbContext.Model;
 
+            var sql = dbContext.Database.GenerateCreateScript();
+
             if (dbContext.Database.EnsureCreated())
             {
                 dbContext.Add(_dynamicService.Service);
@@ -146,7 +148,7 @@ namespace Nox.Dynamic.OData.Models
                 modelBuilder.Entity(entity.Type, b =>
                 {
 
-                    b.ToTable(entity.Entity.Table, entity.Entity.Schema);
+                    _databaseProvider.ConfigureEntityTypeBuilder(b, entity.Entity.Table, entity.Entity.Schema);
 
                     foreach (var attr in entity.Entity.Attributes)
                     {
@@ -203,11 +205,11 @@ namespace Nox.Dynamic.OData.Models
 
             }
 
-            AddMetadataFromNamespace(modelBuilder, typeof(MetaBase), "meta");
+            AddMetadataFromNamespace(modelBuilder, typeof(MetaBase), DatabaseObject.MetadataSchemaName);
 
-            AddMetadataFromNamespace(modelBuilder, typeof(ModelBase), "meta");
+            AddMetadataFromNamespace(modelBuilder, typeof(ModelBase), DatabaseObject.MetadataSchemaName);
 
-            AddMetadataFromNamespace(modelBuilder, typeof(DatabaseBase), "meta");
+            AddMetadataFromNamespace(modelBuilder, typeof(DatabaseBase), DatabaseObject.MetadataSchemaName);
 
             AddMetadataFromNamespace(modelBuilder, typeof(XtendedAttributeValue), "dbo");
 
@@ -228,7 +230,9 @@ namespace Nox.Dynamic.OData.Models
             {
                 modelBuilder.Entity(metaType, b =>
                 {
-                    b.ToTable(metaType.Name, schema);
+                    // b.ToTable(metaType.Name, schema);
+
+                    _databaseProvider.ConfigureEntityTypeBuilder( b ,metaType.Name, schema);
 
                     var entityTypes = modelBuilder.Model.GetEntityTypes();
 
@@ -255,10 +259,21 @@ namespace Nox.Dynamic.OData.Models
                         }
                         else if (typeString == "object")
                         {
-                            b.Property(prop.Name)
-                            .HasColumnType(_databaseProvider
-                                .ToDatabaseColumnType(new EntityAttribute() { Type = "object" })
-                            );
+                            var dbType = _databaseProvider.ToDatabaseColumnType(new EntityAttribute() { Type = "object" });
+
+                            if (dbType == null)
+                            {
+                                b.Ignore(prop.Name);
+                            }
+                            else
+                            {
+                                b.Property(prop.Name).HasColumnType(dbType);
+                            }
+
+                            //b.Property(prop.Name).HasConversion(
+                            //    v => JsonConvert.SerializeObject(v, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }),
+                            //    v => JsonConvert.DeserializeObject<IList<Address>>(v, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore })
+                            //);
                         }
                     }
                 });

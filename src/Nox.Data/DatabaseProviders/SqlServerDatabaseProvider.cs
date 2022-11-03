@@ -2,6 +2,7 @@
 using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SqlKata.Compilers;
 using System.Data.SqlClient;
 
@@ -67,11 +68,6 @@ namespace Nox.Data
             return optionsBuilder.UseSqlServer(_connectionString);
         }
 
-        public string ToTableNameForSql(IEntity entity)
-        {
-            return $"[{entity.Schema}].[{entity.Table}]";
-        }
-
         public string ToDatabaseColumnType(IEntityAttribute entityAttribute)
         {
             var propType = entityAttribute.Type?.ToLower() ?? "string";
@@ -123,6 +119,22 @@ namespace Nox.Data
                 PrepareSchemaIfNecessary = true,
             });
             return configuration;
+        }
+
+        public string ToTableNameForSql(string table, string schema)
+        {
+            return $"[{schema}].[{table}]";
+        }
+
+        public string ToTableNameForSqlRaw(string table, string schema)
+        {
+            return $"{schema}.{table}";
+        }
+
+        public EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema)
+        {
+            builder.ToTable(table,schema);
+            return builder;
         }
     }
 }

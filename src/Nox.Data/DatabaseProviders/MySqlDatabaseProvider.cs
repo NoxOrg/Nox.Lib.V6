@@ -1,76 +1,78 @@
 ﻿using ETLBox.Connection;
 using Hangfire;
-using Hangfire.PostgreSql;
+using Hangfire.MySql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Npgsql;
+using MySql.Data.MySqlClient;
 using SqlKata.Compilers;
+using System.Transactions;
+
 
 namespace Nox.Data
 {
-    public class PostgresDatabaseProvider : IDatabaseProvider
+    public class MySqlDatabaseProvider : IDatabaseProvider
     {
+
         private string _connectionString = string.Empty;
+        
+        private readonly IConnectionManager _connectionManager = new MySqlConnectionManager();
 
-        private readonly IConnectionManager _connectionManager = new PostgresConnectionManager();
+        private readonly Compiler _sqlCompiler = new MySqlCompiler();
 
-        private readonly Compiler _sqlCompiler = new PostgresCompiler();
-
-        public IConnectionManager ConnectionManager => _connectionManager;
-        public Compiler SqlCompiler => _sqlCompiler;
         public string ConnectionString
         {
             get { return _connectionString; }
-
+         
             set { SetConnectionString(value); }
         }
 
-        public string Name => "postgres";
+        public string Name => "mysql";
+
+        public IConnectionManager ConnectionManager => _connectionManager;
+
+        public Compiler SqlCompiler => _sqlCompiler;
 
         public void ConfigureServiceDatabase(IServiceDatabase serviceDb, string applicationName)
         {
-            NpgsqlConnectionStringBuilder csb;
+            MySqlConnectionStringBuilder csb;
 
             if (string.IsNullOrEmpty(serviceDb.ConnectionString))
             {
-                csb = new NpgsqlConnectionStringBuilder(serviceDb.Options)
+                csb = new MySqlConnectionStringBuilder(serviceDb.Options)
                 {
-                    Host = serviceDb.Server,
-                    Port = serviceDb.Port,
-                    Username = serviceDb.User,
+                    Server = serviceDb.Server,
+                    Port = (uint)serviceDb.Port,
+                    UserID = serviceDb.User,
                     Password = serviceDb.Password,
-                    Database = serviceDb.Name,
+                    Database = serviceDb.Name
                 };
             }
             else
             {
-                csb = new NpgsqlConnectionStringBuilder(serviceDb.ConnectionString);
+                csb = new MySqlConnectionStringBuilder(serviceDb.ConnectionString);
             }
-
-            csb.ApplicationName = applicationName;
 
             serviceDb.ConnectionString = csb.ToString();
 
             SetConnectionString(serviceDb.ConnectionString);
-
         }
 
         private void SetConnectionString(string connectionString)
         {
             _connectionString = connectionString;
 
-            _connectionManager.ConnectionString = new PostgresConnectionString(connectionString);
+            _connectionManager.ConnectionString = new MySqlConnectionString(_connectionString);
         }
 
         public DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
         {
-            return optionsBuilder.UseNpgsql(_connectionString);
+            return optionsBuilder.UseMySQL(_connectionString);
         }
 
         public string ToDatabaseColumnType(IEntityAttribute entityAttribute)
         {
             var propType = entityAttribute.Type?.ToLower() ?? "string";
-            var propWidth = entityAttribute.MaxWidth < 1 ? "2048" : entityAttribute.MaxWidth.ToString();
+            var propWidth = entityAttribute.MaxWidth < 1 ? "65535" : entityAttribute.MaxWidth.ToString();
             var propPrecision = entityAttribute.Precision.ToString();
             var isFixedWidth = entityAttribute.MaxWidth == entityAttribute.MinWidth;
 
@@ -87,14 +89,14 @@ namespace Nox.Data
                 "url" => "varchar(2048)",
                 "email" => "varchar(320)",
                 "char" => $"char({propWidth})",
-                "guid" => "uuid",
+                "guid" => "binary(16)",
                 "date" => "date",
-                "datetime" => "timestamp with time zone",
-                "time" => "timestamp without time zone",
-                "timespan" => "timestamp without time zone",
-                "bool" => "boolean",
-                "boolean" => "boolean",
-                "object" => "jsonb",
+                "datetime" => "datetime",
+                "time" => "timestamp",
+                "timespan" => "timestamp",
+                "bool" => "tinyint(1)",
+                "boolean" => "tinyint(1)",
+                "object" => null!,
                 "int" => "integer",
                 "uint" => "integer",
                 "bigint" => "bigint",
@@ -108,27 +110,34 @@ namespace Nox.Data
 
         public IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration)
         {
-            configuration.UsePostgreSqlStorage(_connectionString, new PostgreSqlStorageOptions
-            {
-                SchemaName = "jobs",
-                PrepareSchemaIfNecessary = true,
-            });
+            configuration.UseStorage(
+                new MySqlStorage(_connectionString, new MySqlStorageOptions
+                {
+                    TransactionIsolationLevel = IsolationLevel.ReadCommitted,
+                    QueuePollInterval = TimeSpan.FromSeconds(15),
+                    JobExpirationCheckInterval = TimeSpan.FromHours(1),
+                    CountersAggregateInterval = TimeSpan.FromMinutes(5),
+                    PrepareSchemaIfNecessary = true,
+                    DashboardJobListLimit = 50000,
+                    TransactionTimeout = TimeSpan.FromMinutes(1),
+                    TablesPrefix = "jobs_",
+                }));
             return configuration;
         }
 
         public string ToTableNameForSql(string table, string schema)
         {
-            return $"\"{schema}\".\"{table}\"";
+            return $"`{schema}_{table}`";
         }
 
         public string ToTableNameForSqlRaw(string table, string schema)
         {
-            return $"{schema}.{table}";
+            return $"{schema}_{table}";
         }
 
         public EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema)
         {
-            builder.ToTable(table, schema);
+            builder.ToTable($"{schema}_{table}");
             return builder;
         }
 

@@ -25,7 +25,7 @@ class GooGit {
     [void] CheckoutMain()
     {
         $headBranch = $this.HeadBranch()
-        Checkout($headbranch)
+        $this.Checkout($headbranch)
     }
 
     [void] CheckoutMaster()

@@ -34,6 +34,10 @@ public class DatabaseBase : ModelBase, IServiceDatabase
                 if (Port == 0) Port = 5432;
                 break;
 
+            case "mysql":
+                if (Port == 0) Port = 3306;
+                break;
+
             default:
                 isValid = false;
                 break;

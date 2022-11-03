@@ -5,7 +5,6 @@ using ETLBox.DataFlow;
 using ETLBox.DataFlow.Connectors;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using Nox;
 using Nox.Data;
 using Nox.Dynamic.MetaData;
 using SqlKata;
@@ -66,7 +65,7 @@ public class LoaderExecutor : ILoaderExecutor
     {
         var destinationDb = destinationDbProvider.ConnectionManager;
 
-        var destinationTable = destinationDbProvider.ToTableNameForSql(entity);
+        var destinationTable = destinationDbProvider.ToTableNameForSql(entity.Table, entity.Schema);
 
         var destinationSqlCompiler = destinationDbProvider.SqlCompiler;
 
@@ -78,7 +77,6 @@ public class LoaderExecutor : ILoaderExecutor
             }
 
             var sourceDb = loaderSource.DatabaseProvider.ConnectionManager;
-
 
             var sourceSqlCompiler = loaderSource.DatabaseProvider.SqlCompiler!;
 
@@ -98,7 +96,8 @@ public class LoaderExecutor : ILoaderExecutor
 
                     await MergeNewData(sourceDb, destinationDb,
                         loaderSource, loader, destinationTable, entity,
-                        sourceSqlCompiler, destinationSqlCompiler);
+                        sourceSqlCompiler, destinationSqlCompiler,
+                        destinationDbProvider);
 
                     break;
 
@@ -150,7 +149,8 @@ public class LoaderExecutor : ILoaderExecutor
         string destinationTable,
         Entity entity,
         Compiler sourceSqlCompiler,
-        Compiler destinationSqlCompiler)
+        Compiler destinationSqlCompiler,
+        IDatabaseProvider destinationDbProvider)
     {
         var newLastMergeDateTimeStamp = new Dictionary<string, (DateTime LastMergeDateTimeStamp, bool Updated)>();
 
@@ -166,7 +166,7 @@ public class LoaderExecutor : ILoaderExecutor
 
         foreach (var dateColumn in loader.LoadStrategy.Columns)
         {
-            lastMergeDateTimeStamp = GetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, destinationSqlCompiler);
+            lastMergeDateTimeStamp = GetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, destinationSqlCompiler, destinationDbProvider);
 
             if (!lastMergeDateTimeStamp.Equals(DateTime.MinValue))
             {
@@ -195,6 +195,7 @@ public class LoaderExecutor : ILoaderExecutor
         {
             CacheMode = ETLBox.DataFlow.Transformations.CacheMode.Partial,
             MergeMode = MergeMode.InsertsAndUpdates,
+            BatchSize = 1,
         };
 
         destination.MergeProperties.IdColumns =
@@ -286,6 +287,7 @@ public class LoaderExecutor : ILoaderExecutor
         {
             _logger.LogCritical("Failed to run Merge for Entity {entity} at {lastMergeDateTimeStamp}", entity.Name, lastMergeDateTimeStamp);
             _logger.LogError("{message}", ex.Message);
+            throw;
         }
 
         if (inserts == 0 && updates == 0)
@@ -309,30 +311,26 @@ public class LoaderExecutor : ILoaderExecutor
         {
             if (updated)
             {
-                SetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, timeStamp, destinationSqlCompiler);
+                SetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, timeStamp, destinationSqlCompiler, destinationDbProvider);
             }
         }
         return true;
 
     }
 
-    private static DateTime GetLastMergeDateTimeStamp(IConnectionManager destinationDb, string loaderName, string dateColumn, Compiler compiler)
+    private static DateTime GetLastMergeDateTimeStamp(IConnectionManager destinationDb, string loaderName, string dateColumn, 
+        Compiler destinationSqlCompiler, IDatabaseProvider destinationDbProvider)
     {
         var lastMergeDateTime = DateTime.MinValue;
 
-        var destination = new DbDestination()
-        {
-            ConnectionManager = destinationDb,
-            TableName = DatabaseObject.MergeStateTableName,
-        };
+        var mergeStateTableName = destinationDbProvider.ToTableNameForSqlRaw(DatabaseObject.MergeStateTableName, DatabaseObject.MetadataSchemaName);
 
-        var findQuery = new Query(
-                $"meta.{DatabaseObject.MergeStateTableName}")
+        var findQuery = new Query(mergeStateTableName)
                 .Where("Property", dateColumn)
                 .Where("Loader", loaderName)
                 .Select("LastDateLoadedUtc");
 
-        var findSql = compiler.Compile(findQuery).ToString();
+        var findSql = destinationSqlCompiler.Compile(findQuery).ToString();
 
         object? resultDate = null;
         SqlTask.ExecuteReader(destinationDb, findSql, r => resultDate = r);
@@ -341,7 +339,7 @@ public class LoaderExecutor : ILoaderExecutor
             return (DateTime)resultDate;
         }
 
-        var insertQuery = new Query($"meta.{DatabaseObject.MergeStateTableName}").AsInsert(
+        var insertQuery = new Query(mergeStateTableName).AsInsert(
         new
         {
             Loader = loaderName,
@@ -349,7 +347,7 @@ public class LoaderExecutor : ILoaderExecutor
             LastDateLoadedUtc = lastMergeDateTime
         });
 
-        var insertSql = compiler.Compile(insertQuery).ToString();
+        var insertSql = destinationSqlCompiler.Compile(insertQuery).ToString();
 
         SqlTask.ExecuteNonQuery(destinationDb, insertSql);
 
@@ -358,12 +356,14 @@ public class LoaderExecutor : ILoaderExecutor
     }
 
     private bool SetLastMergeDateTimeStamp(IConnectionManager destinationDb, string loaderName,
-        string dateColumn, DateTime lastMergeDateTime, Compiler compiler)
+        string dateColumn, DateTime lastMergeDateTime, Compiler destinationSqlCompiler,
+        IDatabaseProvider destinationDbProvider)
     {
+        var mergeStateTableName = destinationDbProvider.ToTableNameForSqlRaw(DatabaseObject.MergeStateTableName, DatabaseObject.MetadataSchemaName);
 
         _logger.LogInformation("...setting last merge date for {loaderName}.{dateColumn} to {lastMergeDateTime}", loaderName, dateColumn, lastMergeDateTime);
 
-        var updateQuery = new Query($"meta.{DatabaseObject.MergeStateTableName}")
+        var updateQuery = new Query(mergeStateTableName)
           .Where("Property", dateColumn)
           .Where("Loader", loaderName)
           .AsUpdate(
@@ -372,7 +372,7 @@ public class LoaderExecutor : ILoaderExecutor
               LastDateLoadedUtc = lastMergeDateTime
           });
 
-        var updateSql = compiler.Compile(updateQuery).ToString();
+        var updateSql = destinationSqlCompiler.Compile(updateQuery).ToString();
 
         var result = SqlTask.ExecuteNonQuery(destinationDb, updateSql);
 

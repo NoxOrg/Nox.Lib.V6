@@ -8,9 +8,12 @@ namespace Nox.Data
         {
             services.AddTransient<IDatabaseProvider, SqlServerDatabaseProvider>();
             services.AddTransient<IDatabaseProvider, PostgresDatabaseProvider>();
+            services.AddTransient<IDatabaseProvider, MySqlDatabaseProvider>();
+
             services.AddSingleton<Func<IEnumerable<IDatabaseProvider>>>(x => 
                 () => x.GetService<IEnumerable<IDatabaseProvider>>()!
             );
+
             services.AddSingleton<IDatabaseProviderFactory, DatabaseProviderFactory>();
 
             return services;

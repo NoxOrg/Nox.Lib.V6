@@ -4,6 +4,7 @@ services:
   sqlserver:
     container_name: sqlserver_container
     image: "mcr.microsoft.com/azure-sql-edge:latest"
+    user: root
     ports:
       - "1433:1433"
     environment:
@@ -26,6 +27,22 @@ services:
       - "54320:5432"
     volumes:
       - ./.docker-data/postgres:/var/lib/postgresql/data
+
+  mysql:
+    container_name: mysql_container
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_DATABASE: Workplace
+      MYSQL_USER: "sa"
+      MYSQL_PASSWORD: "Developer*123"
+      MYSQL_ROOT_PASSWORD: "Developer*123"
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - ./.docker-data/mysql:/var/lib/mysql
 
   rabbitmq:
       container_name: rabbitmq_container
