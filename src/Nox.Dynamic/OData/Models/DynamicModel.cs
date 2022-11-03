@@ -269,11 +269,6 @@ namespace Nox.Dynamic.OData.Models
                             {
                                 b.Property(prop.Name).HasColumnType(dbType);
                             }
-
-                            //b.Property(prop.Name).HasConversion(
-                            //    v => JsonConvert.SerializeObject(v, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }),
-                            //    v => JsonConvert.DeserializeObject<IList<Address>>(v, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore })
-                            //);
                         }
                     }
                 });
