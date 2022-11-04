@@ -11,15 +11,12 @@
     <PackageReference Include="ETLBox.MySql" Version="2.6.6" />
     <PackageReference Include="ETLBox.Postgres" Version="2.6.6" />
     <PackageReference Include="ETLBox.SqlServer" Version="2.6.6" />
-    <PackageReference Include="Hangfire.AspNetCore" Version="1.7.31" />
     <PackageReference Include="Hangfire.MySqlStorage" Version="2.0.3" />
     <PackageReference Include="Hangfire.PostgreSql" Version="1.9.9" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.7.31" />
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.11" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.10" />
     <PackageReference Include="MySql.EntityFrameworkCore" Version="6.0.7" />
-    <PackageReference Include="Npgsql" Version="6.0.7" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
     <PackageReference Include="SqlKata" Version="2.4.0" />
   </ItemGroup>

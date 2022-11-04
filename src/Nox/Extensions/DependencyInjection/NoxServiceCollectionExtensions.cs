@@ -13,7 +13,6 @@ using Nox.Dynamic.MessageBus;
 using Nox.Dynamic.OData.Models;
 using Nox.Dynamic.OData.Routing;
 using Nox.Dynamic.Services;
-using Nox.Dynamic.DatabaseProviders;
 using System.Reflection;
 
 namespace Nox.Extensions.DependencyInjection;

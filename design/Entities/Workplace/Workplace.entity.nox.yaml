@@ -39,12 +39,12 @@ Attributes:
     MaxWidth: 18
     Precision: 15
 
-  #- Name: OpeningTime
-    #Description: The opening time for the workplace
-    #Type: time
-    #IsRequired: false
-    #Default: '08:30'
-    #DefaultFromParents: [AdministrativeArea,Country]
+  - Name: OpeningTime
+    Description: The opening time for the workplace
+    Type: time
+    IsRequired: false
+    Default: '08:30'
+    DefaultFromParents: [AdministrativeArea,Country]
 
   #- Name: ClosingTime
     #Description: The closing time for the workplace

@@ -14,7 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
 using Nox.Data;
-using Nox.Dynamic.OData.Models;
 using Nox.Dynamic.OData.Serializers;
 
 namespace Nox.Dynamic.OData.Routing

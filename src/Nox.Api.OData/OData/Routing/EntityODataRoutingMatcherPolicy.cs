@@ -15,11 +15,6 @@ using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Nox.Data;
-using Nox.Dynamic.OData.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Nox.Dynamic.OData.Routing
 {

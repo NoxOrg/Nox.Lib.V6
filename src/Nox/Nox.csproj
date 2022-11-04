@@ -20,6 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Nox.Api.OData\Nox.Api.OData.csproj" />
     <ProjectReference Include="..\Nox.Configuration\Nox.Configuration.csproj" />
     <ProjectReference Include="..\Nox.Data\Nox.Data.csproj" />
     <ProjectReference Include="..\Nox.Dynamic\Nox.Dynamic.csproj" />

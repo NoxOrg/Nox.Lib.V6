@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.UriParser;
 using System.Reflection;
 using System.Text.Json;
