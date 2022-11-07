@@ -51,7 +51,7 @@ internal class Program
         // Logger
 
         ILogger logger = new LoggerConfiguration()
-            .ReadFrom.Configuration(Configuration)
+            //.ReadFrom.Configuration(Configuration)
             .CreateLogger();
 
         Log.Logger = logger;

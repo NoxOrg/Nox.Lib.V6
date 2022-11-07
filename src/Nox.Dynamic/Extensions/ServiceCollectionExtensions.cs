@@ -156,7 +156,8 @@ namespace Nox.Dynamic.Extensions
 
             dbProvider.ConfigureHangfire(configuration);
 
-            model.SetupRecurringLoaderTasks();
+            model.
+                SetupRecurringLoaderTasks();
 
             return configuration;
         }

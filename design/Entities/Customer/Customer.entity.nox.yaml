@@ -3,25 +3,22 @@
 #
 
 Name: Customer
-Description: F&O customer
+Description: F&O customers
 PluralName: Customers
-Table: INT_001_Cust
+Table: Customer
 Schema: dbo
-
-# RelatedParents: []
 
 Attributes:
 
-  - Name: CustAccountNum
+  - Name: Id
     Description: The company unique identifier 
     IsPrimaryKey: true
-    Type: int
+    Type: string
 
   - Name: SourceSystem
     Description: The source system
     IsRequired: true
     Type: string
-
 
   - Name: Type
     Description: The integration type
@@ -63,11 +60,6 @@ Attributes:
     IsRequired: true
     Type: string
 
-  - Name: LanguageId
-    Description: The 
-    IsRequired: true
-    Type: string
-
   - Name: ExtCustClassificationId
     Description: The 
     IsRequired: true
@@ -90,7 +82,7 @@ Attributes:
 
   - Name: CountryRegionId
     Description: The 
-    IsRequired: true
+    IsRequired: false
     Type: string
 
   - Name: ExtTaxGroup
@@ -115,7 +107,7 @@ Attributes:
 
   - Name: ExtPaymModeId
     Description: The
-    IsRequired: true
+    IsRequired: false
     Type: string
 
   - Name: InclTax
@@ -133,11 +125,6 @@ Attributes:
     IsRequired: true
     Type: string
 
-  - Name: ExtProArCustomerTaxClassification
-    Description: The
-    IsRequired: true
-    Type: string
-
   - Name: ExtProArTaxRegistrationType
     Description: The 
     IsRequired: true
@@ -147,5 +134,3 @@ Attributes:
     Description: The
     IsRequired: true
     Type: string
-
-

@@ -2,12 +2,12 @@
 # Brand data loader definition
 #
 
-Name: BrandLoader
+Name: CustomerLoader
 
-Description: Loads brand data 
+Description: Loads customer data 
 
 Schedule:
-  Start: every 2 minutes
+  Start: 1 time every day
   Retry:
     Limit: 10
     DelaySeconds: 60
@@ -19,14 +19,14 @@ LoadStrategy:
 
 
 Target:
-  Entity: nBrand
+  Entity: Customer
 
 Sources:
   - ConnectionVariable: ConnectionString:MasterDataSource
     Provider: SqlServer
     MinimumExpectedRecords: 30 
     Query: >-
-      select top 20
+      select 
         'Titan'																		as [SourceSystem],
         'INT_001_Cust'																as [Type],
         ''																			as [SubType],

@@ -160,6 +160,14 @@ internal class LoaderExecutor : ILoaderExecutor
                 .Concat(loader.LoadStrategy.Columns.Select(c => c))
                 .ToArray();
 
+        var primaryColumns = entity.Attributes.Where(a => a.IsPrimaryKey && a.IsMappedAttribute()).Select(a => a.Name)
+                .Concat(entity.RelatedParents.Select(p => p + "Id"))
+                .ToArray();
+
+        var compairColumns = entity.Attributes.Where(a => !a.IsPrimaryKey && !loader.LoadStrategy.Columns.Contains(a.Name) && a.IsMappedAttribute()).Select(a => a.Name)
+                .Concat(entity.RelatedParents.Select(p => p + "Id"))
+                .ToArray();
+
         var query = new Query().FromRaw($"({loaderSource.Query}) AS tmp")
             .Select(targetColumns);
 
@@ -199,16 +207,13 @@ internal class LoaderExecutor : ILoaderExecutor
         };
 
         destination.MergeProperties.IdColumns =
-            targetColumns
-            .Skip(0)
-            .Take(1)
+            primaryColumns
             .Select(colName => new IdColumn() { IdPropertyName = colName })
             .ToArray();
 
+     
         destination.MergeProperties.CompareColumns =
-            targetColumns
-            .Skip(1)
-            .Take(targetColumns.Length - 1 - loader.LoadStrategy.Columns.Length)
+            compairColumns
             .Select(colName => new CompareColumn() { ComparePropertyName = colName })
             .ToArray();
 
@@ -281,7 +286,7 @@ internal class LoaderExecutor : ILoaderExecutor
 
         try
         {
-            await Network.ExecuteAsync(source);
+            Network.Execute(source);
         }
         catch (Exception ex)
         {
