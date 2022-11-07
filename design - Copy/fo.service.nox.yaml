@@ -1,0 +1,24 @@
+#
+# Service definition
+#
+
+Name: FO
+
+Description: FO Microservice
+
+Database:
+  Name: FO
+  Provider: SqlServer
+  Options: Trusted_Connection=no;connection timeout=120;
+  #Provider: Postgres
+  #Port: 54320
+  Server: localhost
+  User: sa
+  Password: Developer*123
+
+MessageBus:
+  Name: FOMessaging
+  #Provider: AzureServiceBus
+  #ConnectionVariable: ConnectionString:AzureServiceBus
+  Provider: RabbitMQ
+  ConnectionString: rabbitmq://guest:guest@localhost/

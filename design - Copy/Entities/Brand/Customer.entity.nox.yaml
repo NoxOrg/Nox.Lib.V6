@@ -1,0 +1,151 @@
+﻿#
+# Brand entity definition
+#
+
+Name: Customer
+Description: F&O customer
+PluralName: Customers
+Table: INT_001_Cust
+Schema: dbo
+
+# RelatedParents: []
+
+Attributes:
+
+  - Name: CustAccountNum
+    Description: The company unique identifier 
+    IsPrimaryKey: true
+    Type: int
+
+  - Name: SourceSystem
+    Description: The source system
+    IsRequired: true
+    Type: string
+
+
+  - Name: Type
+    Description: The integration type
+    IsRequired: true
+    Type: string
+
+  - Name: SubType
+    Description: The integration sub type
+    IsRequired: true
+    Type: string
+
+  - Name: TargetSystem
+    Description: The target system 
+    IsRequired: true
+    Type: string
+
+  - Name: CreateDateUTC
+    Description: Created date
+    IsRequired: true
+    Type: string
+
+  - Name: CorrelationId
+    Description: The correlation Id
+    IsRequired: true
+    Type: string
+
+  - Name: CustName
+    Description: The 
+    IsRequired: true
+    Type: string
+
+  - Name: ExtInvoiceAccount
+    Description: The 
+    IsRequired: true
+    Type: string
+
+  - Name: ProArCRMSystemId
+    Description: The 
+    IsRequired: true
+    Type: string
+
+  - Name: LanguageId
+    Description: The 
+    IsRequired: true
+    Type: string
+
+  - Name: ExtCustClassificationId
+    Description: The 
+    IsRequired: true
+    Type: string
+
+  - Name: DunsNumber
+    Description: The
+    IsRequired: true
+    Type: string
+
+  - Name: Currency
+    Description: The 
+    IsRequired: true
+    Type: string
+
+  - Name: VATNum
+    Description: The
+    IsRequired: true
+    Type: string
+
+  - Name: CountryRegionId
+    Description: The 
+    IsRequired: true
+    Type: string
+
+  - Name: ExtTaxGroup
+    Description: The
+    IsRequired: true
+    Type: string
+
+  - Name: TaxWithholdCalculate_TH
+    Description: The 
+    IsRequired: true
+    Type: string
+
+  - Name: ExtTaxWithholdGroup_TH
+    Description: The
+    IsRequired: true
+    Type: string
+
+  - Name: ExtPaymTermId
+    Description: The 
+    IsRequired: true
+    Type: string
+
+  - Name: ExtPaymModeId
+    Description: The
+    IsRequired: true
+    Type: string
+
+  - Name: InclTax
+    Description: The 
+    IsRequired: true
+    Type: string
+
+  - Name: ExtCredManAccountStatusId
+    Description: The
+    IsRequired: true
+    Type: string
+
+  - Name: ExtBlocked
+    Description: The 
+    IsRequired: true
+    Type: string
+
+  - Name: ExtProArCustomerTaxClassification
+    Description: The
+    IsRequired: true
+    Type: string
+
+  - Name: ExtProArTaxRegistrationType
+    Description: The 
+    IsRequired: true
+    Type: string
+
+  - Name: ExtCompanyCentreId
+    Description: The
+    IsRequired: true
+    Type: string
+
+
