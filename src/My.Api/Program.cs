@@ -1,5 +1,6 @@
-
+using FO.Consumer;
 using Nox.Dynamic.Extensions;
+using Nox.Dynamic.Loaders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add magic
+builder.Services.RegisterNoxConsumers(new List<INoxConsumer> { new INT001_Customer() });
 builder.Services.AddNox();
 
 var app = builder.Build();

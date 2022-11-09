@@ -14,6 +14,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "My.Api", "My.Api\My.Api.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nox.Dynamic.Analyzer", "Nox.Dynamic.Analyzer\Nox.Dynamic.Analyzer.csproj", "{808878CA-E4D7-42E8-9D60-CF1B8F46132B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FO.Consumer", "FO.Consumer\FO.Consumer.csproj", "{A957FE24-B4EB-4DF8-AB6B-281269089AB3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FO.IngestionService", "FO.IngestionService\FO.IngestionService.csproj", "{3B9A856B-971B-4F1D-BC29-B06997CEE7B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +40,14 @@ Global
 		{808878CA-E4D7-42E8-9D60-CF1B8F46132B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{808878CA-E4D7-42E8-9D60-CF1B8F46132B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{808878CA-E4D7-42E8-9D60-CF1B8F46132B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A957FE24-B4EB-4DF8-AB6B-281269089AB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A957FE24-B4EB-4DF8-AB6B-281269089AB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A957FE24-B4EB-4DF8-AB6B-281269089AB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A957FE24-B4EB-4DF8-AB6B-281269089AB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B9A856B-971B-4F1D-BC29-B06997CEE7B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B9A856B-971B-4F1D-BC29-B06997CEE7B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B9A856B-971B-4F1D-BC29-B06997CEE7B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B9A856B-971B-4F1D-BC29-B06997CEE7B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

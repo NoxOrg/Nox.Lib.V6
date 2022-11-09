@@ -14,11 +14,11 @@
 
   <ItemGroup>
     
+    <ProjectReference Include="..\FO.Consumer\FO.Consumer.csproj" />
+    
     <ProjectReference Include="..\Nox.Dynamic\Nox.Dynamic.csproj" />
 
-    <ProjectReference Include="..\Nox.Dynamic.Analyzer\Nox.Dynamic.Analyzer.csproj"
-                      OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Nox.Dynamic.Analyzer\Nox.Dynamic.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 
   </ItemGroup>
 

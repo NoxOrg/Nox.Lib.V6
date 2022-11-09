@@ -20,6 +20,7 @@ LoadStrategy:
 
 Target:
   Entity: Customer
+  Consumer: INT001_Customer
 
 Sources:
   - ConnectionVariable: ConnectionString:MasterDataSource

@@ -20,12 +20,14 @@ internal class LoaderExecutor : ILoaderExecutor
     private readonly ILogger<LoaderExecutor> _logger;
     
     private readonly IBus _bus;
-    
-    public LoaderExecutor(ILogger<LoaderExecutor> logger, IBus bus)
+    private readonly IList<INoxConsumer> _consumers;
+
+    public LoaderExecutor(ILogger<LoaderExecutor> logger, IBus bus, IList<INoxConsumer> consumers)
     {
         _logger = logger;
         
-        _bus = bus;       
+        _bus = bus;
+        _consumers = consumers;
     }
 
     public async Task<bool> ExecuteAsync(Service service)
@@ -164,7 +166,8 @@ internal class LoaderExecutor : ILoaderExecutor
                 .Concat(entity.RelatedParents.Select(p => p + "Id"))
                 .ToArray();
 
-        var compairColumns = entity.Attributes.Where(a => !a.IsPrimaryKey && !loader.LoadStrategy.Columns.Contains(a.Name) && a.IsMappedAttribute()).Select(a => a.Name)
+        var compairColumns = entity.Attributes.Where(a => !a.IsPrimaryKey && !loader.LoadStrategy.Columns.Contains(a.Name) 
+                && a.IsMappedAttribute()).Select(a => a.Name)
                 .Concat(entity.RelatedParents.Select(p => p + "Id"))
                 .ToArray();
 
@@ -186,6 +189,8 @@ internal class LoaderExecutor : ILoaderExecutor
 
             newLastMergeDateTimeStamp[dateColumn] = new() { LastMergeDateTimeStamp = lastMergeDateTimeStamp, Updated = false };
         }
+
+        query = query.OrderBy(loader.LoadStrategy.Columns);
 
         var compiledQuery = sourceSqlCompiler.Compile(query);
 
@@ -230,12 +235,19 @@ internal class LoaderExecutor : ILoaderExecutor
             dynamic r = row;
 
             IDictionary<string, object?> d = new Dictionary<string, object?>(row);
+            dynamic? consumer = _consumers.FirstOrDefault(c => c.GetType().Name == loader.Target.Consumer);
 
             if (r.ChangeAction == ChangeAction.Insert)
             {
                 inserts++;
 
-                _bus.Publish(new LoaderInsertMessage { Value = d }).GetAwaiter().GetResult();
+
+                if (consumer != null)
+                {
+                    consumer.Value = d;
+                    consumer.Type = NoxConsumerType.Insert;
+                    _bus.Publish(consumer).GetAwaiter().GetResult();
+                }
 
                 foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
                 {
@@ -258,7 +270,12 @@ internal class LoaderExecutor : ILoaderExecutor
             {
                 updates++;
 
-                _bus.Publish(new LoaderUpdateMessage() { Value = d }).GetAwaiter().GetResult();
+                if (consumer != null)
+                {
+                    consumer.Value = d;
+                    consumer.Type = NoxConsumerType.Update;
+                    _bus.Publish(consumer).GetAwaiter().GetResult();
+                }
 
                 foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
                 {

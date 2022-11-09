@@ -48,6 +48,14 @@ namespace Nox.Dynamic.Extensions
             return services;
         }
 
+        public static IServiceCollection RegisterNoxConsumers(this IServiceCollection services, IList<INoxConsumer> consumers)
+        {
+            services.AddSingleton(consumers);
+
+            return services;
+        }
+    
+
         public static IServiceCollection AddMessageBusFeature(this IServiceCollection services, 
             IConfiguration config, bool isServer = true)
         {
