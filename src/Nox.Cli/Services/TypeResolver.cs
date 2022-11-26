@@ -5,20 +5,23 @@ namespace Nox.Cli.Services;
 
 public sealed class TypeResolver : ITypeResolver, IDisposable
 {
-    private readonly IHost _host;
+    private readonly IServiceProvider _provider;
 
-    public TypeResolver(IHost provider)
+    public TypeResolver(IServiceProvider provider)
     {
-        _host = provider ?? throw new ArgumentNullException(nameof(provider));
+        _provider = provider ?? throw new ArgumentNullException(nameof(provider));
     }
 
     public object? Resolve(Type? type)
     {
-        return type != null ? _host.Services.GetService(type) : null;
+        return type != null ? _provider.GetService(type) : null;
     }
 
     public void Dispose()
     {
-        _host.Dispose();
+        if (_provider is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
     }
 }

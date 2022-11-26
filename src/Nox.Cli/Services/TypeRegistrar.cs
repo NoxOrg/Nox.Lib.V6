@@ -6,32 +6,32 @@ namespace Nox.Cli.Services;
 
 public sealed class TypeRegistrar : ITypeRegistrar
 {
-    private readonly IHostBuilder _builder;
+    private readonly IServiceCollection _services;
 
-    public TypeRegistrar(IHostBuilder builder)
+    public TypeRegistrar(IServiceCollection services)
     {
-        _builder = builder;
+        _services = services;
     }
 
     public ITypeResolver Build()
     {
-        return new TypeResolver(_builder.Build());
+        return new TypeResolver(_services.BuildServiceProvider());
     }
 
     public void Register(Type service, Type implementation)
     {
-        _builder.ConfigureServices((_, services) => services.AddSingleton(service, implementation));
+        _services.AddSingleton(service, implementation);
     }
 
-    public void RegisterInstance(Type service, object implementation)
+    public void RegisterInstance(Type service, object instance)
     {
-        _builder.ConfigureServices((_, services) => services.AddSingleton(service, implementation));
+        _services.AddSingleton(service, instance);
     }
 
     public void RegisterLazy(Type service, Func<object> func)
     {
         if (func is null) throw new ArgumentNullException(nameof(func));
 
-        _builder.ConfigureServices((_, services) => services.AddSingleton(service, _ => func()));
+        _services.AddSingleton(service, (provider) => func());
     }
 }

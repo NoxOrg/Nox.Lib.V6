@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "Nox.Cli": {
-      "commandName": "Project",
-      "commandLineArgs": "listen",
-      "workingDirectory": "$(ProjectDir)"
-    }
-  }
-}
