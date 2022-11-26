@@ -26,12 +26,13 @@ $script:SolutionName            = 'Nox'
 
 $script:RootFolder              = (Get-Location).Path
 $script:SourceFolder            = '.\src'
+$script:SamplesFolder          	= '.\samples'
+$script:TestsFolder            	= '.\tests'
 $script:SolutionFolder          = $script:SourceFolder
 $script:SolutionFile            = "$script:SolutionFolder\Nox.sln"
-$script:ProjectFolder           = "$script:SourceFolder\My.Api"
-$script:ProjectFile             = "$script:ProjectFolder\My.Api.csproj"
-$script:LibFolder               = "$script:SourceFolder\Nox"
-$script:CliFolder               = "$script:SourceFolder\Nox.Cli"
+$script:ProjectFolder           = "$script:SamplesFolder\Samples.Api"
+$script:ProjectFile             = "$script:SamplesFolder\Samples.Api.csproj"
+$script:CliFolder               = "$script:SamplesFolder\Samples.Cli"
 
 $script:DefaultEnvironment      = 'Development'
 
@@ -173,6 +174,7 @@ $goo.Command.Add( 'run', {
 # command: goo listen | View events being emmited from event source
 $goo.Command.Add( 'listen', {
     $goo.Command.Run( 'waitfordb' )
+    $goo.Console.WriteLine( "starting the Event Listener..." )
     $goo.Command.RunExternal('dotnet','run -- listen',$script:CliFolder)
 })
 
@@ -211,15 +213,15 @@ $goo.Command.Add( 'main', { param( $featureName )
     $goo.Git.CheckoutMain()
 })
 
-# command: goo pubish | Build and publish Nox.Dynamic nuget package
+# command: goo publish | Build and publish Nox nuget packages
 $goo.Command.Add( 'publish', { 
-    $goo.Console.WriteInfo("Packing solution ($script:LibFolder)...")
-    $goo.Command.RunExternal('dotnet','pack /clp:ErrorsOnly --configuration Release', $script:LibFolder)
-    $goo.StopIfError("Failed to pack solution. (Release)")
-    $nupkgFile = Get-ChildItem "$script:LibFolder\bin\Release\Nox.Lib.*.nupkg" | Sort-Object -Property LastWriteTime | Select-Object -Last 1
-    $publishCmd = "nuget push $($nupkgFile.FullName) --api-key $Env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json"
-    $goo.Command.RunExternal('dotnet', $publishCmd, $script:LibFolder)
-    $goo.StopIfError("Failed to publish library to nuget. (Release)")
+	#Nox.Microservice
+	$goo.Console.WriteInfo("Packing project ($script:SourceFolder\Nox.Microservice)...")
+    $goo.Command.RunExternal('dotnet','pack /clp:ErrorsOnly --configuration Release', "$script:SourceFolder\Nox.Microservice")
+    $goo.StopIfError("Failed to pack Nox.Microservice (Release)")
+    $nupkgFile = Get-ChildItem "$script:SourceFolder\Nox.Microservice\bin\Release\Nox.Microservice.*.nupkg" | Sort-Object -Property LastWriteTime | Select-Object -Last 1
+    $goo.Command.RunExternal('dotnet',"nuget push $($nupkgFile.FullName) --api-key $Env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json", "$script:SourceFolder\Nox.Microservice")
+    $goo.StopIfError("Failed to publish Nox.Microservice to nuget. (Release)")
 })
 
 $goo.Command.Add( 'waitfordb', {
@@ -232,6 +234,7 @@ $goo.Command.Add( 'waitfordb', {
         "Connection Timeout=120;" +
         "Application Name=$script:SolutionName;" 
     )
+    $goo.Console.WriteInfo("Master Connection String: $masterConnectionString")
     while (-not $goo.Sql.TestConnection( $masterConnectionString )){
         $goo.Console.WriteInfo('Waiting for docker SQL database to be ready to accept connections...')
         $goo.Sleep(10)

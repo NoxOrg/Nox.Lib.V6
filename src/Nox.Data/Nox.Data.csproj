@@ -1,34 +1,42 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DebugType>none</DebugType>
+        <DebugSymbols>false</DebugSymbols>
+        <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+    <PropertyGroup>
+        <PackageId>Nox.Data</PackageId>
+        <Authors>Andre Sharpe,Lakkana Waduge,Jan Schutte</Authors>
+        <Description>Nox data library</Description>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <Copyright>Copyright (c) Andre Sharpe 2022</Copyright>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <AssemblyVersion>6.0.0.0</AssemblyVersion>
+        <FileVersion>6.0.0.0</FileVersion>
+        <PackageVersion>6.0.0</PackageVersion>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Nox.Core\Nox.Core.csproj" />
+      <ProjectReference Include="..\Nox.Data.MySql\Nox.Data.MySql.csproj" />
+      <ProjectReference Include="..\Nox.Data.Postgres\Nox.Data.Postgres.csproj" />
+      <ProjectReference Include="..\Nox.Data.SqlServer\Nox.Data.SqlServer.csproj" />
+      <ProjectReference Include="..\Nox.Entity.XtendedAttributes\Nox.Entity.XtendedAttributes.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="ETLBox" Version="2.6.6" />
-    <PackageReference Include="ETLBox.MySql" Version="2.6.6" />
-    <PackageReference Include="ETLBox.Postgres" Version="2.6.6" />
-    <PackageReference Include="ETLBox.SqlServer" Version="2.6.6" />
-    <PackageReference Include="Hangfire.MySqlStorage" Version="2.0.3" />
-    <PackageReference Include="Hangfire.PostgreSql" Version="1.9.9" />
-    <PackageReference Include="Hangfire.SqlServer" Version="1.7.31" />
-    <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.11" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.10" />
-    <PackageReference Include="MySql.EntityFrameworkCore" Version="6.0.7" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
-    <PackageReference Include="SqlKata" Version="2.4.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Nox.Abstractions\Nox.Abstractions.csproj" />
-  </ItemGroup>
-
-
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.11" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.11" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+    </ItemGroup>
 
 </Project>
