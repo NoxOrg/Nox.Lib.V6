@@ -10,7 +10,7 @@ public class SyncCommand : AsyncCommand<SyncCommand.Settings>
 {
     private readonly ILogger<DynamicService> _logger;
     private readonly IConfiguration _configuration;
-    private readonly ILoaderExecutor _loaderExecutor;
+    private readonly IEtlExecutor _etlExecutor;
     private readonly IDynamicService _dynamicService;
 
     public class Settings : CommandSettings
@@ -20,12 +20,12 @@ public class SyncCommand : AsyncCommand<SyncCommand.Settings>
     public SyncCommand(
         ILogger<DynamicService> logger, 
         IConfiguration configuration, 
-        ILoaderExecutor loaderExecutor,
+        IEtlExecutor etlExecutor,
         IDynamicService dynamicService)
     {
         _logger = logger;
         _configuration = configuration;
-        _loaderExecutor = loaderExecutor;
+        _etlExecutor = etlExecutor;
         _dynamicService = dynamicService;
     }
 

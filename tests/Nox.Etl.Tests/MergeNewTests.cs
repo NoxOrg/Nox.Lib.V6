@@ -13,7 +13,7 @@ public class MergeNewTests : MergeNewTestFixture
     [Test]
     public async Task Can_Execute_a_MergeNew()
     {
-        var loaderExecutor = TestServiceProvider!.GetRequiredService<ILoaderExecutor>();
+        var loaderExecutor = TestServiceProvider!.GetRequiredService<IEtlExecutor>();
         var service = TestServiceProvider!.GetRequiredService<IDynamicService>();
         var loader = service.Loaders.Single(l => l.Name == "VehicleLoader");
         var entity = service.Entities.FirstOrDefault(e => e.Key == "Vehicle").Value;

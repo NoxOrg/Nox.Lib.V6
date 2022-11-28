@@ -66,14 +66,11 @@ internal class Program
             {
                 services.AddSingleton(Configuration);
                 services
-                    .AddLoaderExecutor()
-                    .AddDynamicService()
                     .AddMessageBus(Configuration, false);
             })
             .UseSerilog();
 
         return hostBuilder;
     }
-
 
 }
