@@ -29,7 +29,7 @@ public class DynamicModel : IDynamicModel
 
     private readonly IDynamicService _dynamicService;
 
-    private readonly ILoaderExecutor _loaderExecutor;
+    private readonly IEtlExecutor _etlExecutor;
 
     private readonly IDatabaseProvider _databaseProvider;
 
@@ -39,13 +39,13 @@ public class DynamicModel : IDynamicModel
 
     public DynamicModel(
         IConfiguration config, ILogger<DynamicModel> logger,
-        IDynamicService dynamicService, ILoaderExecutor loaderExecutor)
+        IDynamicService dynamicService, IEtlExecutor etlExecutor)
     {
         _config = config;
 
         _logger = logger;
 
-        _loaderExecutor = loaderExecutor;
+        _etlExecutor = etlExecutor;
 
         _dynamicService = dynamicService;
 
@@ -116,7 +116,7 @@ public class DynamicModel : IDynamicModel
 
     public void SetupRecurringLoaderTasks()
     {
-        var executor = _loaderExecutor;
+        var executor = _etlExecutor;
 
         // setup recurring jobs based on cron schedule
 

@@ -2,8 +2,10 @@ using System.Reflection;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nox.Core.Interfaces;
 using Nox.Messaging.AmazonSQS;
 using Nox.Messaging.AzureServiceBus;
+using Nox.Messaging.Events;
 using Nox.Messaging.RabbitMQ;
 
 namespace Nox.Messaging;
@@ -71,5 +73,14 @@ public static class ServiceExtensions
         });
 
         return services;
+    }
+
+    public static void AddNoxEvents(this IServiceCollection services, Assembly? assembly = null)
+    {
+        if (assembly == null) assembly = Assembly.GetExecutingAssembly();
+        foreach (var implementationType in assembly.GetTypes().Where(m => !m.IsInterface && m.GetInterfaces().Any(i => i == typeof(INoxEvent))))
+        {
+            services.AddSingleton(typeof(INoxEvent), implementationType);
+        }
     }
 }

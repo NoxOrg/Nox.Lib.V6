@@ -1,4 +1,8 @@
+using System.Reflection;
+using MassTransit;
+using Nox.Messaging;
 using Nox.Microservice;
+using Samples.Api.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,9 +14,14 @@ builder.Services.AddSwaggerGen();
 
 // Add Nox to the service collection
 builder.Services.AddNox();
+builder.Services.AddMediator(cfg =>
+{
+    cfg.AddConsumer<CountryCreatedEventConsumer>();
+});
+
+builder.Services.AddNoxEvents(Assembly.GetExecutingAssembly());
 
 var app = builder.Build();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

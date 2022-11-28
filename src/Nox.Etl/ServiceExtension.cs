@@ -7,7 +7,7 @@ public static class ServiceExtension
 {
     public static IServiceCollection AddLoaderExecutor(this IServiceCollection services)
     {
-        services.AddSingleton<ILoaderExecutor, LoaderExecutor>();
+        services.AddSingleton<IEtlExecutor, EtlExecutor>();
         return services;
     }
 }

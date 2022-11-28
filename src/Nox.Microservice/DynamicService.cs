@@ -19,7 +19,7 @@ public class DynamicService : IDynamicService
 
     private readonly IConfiguration _configuration = null!;
 
-    private readonly ILoaderExecutor _loaderExector;
+    private readonly IEtlExecutor _etlExector;
 
     private readonly IDatabaseProviderFactory _factory;
 
@@ -43,14 +43,14 @@ public class DynamicService : IDynamicService
 
     public DynamicService(ILogger<DynamicService> logger,
         IConfiguration configuration,
-        ILoaderExecutor loaderExector,
+        IEtlExecutor etlExector,
         IDatabaseProviderFactory factory)
     {
         _logger = logger;
 
         _configuration = configuration;
 
-        _loaderExector = loaderExector;
+        _etlExector = etlExector;
 
         _factory = factory;
 
@@ -67,7 +67,7 @@ public class DynamicService : IDynamicService
     {
         _logger.LogInformation("Executing data load tasks");
 
-        return await _loaderExector.ExecuteAsync(_service);
+        return await _etlExector.ExecuteAsync(_service);
 
     }
 
@@ -75,7 +75,7 @@ public class DynamicService : IDynamicService
     {
         var entity = _service.Entities.First(e => e.Name.Equals(loader.Target.Entity, StringComparison.OrdinalIgnoreCase));
 
-        return await _loaderExector.ExecuteLoaderAsync(loader, destinationDbProvider, entity);
+        return await _etlExector.ExecuteLoaderAsync(loader, destinationDbProvider, entity);
     }
 
     private class Configurator
