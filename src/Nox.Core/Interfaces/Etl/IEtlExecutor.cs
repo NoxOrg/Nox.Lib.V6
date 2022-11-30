@@ -1,4 +1,6 @@
-﻿namespace Nox.Core.Interfaces
+﻿using Nox.Core.Interfaces.Database;
+
+namespace Nox.Core.Interfaces.Etl
 {
     public interface IEtlExecutor
     {

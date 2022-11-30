@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Database;
 using Nox.Microservice.Extensions;
 using NUnit.Framework;
 

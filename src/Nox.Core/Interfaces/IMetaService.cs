@@ -1,3 +1,8 @@
+using Nox.Core.Interfaces.Api;
+using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces.Etl;
+using Nox.Core.Interfaces.Messaging;
+
 namespace Nox.Core.Interfaces;
 
 public interface IMetaService

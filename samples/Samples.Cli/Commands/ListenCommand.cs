@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using Nox;
 using Nox.Messaging;
 
 namespace Samples.Cli.Commands;

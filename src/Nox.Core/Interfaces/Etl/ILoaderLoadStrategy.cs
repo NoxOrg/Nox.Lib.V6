@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Nox.Core.Interfaces;
+namespace Nox.Core.Interfaces.Etl;
 
 public interface ILoaderLoadStrategy
 {

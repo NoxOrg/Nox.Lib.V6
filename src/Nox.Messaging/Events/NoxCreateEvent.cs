@@ -1,4 +1,4 @@
-using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Database;
 using Nox.Messaging.Enumerations;
 
 namespace Nox.Messaging.Events;

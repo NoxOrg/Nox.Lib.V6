@@ -7,6 +7,8 @@ using MassTransit;
 using MassTransit.Mediator;
 using Microsoft.Extensions.Logging;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces.Etl;
 using Nox.Core.Models;
 using Nox.Messaging;
 using Nox.Messaging.Enumerations;

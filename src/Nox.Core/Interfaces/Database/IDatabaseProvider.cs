@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SqlKata.Compilers;
 
-namespace Nox.Core.Interfaces
+namespace Nox.Core.Interfaces.Database
 {
     public interface IDatabaseProvider
     {

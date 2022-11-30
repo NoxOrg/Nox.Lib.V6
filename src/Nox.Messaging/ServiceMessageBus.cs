@@ -1,4 +1,6 @@
-﻿namespace Nox.Core.Components;
+﻿using Nox.Core.Components;
+
+namespace Nox.Messaging;
 
 public sealed class ServiceMessageBus : ServiceMessageBusBase { }
 

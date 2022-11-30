@@ -3,7 +3,7 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Database;
 using Npgsql;
 using SqlKata.Compilers;
 

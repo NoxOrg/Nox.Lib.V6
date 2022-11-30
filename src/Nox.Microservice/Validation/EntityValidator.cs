@@ -1,5 +1,5 @@
 using FluentValidation;
-using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Database;
 
 namespace Nox.Microservice.Validation;
 

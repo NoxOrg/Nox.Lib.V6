@@ -1,6 +1,5 @@
 using System.Text.Json;
 using MassTransit;
-using Nox;
 
 namespace Samples.Api.Consumers;
 

@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Etl;
 
 namespace Nox.Etl;
 

@@ -7,6 +7,8 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Nox.Core.Extensions;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces.Etl;
 
 namespace Nox.Data;
 

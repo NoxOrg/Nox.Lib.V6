@@ -15,7 +15,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
 using Nox.Api.OData.Routing.TemplateSegments;
 using Nox.Api.OData.Serializers;
-using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Database;
 
 namespace Nox.Api.OData.Routing
 {
