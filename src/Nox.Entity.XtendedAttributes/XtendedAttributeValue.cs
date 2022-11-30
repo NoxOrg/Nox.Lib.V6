@@ -1,5 +1,3 @@
-using Nox.Core.Interfaces;
-
 namespace Nox.Entity.XtendedAttributes;
 
 public class XtendedAttributeValue

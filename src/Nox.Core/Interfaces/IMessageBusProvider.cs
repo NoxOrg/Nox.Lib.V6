@@ -1,6 +1,4 @@
-﻿using MassTransit;
-
-namespace Nox.Core.Interfaces
+﻿namespace Nox.Core.Interfaces
 {
     public interface IMessageBusProvider
     {

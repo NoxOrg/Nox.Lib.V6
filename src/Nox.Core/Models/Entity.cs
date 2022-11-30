@@ -1,10 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
-using FluentValidation;
 using Humanizer;
+using Nox.Core.Components;
 using Nox.Core.Interfaces;
 
-namespace Nox.Core.Components;
+namespace Nox.Core.Models;
 
 public sealed class Entity : MetaBase, IEntity
 {

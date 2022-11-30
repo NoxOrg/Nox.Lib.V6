@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Nox.Core.Components;
 
 namespace Nox.Core.Interfaces
 {

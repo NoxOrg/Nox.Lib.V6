@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using FluentValidation;
+using Nox.Core.Components;
 using Nox.Core.Interfaces;
 
-namespace Nox.Core.Components;
+namespace Nox.Core.Models;
 
 public sealed class EntityAttribute : MetaBase, IEntityAttribute
 {

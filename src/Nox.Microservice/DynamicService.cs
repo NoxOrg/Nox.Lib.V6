@@ -289,13 +289,13 @@ public class DynamicService : IDynamicService
                 .First();
         }
 
-        private List<Core.Components.Entity> ReadEntityDefinitionsFromFolder(string rootFolder)
+        private List<Core.Models.Entity> ReadEntityDefinitionsFromFolder(string rootFolder)
         {
             return Directory
                 .EnumerateFiles(rootFolder, FileExtension.EntityDefinition, SearchOption.AllDirectories)
                 .Select(f =>
                 {
-                    var entity = _deserializer.Deserialize<Core.Components.Entity>(ReadDefinitionFile(f));
+                    var entity = _deserializer.Deserialize<Core.Models.Entity>(ReadDefinitionFile(f));
                     entity.DefinitionFileName = Path.GetFullPath(f);
                     entity.Attributes.ToList().ForEach(a => { a.DefinitionFileName = Path.GetFullPath(f); });
                     return entity;

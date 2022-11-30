@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using Nox.Core.Components;
+﻿using Nox.Core.Components;
 using Nox.Core.Constants;
 using Nox.Core.Interfaces;
 using Nox.Data;
@@ -31,9 +30,9 @@ public sealed class MetaService : MetaBase, IMetaService
     ICollection<IEntity>? IMetaService.Entities
     {
         get => Entities?.ToList<IEntity>();
-        set => Entities = value as ICollection<Core.Components.Entity>;
+        set => Entities = value as ICollection<Core.Models.Entity>;
     }
-    public ICollection<Core.Components.Entity>? Entities { get; set; }
+    public ICollection<Core.Models.Entity>? Entities { get; set; }
 
     ICollection<ILoader>? IMetaService.Loaders
     {
@@ -62,7 +61,7 @@ public sealed class MetaService : MetaBase, IMetaService
     }
 
 
-    private ICollection<Core.Components.Entity> SortEntitiesByDependency()
+    private ICollection<Core.Models.Entity> SortEntitiesByDependency()
     {
         var entities = Entities!.ToList();
 
@@ -85,7 +84,7 @@ public sealed class MetaService : MetaBase, IMetaService
         // hierarchy sort to place entities in dependency order
 
         var i = 0;
-        var sortedEntities = new List<Core.Components.Entity>();
+        var sortedEntities = new List<Core.Models.Entity>();
         while (entities.Count > 0)
         {
             var count = CountParentsInSortedEntities(entities, sortedEntities, i);
@@ -113,8 +112,8 @@ public sealed class MetaService : MetaBase, IMetaService
     }
 
     private static int CountParentsInSortedEntities(
-            IList<Core.Components.Entity> unsortedEntities,
-            IList<Core.Components.Entity> sortedEntities,
+            IList<Core.Models.Entity> unsortedEntities,
+            IList<Core.Models.Entity> sortedEntities,
             int iteration)
     {
         var result = 0;

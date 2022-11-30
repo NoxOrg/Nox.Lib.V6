@@ -8,7 +8,7 @@ internal class ServiceBase
 {
     public string KeyVaultUri { get; set; } = KeyVault.DefaultKeyVaultUri;
 
-    public MessageBusBase MessageBus { get; set; } = new();
+    public Components.MessageBusBase MessageBus { get; set; } = new();
     public string EndpointProvider { get; set; } = string.Empty;
 }
 

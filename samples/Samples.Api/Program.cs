@@ -1,7 +1,6 @@
 using System.Reflection;
 using MassTransit;
 using Nox.Messaging;
-using Nox.Microservice;
 using Nox.Microservice.Extensions;
 using Samples.Api.Consumers;
 

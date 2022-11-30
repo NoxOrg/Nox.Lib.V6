@@ -1,5 +1,4 @@
-using Nox.Core.Interfaces;
-using Nox.Core.Models;
+using Nox.Core.Components;
 
 namespace Nox.Data;
 

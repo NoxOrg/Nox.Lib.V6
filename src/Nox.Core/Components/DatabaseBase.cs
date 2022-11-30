@@ -1,9 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using FluentValidation;
-using Nox.Core.Components;
 using Nox.Core.Interfaces;
 
-namespace Nox.Core.Models;
+namespace Nox.Core.Components;
 
 public class DatabaseBase : MetaBase, IServiceDatabase
 {

@@ -1,5 +1,4 @@
-﻿
-using Nox.Core.Components;
+﻿using EntityAttribute = Nox.Core.Models.EntityAttribute;
 
 namespace Nox.Core.Interfaces;
 
