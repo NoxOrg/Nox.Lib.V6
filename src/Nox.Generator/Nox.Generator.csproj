@@ -15,7 +15,7 @@
     <PropertyGroup>
         <PackageId>Nox.Generator</PackageId>
         <Authors>Andre Sharpe,Lakkana Waduge,Jan Schutte</Authors>
-        <Description>Nox Code Generation library</Description>
+        <Description>Nox Dynamic Generator library</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <Copyright>Copyright (c) Andre Sharpe 2022</Copyright>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

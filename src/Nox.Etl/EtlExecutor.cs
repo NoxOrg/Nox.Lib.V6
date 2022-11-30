@@ -238,10 +238,7 @@ public class EtlExecutor : IEtlExecutor
                 {
                     var toSend = msg.MapInstance(row);
                     _bus.Publish(toSend).GetAwaiter().GetResult();
-                    if (_mediator != null)
-                    {
-                        _mediator.Publish(toSend).GetAwaiter().GetResult();
-                    }
+                    _mediator?.Publish(toSend).GetAwaiter().GetResult();
                 }
                 
                 foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
@@ -264,8 +261,15 @@ public class EtlExecutor : IEtlExecutor
             else if (r.ChangeAction == ChangeAction.Update)
             {
                 updates++;
-
-                _bus.Publish(new LoaderUpdateMessage() { Value = d }).GetAwaiter().GetResult();
+                
+                var msg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Update);
+                
+                if (msg != null)
+                {
+                    var toSend = msg.MapInstance(row);
+                    _bus.Publish(toSend).GetAwaiter().GetResult();
+                    _mediator?.Publish(toSend).GetAwaiter().GetResult();
+                }
 
                 foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
                 {

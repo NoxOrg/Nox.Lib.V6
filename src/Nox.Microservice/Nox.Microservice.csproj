@@ -14,7 +14,7 @@
         <PlatformTarget>x64</PlatformTarget>
     </PropertyGroup>
     <PropertyGroup>
-        <PackageId>Nox.Mocroservice</PackageId>
+        <PackageId>Nox.Microservice</PackageId>
         <Authors>Andre Sharpe,Lakkana Waduge,Jan Schutte</Authors>
         <Description>Nox microservice library</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -25,6 +25,114 @@
         <PackageVersion>6.0.0</PackageVersion>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
+    <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Api.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Api.OData.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Data.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Data.MySql.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Data.Postgres.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Data.SqlServer.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Entity.XtendedAttributes.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Etl.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Jobs.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Messaging.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Messaging.AmazonSQS.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Messaging.AzureServiceBus.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Messaging.RabbitMQ.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+    </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <Content Include=".\bin\Release\$(TargetFramework)\Nox.Api.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Release\$(TargetFramework)\Nox.Api.OData.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Release\$(TargetFramework)\Nox.Data.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Release\$(TargetFramework)\Nox.Data.MySql.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Release\$(TargetFramework)\Nox.Data.Postgres.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Release\$(TargetFramework)\Nox.Data.SqlServer.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Release\$(TargetFramework)\Nox.Entity.XtendedAttributes.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Release\$(TargetFramework)\Nox.Etl.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Release\$(TargetFramework)\Nox.Jobs.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Release\$(TargetFramework)\Nox.Messaging.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Release\$(TargetFramework)\Nox.Messaging.AmazonSQS.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Release\$(TargetFramework)\Nox.Messaging.AzureServiceBus.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Release\$(TargetFramework)\Nox.Messaging.RabbitMQ.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+    </ItemGroup>
     <ItemGroup>
       <PackageReference Include="FluentValidation" Version="11.3.0" />
       <PackageReference Include="Hangfire" Version="1.7.31" />

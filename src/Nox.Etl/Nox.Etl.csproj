@@ -13,18 +13,6 @@
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <PlatformTarget>x64</PlatformTarget>
     </PropertyGroup>
-    <PropertyGroup>
-        <PackageId>Nox.Etl</PackageId>
-        <Authors>Andre Sharpe,Lakkana Waduge,Jan Schutte</Authors>
-        <Description>Nox ETL library</Description>
-        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        <Copyright>Copyright (c) Andre Sharpe 2022</Copyright>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <AssemblyVersion>6.0.0.0</AssemblyVersion>
-        <FileVersion>6.0.0.0</FileVersion>
-        <PackageVersion>6.0.0</PackageVersion>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    </PropertyGroup>
     <ItemGroup>
       <ProjectReference Include="..\Nox.Core\Nox.Core.csproj" />
       <ProjectReference Include="..\Nox.Data\Nox.Data.csproj" />
