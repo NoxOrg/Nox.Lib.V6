@@ -1,64 +1,88 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection;
+using Hangfire;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Nox.Core.Components;
 using Nox.Core.Constants;
 using Nox.Core.Exceptions;
 using Nox.Core.Interfaces;
 using Nox.Core.Models;
+using Nox.Data;
+using Nox.Entity.XtendedAttributes;
+using Nox.Etl;
+using Nox.Microservice.Extensions;
 using YamlDotNet.Serialization;
 
 namespace Nox.Microservice;
 
 public class DynamicService : IDynamicService
 {
-    private ILogger _logger = null!;
+    private ILogger _logger;
 
-    private readonly MetaService _service = null!;
+    private readonly IMetaService _service;
 
-    private readonly IConfiguration _configuration = null!;
-
-    private readonly IEtlExecutor _etlExector;
-
-    private readonly IDatabaseProviderFactory _factory;
+    private readonly IEtlExecutor _etlExecutor;
 
     public string Name => _service.Name;
 
-    public MetaService Service => _service;
-
-    public IServiceDatabase ServiceDatabase => _service.Database;
+    public IMetaService MetaService => _service;
 
     public string KeyVaultUri => _service.KeyVaultUri;
 
-    public IReadOnlyDictionary<string, Core.Components.Entity> Entities => new ReadOnlyDictionary<string, Core.Components.Entity>(
-        _service.Entities.ToDictionary(x => x.Name, x => x));
+    public IReadOnlyDictionary<string, IEntity>? Entities
+    {
+        get
+        {
+            if (_service.Entities != null)
+                return new ReadOnlyDictionary<string, IEntity>(
+                    _service.Entities.ToDictionary(x => x.Name, x => x));
+            return null;
+        }
+    }
 
-    public IReadOnlyDictionary<string, Core.Models.Api> Apis => new ReadOnlyDictionary<string, Core.Models.Api>(
-        _service.Apis.ToDictionary(x => x.Name, x => x)
-    );
+    public IReadOnlyDictionary<string, IApi>? Apis
+    {
+        get
+        {
+            if (_service.Apis != null)
+                return new ReadOnlyDictionary<string, IApi>(
+                    _service.Apis.ToDictionary(x => x.Name, x => x)
+                );
+            return null;
+        }
+    }
 
-    public IReadOnlyCollection<Loader> Loaders => new ReadOnlyCollection<Loader>(_service.Loaders.ToList());
+    public IEnumerable<ILoader>? Loaders
+    {
+        get
+        {
+            if (_service.Loaders != null) return new ReadOnlyCollection<ILoader>(_service.Loaders.ToList());
+            return null;
+        }
+    }
 
 
     public DynamicService(ILogger<DynamicService> logger,
         IConfiguration configuration,
-        IEtlExecutor etlExector,
+        IEtlExecutor etlExecutor,
         IDatabaseProviderFactory factory)
     {
         _logger = logger;
 
-        _configuration = configuration;
+        var configuration1 = configuration;
 
-        _etlExector = etlExector;
-
-        _factory = factory;
+        _etlExecutor = etlExecutor;
 
         _service = new Configurator(this)
             .WithLogger(_logger)
-            .WithConfiguration(_configuration)
-            .WithDatabaseProviderFactory(_factory)
-            .FromRootFolder(_configuration["Nox:DefinitionRootPath"])
+            .WithConfiguration(configuration1)
+            .WithDatabaseProviderFactory(factory)
+            .FromRootFolder(configuration1["Nox:DefinitionRootPath"])
             .Configure();
 
     }
@@ -67,15 +91,108 @@ public class DynamicService : IDynamicService
     {
         _logger.LogInformation("Executing data load tasks");
 
-        return await _etlExector.ExecuteAsync(_service);
+        return await _etlExecutor.ExecuteAsync(_service);
 
     }
 
-    public async Task<bool> ExecuteDataLoaderAsync(Loader loader, IDatabaseProvider destinationDbProvider)
+    public async Task<bool> ExecuteDataLoaderAsync(ILoader loader, IDatabaseProvider destinationDbProvider)
     {
-        var entity = _service.Entities.First(e => e.Name.Equals(loader.Target.Entity, StringComparison.OrdinalIgnoreCase));
+        if (_service.Entities == null) return false;
+        var entity = _service.Entities.First(e => e.Name.Equals(loader.Target!.Entity, StringComparison.OrdinalIgnoreCase));
+        return await _etlExecutor.ExecuteLoaderAsync(loader, destinationDbProvider, entity);
+    }
 
-        return await _etlExector.ExecuteLoaderAsync(loader, destinationDbProvider, entity);
+    public void AddMetadata(ModelBuilder modelBuilder)
+    {
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(MetaBase)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(DynamicService)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(Loader)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(DatabaseBase)), typeof(DatabaseBase), DatabaseObject.MetadataSchemaName);
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(ServiceDatabase)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(Api.Api)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(XtendedAttributeValue)), typeof(XtendedAttributeValue), "dbo");
+    }
+    
+    public void SetupRecurringLoaderTasks()
+    {
+        var executor = _etlExecutor;
+
+        // setup recurring jobs based on cron schedule
+
+        foreach (var loader in Loaders!)
+        {
+            var loaderInstance = (Loader)loader;
+            var entity = Entities![loaderInstance.Target!.Entity];
+            //
+
+            if (loaderInstance.Schedule!.RunOnStartup)
+            {
+                executor.ExecuteLoaderAsync(loaderInstance, _service.Database!.DatabaseProvider, entity).GetAwaiter().GetResult();
+            }
+
+            RecurringJob.AddOrUpdate(
+                $"{Name}.{loader.Name}",
+                () => executor.ExecuteLoaderAsync(loader, _service.Database!.DatabaseProvider!, entity),
+                loaderInstance.Schedule.CronExpression
+            );
+        }
+
+    }
+
+    public void EnsureDatabaseCreated(DbContext dbContext)
+    {
+        if (dbContext.Database.EnsureCreated())
+        {
+            dbContext.Add((MetaService)_service);
+            dbContext.SaveChanges();    
+        }
+    }
+
+    private void AddMetadataFromNamespace(ModelBuilder modelBuilder, Assembly? assembly, Type baseType, string schema)
+    {
+        if (assembly == null) return;
+        var nsTypes = assembly.GetTypes()
+            .Where(t => t.IsSubclassOf(baseType))
+            .Where(t => t.IsClass && t.IsSealed && t.IsPublic);
+
+        foreach (var metaType in nsTypes)
+        {
+            modelBuilder.Entity(metaType, b =>
+            {
+                _service.Database!.DatabaseProvider.ConfigureEntityTypeBuilder(b, metaType.Name, schema);
+
+                var entityTypes = modelBuilder.Model.GetEntityTypes();
+
+                var properties = entityTypes
+                    .First(e => e.ClrType.Name == metaType.Name)
+                    .ClrType
+                    .GetProperties();
+
+
+                foreach (var prop in properties)
+                {
+                    if (prop.GetCustomAttributes(typeof(NotMappedAttribute), false).Length > 0)
+                        continue;
+
+                    var typeString = prop.PropertyType.Name.ToLower();
+
+                    if (prop.Name == "Name" && typeString == "string")
+                    {
+                        b.Property(prop.Name).HasMaxLength(128);
+                    }
+                    else if (typeString == "decimal")
+                    {
+                        b.Property(prop.Name).HasPrecision(9, 6);
+                    }
+                    else if (typeString == "object")
+                    {
+                        var dbType = _service.Database.DatabaseProvider!.ToDatabaseColumnType(new EntityAttribute() { Type = "object" });
+
+                        b.Property(prop.Name).HasColumnType(dbType);
+                    }
+                }
+            });
+        }
     }
 
     private class Configurator
@@ -96,7 +213,8 @@ public class DynamicService : IDynamicService
 
         public Configurator(DynamicService dynamicService)
         {
-            _deserializer = new DeserializerBuilder().Build();
+            _deserializer = new DeserializerBuilder()
+                .Build();
 
             _dynamicService = dynamicService;
         }
@@ -165,7 +283,7 @@ public class DynamicService : IDynamicService
                 {
                     var service = _deserializer.Deserialize<MetaService>(ReadDefinitionFile(f));
                     service.DefinitionFileName = Path.GetFullPath(f);
-                    service.Database.DefinitionFileName = Path.GetFullPath(f);
+                    service.Database!.DefinitionFileName = Path.GetFullPath(f);
                     return service;
                 })
                 .First();
@@ -187,25 +305,25 @@ public class DynamicService : IDynamicService
 
         private List<Loader> ReadLoaderDefinitionsFromFolder(string rootFolder)
         {
-            return Directory
+            var loaders = Directory
                 .EnumerateFiles(rootFolder, FileExtension.LoaderDefinition, SearchOption.AllDirectories)
                 .Select(f =>
                 {
-                    var loader = _deserializer.Deserialize<Loader>(ReadDefinitionFile(f));
-                    loader.DefinitionFileName = Path.GetFullPath(f);
-                    loader.Sources.ToList().ForEach(s => { s.DefinitionFileName = Path.GetFullPath(f); });
+                    var loader = _deserializer.Deserialize<Loader>(ReadDefinitionFile(f)) as Loader;
+                    loader!.DefinitionFileName = Path.GetFullPath(f);
+                    loader.Sources!.ToList().ForEach(s => { s.DefinitionFileName = Path.GetFullPath(f); });
                     return loader;
-                })
-                .ToList();
+                });
+            return loaders.ToList();
         }
 
-        private List<Core.Models.Api> ReadApiDefinitionsFromFolder(string rootFolder)
+        private List<Api.Api> ReadApiDefinitionsFromFolder(string rootFolder)
         {
             return Directory
                 .EnumerateFiles(rootFolder, FileExtension.ApiDefinition, SearchOption.AllDirectories)
                 .Select(f =>
                 {
-                    var api = _deserializer.Deserialize<Core.Models.Api>(ReadDefinitionFile(f));
+                    var api = _deserializer.Deserialize<Api.Api>(ReadDefinitionFile(f));
                     api.DefinitionFileName = Path.GetFullPath(f);
                     return api;
                 })
@@ -220,7 +338,7 @@ public class DynamicService : IDynamicService
             return File.ReadAllText(fileName);
         }
 
-        private IReadOnlyDictionary<string, string> ResolveConfigurationVariables(IList<IServiceDatabase> serviceDatabases)
+        private void ResolveConfigurationVariables(IList<IServiceDatabase> serviceDatabases)
         {
             _logger.LogInformation("Resolving all configuration variables...");
 
@@ -235,7 +353,7 @@ public class DynamicService : IDynamicService
                 .ToHashSet()
                 .ToDictionary(v => v, v => _configuration[v], StringComparer.OrdinalIgnoreCase);
 
-            if (string.IsNullOrEmpty(_service.MessageBus.ConnectionString) &&
+            if (string.IsNullOrEmpty(_service.MessageBus!.ConnectionString) &&
                 !string.IsNullOrEmpty(_service.MessageBus.ConnectionVariable))
             {
                 variables.Add(_service.MessageBus.ConnectionVariable,
@@ -269,9 +387,6 @@ public class DynamicService : IDynamicService
             {
                 _service.MessageBus.ConnectionString = variables[_service.MessageBus.ConnectionVariable!];
             }
-
-            return variables;
-
         }
 
         private void TryAddMissingConfigsFromKeyVault(string vaultUri, Dictionary<string, string> variables)
@@ -297,6 +412,7 @@ public class DynamicService : IDynamicService
                 {
                     _logger.LogInformation("...Resolving variable [{key}] from secrets vault {vault}", key, vaultUri);
                     variables[key] = keyVault.GetSecretAsync(vaultUri, key.Replace(":", "--")).GetAwaiter().GetResult().Value;
+                    _logger.LogInformation($"Variable [{key}] resolved to: {variables[key]}");
                 }
                 else
                 {
@@ -310,12 +426,13 @@ public class DynamicService : IDynamicService
         {
             var serviceDatabases = new List<IServiceDatabase>
             {
-                _service.Database
+                _service.Database!
             };
 
-            foreach (var kvp in _service.Loaders)
+            foreach (var loader in _service.Loaders!)
             {
-                foreach (var db in kvp.Sources)
+                var kvp = (Loader)loader;
+                foreach (var db in kvp.Sources!)
                 {
                     serviceDatabases.Add(db);
                 }

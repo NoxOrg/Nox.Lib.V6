@@ -17,7 +17,7 @@ public class MetaServiceValidator : AbstractValidator<MetaService>
             .SetValidator(new ApiValidator());
 
         RuleFor(service => service.Database)
-            .SetValidator(new ServiceDatabaseValidator());
+            .SetValidator(new ServiceDatabaseValidator()!);
 
     }
 }

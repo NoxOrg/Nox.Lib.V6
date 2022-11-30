@@ -1,4 +1,6 @@
-﻿namespace Nox.Entity.XtendedAttributes;
+﻿using Nox.Core.Interfaces;
+
+namespace Nox.Entity.XtendedAttributes;
 
 public sealed class XtendedAttributeValue_boolean : XtendedAttributeValue
 {

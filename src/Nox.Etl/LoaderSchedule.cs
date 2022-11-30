@@ -1,12 +1,21 @@
-﻿using Nox.Core.Components;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Nox.Core.Components;
+using Nox.Core.Interfaces;
 using Nox.Cron;
 
-namespace Nox.Core.Models
+namespace Nox.Etl
 {
-    public sealed class LoaderSchedule : MetaBase
+    public sealed class LoaderSchedule : MetaBase, ILoaderSchedule
     {
         public string Start { get; set; } = string.Empty;
         public string CronExpression { get; set; } = string.Empty;
+
+        ILoaderScheduleRetryPolicy? ILoaderSchedule.Retry
+        {
+            get => Retry;
+            set => Retry = value as LoaderScheduleRetryPolicy;
+        }
+        
         public LoaderScheduleRetryPolicy? Retry { get; set; }
         public bool RunOnStartup { get; set; } = true; 
 

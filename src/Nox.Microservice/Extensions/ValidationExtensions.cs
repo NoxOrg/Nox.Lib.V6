@@ -1,8 +1,7 @@
 using FluentValidation;
-using Nox.Core.Models;
 using Nox.Microservice.Validation;
 
-namespace Nox.Microservice;
+namespace Nox.Microservice.Extensions;
 
 public static class ValidationExtensions
 {

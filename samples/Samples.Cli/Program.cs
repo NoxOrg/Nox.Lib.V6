@@ -2,13 +2,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Nox.Core.Configuration;
-using Nox.Etl;
 using Nox.Messaging;
-using Nox.Microservice;
 using Samples.Cli.Commands;
 using Samples.Cli.Services;
 using Serilog;
 using Spectre.Console.Cli;
+
+namespace Samples.Cli;
 
 internal class Program
 {

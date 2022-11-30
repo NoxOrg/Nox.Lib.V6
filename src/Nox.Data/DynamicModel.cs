@@ -1,30 +1,17 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using System.Reflection.Emit;
-using Hangfire;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
-using Nox.Core.Components;
 using Nox.Core.Extensions;
 using Nox.Core.Interfaces;
-using Nox.Core.Models;
-using Nox.Entity.XtendedAttributes;
-using AssemblyBuilder = System.Reflection.Emit.AssemblyBuilder;
-using AssemblyBuilderAccess = System.Reflection.Emit.AssemblyBuilderAccess;
-using ModuleBuilder = System.Reflection.Emit.ModuleBuilder;
 
 namespace Nox.Data;
 
 public class DynamicModel : IDynamicModel
 {
-    private readonly IConfiguration _config;
-
-    private readonly ILogger<DynamicModel> _logger;
-
     private readonly IEdmModel _edmModel;
 
     private readonly IDynamicService _dynamicService;
@@ -35,21 +22,13 @@ public class DynamicModel : IDynamicModel
 
     private readonly Dictionary<string, DynamicDbEntity> _dynamicDbEntities = new();
 
-
-
-    public DynamicModel(
-        IConfiguration config, ILogger<DynamicModel> logger,
-        IDynamicService dynamicService, IEtlExecutor etlExecutor)
+    public DynamicModel(ILogger<DynamicModel> logger, IDynamicService dynamicService, IEtlExecutor etlExecutor)
     {
-        _config = config;
-
-        _logger = logger;
-
         _etlExecutor = etlExecutor;
 
         _dynamicService = dynamicService;
 
-        _databaseProvider = _dynamicService.ServiceDatabase.DatabaseProvider!;
+        _databaseProvider = _dynamicService.MetaService.Database!.DatabaseProvider;
 
         var builder = new ODataConventionModelBuilder();
 
@@ -104,40 +83,7 @@ public class DynamicModel : IDynamicModel
         var model = dbContext.Model;
 
         var sql = dbContext.Database.GenerateCreateScript();
-
-        if (dbContext.Database.EnsureCreated())
-        {
-            dbContext.Add(_dynamicService.Service);
-
-            dbContext.SaveChanges();
-        }
-
-    }
-
-    public void SetupRecurringLoaderTasks()
-    {
-        var executor = _etlExecutor;
-
-        // setup recurring jobs based on cron schedule
-
-        foreach (var loader in _dynamicService.Loaders)
-        {
-
-            var entity = _dynamicService.Entities[loader.Target.Entity];
-            //
-
-            if (loader.Schedule.RunOnStartup)
-            {
-                executor.ExecuteLoaderAsync(loader, _databaseProvider, entity).GetAwaiter().GetResult();
-            }
-
-            RecurringJob.AddOrUpdate(
-                $"{_dynamicService.Name}.{loader.Name}",
-                () => executor.ExecuteLoaderAsync(loader, _databaseProvider, entity),
-                loader.Schedule.CronExpression
-            );
-        }
-
+        _dynamicService.EnsureDatabaseCreated(dbContext);
     }
 
     public IDatabaseProvider GetDatabaseProvider() => _databaseProvider;
@@ -150,7 +96,6 @@ public class DynamicModel : IDynamicModel
         {
             modelBuilder.Entity(entity.Type, b =>
             {
-
                 _databaseProvider.ConfigureEntityTypeBuilder(b, entity.Entity.Table, entity.Entity.Schema);
 
                 foreach (var attr in entity.Entity.Attributes)
@@ -161,7 +106,7 @@ public class DynamicModel : IDynamicModel
 
                     prop.HasColumnType(_databaseProvider.ToDatabaseColumnType(attr));
 
-                    if (netType.Equals(typeof(string)))
+                    if (netType == typeof(string))
                     {
                         prop.HasMaxLength(attr.MaxWidth);
                     }
@@ -209,77 +154,10 @@ public class DynamicModel : IDynamicModel
             });
 
         }
-
-        AddMetadataFromNamespace(modelBuilder, typeof(MetaBase), DatabaseObject.MetadataSchemaName);
-
-        AddMetadataFromNamespace(modelBuilder, typeof(MetaBase), DatabaseObject.MetadataSchemaName);
-
-        AddMetadataFromNamespace(modelBuilder, typeof(DatabaseBase), DatabaseObject.MetadataSchemaName);
-
-        AddMetadataFromNamespace(modelBuilder, typeof(XtendedAttributeValue), "dbo");
-
+        
+        _dynamicService.AddMetadata(modelBuilder);
         return modelBuilder;
     }
-
-    private void AddMetadataFromNamespace(ModelBuilder modelBuilder, Type baseType, string schema)
-    {
-        var assemblyToScan = Assembly.GetAssembly(baseType);
-
-        if (assemblyToScan == null) return;
-
-        var nsTypes = assemblyToScan.GetTypes()
-            .Where(t => t.IsSubclassOf(baseType))
-            .Where(t => t.IsClass && t.IsSealed && t.IsPublic);
-
-        foreach (var metaType in nsTypes)
-        {
-            modelBuilder.Entity(metaType, b =>
-            {
-                // b.ToTable(metaType.Name, schema);
-
-                _databaseProvider.ConfigureEntityTypeBuilder(b, metaType.Name, schema);
-
-                var entityTypes = modelBuilder.Model.GetEntityTypes();
-
-                var properties = entityTypes
-                    .First(e => e.ClrType.Name == metaType.Name)
-                    .ClrType
-                    .GetProperties();
-
-
-                foreach (var prop in properties)
-                {
-                    if (prop.GetCustomAttributes(typeof(NotMappedAttribute), false).Length > 0)
-                        continue;
-
-                    var typeString = prop.PropertyType.Name.ToLower();
-
-                    if (prop.Name == "Name" && typeString == "string")
-                    {
-                        b.Property(prop.Name).HasMaxLength(128);
-                    }
-                    else if (typeString == "decimal")
-                    {
-                        b.Property(prop.Name).HasPrecision(9, 6);
-                    }
-                    else if (typeString == "object")
-                    {
-                        var dbType = _databaseProvider.ToDatabaseColumnType(new EntityAttribute() { Type = "object" });
-
-                        if (dbType == null)
-                        {
-                            b.Ignore(prop.Name);
-                        }
-                        else
-                        {
-                            b.Property(prop.Name).HasColumnType(dbType);
-                        }
-                    }
-                }
-            });
-        }
-    }
-
 
     public IEdmModel GetEdmModel()
     {
@@ -329,7 +207,7 @@ public class DynamicModel : IDynamicModel
         return ret!;
     }
 
-    private Dictionary<string, (Core.Components.Entity Entity, TypeBuilder TypeBuilder)> GetTablesAndTypeBuilders()
+    private Dictionary<string, (IEntity Entity, TypeBuilder TypeBuilder)> GetTablesAndTypeBuilders()
     {
         var entities = _dynamicService.Entities;
 
@@ -339,9 +217,9 @@ public class DynamicModel : IDynamicModel
 
         var mb = ab.DefineDynamicModule(aName.Name!);
 
-        var dynamicTypes = new Dictionary<string, (Core.Components.Entity Entity, TypeBuilder TypeBuilder)>();
+        var dynamicTypes = new Dictionary<string, (IEntity Entity, TypeBuilder TypeBuilder)>();
 
-        foreach (var (_, entity) in entities)
+        foreach (var (_, entity) in entities!)
         {
             var tb = mb.DefineType(entity.Name, TypeAttributes.Public, null);
 

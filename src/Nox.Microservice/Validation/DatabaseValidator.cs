@@ -1,9 +1,10 @@
 using FluentValidation;
+using Nox.Core.Interfaces;
 using Nox.Core.Models;
 
 namespace Nox.Microservice.Validation;
 
-public class DatabaseValidator : AbstractValidator<DatabaseBase>
+public class DatabaseValidator : AbstractValidator<IServiceDatabase>
 {
     public DatabaseValidator()
     {

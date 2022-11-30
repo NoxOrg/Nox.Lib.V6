@@ -17,7 +17,8 @@ public static class ServiceExtension
             var model = serviceProvider.GetRequiredService<IDynamicModel>();
             var dbProvider = model.GetDatabaseProvider();
             dbProvider.ConfigureJobScheduler(configuration);
-            model.SetupRecurringLoaderTasks();
+            var dynamicService = serviceProvider.GetRequiredService<IDynamicService>();
+            dynamicService.SetupRecurringLoaderTasks();
         });
         services.AddHangfireServer();
         return services;

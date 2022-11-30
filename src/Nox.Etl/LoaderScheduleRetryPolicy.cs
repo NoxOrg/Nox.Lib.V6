@@ -1,8 +1,9 @@
 ﻿using Nox.Core.Components;
+using Nox.Core.Interfaces;
 
-namespace Nox.Core.Models
+namespace Nox.Etl
 {
-    public sealed class LoaderScheduleRetryPolicy : MetaBase
+    public sealed class LoaderScheduleRetryPolicy : MetaBase, ILoaderScheduleRetryPolicy
     {
         public int Limit { get; set; } = 5;
         public int DelaySeconds { get; set; } = 60;

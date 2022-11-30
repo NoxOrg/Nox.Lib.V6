@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Nox.Data;
 using Nox.Messaging;
 using Nox.Microservice;
+using Nox.Microservice.Extensions;
 using NUnit.Framework;
 
 namespace Nox.TestFixtures;

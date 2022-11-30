@@ -18,7 +18,7 @@ public class DatabaseBase : MetaBase, IServiceDatabase
     public string? ConnectionVariable { get; set; }
         
     [NotMapped]
-    public IDatabaseProvider? DatabaseProvider { get; set; }
+    public IDatabaseProvider DatabaseProvider { get; set; }
 
     public virtual bool ApplyDefaults()
     {

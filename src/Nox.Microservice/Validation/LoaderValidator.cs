@@ -1,10 +1,11 @@
 using FluentValidation;
 using Nox.Core.Components;
+using Nox.Core.Interfaces;
 using Nox.Core.Models;
 
 namespace Nox.Microservice.Validation;
 
-public class LoaderValidator : AbstractValidator<Loader>
+public class LoaderValidator : AbstractValidator<ILoader>
 {
     public LoaderValidator()
     {

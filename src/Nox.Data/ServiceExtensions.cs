@@ -27,7 +27,6 @@ public static class ServiceExtensions
     public static IServiceCollection AddDynamicModel(this IServiceCollection services)
     {
         services.AddSingleton<IDynamicModel, DynamicModel>();
-
         return services;
     }
 

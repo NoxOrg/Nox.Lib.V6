@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Nox.Core.Components;
+using Nox.Core.Interfaces;
 
-namespace Nox.Core.Models
+namespace Nox.Etl
 {
-    public sealed class LoaderLoadStrategy : MetaBase
+    public sealed class LoaderLoadStrategy : MetaBase, ILoaderLoadStrategy
     {
         public string Type { get; set; } = string.Empty;
         [NotMapped]

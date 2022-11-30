@@ -1,8 +1,9 @@
 ﻿using Nox.Core.Components;
+using Nox.Core.Interfaces;
 
-namespace Nox.Core.Models
+namespace Nox.Api
 {
-    public sealed class ApiRouteParameter : MetaBase
+    public sealed class ApiRouteParameter : MetaBase, IApiRouteParameter
     {
         public string Name { get; set; } = string.Empty;
         public string Type { get; set; } = "string";

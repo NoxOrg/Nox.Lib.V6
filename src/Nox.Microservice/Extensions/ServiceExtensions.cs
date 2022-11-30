@@ -9,7 +9,7 @@ using Nox.Etl;
 using Nox.Jobs;
 using Nox.Messaging;
 
-namespace Nox.Microservice;
+namespace Nox.Microservice.Extensions;
 
 public static class ServiceExtensions
 {

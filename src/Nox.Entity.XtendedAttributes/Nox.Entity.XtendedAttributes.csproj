@@ -25,4 +25,7 @@
         <PackageVersion>6.0.0</PackageVersion>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Nox.Core\Nox.Core.csproj" />
+    </ItemGroup>
 </Project>

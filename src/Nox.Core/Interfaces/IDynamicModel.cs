@@ -13,5 +13,4 @@ public interface IDynamicModel
     object GetDynamicSingleResult(DbContext context, string dbSetName, object id);
     IEdmModel GetEdmModel();
     object PostDynamicObject(DbContext context, string dbSetName, string obj);
-    void SetupRecurringLoaderTasks();
 }

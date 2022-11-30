@@ -4,6 +4,6 @@ using Nox.Core.Models;
 
 namespace Nox.Core.Components;
 
-public sealed class ServiceMessageBus : Models.MessageBusBase, IServiceMessageBus { }
+public sealed class ServiceMessageBus : Models.MessageBusBase { }
 
 

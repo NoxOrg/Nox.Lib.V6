@@ -1,4 +1,4 @@
-namespace Nox.Data;
+namespace Nox.Core.Components;
 
 public static class DatabaseObject
 {

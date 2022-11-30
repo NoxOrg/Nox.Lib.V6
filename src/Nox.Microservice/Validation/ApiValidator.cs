@@ -3,7 +3,7 @@ using Nox.Core.Models;
 
 namespace Nox.Microservice.Validation;
 
-public class ApiValidator : AbstractValidator<Core.Models.Api>
+public class ApiValidator : AbstractValidator<Api.Api>
 {
     public ApiValidator()
     {

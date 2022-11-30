@@ -1,21 +1,54 @@
-﻿using FluentValidation;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using Nox.Core.Components;
 using Nox.Core.Constants;
+using Nox.Core.Interfaces;
+using Nox.Data;
+using Nox.Etl;
 
-namespace Nox.Core.Models;
+namespace Nox.Microservice;
 
-public sealed class MetaService : MetaBase
+public sealed class MetaService : MetaBase, IMetaService
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string EndpointProvider { get; set; } = string.Empty;
     public string KeyVaultUri { get; set; } = KeyVault.DefaultKeyVaultUri;
-    public ServiceDatabase Database { get; set; } = new();
-    public ServiceMessageBus MessageBus { get; set; } = new();
-    public ICollection<Entity> Entities { get; set; } = null!;
-    public ICollection<Loader> Loaders { get; set; } = null!;
-    public ICollection<Api> Apis { get; set; } = null!;
 
+    IServiceDatabase? IMetaService.Database
+    {
+        get => Database;
+        set => Database = value as ServiceDatabase;
+    }
+    public ServiceDatabase? Database { get; set; } = new();
+
+    IServiceMessageBus? IMetaService.MessageBus
+    {
+        get => MessageBus;
+        set => MessageBus = value as ServiceMessageBus;
+    }
+    public ServiceMessageBus? MessageBus { get; set; } = new();
+
+    ICollection<IEntity>? IMetaService.Entities
+    {
+        get => Entities?.ToList<IEntity>();
+        set => Entities = value as ICollection<Core.Components.Entity>;
+    }
+    public ICollection<Core.Components.Entity>? Entities { get; set; }
+
+    ICollection<ILoader>? IMetaService.Loaders
+    {
+        get => Loaders?.ToList<ILoader>();
+        set => Loaders = value as ICollection<Loader>;
+    }
+    public ICollection<Loader>? Loaders { get; set; }
+
+    ICollection<IApi>? IMetaService.Apis
+    {
+        get => Apis?.ToList<IApi>();
+        set => Apis = value as ICollection<Api.Api>;
+    }
+    public ICollection<Api.Api>? Apis { get; set; }
+    
     public void Configure()
     {
         Entities = SortEntitiesByDependency();
@@ -24,15 +57,14 @@ public sealed class MetaService : MetaBase
 
     private ICollection<Loader> SortLoadersByEntitySortOrder()
     {
-        var entities = Entities.ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
-
-        return Loaders.OrderBy(l => entities[l.Target.Entity].SortOrder).ToList();
+        var entities = Entities!.ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
+        return Loaders!.OrderBy(l => entities[l.Target!.Entity].SortOrder).ToList();
     }
 
 
-    private ICollection<Entity> SortEntitiesByDependency()
+    private ICollection<Core.Components.Entity> SortEntitiesByDependency()
     {
-        var entities = Entities.ToList();
+        var entities = Entities!.ToList();
 
         foreach (var entity in entities)
         {
@@ -53,7 +85,7 @@ public sealed class MetaService : MetaBase
         // hierarchy sort to place entities in dependency order
 
         var i = 0;
-        var sortedEntities = new List<Entity>();
+        var sortedEntities = new List<Core.Components.Entity>();
         while (entities.Count > 0)
         {
             var count = CountParentsInSortedEntities(entities, sortedEntities, i);
@@ -81,8 +113,8 @@ public sealed class MetaService : MetaBase
     }
 
     private static int CountParentsInSortedEntities(
-            IList<Entity> unsortedEntities,
-            IList<Entity> sortedEntities,
+            IList<Core.Components.Entity> unsortedEntities,
+            IList<Core.Components.Entity> sortedEntities,
             int iteration)
     {
         var result = 0;
