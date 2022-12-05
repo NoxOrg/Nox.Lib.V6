@@ -2,19 +2,21 @@
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Nox;
+using Nox.Core.Interfaces;
 using Nox.Messaging;
 
 namespace Samples.Cli.Commands;
 
-public class HeartbeatConsumer : IConsumer<HeartbeatMessage>
+public class HeartbeatConsumer : IConsumer<IHeartbeatMessage>
 {
     readonly ILogger<HeartbeatConsumer> _logger;
+
     public HeartbeatConsumer(ILogger<HeartbeatConsumer> logger)
     {
         _logger = logger;
     }
-
-    public Task Consume(ConsumeContext<HeartbeatMessage> context)
+    
+    public Task Consume(ConsumeContext<IHeartbeatMessage> context)
     {
         _logger.LogInformation("Received Heartbeat: {Text}", context.Message.Value);
         return Task.CompletedTask;
@@ -76,7 +78,6 @@ public class CurrencyCreatedEventConsumerDefinition : ConsumerDefinition<Currenc
         endpointConfigurator.UseMessageRetry(r => r.Intervals(500, 1000));
     }
 }
-
 
 public class WorkplaceCreatedEventConsumer : IConsumer<WorkplaceCreatedDomainEvent>
 {

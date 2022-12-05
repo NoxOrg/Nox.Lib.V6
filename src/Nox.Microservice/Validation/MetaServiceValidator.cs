@@ -1,5 +1,4 @@
 using FluentValidation;
-using Nox.Core.Models;
 
 namespace Nox.Microservice.Validation;
 
@@ -17,7 +16,7 @@ public class MetaServiceValidator : AbstractValidator<MetaService>
             .SetValidator(new ApiValidator());
 
         RuleFor(service => service.Database)
-            .SetValidator(new ServiceDatabaseValidator());
+            .SetValidator(new ServiceDatabaseValidator()!);
 
     }
 }

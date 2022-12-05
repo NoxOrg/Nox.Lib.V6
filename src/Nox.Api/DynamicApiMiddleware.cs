@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
-using Nox.Core.Components;
 using Nox.Core.Interfaces;
-using Nox.Core.Models;
 
 namespace Nox.Api;
 
@@ -21,21 +19,27 @@ public class DynamicApiMiddleware
     {
         _next = next;
 
-        foreach (var api in service.Apis.Values)
+        if (service.Apis != null)
         {
-            foreach (var route in api.Routes)
+            foreach (var api in service.Apis.Values)
             {
-                if (route.Name[0] != BACKSLASH)
+                if (api.Routes != null)
                 {
-                    route.Name = @$"/{route.Name}";
-                }
+                    foreach (var route in api.Routes)
+                    {
+                        if (route.Name[0] != BACKSLASH)
+                        {
+                            route.Name = @$"/{route.Name}";
+                        }
 
-                if (route.TargetUrl[0] != BACKSLASH)
-                {
-                    route.TargetUrl = @$"/{route.TargetUrl}";
-                }
+                        if (route.TargetUrl[0] != BACKSLASH)
+                        {
+                            route.TargetUrl = @$"/{route.TargetUrl}";
+                        }
 
-                _matchers.Add(new RouteMatcher(route, DYNAMIC_API_PREFIX));
+                        _matchers.Add(new RouteMatcher(route, DYNAMIC_API_PREFIX));
+                    }
+                }
             }
         }
     }
@@ -58,7 +62,7 @@ public class DynamicApiMiddleware
 
         RouteValueDictionary? urlParameters = null;
 
-        ApiRoute? apiRoute = null;
+        IApiRoute? apiRoute = null;
 
         foreach (var matcher in _matchers)
         {
@@ -90,7 +94,7 @@ public class DynamicApiMiddleware
             translatedTarget = translatedTarget.Replace($"{{{kvp.Key}}}", kvp.Value?.ToString());
         }
 
-        foreach (var parameter in apiRoute.Parameters)
+        foreach (var parameter in apiRoute.Parameters!)
         {
             translatedTarget = translatedTarget.Replace($"{{{parameter.Name}}}", parameter.Default?.ToString());
         }
@@ -116,9 +120,9 @@ internal class RouteMatcher
 
     private readonly TemplateMatcher _matcher;
 
-    private readonly ApiRoute _apiRoute;
+    private readonly IApiRoute _apiRoute;
 
-    public RouteMatcher(ApiRoute apiRoute, string prefix)
+    public RouteMatcher(IApiRoute apiRoute, string prefix)
     {
         _template = $"{prefix}{apiRoute.Name}";
 
@@ -129,7 +133,7 @@ internal class RouteMatcher
         _matcher = new TemplateMatcher(template, GetDefaults(template));
     }
 
-    public ApiRoute ApiRoute => _apiRoute;
+    public IApiRoute ApiRoute => _apiRoute;
 
     public RouteValueDictionary? Match(string requestPath)
     {

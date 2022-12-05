@@ -4,6 +4,7 @@
 
 Name: PlatformTenant
 Description: Tenants of the platform
+Table: PlatformTenant
 
 Attributes:
 

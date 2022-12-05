@@ -8,7 +8,7 @@ namespace Nox.Messaging;
 
 public static class MessageExtensions
 {
-    public static INoxEvent? FindEventImplementation(this IEnumerable<INoxEvent> messages, Core.Components.Entity entity, NoxEventTypeEnum eventType)
+    public static INoxEvent? FindEventImplementation(this IEnumerable<INoxEvent> messages, IEntity entity, NoxEventTypeEnum eventType)
     {
         foreach (var msg in messages.ToImmutableList())
         {

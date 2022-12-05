@@ -1,64 +1,78 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection;
+using Hangfire;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Nox.Core.Constants;
+using Nox.Core.Components;
 using Nox.Core.Exceptions;
 using Nox.Core.Interfaces;
 using Nox.Core.Models;
-using YamlDotNet.Serialization;
+using Nox.Data;
+using Nox.Entity.XtendedAttributes;
+using Nox.Etl;
+using Nox.Messaging;
+using Nox.Microservice.Extensions;
 
 namespace Nox.Microservice;
 
 public class DynamicService : IDynamicService
 {
-    private ILogger _logger = null!;
-
-    private readonly MetaService _service = null!;
-
-    private readonly IConfiguration _configuration = null!;
-
-    private readonly IEtlExecutor _etlExector;
-
-    private readonly IDatabaseProviderFactory _factory;
-
-    public string Name => _service.Name;
-
-    public MetaService Service => _service;
-
-    public IServiceDatabase ServiceDatabase => _service.Database;
-
-    public string KeyVaultUri => _service.KeyVaultUri;
-
-    public IReadOnlyDictionary<string, Core.Components.Entity> Entities => new ReadOnlyDictionary<string, Core.Components.Entity>(
-        _service.Entities.ToDictionary(x => x.Name, x => x));
-
-    public IReadOnlyDictionary<string, Core.Models.Api> Apis => new ReadOnlyDictionary<string, Core.Models.Api>(
-        _service.Apis.ToDictionary(x => x.Name, x => x)
-    );
-
-    public IReadOnlyCollection<Loader> Loaders => new ReadOnlyCollection<Loader>(_service.Loaders.ToList());
-
+    private ILogger _logger;
+    private readonly IMetaService _metaService;
+    private readonly IEtlExecutor _etlExecutor;
+    public string Name => _metaService.Name;
+    public IMetaService MetaService => _metaService;
+    public string KeyVaultUri => _metaService.KeyVaultUri;
+    public IReadOnlyDictionary<string, IEntity>? Entities
+    {
+        get
+        {
+            if (_metaService.Entities != null)
+                return new ReadOnlyDictionary<string, IEntity>(
+                    _metaService.Entities.ToDictionary(x => x.Name, x => x));
+            return null;
+        }
+    }
+    public IReadOnlyDictionary<string, IApi>? Apis
+    {
+        get
+        {
+            if (_metaService.Apis != null)
+                return new ReadOnlyDictionary<string, IApi>(
+                    _metaService.Apis.ToDictionary(x => x.Name, x => x)
+                );
+            return null;
+        }
+    }
+    public IEnumerable<ILoader>? Loaders
+    {
+        get
+        {
+            if (_metaService.Loaders != null) return new ReadOnlyCollection<ILoader>(_metaService.Loaders.ToList());
+            return null;
+        }
+    }
 
     public DynamicService(ILogger<DynamicService> logger,
-        IConfiguration configuration,
-        IEtlExecutor etlExector,
-        IDatabaseProviderFactory factory)
+        IConfiguration appConfig,
+        INoxConfiguration noxConfig,
+        IEtlExecutor etlExecutor,
+        IDatabaseProviderFactory factory,
+        INoxMessenger messenger)
     {
         _logger = logger;
+        _etlExecutor = etlExecutor;
 
-        _configuration = configuration;
-
-        _etlExector = etlExector;
-
-        _factory = factory;
-
-        _service = new Configurator(this)
+        _metaService = new Configurator(this)
             .WithLogger(_logger)
-            .WithConfiguration(_configuration)
-            .WithDatabaseProviderFactory(_factory)
-            .FromRootFolder(_configuration["Nox:DefinitionRootPath"])
+            .WithAppConfiguration(appConfig)
+            .WithNoxConfiguration(noxConfig)
+            .WithDatabaseProviderFactory(factory)
+            .WithMessenger(messenger)
             .Configure();
 
     }
@@ -67,165 +81,179 @@ public class DynamicService : IDynamicService
     {
         _logger.LogInformation("Executing data load tasks");
 
-        return await _etlExector.ExecuteAsync(_service);
+        return await _etlExecutor.ExecuteAsync(_metaService);
 
     }
 
-    public async Task<bool> ExecuteDataLoaderAsync(Loader loader, IDatabaseProvider destinationDbProvider)
+    public async Task<bool> ExecuteDataLoaderAsync(ILoader loader)
     {
-        var entity = _service.Entities.First(e => e.Name.Equals(loader.Target.Entity, StringComparison.OrdinalIgnoreCase));
+        if (_metaService.Entities == null) return false;
+        var entity = _metaService.Entities.First(e => e.Name.Equals(loader.Target!.Entity, StringComparison.OrdinalIgnoreCase));
+        return await _etlExecutor.ExecuteLoaderAsync(_metaService, loader, entity);
+    }
 
-        return await _etlExector.ExecuteLoaderAsync(loader, destinationDbProvider, entity);
+    public void AddMetadata(ModelBuilder modelBuilder)
+    {
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(MetaBase)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(DynamicService)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(Loader)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(DatabaseBase)), typeof(DatabaseBase), DatabaseObject.MetadataSchemaName);
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(ServiceDatabase)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(Api.Api)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(MessagingProvider)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(XtendedAttributeValue)), typeof(XtendedAttributeValue), "dbo");
+    }
+    
+    public void SetupRecurringLoaderTasks()
+    {
+        var executor = _etlExecutor;
+
+        // setup recurring jobs based on cron schedule
+
+        foreach (var loader in Loaders!)
+        {
+            var loaderInstance = (Loader)loader;
+            var entity = Entities![loaderInstance.Target!.Entity];
+            //
+
+            if (loaderInstance.Schedule!.RunOnStartup)
+            {
+                executor.ExecuteLoaderAsync(_metaService, loaderInstance, entity).GetAwaiter().GetResult();
+            }
+
+            RecurringJob.AddOrUpdate(
+                $"{Name}.{loader.Name}",
+                () => executor.ExecuteLoaderAsync(_metaService, loader, entity),
+                loaderInstance.Schedule.CronExpression
+            );
+        }
+    }
+
+    public void EnsureDatabaseCreated(DbContext dbContext)
+    {
+        if (dbContext.Database.EnsureCreated())
+        {
+            dbContext.Add((MetaService)_metaService);
+            dbContext.SaveChanges();    
+        }
+    }
+
+    private void AddMetadataFromNamespace(ModelBuilder modelBuilder, Assembly? assembly, Type baseType, string schema)
+    {
+        if (assembly == null) return;
+        var nsTypes = assembly.GetTypes()
+            .Where(t => t.IsSubclassOf(baseType))
+            .Where(t => t.IsClass && t.IsSealed && t.IsPublic);
+
+        foreach (var metaType in nsTypes)
+        {
+            modelBuilder.Entity(metaType, b =>
+            {
+                _metaService.Database!.DatabaseProvider!.ConfigureEntityTypeBuilder(b, metaType.Name, schema);
+
+                var entityTypes = modelBuilder.Model.GetEntityTypes();
+
+                var properties = entityTypes
+                    .First(e => e.ClrType.Name == metaType.Name)
+                    .ClrType
+                    .GetProperties();
+
+
+                foreach (var prop in properties)
+                {
+                    if (prop.GetCustomAttributes(typeof(NotMappedAttribute), false).Length > 0)
+                        continue;
+
+                    var typeString = prop.PropertyType.Name.ToLower();
+
+                    if (prop.Name == "Name" && typeString == "string")
+                    {
+                        b.Property(prop.Name).HasMaxLength(128);
+                    }
+                    else if (typeString == "decimal")
+                    {
+                        b.Property(prop.Name).HasPrecision(9, 6);
+                    }
+                    else if (typeString == "object")
+                    {
+                        var dbType = _metaService.Database.DatabaseProvider!.ToDatabaseColumnType(new EntityAttribute() { Type = "object" });
+
+                        b.Property(prop.Name).HasColumnType(dbType);
+                    }
+                }
+            });
+        }
     }
 
     private class Configurator
     {
-        // Class def
-
         private readonly DynamicService _dynamicService;
-
-        private readonly IDeserializer _deserializer;
-
-        private ILogger _logger = null!;
-
-        private IConfiguration _configuration = null!;
-
-        private IDatabaseProviderFactory _factory = null!;
-
-        private MetaService _service = null!;
-
+        private IDatabaseProviderFactory? _factory;
+        private ILogger? _logger;
+        private IMetaService? _service;
+        private IConfiguration? _appConfig;
+        private INoxConfiguration? _noxConfig;
+        private INoxMessenger? _messenger;
+        
         public Configurator(DynamicService dynamicService)
         {
-            _deserializer = new DeserializerBuilder().Build();
-
             _dynamicService = dynamicService;
         }
-
-        public Configurator FromRootFolder(string rootFolder)
-        {
-            var service = ReadServiceDefinitionsFromFolder(rootFolder);
-
-            service.Entities = ReadEntityDefinitionsFromFolder(rootFolder);
-
-            service.Loaders = ReadLoaderDefinitionsFromFolder(rootFolder);
-
-            service.Apis = ReadApiDefinitionsFromFolder(rootFolder);
-
-            _service = service;
-
-            return this;
-        }
-
+        
         public Configurator WithLogger(ILogger logger)
         {
             _dynamicService._logger = logger;
-
             _logger = logger;
-
             return this;
         }
 
-        public Configurator WithConfiguration(IConfiguration configuration)
+        public Configurator WithAppConfiguration(IConfiguration appConfig)
         {
-            _configuration = configuration;
-
+            _appConfig = appConfig;
             return this;
         }
 
+        public Configurator WithNoxConfiguration(INoxConfiguration noxConfig)
+        {
+            _noxConfig = noxConfig;
+            return this;
+        }
+        
         public Configurator WithDatabaseProviderFactory(IDatabaseProviderFactory factory)
         {
             _factory = factory;
-
             return this;
         }
 
-        public MetaService Configure()
+        public Configurator WithMessenger(INoxMessenger messenger)
         {
-            var serviceDatabases = GetServiceDatabasesFromDefinition();
+            _messenger = messenger;
+            return this;
+        }
+        
+        public IMetaService Configure()
+        {
+            _service = _noxConfig!.ToMetaService();
+            var serviceDatabases = GetServiceDatabasesFromNoxConfig();
             ResolveConfigurationVariables(serviceDatabases);
 
             _service.Validate();
             _service.Configure();
+            //if (_messenger != null) _messenger.Configure(_service.MessagingProviders);
             
             serviceDatabases.ToList().ForEach(db =>
             {
-                db.DatabaseProvider = _factory.Create(db.Provider);
+                db.DatabaseProvider = _factory!.Create(db.Provider);
                 db.DatabaseProvider.ConfigureServiceDatabase(db, _service.Name);
             });
 
             return _service;
         }
-
-        private MetaService ReadServiceDefinitionsFromFolder(string rootFolder)
+        
+        private void ResolveConfigurationVariables(IList<IServiceDatabase> serviceDatabases)
         {
-            return Directory
-                .EnumerateFiles(rootFolder, FileExtension.ServiceDefinition, SearchOption.AllDirectories)
-                .Take(1)
-                .Select(f =>
-                {
-                    var service = _deserializer.Deserialize<MetaService>(ReadDefinitionFile(f));
-                    service.DefinitionFileName = Path.GetFullPath(f);
-                    service.Database.DefinitionFileName = Path.GetFullPath(f);
-                    return service;
-                })
-                .First();
-        }
-
-        private List<Core.Components.Entity> ReadEntityDefinitionsFromFolder(string rootFolder)
-        {
-            return Directory
-                .EnumerateFiles(rootFolder, FileExtension.EntityDefinition, SearchOption.AllDirectories)
-                .Select(f =>
-                {
-                    var entity = _deserializer.Deserialize<Core.Components.Entity>(ReadDefinitionFile(f));
-                    entity.DefinitionFileName = Path.GetFullPath(f);
-                    entity.Attributes.ToList().ForEach(a => { a.DefinitionFileName = Path.GetFullPath(f); });
-                    return entity;
-                })
-                .ToList();
-        }
-
-        private List<Loader> ReadLoaderDefinitionsFromFolder(string rootFolder)
-        {
-            return Directory
-                .EnumerateFiles(rootFolder, FileExtension.LoaderDefinition, SearchOption.AllDirectories)
-                .Select(f =>
-                {
-                    var loader = _deserializer.Deserialize<Loader>(ReadDefinitionFile(f));
-                    loader.DefinitionFileName = Path.GetFullPath(f);
-                    loader.Sources.ToList().ForEach(s => { s.DefinitionFileName = Path.GetFullPath(f); });
-                    return loader;
-                })
-                .ToList();
-        }
-
-        private List<Core.Models.Api> ReadApiDefinitionsFromFolder(string rootFolder)
-        {
-            return Directory
-                .EnumerateFiles(rootFolder, FileExtension.ApiDefinition, SearchOption.AllDirectories)
-                .Select(f =>
-                {
-                    var api = _deserializer.Deserialize<Core.Models.Api>(ReadDefinitionFile(f));
-                    api.DefinitionFileName = Path.GetFullPath(f);
-                    return api;
-                })
-                .ToList();
-        }
-
-
-        private string ReadDefinitionFile(string fileName)
-        {
-            _logger.LogInformation("Reading definition from {fileName}", fileName.Replace('\\', '/'));
-
-            return File.ReadAllText(fileName);
-        }
-
-        private IReadOnlyDictionary<string, string> ResolveConfigurationVariables(IList<IServiceDatabase> serviceDatabases)
-        {
-            _logger.LogInformation("Resolving all configuration variables...");
-
+            _logger!.LogInformation("Resolving all configuration variables...");
             // populate variables from application config
-
             var databases = serviceDatabases
                 .Where(d => string.IsNullOrEmpty(d.ConnectionString))
                 .Where(d => !string.IsNullOrEmpty(d.ConnectionVariable));
@@ -233,16 +261,20 @@ public class DynamicService : IDynamicService
             var variables = databases
                 .Select(d => d.ConnectionVariable!)
                 .ToHashSet()
-                .ToDictionary(v => v, v => _configuration[v], StringComparer.OrdinalIgnoreCase);
+                .ToDictionary(v => v, v => _appConfig?[v], StringComparer.OrdinalIgnoreCase);
 
-            if (string.IsNullOrEmpty(_service.MessageBus.ConnectionString) &&
-                !string.IsNullOrEmpty(_service.MessageBus.ConnectionVariable))
+            if (_service!.MessagingProviders is { Count: > 0 })
             {
-                variables.Add(_service.MessageBus.ConnectionVariable,
-                    _configuration[_service.MessageBus.ConnectionVariable]);
+                foreach (var item in _service.MessagingProviders)
+                {
+                    if (string.IsNullOrEmpty(item.ConnectionString) && !string.IsNullOrEmpty(item.ConnectionVariable))
+                    {
+                        variables.Add(item.ConnectionVariable, _appConfig?[item.ConnectionVariable]);
+                    }
+                }    
             }
-
-            variables.Add("EtlBox:LicenseKey", _configuration["EtlBox:LicenseKey"]);
+            
+            variables.Add("EtlBox:LicenseKey", _appConfig?["EtlBox:LicenseKey"]);
 
             // try key vault where app configuration is missing 
             if (variables.Any(v => v.Value == null))
@@ -263,15 +295,17 @@ public class DynamicService : IDynamicService
             databases.ToList().ForEach(db =>
                 db.ConnectionString = variables[db.ConnectionVariable!]
             );
-
-            if (string.IsNullOrEmpty(_service.MessageBus.ConnectionString) &&
-                !string.IsNullOrEmpty(_service.MessageBus.ConnectionVariable))
+            
+            if (_service.MessagingProviders is { Count: > 0 })
             {
-                _service.MessageBus.ConnectionString = variables[_service.MessageBus.ConnectionVariable!];
+                foreach (var item in _service.MessagingProviders)
+                {
+                    if (string.IsNullOrEmpty(item.ConnectionString) && !string.IsNullOrEmpty(item.ConnectionVariable))
+                    {
+                        item.ConnectionString = variables[item.ConnectionVariable!];
+                    }        
+                }    
             }
-
-            return variables;
-
         }
 
         private void TryAddMissingConfigsFromKeyVault(string vaultUri, Dictionary<string, string> variables)
@@ -286,42 +320,41 @@ public class DynamicService : IDynamicService
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("...unable to connect to key vault because [{msg}]", ex.Message);
+                _logger!.LogWarning("...unable to connect to key vault because [{msg}]", ex.Message);
                 return;
             }
 
             foreach (var key in variables.Keys)
             {
 
-                if (variables[key] == null)
+                if (string.IsNullOrEmpty(variables[key]))
                 {
-                    _logger.LogInformation("...Resolving variable [{key}] from secrets vault {vault}", key, vaultUri);
+                    _logger!.LogInformation("...Resolving variable [{key}] from secrets vault {vault}", key, vaultUri);
                     variables[key] = keyVault.GetSecretAsync(vaultUri, key.Replace(":", "--")).GetAwaiter().GetResult().Value;
+                    _logger!.LogInformation($"Variable [{key}] resolved to: {variables[key]}");
                 }
                 else
                 {
-                    _logger.LogInformation("...Resolving variable [{key}] from app configuration", key);
+                    _logger!.LogInformation("...Resolving variable [{key}] from app configuration", key);
                 }
 
             }
         }
 
-        private IList<IServiceDatabase> GetServiceDatabasesFromDefinition()
+        private IList<IServiceDatabase> GetServiceDatabasesFromNoxConfig()
         {
             var serviceDatabases = new List<IServiceDatabase>
             {
-                _service.Database
+                _service!.Database!
             };
 
-            foreach (var kvp in _service.Loaders)
+            foreach (var dataSource in _service.DataSources!)
             {
-                foreach (var db in kvp.Sources)
-                {
-                    serviceDatabases.Add(db);
-                }
+                serviceDatabases.Add(dataSource);
             }
 
             return serviceDatabases;
         }
+
     }
 }

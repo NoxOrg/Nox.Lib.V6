@@ -2,12 +2,10 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Nox.Core.Interfaces;
 using Nox.Messaging.Enumerations;
 using Nox.Messaging.Events;
 using Nox.TestFixtures;
 using NUnit.Framework;
-using Person = Nox.TestFixtures.Entities.Person;
 
 namespace Nox.Messaging.Tests;
 
@@ -18,7 +16,7 @@ public class MessageExtensionTests: MessagingTestFixture
     {
         TestServiceCollection!.AddNoxEvents(Assembly.GetExecutingAssembly());
         BuildServiceProvider();
-        var personEntity = new Core.Components.Entity
+        var personEntity = new Core.Models.Entity
         {
             Id = 1,
             Name = "Person"
@@ -33,7 +31,7 @@ public class MessageExtensionTests: MessagingTestFixture
     {
         TestServiceCollection!.AddNoxEvents(Assembly.GetExecutingAssembly());
         BuildServiceProvider();
-        var personEntity = new Core.Components.Entity
+        var personEntity = new Core.Models.Entity
         {
             Id = 1,
             Name = "Something"
@@ -52,7 +50,7 @@ public class MessageExtensionTests: MessagingTestFixture
         exObject.AddProperty("Id", 1);
         exObject.AddProperty("Name", "Test User");
         exObject.AddProperty("Age", 50);
-        var personEntity = new Core.Components.Entity
+        var personEntity = new Core.Models.Entity
         {
             Id = 1,
             Name = "Person"

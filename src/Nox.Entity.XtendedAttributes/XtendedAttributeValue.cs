@@ -1,6 +1,6 @@
 namespace Nox.Entity.XtendedAttributes;
 
-public class XtendedAttributeValue 
+public class XtendedAttributeValue
 {
     public int Id { get; set; }
     public int EntityId { get; set; }

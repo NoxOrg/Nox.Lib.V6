@@ -1,5 +1,6 @@
 using System.Runtime.Serialization;
 using Nox.Core.Configuration;
+using Nox.Core.Models;
 
 namespace Nox.Core.Exceptions;
 

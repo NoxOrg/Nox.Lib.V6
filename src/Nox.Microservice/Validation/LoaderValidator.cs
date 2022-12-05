@@ -1,14 +1,12 @@
 using FluentValidation;
-using Nox.Core.Components;
-using Nox.Core.Models;
+using Nox.Core.Interfaces;
 
 namespace Nox.Microservice.Validation;
 
-public class LoaderValidator : AbstractValidator<Loader>
+public class LoaderValidator : AbstractValidator<ILoader>
 {
     public LoaderValidator()
     {
-
         RuleFor(loader => loader.Name)
             .NotEmpty()
             .WithMessage(loader => $"The data loader name must be specified in {loader.DefinitionFileName}");

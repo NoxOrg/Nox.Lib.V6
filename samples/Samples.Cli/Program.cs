@@ -1,14 +1,17 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using MassTransit;
+using MassTransit.Mediator;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Nox.Core.Configuration;
-using Nox.Etl;
+using Nox.Core.Interfaces;
 using Nox.Messaging;
-using Nox.Microservice;
 using Samples.Cli.Commands;
 using Samples.Cli.Services;
 using Serilog;
 using Spectre.Console.Cli;
+
+namespace Samples.Cli;
 
 internal class Program
 {
@@ -16,10 +19,8 @@ internal class Program
 
     public static async Task<int> Main(string[] args)
     {
-
         var hostBuilder = CreateHostBuilder(args);
-
-
+        
         // MassTransit doesn't like Spectre Executor
         if (args.Length > 0 && args[0].Equals("listen", StringComparison.OrdinalIgnoreCase))
         {
@@ -46,10 +47,7 @@ internal class Program
 
     public static IHostBuilder CreateHostBuilder(string[] args)
     {
-        // App Configuration
-
-        Configuration = ConfigurationHelper.GetNoxConfiguration(args)!;
-
+        Configuration = ConfigurationHelper.GetNoxAppSettings(args)!;
         // Logger
 
         ILogger logger = new LoggerConfiguration()
@@ -57,16 +55,13 @@ internal class Program
             .CreateLogger();
 
         Log.Logger = logger;
-
+       
         // HostBuilder
-
         var hostBuilder = Host
             .CreateDefaultBuilder(args)
-            .ConfigureServices((hostContext, services) =>
+            .ConfigureServices((_, services) =>
             {
-                services.AddSingleton(Configuration);
-                services
-                    .AddMessageBus(Configuration, false);
+                services.AddNoxMessaging();
             })
             .UseSerilog();
 

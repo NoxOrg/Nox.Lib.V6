@@ -8,9 +8,9 @@ public class AzureServiceBusMessageBusProvider: IMessageBusProvider
     private readonly string _connectionString;
 
 
-    public AzureServiceBusMessageBusProvider(IServiceMessageBus serviceBus)
+    public AzureServiceBusMessageBusProvider(IMessagingProvider provider)
     {
-        _connectionString = serviceBus.ConnectionString!;
+        _connectionString = provider.ConnectionString!;
     }
 
     public IBusRegistrationConfigurator ConfigureMassTransit(IBusRegistrationConfigurator configuration)

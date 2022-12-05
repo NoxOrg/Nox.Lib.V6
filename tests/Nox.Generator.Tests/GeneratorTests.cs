@@ -1,7 +1,5 @@
 using System.Collections.Immutable;
 using System.Linq;
-using System.Net.Mime;
-using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Nox.Generator.TestFixture;

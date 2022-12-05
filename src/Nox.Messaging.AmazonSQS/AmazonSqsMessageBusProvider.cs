@@ -5,10 +5,13 @@ namespace Nox.Messaging.AmazonSQS;
 public class AmazonSqsMessageBusProvider: IMessageBusProvider
 {
     private string _connectionString;
+    private string _accessKey;
+    private string _secretKey;
 
-
-    public AmazonSqsMessageBusProvider(IServiceMessageBus serviceBus)
+    public AmazonSqsMessageBusProvider(IMessagingProvider provider)
     {
-        _connectionString = serviceBus.ConnectionString!;
+        _connectionString = provider.ConnectionString!;
+        _accessKey = provider.AccessKey!;
+        _secretKey = provider.SecretKey!;
     }
 }

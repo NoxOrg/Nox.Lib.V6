@@ -34,7 +34,7 @@ $script:ProjectFolder           = "$script:SamplesFolder\Samples.Api"
 $script:ProjectFile             = "$script:SamplesFolder\Samples.Api.csproj"
 $script:CliFolder               = "$script:SamplesFolder\Samples.Cli"
 
-$script:DefaultEnvironment      = 'Development'
+$script:DefaultEnvironment      = 'Samples'
 
 $script:DockerContainerName     = 'nox'
 

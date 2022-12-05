@@ -14,9 +14,10 @@ public class DropAndLoadTests: DropAndLoadTestFixture
     {
         var loaderExecutor = TestServiceProvider!.GetRequiredService<IEtlExecutor>();
         var service = TestServiceProvider!.GetRequiredService<IDynamicService>();
-        var loader = service.Loaders.Single(l => l.Name == "VehicleLoader");
-        var entity = service.Entities.FirstOrDefault(e => e.Key == "Vehicle").Value;
-        var result = await loaderExecutor.ExecuteLoaderAsync(loader, service.ServiceDatabase.DatabaseProvider!, entity);
+        var metaService = TestServiceProvider!.GetRequiredService<IMetaService>();
+        var loader = service.Loaders!.Single(l => l.Name == "VehicleLoader");
+        var entity = service.Entities!.FirstOrDefault(e => e.Key == "Vehicle").Value;
+        var result = await loaderExecutor.ExecuteLoaderAsync(metaService, loader, entity);
         Assert.That(result, Is.True);
         var sqlHelper = TestServiceProvider!.GetRequiredService<SqlHelper>();
         var count = await sqlHelper.ExecuteInt("SELECT COUNT(*) FROM dbo.Vehicle");

@@ -23,18 +23,11 @@ public static class ServiceExtensions
 
         return services;
     }
-    
-    public static IServiceCollection AddDynamicModel(this IServiceCollection services)
+
+    public static IServiceCollection AddData(this IServiceCollection services)
     {
         services.AddSingleton<IDynamicModel, DynamicModel>();
-
-        return services;
-    }
-
-    public static IServiceCollection AddDynamicDbContext(this IServiceCollection services)
-    {
         services.AddDbContext<IDynamicDbContext, DynamicDbContext>();
-
         return services;
     }
 }

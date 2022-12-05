@@ -25,6 +25,34 @@
         <PackageVersion>6.0.0</PackageVersion>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
+    <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Messaging.AmazonSQS.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Messaging.AzureServiceBus.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Messaging.RabbitMQ.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+    </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <Content Include=".\bin\Release\$(TargetFramework)\Nox.Messaging.AmazonSQS.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Release\$(TargetFramework)\Nox.Messaging.AzureServiceBus.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include=".\bin\Release\$(TargetFramework)\Nox.Messaging.RabbitMQ.dll">
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+    </ItemGroup>
     <ItemGroup>
       <PackageReference Include="MassTransit" Version="8.0.8" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />

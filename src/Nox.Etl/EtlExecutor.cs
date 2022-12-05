@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using ETLBox.Connection;
 using ETLBox.ControlFlow;
 using ETLBox.ControlFlow.Tasks;
@@ -6,12 +5,9 @@ using ETLBox.DataFlow;
 using ETLBox.DataFlow.Connectors;
 using MassTransit;
 using MassTransit.Mediator;
-using MassTransit.RabbitMqTransport;
 using Microsoft.Extensions.Logging;
-using Nox.Core.Components;
 using Nox.Core.Interfaces;
 using Nox.Core.Models;
-using Nox.Data;
 using Nox.Messaging;
 using Nox.Messaging.Enumerations;
 using Nox.Messaging.Events;
@@ -22,75 +18,65 @@ namespace Nox.Etl;
 
 public class EtlExecutor : IEtlExecutor
 {
-
     private readonly ILogger<EtlExecutor> _logger;
-    private readonly IBus _bus;
     private readonly IEnumerable<INoxEvent> _messages;
-    private readonly IMediator? _mediator;
-
-    public EtlExecutor(ILogger<EtlExecutor> logger, IBus bus, IEnumerable<INoxEvent> messages, IMediator? mediator = null)
+    private readonly INoxMessenger? _messenger;
+    
+    public EtlExecutor(
+        ILogger<EtlExecutor> logger,
+        IEnumerable<INoxEvent> messages,
+        INoxMessenger? messenger = null)
     {
         _logger = logger;
-        _bus = bus;
         _messages = messages;
-        _mediator = mediator;
+        _messenger = messenger;
     }
 
-    public async Task<bool> ExecuteAsync(MetaService service)
+    public async Task<bool> ExecuteAsync(IMetaService service)
     {
         // ETLBox.Logging.Logging.LogInstance = _logger;
 
-        var destinationDbProvider = service.Database.DatabaseProvider!;
-
         var loaders = service.Loaders;
 
-        var entities = service.Entities.ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
+        var entities = service.Entities!.ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
 
-        foreach (var loader in loaders)
+        foreach (var loader in loaders!)
         {
-            await LoadDataFromSource(destinationDbProvider, loader, entities[loader.Target.Entity]);
+            await LoadDataFromSource(service, loader, entities[loader.Target!.Entity]);
         }
 
         return true;
     }
 
-    public async Task<bool> ExecuteLoaderAsync(
-        Loader loader, IDatabaseProvider destinationDbProvider, Core.Components.Entity entity)
+    public async Task<bool> ExecuteLoaderAsync(IMetaService service, ILoader loader, IEntity entity)
     {
-        // ETLBox.Logging.Logging.LogInstance = _logger;
-
-        // Hack to accomodate Hangfire bug with collection initialization
-        // (zero length List and Array comes back with single blank entry!
 
         entity.ApplyDefaults();
         entity.Attributes.ToList().ForEach(a => a.ApplyDefaults());
 
-        await LoadDataFromSource(destinationDbProvider, loader, entity);
+        await LoadDataFromSource(service, loader, entity);
 
         return true;
     }
 
-    private async Task LoadDataFromSource(IDatabaseProvider destinationDbProvider,
-        Loader loader, Core.Components.Entity entity)
+    private async Task LoadDataFromSource(IMetaService service, ILoader loader, IEntity entity)
     {
-        var destinationDb = destinationDbProvider.ConnectionManager;
+        var destinationDb = service.Database!.DatabaseProvider!.ConnectionManager;
 
-        var destinationTable = destinationDbProvider.ToTableNameForSql(entity.Table, entity.Schema);
+        var destinationTable = service.Database!.DatabaseProvider!.ToTableNameForSql(entity.Table, entity.Schema);
 
-        var destinationSqlCompiler = destinationDbProvider.SqlCompiler;
+        var destinationSqlCompiler = service.Database!.DatabaseProvider!.SqlCompiler;
 
-        foreach (var loaderSource in loader.Sources)
+        var loaderInstance = (Loader)loader;
+        foreach (var loaderSource in loaderInstance.Sources!)
         {
-            if (loaderSource.DatabaseProvider is null)
-            {
-                continue;
-            }
+            var dataSource = service.DataSources!.First(ds => ds.Name == loaderSource.Name);
+            
+            var sourceDb = dataSource.DatabaseProvider!.ConnectionManager;
 
-            var sourceDb = loaderSource.DatabaseProvider.ConnectionManager;
+            var sourceSqlCompiler = dataSource.DatabaseProvider.SqlCompiler;
 
-            var sourceSqlCompiler = loaderSource.DatabaseProvider.SqlCompiler!;
-
-            var loadStrategy = loader.LoadStrategy.Type.Trim().ToLower();
+            var loadStrategy = loaderInstance.LoadStrategy?.Type.Trim().ToLower();
 
             switch (loadStrategy)
             {
@@ -105,15 +91,14 @@ public class EtlExecutor : IEtlExecutor
                     _logger.LogInformation("Merging new data for entity {entity}...", entity.Name);
 
                     await MergeNewData(sourceDb, destinationDb,
-                        loaderSource, loader, destinationTable, entity,
-                        sourceSqlCompiler, destinationSqlCompiler,
-                        destinationDbProvider);
+                        loaderSource, service, loaderInstance, destinationTable, entity,
+                        sourceSqlCompiler, destinationSqlCompiler);
 
                     break;
 
                 default:
 
-                    _logger.LogError("{message}",$"Unsupported load strategy '{loader.LoadStrategy.Type}' in loader '{loader.Name}'.");
+                    _logger.LogError("{message}",$"Unsupported load strategy '{loaderInstance.LoadStrategy!.Type}' in loader '{loaderInstance.Name}'.");
 
                     break;
 
@@ -151,22 +136,21 @@ public class EtlExecutor : IEtlExecutor
     }
 
 
-    private async Task<bool> MergeNewData(
-        IConnectionManager sourceDb,
+    private async Task MergeNewData(IConnectionManager sourceDb,
         IConnectionManager destinationDb,
-        LoaderSource loaderSource,
+        ILoaderSource loaderSource,
+        IMetaService service,
         Loader loader,
         string destinationTable,
-        Core.Components.Entity entity,
+        IEntity entity,
         Compiler sourceSqlCompiler,
-        Compiler destinationSqlCompiler,
-        IDatabaseProvider destinationDbProvider)
+        Compiler destinationSqlCompiler)
     {
         var newLastMergeDateTimeStamp = new Dictionary<string, (DateTime LastMergeDateTimeStamp, bool Updated)>();
 
         var targetColumns = entity.Attributes.Where(a => a.IsMappedAttribute()).Select(a => a.Name)
                 .Concat(entity.RelatedParents.Select(p => p + "Id"))
-                .Concat(loader.LoadStrategy.Columns.Select(c => c))
+                .Concat(loader.LoadStrategy!.Columns.Select(c => c))
                 .ToArray();
 
         var query = new Query().FromRaw($"({loaderSource.Query}) AS tmp")
@@ -176,12 +160,13 @@ public class EtlExecutor : IEtlExecutor
 
         foreach (var dateColumn in loader.LoadStrategy.Columns)
         {
-            lastMergeDateTimeStamp = GetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, destinationSqlCompiler, destinationDbProvider);
+            lastMergeDateTimeStamp = GetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, destinationSqlCompiler, service.Database!.DatabaseProvider!);
 
             if (!lastMergeDateTimeStamp.Equals(DateTime.MinValue))
             {
+                var stamp = lastMergeDateTimeStamp;
                 query = query.Where(
-                    q => q.WhereNotNull(dateColumn).Where(dateColumn, ">", lastMergeDateTimeStamp)
+                    q => q.WhereNotNull(dateColumn).Where(dateColumn, ">", stamp)
                 );
             }
 
@@ -241,14 +226,10 @@ public class EtlExecutor : IEtlExecutor
                 inserts++;
                 var msg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Create);
                 
-                if (msg != null)
+                if (loader.Messaging != null && loader.Messaging.Any() && msg != null)
                 {
                     var toSend = msg.MapInstance(row);
-                    _bus.Publish(toSend).GetAwaiter().GetResult();
-                    if (_mediator != null)
-                    {
-                        _mediator.Publish(toSend).GetAwaiter().GetResult();
-                    }
+                    _messenger?.SendMessage(loader, toSend);
                 }
                 
                 foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
@@ -271,9 +252,16 @@ public class EtlExecutor : IEtlExecutor
             else if (r.ChangeAction == ChangeAction.Update)
             {
                 updates++;
-
-                _bus.Publish(new LoaderUpdateMessage() { Value = d }).GetAwaiter().GetResult();
-
+                
+                var msg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Update);
+                
+                if (loader.Messaging != null && loader.Messaging.Any() && msg != null)
+                {
+                    var toSend = msg.MapInstance(row);
+                    _logger.LogInformation($"Publishing bus message: {toSend.GetType().Name}");
+                    _messenger?.SendMessage(loader, toSend);
+                }
+                
                 foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
                 {
 
@@ -320,7 +308,8 @@ public class EtlExecutor : IEtlExecutor
             {
                 _logger.LogInformation("...no changes found to merge");
             }
-            return false;
+
+            return;
         }
 
         _logger.LogInformation("{inserts} records inserted, last merge at {lastMergeDateTimeStamp}", inserts, lastMergeDateTimeStamp);
@@ -330,11 +319,9 @@ public class EtlExecutor : IEtlExecutor
         {
             if (updated)
             {
-                SetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, timeStamp, destinationSqlCompiler, destinationDbProvider);
+                SetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, timeStamp, destinationSqlCompiler, service.Database!.DatabaseProvider!);
             }
         }
-        return true;
-
     }
 
     private static DateTime GetLastMergeDateTimeStamp(IConnectionManager destinationDb, string loaderName, string dateColumn, 
@@ -397,7 +384,4 @@ public class EtlExecutor : IEtlExecutor
 
         return result == 1;
     }
-
-    
-
 }

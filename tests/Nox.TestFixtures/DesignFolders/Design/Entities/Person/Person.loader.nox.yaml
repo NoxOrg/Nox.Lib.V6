@@ -20,10 +20,12 @@ LoadStrategy:
 
 Target:
   Entity: Person
+  
+Messaging:
+  - Name: TestMessagingProvider1
 
 Sources:
-  - ConnectionVariable: ConnectionString:MasterDataSource
-    Provider: SqlServer
+  - Name: TestDataSource1
     MinimumExpectedRecords: 30 
     Query: >-
       SELECT 

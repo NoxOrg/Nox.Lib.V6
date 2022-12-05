@@ -1,6 +1,5 @@
-using Nox.Core.Interfaces;
-using Nox.Core.Models;
+using Nox.Core.Components;
 
 namespace Nox.Data;
 
-public sealed class ServiceDatabase : DatabaseBase, IServiceDatabase  {}
+public sealed class ServiceDatabase : DatabaseBase  {}

@@ -1,9 +1,10 @@
 using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nox.Core.Interfaces;
 using Nox.Data;
 using Nox.Microservice;
+using Nox.Microservice.Extensions;
 using NUnit.Framework;
 
 namespace Nox.TestFixtures;
@@ -25,9 +26,9 @@ public class DataTestFixture
         services.AddLogging();
         services
             .AddDatabaseProviderFactory()
-            .AddDynamicDbContext()
-            .AddDynamicModel()
-            .AddDynamicService();
+            .AddDbContext<IDynamicDbContext, DynamicDbContext>()
+            .AddSingleton<IDynamicModel, DynamicModel>()
+            .AddSingleton<IDynamicService, DynamicService>();
         TestServiceProvider = services.BuildServiceProvider();
     }
 }

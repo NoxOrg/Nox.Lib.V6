@@ -14,10 +14,11 @@ public class MergeNewTests : MergeNewTestFixture
     public async Task Can_Execute_a_MergeNew()
     {
         var loaderExecutor = TestServiceProvider!.GetRequiredService<IEtlExecutor>();
+        var metaService = TestServiceProvider!.GetRequiredService<IMetaService>();
         var service = TestServiceProvider!.GetRequiredService<IDynamicService>();
-        var loader = service.Loaders.Single(l => l.Name == "VehicleLoader");
-        var entity = service.Entities.FirstOrDefault(e => e.Key == "Vehicle").Value;
-        var result = await loaderExecutor.ExecuteLoaderAsync(loader, service.ServiceDatabase.DatabaseProvider!, entity);
+        var loader = service.Loaders!.Single(l => l.Name == "VehicleLoader");
+        var entity = service.Entities!.FirstOrDefault(e => e.Key == "Vehicle").Value;
+        var result = await loaderExecutor.ExecuteLoaderAsync(metaService, loader, entity);
         Assert.That(result, Is.True);
         var sqlHelper = TestServiceProvider!.GetRequiredService<SqlHelper>();
         var count = await sqlHelper.ExecuteInt("SELECT COUNT(*) FROM dbo.Vehicle");
@@ -26,7 +27,7 @@ public class MergeNewTests : MergeNewTestFixture
         var seed = TestServiceProvider!.GetRequiredService<MergeNewSeed>();
         await seed.Execute(false);
         Console.WriteLine("Seeded 100 more rows");
-        result = await loaderExecutor.ExecuteLoaderAsync(loader, service.ServiceDatabase.DatabaseProvider!, entity);
+        result = await loaderExecutor.ExecuteLoaderAsync(metaService, loader, entity);
         Assert.That(result, Is.True);
         count = await sqlHelper.ExecuteInt("SELECT COUNT(*) FROM dbo.Vehicle");
         //Count must be 120 as only 20 of the new seeded items has a create/edit date > last merge date
