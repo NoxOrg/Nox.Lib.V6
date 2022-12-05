@@ -2,7 +2,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Nox.Core.Interfaces;
-using Nox.Core.Interfaces.Etl;
 using Nox.TestFixtures;
 using NUnit.Framework;
 
@@ -15,9 +14,10 @@ public class DropAndLoadTests: DropAndLoadTestFixture
     {
         var loaderExecutor = TestServiceProvider!.GetRequiredService<IEtlExecutor>();
         var service = TestServiceProvider!.GetRequiredService<IDynamicService>();
+        var metaService = TestServiceProvider!.GetRequiredService<IMetaService>();
         var loader = service.Loaders!.Single(l => l.Name == "VehicleLoader");
         var entity = service.Entities!.FirstOrDefault(e => e.Key == "Vehicle").Value;
-        var result = await loaderExecutor.ExecuteLoaderAsync(loader, service.MetaService.Database!.DatabaseProvider!, entity);
+        var result = await loaderExecutor.ExecuteLoaderAsync(metaService, loader, entity);
         Assert.That(result, Is.True);
         var sqlHelper = TestServiceProvider!.GetRequiredService<SqlHelper>();
         var count = await sqlHelper.ExecuteInt("SELECT COUNT(*) FROM dbo.Vehicle");

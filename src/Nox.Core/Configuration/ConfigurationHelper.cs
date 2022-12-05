@@ -3,55 +3,32 @@ using ETLBoxOffice.LicenseManager;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
-using Nox.Core.Components;
 using Nox.Core.Constants;
 using Nox.Core.Exceptions;
-using YamlDotNet.Serialization;
 
 namespace Nox.Core.Configuration;
 
 public class ConfigurationHelper
 {
 
-    public static IConfiguration? GetNoxConfiguration()
+    public static IConfiguration? GetNoxAppSettings()
     {
-        return GetNoxConfiguration(Array.Empty<string>());
+        return GetNoxAppSettings(Array.Empty<string>());
     }
 
-    public static IConfiguration? GetNoxConfiguration(string[] args)
+    public static IConfiguration? GetNoxAppSettings(string[] args)
     {
-
         var configBuilder = GetApplicationConfigurationBuilder(args);
-
         var config = configBuilder.Build();
 
         if (string.IsNullOrEmpty(config["Nox:DefinitionRootPath"]))
         {
             throw new ConfigurationException("Could not find 'Nox:DefinitionRootPath' in environment or appsettings");
         }
-        
-        var deserializer = new DeserializerBuilder()
-            .IgnoreUnmatchedProperties()
-            .Build();
 
-        var path = Path.GetFullPath(config["Nox:DefinitionRootPath"]);
-        if (Directory.GetFiles(path, "*.yaml").Length == 0) throw new ConfigurationException($"Could not find any yaml files in {path}");
-        if (Directory.GetDirectories(path).Length == 0) throw new ConfigurationException($"Could not find any entity folders in {path}");
-
-        var service = Directory
-            .EnumerateFiles(path, FileExtension.ServiceDefinition, SearchOption.AllDirectories)
-            .Take(1)
-            .Select(f =>
-            {
-                var svc = deserializer.Deserialize<ServiceBase>(File.ReadAllText(f));
-                return svc;
-            })
-            .FirstOrDefault();
-
-        if (service == null)
-        {
-            throw new ConfigurationException($"Could not find file matching '{FileExtension.ServiceDefinition}' in '{path}'");
-        }
+        config = configBuilder.Build();
+        var keyVaultUri = config["KeyValueUri"];
+        if (string.IsNullOrEmpty(keyVaultUri)) keyVaultUri = KeyVault.DefaultKeyVaultUri;
 
         var keys = new[] {
             "ConnectionString:AzureServiceBus",
@@ -60,24 +37,19 @@ public class ConfigurationHelper
             "XECurrency:ApiUser",
             "EtlBox:LicenseKey",
         };
-
-        var secrets = GetSecrets(service.KeyVaultUri, keys).GetAwaiter().GetResult();
+        
+        var secrets = GetSecrets(keyVaultUri, keys).GetAwaiter().GetResult();
         
         if (secrets == null)
         {
-            throw new ConfigurationException($"Error loading secrets from vault at '{service.KeyVaultUri}'");
+            throw new ConfigurationException($"Error loading secrets from vault at '{keyVaultUri}'");
         }
-
-        //Message bus config
-        secrets.Add(new KeyValuePair<string, string>("ServiceMessageBusProvider", service.MessageBus.Provider.ToLower()));
-        secrets.Add(new KeyValuePair<string, string>("ServiceMessageBusConnectionString", service.MessageBus.ConnectionString ?? ""));
-        secrets.Add(new KeyValuePair<string, string>("ServiceMessageBusConnectionVariable", service.MessageBus.ConnectionVariable ?? ""));
         
         //Api endpoint config
-        secrets.Add(new KeyValuePair<string, string>("ServiceApiEndpointProvider", service.EndpointProvider.ToLower()));
-
+        secrets.Add(new KeyValuePair<string, string>("ServiceApiEndpointProvider", ""));
+        
         configBuilder.AddInMemoryCollection(secrets);
-
+        
         LicenseCheck.LicenseKey = secrets.First(s => s.Key.Equals("EtlBox:LicenseKey")).Value;
 
         return configBuilder.Build();
@@ -107,10 +79,10 @@ public class ConfigurationHelper
         return secrets;
     }
 
-    public static IConfiguration GetApplicationConfiguration(string[] args)
-    {
-        return GetApplicationConfigurationBuilder(args).Build();
-    }
+    // public static IConfiguration GetApplicationConfiguration(string[] args)
+    // {
+    //     return GetApplicationConfigurationBuilder(args).Build();
+    // }
 
     private static IConfigurationBuilder GetApplicationConfigurationBuilder(string[] args)
     {

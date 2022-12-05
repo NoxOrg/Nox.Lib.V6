@@ -1,5 +1,5 @@
 ﻿
-namespace Nox.Core.Interfaces.Database;
+namespace Nox.Core.Interfaces;
  
 public interface IDynamicDbContext
 {

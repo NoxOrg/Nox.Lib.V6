@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
 using Nox.Core.Interfaces;
-using Nox.Core.Interfaces.Api;
 
 namespace Nox.Api;
 

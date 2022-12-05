@@ -1,5 +1,5 @@
 ﻿using Nox.Core.Components;
-using Nox.Core.Interfaces.Etl;
+using Nox.Core.Interfaces;
 
 namespace Nox.Etl
 {

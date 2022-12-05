@@ -1,4 +1,4 @@
-namespace Nox.Core.Interfaces.Etl;
+namespace Nox.Core.Interfaces;
 
 public interface ILoaderSchedule
 {

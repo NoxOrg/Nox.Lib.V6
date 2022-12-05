@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
-using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces;
 
 namespace Nox.Data;
 

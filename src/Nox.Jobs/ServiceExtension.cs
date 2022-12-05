@@ -1,13 +1,12 @@
 using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using Nox.Core.Interfaces;
-using Nox.Core.Interfaces.Database;
 
 namespace Nox.Jobs;
 
 public static class ServiceExtension
 {
-    public static IServiceCollection AddJobSchedulerFeature(this IServiceCollection services)
+    public static IServiceCollection AddJobScheduler(this IServiceCollection services)
     {
         services.AddHangfire((serviceProvider, configuration) =>
         {

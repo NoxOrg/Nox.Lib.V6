@@ -1,11 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
-using Nox.Core.Interfaces.Etl;
+using Nox.Core.Interfaces;
 
 namespace Nox.Etl;
 
-public static class ServiceExtension
+public static class ServiceExtensions
 {
-    public static IServiceCollection AddLoaderExecutor(this IServiceCollection services)
+    public static IServiceCollection AddEtl(this IServiceCollection services)
     {
         services.AddSingleton<IEtlExecutor, EtlExecutor>();
         return services;

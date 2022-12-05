@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces;
 
 namespace Nox.Data.Postgres;
 

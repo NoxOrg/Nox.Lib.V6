@@ -1,3 +1,4 @@
+using System.Reflection;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,9 +14,12 @@ namespace Nox.Microservice.Extensions;
 
 public static class ServiceExtensions
 {
-    private static readonly IConfiguration? _configuration = ConfigurationHelper.GetNoxConfiguration();
+    private static readonly IConfiguration? _configuration = ConfigurationHelper.GetNoxAppSettings();
 
-    public static IServiceCollection AddNox(this IServiceCollection services)
+    public static IServiceCollection AddNox(
+        this IServiceCollection services, 
+        Action<IBusRegistrationConfigurator>? busConsumers = null, 
+        Action<IMediatorRegistrationConfigurator>? mediatorConsumers = null)
     {
         if (_configuration == null)
         {
@@ -23,26 +27,21 @@ public static class ServiceExtensions
         }
 
         services
+            .AddNoxConfiguration(_configuration["Nox:DefinitionRootPath"])
             .AddDatabaseProviderFactory()
             .AddDynamicApi(_configuration)
-            .AddDynamicModel()
-            .AddDynamicDbContext()
-            .AddLoaderExecutor()
-            .AddDynamicService()
-            .AddMessageBus(_configuration)
-            .AddJobSchedulerFeature()
-            .AddHeartbeat();
-
+            .AddData()
+            .AddEtl()
+            .AddMicroservice()
+            .AddNoxMessaging(busConsumers, mediatorConsumers, false)
+            .AddJobScheduler();
+            
         return services;
     }
 
-    public static IServiceCollection AddDynamicService(this IServiceCollection services)
+    private static IServiceCollection AddMicroservice(this IServiceCollection services)
     {
         services.AddSingleton<IDynamicService, DynamicService>();
-        return services;
-    }
-    private static IServiceCollection AddHeartbeat(this IServiceCollection services)
-    {
         services.AddHostedService<HeartbeatWorker>();
         return services;
     }

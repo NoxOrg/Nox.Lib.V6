@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Nox.Core.Configuration;
 using Nox.Messaging;
@@ -18,8 +17,9 @@ internal class Program
     {
 
         var hostBuilder = CreateHostBuilder(args);
-
-
+//        var host = hostBuilder.Build();
+        
+        
         // MassTransit doesn't like Spectre Executor
         if (args.Length > 0 && args[0].Equals("listen", StringComparison.OrdinalIgnoreCase))
         {
@@ -46,10 +46,7 @@ internal class Program
 
     public static IHostBuilder CreateHostBuilder(string[] args)
     {
-        // App Configuration
-
-        Configuration = ConfigurationHelper.GetNoxConfiguration(args)!;
-
+        Configuration = ConfigurationHelper.GetNoxAppSettings(args)!;
         // Logger
 
         ILogger logger = new LoggerConfiguration()
@@ -57,16 +54,16 @@ internal class Program
             .CreateLogger();
 
         Log.Logger = logger;
-
+       
         // HostBuilder
-
         var hostBuilder = Host
             .CreateDefaultBuilder(args)
-            .ConfigureServices((hostContext, services) =>
+            .ConfigureServices((_, services) =>
             {
-                services.AddSingleton(Configuration);
-                services
-                    .AddMessageBus(Configuration, false);
+                services.AddNoxMessaging(busConsumers =>
+                {
+                    busConsumers.AddConsumer<CountryCreatedEventConsumer>();
+                });
             })
             .UseSerilog();
 

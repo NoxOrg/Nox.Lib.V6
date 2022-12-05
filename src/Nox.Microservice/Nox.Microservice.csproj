@@ -134,6 +134,7 @@
         </Content>
     </ItemGroup>
     <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="12.0.0" />
       <PackageReference Include="FluentValidation" Version="11.3.0" />
       <PackageReference Include="Hangfire" Version="1.7.31" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
@@ -152,6 +153,18 @@
       <ProjectReference Include="..\Nox.Etl\Nox.Etl.csproj" />
       <ProjectReference Include="..\Nox.Jobs\Nox.Jobs.csproj" />
       <ProjectReference Include="..\Nox.Messaging\Nox.Messaging.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="bin\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="bin\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="bin\**" />
     </ItemGroup>
 
 </Project>

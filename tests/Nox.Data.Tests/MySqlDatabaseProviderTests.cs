@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces;
 using Nox.Core.Models;
 using Nox.TestFixtures;
 using NUnit.Framework;

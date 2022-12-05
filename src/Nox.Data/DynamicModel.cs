@@ -7,30 +7,21 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Nox.Core.Extensions;
 using Nox.Core.Interfaces;
-using Nox.Core.Interfaces.Database;
-using Nox.Core.Interfaces.Etl;
 
 namespace Nox.Data;
 
 public class DynamicModel : IDynamicModel
 {
     private readonly IEdmModel _edmModel;
-
     private readonly IDynamicService _dynamicService;
-
-    private readonly IEtlExecutor _etlExecutor;
-
     private readonly IDatabaseProvider _databaseProvider;
-
     private readonly Dictionary<string, DynamicDbEntity> _dynamicDbEntities = new();
 
     public DynamicModel(ILogger<DynamicModel> logger, IDynamicService dynamicService, IEtlExecutor etlExecutor)
     {
-        _etlExecutor = etlExecutor;
-
         _dynamicService = dynamicService;
 
-        _databaseProvider = _dynamicService.MetaService.Database!.DatabaseProvider;
+        _databaseProvider = dynamicService.MetaService.Database!.DatabaseProvider!;
 
         var builder = new ODataConventionModelBuilder();
 

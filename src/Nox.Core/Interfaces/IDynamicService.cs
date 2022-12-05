@@ -1,19 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Nox.Core.Interfaces.Api;
-using Nox.Core.Interfaces.Database;
-using Nox.Core.Interfaces.Etl;
 
 namespace Nox.Core.Interfaces
 {
     public interface IDynamicService
     {
         string Name { get; }
-        IMetaService MetaService { get; }
         string KeyVaultUri { get; }
+        IMetaService MetaService { get; }
         IReadOnlyDictionary<string, IApi>? Apis { get; }
         IReadOnlyDictionary<string, IEntity>? Entities { get; }
         IEnumerable<ILoader>? Loaders { get; }
-        Task<bool> ExecuteDataLoaderAsync(ILoader loader, IDatabaseProvider destinationDbProvider);
+        Task<bool> ExecuteDataLoaderAsync(ILoader loader);
         Task<bool> ExecuteDataLoadersAsync();
         void AddMetadata(ModelBuilder modelBuilder);
         void SetupRecurringLoaderTasks();

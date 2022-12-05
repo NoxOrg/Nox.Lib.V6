@@ -17,13 +17,14 @@ LoadStrategy:
   Type: MergeNew
   Columns: [CreateDate,EditDate]
 
-
 Target:
   Entity: Brand
+  
+Messaging:
+  - Name: Hasie  
 
 Sources:
-  - ConnectionVariable: ConnectionString:MasterDataSource
-    Provider: SqlServer
+  - Name: Titan
     MinimumExpectedRecords: 30 
     Query: >-
       SELECT 

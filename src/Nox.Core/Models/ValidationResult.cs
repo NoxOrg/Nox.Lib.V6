@@ -1,4 +1,4 @@
-namespace Nox.Core.Configuration;
+namespace Nox.Core.Models;
 
 /// <summary>
 /// Reports information about the configuration before configuring

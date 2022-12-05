@@ -19,10 +19,12 @@ LoadStrategy:
 
 Target:
   Entity: Country
+  
+Messaging:
+  - Name: InProcess    
 
 Sources:
-  - ConnectionVariable: ConnectionString:MasterDataSource
-    Provider: SqlServer
+  - Name: Titan
     MinimumExpectedRecords: 242 
     Query: >-
       SELECT 

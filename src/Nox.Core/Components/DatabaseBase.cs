@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces;
 
 namespace Nox.Core.Components;
 
@@ -16,7 +16,7 @@ public class DatabaseBase : MetaBase, IServiceDatabase
     public string? ConnectionVariable { get; set; }
         
     [NotMapped]
-    public IDatabaseProvider DatabaseProvider { get; set; }
+    public IDatabaseProvider? DatabaseProvider { get; set; }
 
     public virtual bool ApplyDefaults()
     {

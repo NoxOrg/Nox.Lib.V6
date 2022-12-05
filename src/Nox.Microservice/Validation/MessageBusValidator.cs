@@ -3,7 +3,7 @@ using Nox.Core.Components;
 
 namespace Nox.Microservice.Validation;
 
-public class MessageBusValidator : AbstractValidator<ServiceMessageBusBase>
+public class MessageBusValidator : AbstractValidator<MessagingProviderBase>
 {
     protected MessageBusValidator()
     {

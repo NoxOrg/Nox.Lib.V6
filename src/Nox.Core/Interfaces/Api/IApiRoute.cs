@@ -1,4 +1,4 @@
-namespace Nox.Core.Interfaces.Api;
+namespace Nox.Core.Interfaces;
 
 public interface IApiRoute: IMetaBase
 {

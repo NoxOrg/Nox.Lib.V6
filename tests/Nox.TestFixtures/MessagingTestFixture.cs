@@ -1,7 +1,9 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nox.Core.Interfaces;
 using Nox.Data;
+using Nox.Microservice;
 using Nox.Microservice.Extensions;
 using NUnit.Framework;
 
@@ -24,8 +26,8 @@ public class MessagingTestFixture
         TestServiceCollection.AddSingleton<IConfiguration>(config);
         TestServiceCollection.AddLogging();
         TestServiceCollection
-            .AddDynamicModel()
-            .AddDynamicService();
+            .AddSingleton<IDynamicModel, DynamicModel>()
+            .AddSingleton<IDynamicService, DynamicService>();
     }
 
     public void BuildServiceProvider()

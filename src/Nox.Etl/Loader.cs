@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using Nox.Core.Components;
-using Nox.Core.Interfaces.Etl;
+using Nox.Core.Interfaces;
 
 namespace Nox.Etl;
 
@@ -31,6 +31,14 @@ public sealed class Loader : MetaBase, ILoader
         set => Target = value as LoaderTarget;
     }
     public LoaderTarget? Target { get; set; }
+
+    ICollection<ILoaderMessageTarget>? ILoader.Messaging
+    {
+        get => Messaging?.ToList<ILoaderMessageTarget>();
+        set => Messaging = value as ICollection<LoaderMessageTarget>;
+    }
+
+    public ICollection<LoaderMessageTarget>? Messaging { get; set; }
 
     ICollection<ILoaderSource>? ILoader.Sources
     {

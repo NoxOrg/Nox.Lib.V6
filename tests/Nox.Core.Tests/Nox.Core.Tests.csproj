@@ -17,6 +17,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\Nox.Core\Nox.Core.csproj" />
+      <ProjectReference Include="..\Nox.TestFixtures\Nox.TestFixtures.csproj" />
     </ItemGroup>
 
 </Project>

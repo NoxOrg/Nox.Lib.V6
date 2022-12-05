@@ -1,13 +1,11 @@
-﻿using Nox.Core.Components;
+﻿using FluentValidation;
+using Nox.Core.Components;
 using Nox.Core.Constants;
 using Nox.Core.Interfaces;
-using Nox.Core.Interfaces.Api;
-using Nox.Core.Interfaces.Database;
-using Nox.Core.Interfaces.Etl;
-using Nox.Core.Interfaces.Messaging;
 using Nox.Data;
 using Nox.Etl;
 using Nox.Messaging;
+using Nox.Microservice.Validation;
 
 namespace Nox.Microservice;
 
@@ -24,13 +22,22 @@ public sealed class MetaService : MetaBase, IMetaService
         set => Database = value as ServiceDatabase;
     }
     public ServiceDatabase? Database { get; set; } = new();
-
-    IServiceMessageBus? IMetaService.MessageBus
+    
+    ICollection<IMessagingProvider>? IMetaService.MessagingProviders
     {
-        get => MessageBus;
-        set => MessageBus = value as ServiceMessageBus;
+        get => MessagingProviders?.ToList<IMessagingProvider>();
+        set => MessagingProviders = value as ICollection<MessagingProvider>;
     }
-    public ServiceMessageBus? MessageBus { get; set; } = new();
+    
+    public ICollection<MessagingProvider>? MessagingProviders { get; set; }
+
+    ICollection<IServiceDatabase>? IMetaService.DataSources
+    {
+        get => DataSources?.ToList<IServiceDatabase>();
+        set => DataSources = value as ICollection<ServiceDatabase>;
+    }
+
+    public ICollection<ServiceDatabase>? DataSources { get; set; }
 
     ICollection<IEntity>? IMetaService.Entities
     {
@@ -52,6 +59,12 @@ public sealed class MetaService : MetaBase, IMetaService
         set => Apis = value as ICollection<Api.Api>;
     }
     public ICollection<Api.Api>? Apis { get; set; }
+
+    public void Validate()
+    {
+        var validator = new MetaServiceValidator();
+        validator.ValidateAndThrow(this);
+    }
     
     public void Configure()
     {

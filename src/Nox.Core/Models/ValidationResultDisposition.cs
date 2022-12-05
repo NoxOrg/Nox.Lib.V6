@@ -1,5 +1,5 @@
 
-namespace Nox.Core.Configuration;
+namespace Nox.Core.Models;
 
 [Serializable]
 public enum ValidationResultDisposition

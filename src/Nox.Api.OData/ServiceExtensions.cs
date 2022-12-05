@@ -12,7 +12,13 @@ public static class ServiceExtensions
     public static IServiceCollection AddDynamicODataFeature(this IServiceCollection services)
     {
         services.AddControllers().AddOData(options => options
-            .Select().Filter().OrderBy().Count().Expand().SkipToken().SetMaxTop(100)
+            .Select()
+            .Filter()
+            .OrderBy()
+            .Count()
+            .Expand()
+            .SkipToken()
+            .SetMaxTop(100)
         );
 
         services.TryAddEnumerable(

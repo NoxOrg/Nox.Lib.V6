@@ -19,10 +19,13 @@ LoadStrategy:
 
 Target:
   Entity: Currency
+  
+Messaging:
+  - Name: Hasie
+  - Name: InProcess  
 
 Sources:
-  - ConnectionVariable: ConnectionString:MasterDataSource
-    Provider: SqlServer
+  - Name: Titan
     MinimumExpectedRecords: 160
     Query: >-
       SELECT [CurrencyID] AS [Id]

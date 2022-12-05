@@ -1,6 +1,6 @@
 ﻿using EntityAttribute = Nox.Core.Models.EntityAttribute;
 
-namespace Nox.Core.Interfaces.Database;
+namespace Nox.Core.Interfaces;
 
 public interface IEntity : IMetaBase
 {

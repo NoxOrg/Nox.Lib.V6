@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.Edm;
 
-namespace Nox.Core.Interfaces.Database;
+namespace Nox.Core.Interfaces;
 
 public interface IDynamicModel
 {

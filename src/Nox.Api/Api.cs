@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using Nox.Core.Components;
-using Nox.Core.Interfaces.Api;
+using Nox.Core.Interfaces;
 
 namespace Nox.Api;
 
@@ -11,7 +11,7 @@ public sealed class Api : MetaBase, IApi
 
     ICollection<IApiRoute>? IApi.Routes
     {
-        get => (ICollection<IApiRoute>?)Routes;
+        get => Routes?.ToList<IApiRoute>();
         set => Routes = value as ICollection<ApiRoute>;
     }
     

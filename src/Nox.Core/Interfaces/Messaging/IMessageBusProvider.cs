@@ -1,4 +1,4 @@
-﻿namespace Nox.Core.Interfaces.Messaging
+﻿namespace Nox.Core.Interfaces
 {
     public interface IMessageBusProvider
     {

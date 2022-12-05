@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces;
 
 namespace Nox.Api.OData.Routing
 {

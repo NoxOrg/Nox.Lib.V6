@@ -16,9 +16,18 @@ Database:
   User: sa
   Password: Developer*123
 
-MessageBus:
-  Name: WorkplaceMessaging
-  #Provider: AzureServiceBus
-  #ConnectionVariable: ConnectionString:AzureServiceBus
-  Provider: RabbitMQ
-  ConnectionString: rabbitmq://guest:guest@localhost/
+MessagingProviders:
+  - Name: Hasie
+    #Provider: AzureServiceBus
+    #ConnectionVariable: ConnectionString:AzureServiceBus
+    Provider: RabbitMQ
+    ConnectionString: rabbitmq://guest:guest@localhost/
+    IsHeartbeat: true
+  - Name: InProcess
+    Provider: Mediator  
+  
+DataSources:
+  - Name: Titan
+    ConnectionVariable: ConnectionString:MasterDataSource
+    Provider: SqlServer
+  

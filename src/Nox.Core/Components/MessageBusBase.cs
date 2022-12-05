@@ -1,6 +1,6 @@
 ﻿namespace Nox.Core.Components;
 
-internal class MessageBusBase
+internal class MessageBusProviderBase
 {
     public string Provider { get; set; } = string.Empty;
     public string? ConnectionString { get; set; }

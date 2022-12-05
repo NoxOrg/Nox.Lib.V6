@@ -1,5 +1,5 @@
 ﻿using Nox.Core.Components;
-using Nox.Core.Interfaces.Api;
+using Nox.Core.Interfaces;
 
 namespace Nox.Api
 {

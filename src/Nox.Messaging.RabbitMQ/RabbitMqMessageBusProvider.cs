@@ -1,5 +1,5 @@
 using MassTransit;
-using Nox.Core.Interfaces.Messaging;
+using Nox.Core.Interfaces;
 
 namespace Nox.Messaging.RabbitMQ;
 
@@ -7,16 +7,9 @@ public class RabbitMqMessageBusProvider: IMessageBusProvider
 {
     private readonly string _connectionString;
 
-    public RabbitMqMessageBusProvider(IServiceMessageBus serviceBus)
+    public RabbitMqMessageBusProvider(IMessagingProvider provider)
     {
-        if (serviceBus != null)
-        {
-            _connectionString = serviceBus.ConnectionString!;
-        }
-        else
-        {
-            _connectionString = "";
-        }
+        _connectionString = provider.ConnectionString!;
     }
 
     public IBusRegistrationConfigurator ConfigureMassTransit(IBusRegistrationConfigurator configuration)

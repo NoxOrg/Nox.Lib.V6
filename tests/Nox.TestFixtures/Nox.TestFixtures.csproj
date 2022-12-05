@@ -82,6 +82,9 @@
       <None Update="appsettings.MergeNew.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="DesignFolders\Design\test.api.nox.yaml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>

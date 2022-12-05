@@ -1,9 +1,8 @@
-using Nox.Core.Interfaces.Database;
+namespace Nox.Core.Interfaces;
 
-namespace Nox.Core.Interfaces.Etl;
-
-public interface ILoaderSource: IServiceDatabase
+public interface ILoaderSource: IMetaBase
 {
+    string Name { get; set; }
     string Query { get; set; }
     int MinimumExpectedRecords { get; set; }
 }

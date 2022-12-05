@@ -5,7 +5,7 @@ using Hangfire.MySql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MySql.Data.MySqlClient;
-using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces;
 using SqlKata.Compilers;
 
 namespace Nox.Data.MySql;
