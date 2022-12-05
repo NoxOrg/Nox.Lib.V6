@@ -17,7 +17,7 @@ Database:
   Password: Developer*123
 
 MessagingProviders:
-  - Name: Bunnty
+  - Name: Bunny
     #Provider: AzureServiceBus
     #ConnectionVariable: ConnectionString:AzureServiceBus
     Provider: RabbitMQ
