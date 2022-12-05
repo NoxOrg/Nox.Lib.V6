@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Nox.Core.Constants;
+using Nox.Core.Exceptions;
 using Serilog;
 using YamlDotNet.Serialization;
 
@@ -21,13 +22,17 @@ public class NoxConfigurator
     public NoxConfiguration LoadConfiguration()
     {
         _config = ReadServiceDefinition();
-        _config.Entities = ReadEntityDefinitionsFromFolder();
-        _config.Loaders = ReadLoaderDefinitionsFromFolder();
-        _config.Apis = ReadApiDefinitionsFromFolder();
-        return _config;
+        if (_config != null)
+        {
+            _config.Entities = ReadEntityDefinitionsFromFolder();
+            _config.Loaders = ReadLoaderDefinitionsFromFolder();
+            _config.Apis = ReadApiDefinitionsFromFolder();
+            return _config;
+        }
+        throw new ConfigurationException("Unable to configure Nox. No yaml configuration files found. Please add yaml configuration files to your project root or a folder defined in your appsettings file.");
     }
 
-    private NoxConfiguration ReadServiceDefinition()
+    private NoxConfiguration? ReadServiceDefinition()
     {
         return Directory
             .EnumerateFiles(_designRoot, FileExtension.ServiceDefinition, SearchOption.AllDirectories)
@@ -38,7 +43,7 @@ public class NoxConfigurator
                 config.Database!.DefinitionFileName = Path.GetFullPath(f);
                 return config;
             })
-            .First();
+            .FirstOrDefault();
     }
     
     private List<EntityConfiguration> ReadEntityDefinitionsFromFolder()

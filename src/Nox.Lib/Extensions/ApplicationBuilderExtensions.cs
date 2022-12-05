@@ -2,7 +2,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Nox.Api;
 
-namespace Nox.Microservice.Extensions;
+namespace Nox.Lib;
 
 public static class ApplicationBuilderExtensions
 {

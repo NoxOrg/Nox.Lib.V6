@@ -1,4 +1,4 @@
-namespace Nox.Microservice.Validation;
+namespace Nox.Lib.Validation;
 
 public class ServiceDatabaseValidator : DatabaseValidator
 {

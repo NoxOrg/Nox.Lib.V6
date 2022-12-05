@@ -90,7 +90,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\src\Nox.Core\Nox.Core.csproj" />
       <ProjectReference Include="..\..\src\Nox.Data\Nox.Data.csproj" />
-      <ProjectReference Include="..\..\src\Nox.Microservice\Nox.Microservice.csproj" />
+      <ProjectReference Include="..\..\src\Nox.Lib\Nox.Lib.csproj" />
     </ItemGroup>
 
 </Project>

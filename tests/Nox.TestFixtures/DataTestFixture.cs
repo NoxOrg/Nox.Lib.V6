@@ -3,8 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nox.Core.Interfaces;
 using Nox.Data;
-using Nox.Microservice;
-using Nox.Microservice.Extensions;
+using Nox.Lib;
 using NUnit.Framework;
 
 namespace Nox.TestFixtures;

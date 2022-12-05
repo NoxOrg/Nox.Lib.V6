@@ -1,4 +1,3 @@
-using System.Reflection;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,16 +9,14 @@ using Nox.Etl;
 using Nox.Jobs;
 using Nox.Messaging;
 
-namespace Nox.Microservice.Extensions;
+namespace Nox.Lib;
 
 public static class ServiceExtensions
 {
     private static readonly IConfiguration? _configuration = ConfigurationHelper.GetNoxAppSettings();
 
     public static IServiceCollection AddNox(
-        this IServiceCollection services, 
-        Action<IBusRegistrationConfigurator>? busConsumers = null, 
-        Action<IMediatorRegistrationConfigurator>? mediatorConsumers = null)
+        this IServiceCollection services)
     {
         if (_configuration == null)
         {

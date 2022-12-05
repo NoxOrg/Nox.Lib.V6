@@ -15,9 +15,8 @@ using Nox.Data;
 using Nox.Entity.XtendedAttributes;
 using Nox.Etl;
 using Nox.Messaging;
-using Nox.Microservice.Extensions;
 
-namespace Nox.Microservice;
+namespace Nox.Lib;
 
 public class DynamicService : IDynamicService
 {
@@ -279,7 +278,7 @@ public class DynamicService : IDynamicService
             // try key vault where app configuration is missing 
             if (variables.Any(v => v.Value == null))
             {
-                TryAddMissingConfigsFromKeyVault(_service.KeyVaultUri, variables);
+                TryAddMissingConfigsFromKeyVault(_service.KeyVaultUri, variables!);
             }
 
             if (variables.Any(v => v.Value == null))

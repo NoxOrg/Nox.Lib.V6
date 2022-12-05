@@ -5,9 +5,8 @@ using Nox.Core.Models;
 using Nox.Data;
 using Nox.Etl;
 using Nox.Messaging;
-using Org.BouncyCastle.Bcpg.OpenPgp;
 
-namespace Nox.Microservice.Extensions;
+namespace Nox.Lib;
 
 public static class ConfigurationExtensions
 {

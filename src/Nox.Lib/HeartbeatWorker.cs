@@ -1,9 +1,8 @@
-﻿using MassTransit;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Nox.Core.Interfaces;
 using Nox.Messaging;
 
-namespace Nox.Microservice;
+namespace Nox.Lib;
 
 public class HeartbeatWorker : BackgroundService
 {

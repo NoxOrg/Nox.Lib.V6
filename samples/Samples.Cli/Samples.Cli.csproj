@@ -27,7 +27,7 @@
       <ProjectReference Include="..\..\src\Nox.Core\Nox.Core.csproj" />
       <ProjectReference Include="..\..\src\Nox.Etl\Nox.Etl.csproj" />
       <ProjectReference Include="..\..\src\Nox.Messaging\Nox.Messaging.csproj" />
-      <ProjectReference Include="..\..\src\Nox.Microservice\Nox.Microservice.csproj" />
+      <ProjectReference Include="..\..\src\Nox.Lib\Nox.Lib.csproj" />
       <ProjectReference Include="..\..\src\Nox.Generator\Nox.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
