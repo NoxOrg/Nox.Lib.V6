@@ -13,9 +13,7 @@ namespace Nox.Messaging;
 public static class ServiceExtensions
 {
     public static IServiceCollection AddNoxMessaging(
-        this IServiceCollection services, 
-        Action<IBusRegistrationConfigurator>? busConsumers = null, 
-        Action<IMediatorRegistrationConfigurator>? mediatorConsumers = null,
+        this IServiceCollection services,
         bool loadAppConfig = true)
     {
         if (loadAppConfig)
@@ -37,22 +35,19 @@ public static class ServiceExtensions
                 switch (msgProvider.Provider!.ToLower())
                 {
                     case "rabbitmq":
-                        services.AddRabbitMqBus(msgProvider, busConsumers);
+                        services.AddRabbitMqBus(msgProvider);
                         break;
                     case "azureservicebus":
-                        services.AddAzureBus(msgProvider, busConsumers);
+                        services.AddAzureBus(msgProvider);
                         break;
                     case "amazonsqs":
-                        services.AddAmazonBus(msgProvider, busConsumers);
+                        services.AddAmazonBus(msgProvider);
                         break;
                     case "inmemory":
-                        services.AddInMemoryBus(busConsumers);
+                        services.AddInMemoryBus();
                         break;
                     case "mediator":
-                        services.AddMediator(cfg =>
-                        {
-                            mediatorConsumers?.Invoke(cfg);
-                        });
+                        services.AddMediator();
                         break;
                 }
             }
@@ -73,7 +68,7 @@ public static class ServiceExtensions
         return services;
     }
 
-    private static void AddRabbitMqBus(this IServiceCollection services, MessagingProviderConfiguration config, Action<IBusRegistrationConfigurator>? busConsumers = null)
+    private static void AddRabbitMqBus(this IServiceCollection services, MessagingProviderConfiguration config)
     {
         services.AddMassTransit<IRabbitMqBus>(mt =>
         {
@@ -88,11 +83,10 @@ public static class ServiceExtensions
             mt.AddSagas(entryAssembly);
             mt.AddActivities(entryAssembly);
             mt.UseRabbitMq(config.ConnectionString!);
-            busConsumers?.Invoke(mt);
         });
     }
     
-    private static void AddAzureBus(this IServiceCollection services, MessagingProviderConfiguration config, Action<IBusRegistrationConfigurator>? busConsumers = null)
+    private static void AddAzureBus(this IServiceCollection services, MessagingProviderConfiguration config)
     {
         services.AddMassTransit<IRabbitMqBus>(mt =>
         {
@@ -107,11 +101,10 @@ public static class ServiceExtensions
             mt.AddSagas(entryAssembly);
             mt.AddActivities(entryAssembly);
             mt.UseAzureServiceBus(config.ConnectionString!);
-            busConsumers?.Invoke(mt);
         });
     }
     
-    private static void AddAmazonBus(this IServiceCollection services, MessagingProviderConfiguration config, Action<IBusRegistrationConfigurator>? busConsumers = null)
+    private static void AddAmazonBus(this IServiceCollection services, MessagingProviderConfiguration config)
     {
         services.AddMassTransit<IRabbitMqBus>(mt =>
         {
@@ -126,11 +119,10 @@ public static class ServiceExtensions
             mt.AddSagas(entryAssembly);
             mt.AddActivities(entryAssembly);
             mt.UseAmazonSqs(config.ConnectionString!, config.AccessKey!, config.SecretKey!);
-            busConsumers?.Invoke(mt);
         });
     }
     
-    private static void AddInMemoryBus(this IServiceCollection services, Action<IBusRegistrationConfigurator>? busConsumers = null)
+    private static void AddInMemoryBus(this IServiceCollection services)
     {
         services.AddMassTransit<IRabbitMqBus>(mt =>
         {
@@ -145,7 +137,6 @@ public static class ServiceExtensions
             {
                 cfg.ConfigureEndpoints(context);
             });
-            busConsumers?.Invoke(mt);
         });
     }
 }

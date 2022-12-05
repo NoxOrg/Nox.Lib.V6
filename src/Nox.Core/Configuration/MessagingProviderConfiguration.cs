@@ -8,7 +8,6 @@ public class MessagingProviderConfiguration: MetaBase
     public string? Provider { get; set; }
     public string? ConnectionString { get; set; }
     public string? ConnectionVariable { get; set; }
-    public bool IsHeartbeat { get; set; }
     public string? AccessKey { get; set; }
     public string? SecretKey { get; set; }
 }

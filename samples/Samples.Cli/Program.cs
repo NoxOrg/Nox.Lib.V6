@@ -1,6 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using MassTransit;
+using MassTransit.Mediator;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Nox.Core.Configuration;
+using Nox.Core.Interfaces;
 using Nox.Messaging;
 using Samples.Cli.Commands;
 using Samples.Cli.Services;
@@ -15,10 +19,7 @@ internal class Program
 
     public static async Task<int> Main(string[] args)
     {
-
         var hostBuilder = CreateHostBuilder(args);
-//        var host = hostBuilder.Build();
-        
         
         // MassTransit doesn't like Spectre Executor
         if (args.Length > 0 && args[0].Equals("listen", StringComparison.OrdinalIgnoreCase))
@@ -60,10 +61,7 @@ internal class Program
             .CreateDefaultBuilder(args)
             .ConfigureServices((_, services) =>
             {
-                services.AddNoxMessaging(busConsumers =>
-                {
-                    busConsumers.AddConsumer<CountryCreatedEventConsumer>();
-                });
+                services.AddNoxMessaging();
             })
             .UseSerilog();
 

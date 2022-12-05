@@ -33,7 +33,7 @@ public static class ServiceExtensions
             .AddData()
             .AddEtl()
             .AddMicroservice()
-            .AddNoxMessaging(busConsumers, mediatorConsumers, false)
+            .AddNoxMessaging(false)
             .AddJobScheduler();
             
         return services;

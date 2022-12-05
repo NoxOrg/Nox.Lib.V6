@@ -36,26 +36,33 @@ public class NoxMessenger: INoxMessenger
         {
             foreach (var loaderMsg in loader.Messaging!)
             {
-                if (_config.MessagingProviders == null) throw new ConfigurationException("Cannot add messaging if messaging providers not present in configuration!");
-                var providerInstance = _config.MessagingProviders.First(p => p.Name == loaderMsg.Name);
-                switch (providerInstance.Provider!.ToLower())
+                try
                 {
-                    case "rabbitmq":
-                        _logger.LogInformation($"Publishing {message.GetType().Name} to RabbitMq bus.");
-                        await _rabbitBus!.Publish(message);
-                        break;
-                    case "azureservicebus":
-                        _logger.LogInformation($"Publishing {message.GetType().Name} to Azure bus.");
-                        await _azureBus!.Publish(message);
-                        break;
-                    case "amazonsqs":
-                        _logger.LogInformation($"Publishing {message.GetType().Name} to Amazon bus.");
-                        await _amazonBus!.Publish(message);
-                        break;
-                    case "mediator":
-                        _logger.LogInformation($"Publishing {message.GetType().Name} to Mediator.");
-                        await _mediator!.Publish(message);
-                        break;
+                    if (_config.MessagingProviders == null) throw new ConfigurationException("Cannot add messaging if messaging providers not present in configuration!");
+                    var providerInstance = _config.MessagingProviders.First(p => p.Name == loaderMsg.Name);
+                    switch (providerInstance.Provider!.ToLower())
+                    {
+                        case "rabbitmq":
+                            await _rabbitBus!.Publish(message);
+                            _logger.LogInformation($"{message.GetType().Name} sent to RabbitMq bus.");
+                            break;
+                        case "azureservicebus":
+                            await _azureBus!.Publish(message);
+                            _logger.LogInformation($"{message.GetType().Name} sent to Azure bus.");
+                            break;
+                        case "amazonsqs":
+                            await _amazonBus!.Publish(message);
+                            _logger.LogInformation($"{message.GetType().Name} sent to Amazon bus.");
+                            break;
+                        case "mediator":
+                            await _mediator!.Publish(message);
+                            _logger.LogInformation($"{message.GetType().Name} sent to Mediator.");
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString());
                 }
             }
         }
@@ -65,27 +72,31 @@ public class NoxMessenger: INoxMessenger
     {
         foreach (var provider in _config.MessagingProviders!)
         {
-            if (provider.IsHeartbeat)
+            try
             {
-                switch (provider.Provider.ToLower())
+                switch (provider.Provider!.ToLower())
                 {
                     case "rabbitmq":
-                        _logger.LogInformation($"Publishing heartbeat to RabbitMq bus.");
                         await _rabbitBus!.Publish(message, stoppingToken);
+                        _logger.LogInformation($"Heartbeat sent to RabbitMq bus.");
                         break;
                     case "azureservicebus":
-                        _logger.LogInformation($"Publishing heartbeat to Azure bus.");
                         await _azureBus!.Publish(message, stoppingToken);
+                        _logger.LogInformation($"Heartbeat sent to Azure bus.");
                         break;
                     case "amazonsqs":
-                        _logger.LogInformation($"Publishing heartbeat to Amazon bus.");
                         await _amazonBus!.Publish(message, stoppingToken);
+                        _logger.LogInformation($"Heartbeat sent to Amazon bus.");
                         break;
                     case "mediator":
-                        _logger.LogInformation($"Publishing heartbeat to Mediator.");
                         await _mediator!.Publish(message, stoppingToken);
+                        _logger.LogInformation($"Heartbeat sent to Mediator.");
                         break;
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
             }
         }
     }
