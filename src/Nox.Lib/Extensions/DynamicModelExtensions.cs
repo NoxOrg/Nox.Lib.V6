@@ -1,6 +1,6 @@
 using Nox.Core.Interfaces;
 
-namespace Nox.Microservice.Extensions;
+namespace Nox.Lib;
 
 public static class DynamicModelExtensions
 {

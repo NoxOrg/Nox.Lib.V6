@@ -1,4 +1,4 @@
-namespace Nox.Microservice.Validation;
+namespace Nox.Lib.Validation;
 
 internal class ServiceMessageBusValidator : MessageBusValidator
 {

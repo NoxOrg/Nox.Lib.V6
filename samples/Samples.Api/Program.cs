@@ -1,4 +1,4 @@
-using Nox.Microservice.Extensions;
+using Nox.Lib;
 
 var builder = WebApplication.CreateBuilder(args);
 

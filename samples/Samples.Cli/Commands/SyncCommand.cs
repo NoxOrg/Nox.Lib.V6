@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Spectre.Console.Cli;
 using Nox.Core.Interfaces;
-using Nox.Microservice;
+using Nox.Lib;
 
 namespace Samples.Cli.Commands;
 

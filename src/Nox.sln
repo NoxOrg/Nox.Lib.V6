@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nox.Core", "Nox.Core\Nox.Core.csproj", "{00E159E9-EDE3-4FB6-8524-CEA4D593A021}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nox.Microservice", "Nox.Microservice\Nox.Microservice.csproj", "{7933F156-8994-46D4-B1D2-25C389AD4C84}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nox.Lib", "Nox.Lib\Nox.Lib.csproj", "{7933F156-8994-46D4-B1D2-25C389AD4C84}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nox.Api", "Nox.Api\Nox.Api.csproj", "{A316C289-EBD6-4027-BC36-2617D82BE654}"
 EndProject

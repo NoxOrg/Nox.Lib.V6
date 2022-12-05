@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Nox.Microservice.Validation;
+namespace Nox.Lib.Validation;
 
 public class MetaServiceValidator : AbstractValidator<MetaService>
 {

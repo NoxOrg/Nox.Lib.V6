@@ -4,10 +4,10 @@ using Nox.Core.Constants;
 using Nox.Core.Interfaces;
 using Nox.Data;
 using Nox.Etl;
+using Nox.Lib.Validation;
 using Nox.Messaging;
-using Nox.Microservice.Validation;
 
-namespace Nox.Microservice;
+namespace Nox.Lib;
 
 public sealed class MetaService : MetaBase, IMetaService
 {
