@@ -24,7 +24,7 @@ Messaging:
   - Name: InProcess    
 
 Sources:
-  - Name: Titan
+  - Name: BusinessSystem
     MinimumExpectedRecords: 242 
     Query: >-
       SELECT 

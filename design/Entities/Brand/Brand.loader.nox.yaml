@@ -21,10 +21,10 @@ Target:
   Entity: Brand
   
 Messaging:
-  - Name: Hasie  
+  - Name: Bunny  
 
 Sources:
-  - Name: Titan
+  - Name: BusinessSystem
     MinimumExpectedRecords: 30 
     Query: >-
       SELECT 
