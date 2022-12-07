@@ -170,7 +170,7 @@ public class NoxDynamicGenerator : ISourceGenerator
         context.AddSource(hintName, source);
     }
     
-    private static string? GetEnvironment()
+    private static string GetEnvironment()
     {
         var env = Environment.GetEnvironmentVariable("ENVIRONMENT");
         env ??= Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");

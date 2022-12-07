@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
@@ -24,6 +25,7 @@
     <FileVersion>6.0.3.0</FileVersion>
     <PackageVersion>6.0.3</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>nox.png</PackageIcon>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.0" />
@@ -45,8 +47,8 @@
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.11" />
-    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2"/>
-    <PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.2.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.5" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.11" />
@@ -77,6 +79,7 @@
     <ProjectReference Include="..\Nox.Core\Nox.Core.csproj" PrivateAssets="all" />
     <ProjectReference Include="..\Nox.Data\Nox.Data.csproj" PrivateAssets="all" />
     <ProjectReference Include="..\Nox.Etl\Nox.Etl.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\Nox.Generator\Nox.Generator.csproj" />
     <ProjectReference Include="..\Nox.Jobs\Nox.Jobs.csproj" PrivateAssets="all" />
     <ProjectReference Include="..\Nox.Messaging\Nox.Messaging.csproj" PrivateAssets="all" />
   </ItemGroup>
@@ -88,124 +91,93 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="bin\**" />
+    <None Update="tools\install.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Pack>true</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Update="tools\uninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Pack>true</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Validation\NoxConfiguration" />
   </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Core.dll">
+  <ItemGroup>
+    <Content Include="$(OutputPath)\Nox.Core.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
-    <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Api.dll">
+    <Content Include="$(OutputPath)\Nox.Api.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
-    <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Api.OData.dll">
+    <Content Include="$(OutputPath)\Nox.Api.OData.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
-    <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Data.dll">
+    <Content Include="$(OutputPath)\Nox.Data.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
-    <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Data.MySql.dll">
+    <Content Include="$(OutputPath)\Nox.Data.MySql.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
-    <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Data.Postgres.dll">
+    <Content Include="$(OutputPath)\Nox.Data.Postgres.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
-    <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Data.SqlServer.dll">
+    <Content Include="$(OutputPath)\Nox.Data.SqlServer.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
-    <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Entity.XtendedAttributes.dll">
+    <Content Include="$(OutputPath)\Nox.Entity.XtendedAttributes.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
-    <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Etl.dll">
+    <Content Include="$(OutputPath)\Nox.Etl.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
-    <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Jobs.dll">
+    <Content Include="$(OutputPath)\Nox.Jobs.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
-    <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Messaging.dll">
+    <Content Include="$(OutputPath)\Nox.Messaging.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
-    <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Messaging.AmazonSQS.dll">
+    <Content Include="$(OutputPath)\Nox.Messaging.AmazonSQS.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
-    <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Messaging.AzureServiceBus.dll">
+    <Content Include="$(OutputPath)\Nox.Messaging.AzureServiceBus.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
-    <Content Include=".\bin\Debug\$(TargetFramework)\Nox.Messaging.RabbitMQ.dll">
+    <Content Include="$(OutputPath)\Nox.Messaging.RabbitMQ.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
   </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <Content Include=".\bin\Release\$(TargetFramework)\Nox.Core.dll">
+  <ItemGroup>
+    <None Include="../../nox.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(OutputPath)\Newtonsoft.Json.dll">
       <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)</PackagePath>
+      <PackagePath>analyzers\dotnet\cs</PackagePath>
     </Content>
-    <Content Include=".\bin\Release\$(TargetFramework)\Nox.Api.dll">
+    <Content Include="$(OutputPath)\YamlDotNet.dll">
       <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)</PackagePath>
+      <PackagePath>analyzers\dotnet\cs</PackagePath>
     </Content>
-    <Content Include=".\bin\Release\$(TargetFramework)\Nox.Api.OData.dll">
-      <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)</PackagePath>
-    </Content>
-    <Content Include=".\bin\Release\$(TargetFramework)\Nox.Data.dll">
-      <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)</PackagePath>
-    </Content>
-    <Content Include=".\bin\Release\$(TargetFramework)\Nox.Data.MySql.dll">
-      <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)</PackagePath>
-    </Content>
-    <Content Include=".\bin\Release\$(TargetFramework)\Nox.Data.Postgres.dll">
-      <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)</PackagePath>
-    </Content>
-    <Content Include=".\bin\Release\$(TargetFramework)\Nox.Data.SqlServer.dll">
-      <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)</PackagePath>
-    </Content>
-    <Content Include=".\bin\Release\$(TargetFramework)\Nox.Entity.XtendedAttributes.dll">
-      <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)</PackagePath>
-    </Content>
-    <Content Include=".\bin\Release\$(TargetFramework)\Nox.Etl.dll">
-      <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)</PackagePath>
-    </Content>
-    <Content Include=".\bin\Release\$(TargetFramework)\Nox.Jobs.dll">
-      <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)</PackagePath>
-    </Content>
-    <Content Include=".\bin\Release\$(TargetFramework)\Nox.Messaging.dll">
-      <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)</PackagePath>
-    </Content>
-    <Content Include=".\bin\Release\$(TargetFramework)\Nox.Messaging.AmazonSQS.dll">
-      <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)</PackagePath>
-    </Content>
-    <Content Include=".\bin\Release\$(TargetFramework)\Nox.Messaging.AzureServiceBus.dll">
-      <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)</PackagePath>
-    </Content>
-    <Content Include=".\bin\Release\$(TargetFramework)\Nox.Messaging.RabbitMQ.dll">
-      <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)</PackagePath>
-    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
+    <None Include="$(OutputPath)\Nox.Generator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 </Project>
