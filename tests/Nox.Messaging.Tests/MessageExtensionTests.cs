@@ -14,7 +14,7 @@ public class MessageExtensionTests: MessagingTestFixture
     [Test]
     public void Can_Find_a_Create_Event_Implementation()
     {
-        TestServiceCollection!.AddNoxEvents(Assembly.GetExecutingAssembly());
+        TestServiceCollection!.AddNoxMessaging();
         BuildServiceProvider();
         var personEntity = new Core.Models.Entity
         {

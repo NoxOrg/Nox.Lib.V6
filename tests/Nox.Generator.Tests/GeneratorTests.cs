@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -10,12 +11,22 @@ namespace Nox.Generator.Tests;
 public class GeneratorTests: GeneratorTestFixture
 {
     [Test]
-    public void Can_Generate_Dynamic_Entity_Sources()
+    public void Can_Generate_Dynamic_Entity_Sources_From_AppSettings()
     {
         var compilation = GenerateTestExeCompilation();
         Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
         var updatedComp = RunGenerators(compilation, out var generatorDiags, new NoxDynamicGenerator());
         Assert.That(updatedComp.SyntaxTrees.Count(), Is.EqualTo(9));
+    }
+    
+    [Test]
+    public void Can_Generate_Dynamic_Entity_Sources_From_Env_AppSettings()
+    {
+        Environment.SetEnvironmentVariable("ENVIRONMENT", "Test");
+        var compilation = GenerateTestExeCompilation();
+        Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
+        var updatedComp = RunGenerators(compilation, out var generatorDiags, new NoxDynamicGenerator());
+        Assert.That(updatedComp.SyntaxTrees.Count(), Is.EqualTo(5));
     }
 
     private Compilation RunGenerators(Compilation c, out ImmutableArray<Diagnostic> diagnostics, params ISourceGenerator[] generators)

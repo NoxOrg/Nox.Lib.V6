@@ -1,0 +1,41 @@
+  #
+  # Test api definitions
+  #
+  
+  Name: TestApi
+  Description: Test entity controller and endpoints
+  
+  Routes:
+    - Name: Persons
+      HttpVerb: GET
+      Description: Returns all persons
+      TargetUrl: odata/Persons
+      Responses:
+        - Type: Person
+          IsCollection: true
+
+    - Name: Person/{Id}
+      HttpVerb: GET
+      Description: Returns a specific person
+      Parameters:
+        - Name: Id
+          Type: int
+      TargetUrl: odata/Persons({Id})
+      Responses:
+        - Type: Person
+          IsCollection: false
+
+    - Name: PersonsWithPagination
+      HttpVerb: GET
+      Description: Returns persons with pagination
+      Parameters:
+        - Name: PageNumber
+          Type: int
+          Default: 1
+        - Name: PageSize
+          Type: int
+          Default: 20
+      TargetUrl: odata/Persons?$skip={PageNumber}&$top={PageSize}
+      Responses:
+        - Type: Person
+          IsCollection: true 

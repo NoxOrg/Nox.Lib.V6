@@ -19,7 +19,7 @@ public static class ServiceExtensions
         if (loadAppConfig)
         {
             var appSettings = ConfigurationHelper.GetNoxAppSettings();
-            services.AddNoxConfiguration(appSettings != null ? appSettings["Nox:DefinitionRootPath"] : "");
+            services.AddNoxConfiguration((appSettings != null ? appSettings["Nox:DefinitionRootPath"] : "")!);
         }
 
         if (services == null) throw new ArgumentNullException(nameof (services));

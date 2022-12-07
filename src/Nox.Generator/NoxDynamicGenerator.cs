@@ -30,10 +30,25 @@ public class NoxDynamicGenerator : ISourceGenerator
         if (mainSyntaxTree == null) return;
 
         var programPath = Path.GetDirectoryName(mainSyntaxTree.FilePath);
-        var settingsFile = Path.Combine(programPath, "appsettings.json");
-        var config = JObject.Parse(File.ReadAllText(settingsFile));
-        var designRoot = config["Nox"]?["DefinitionRootPath"]!.ToString();
-        if (string.IsNullOrEmpty(designRoot)) throw new Exception("Nox:DefinitionRootPath does not exist in appsettings.json file.");
+        var designRoot = programPath;
+        
+        var json = Path.Combine(programPath!, "appsettings.json");
+        if (File.Exists(json))
+        {
+            var config = JObject.Parse(File.ReadAllText(json));
+            designRoot = config["Nox"]?["DefinitionRootPath"]!.ToString();
+        }        
+        
+        var env = GetEnvironment();
+        if (!string.IsNullOrEmpty(env))
+        {
+            var envJson = Path.Combine(programPath, $"appsettings.{env}.json");
+            if (File.Exists(envJson))
+            {
+                var envConfig = JObject.Parse(File.ReadAllText(envJson));
+                designRoot = envConfig["Nox"]?["DefinitionRootPath"]!.ToString();
+            }
+        }
         
         var designRootFullPath = Path.GetFullPath(Path.Combine(programPath, designRoot));
 
@@ -153,5 +168,13 @@ public class NoxDynamicGenerator : ISourceGenerator
         var source = SourceText.From(sb.ToString(), Encoding.UTF8);
 
         context.AddSource(hintName, source);
+    }
+    
+    private static string? GetEnvironment()
+    {
+        var env = Environment.GetEnvironmentVariable("ENVIRONMENT");
+        env ??= Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+        env ??= Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        return env;
     }
 }

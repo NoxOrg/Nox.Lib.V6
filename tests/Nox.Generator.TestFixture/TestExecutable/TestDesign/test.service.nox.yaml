@@ -1,0 +1,45 @@
+#
+# Service definition
+#
+
+Name: Test
+
+Description: Test Microservice
+
+Database:
+  Name: Test
+  
+  Provider: SqlServer
+  Options: Trusted_Connection=no;connection timeout=120;TrustServerCertificate=true
+  
+  #Provider: Postgres
+  #Port: 54320
+
+  #Provider: MySql
+
+  Server: localhost
+  User: sa
+  Password: Developer*123
+
+MessagingProviders:
+  - Name: TestMessagingProvider1
+    #Provider: AzureServiceBus
+    #ConnectionVariable: ConnectionString:AzureServiceBus
+    Provider: InMemory
+  - Name: TestMessagingProvider2
+    #Provider: AzureServiceBus
+    #ConnectionVariable: ConnectionString:AzureServiceBus
+    Provider: InMemory
+    
+DataSources:
+  - Name: TestDataSource1
+    Provider: TestProvider
+    ConnectionString: TestConnectionString
+  - Name: TestDataSource2
+    Provider: TestProvider
+    Server: Server1
+    Port: 111
+    User: TestUser
+    Password: TestPassword
+  - Name: TestDataSource3
+    ConnectionVariable: TestConnectionVariable
