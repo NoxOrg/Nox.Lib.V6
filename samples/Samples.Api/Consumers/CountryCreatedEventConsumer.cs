@@ -5,8 +5,16 @@ namespace Samples.Api.Consumers;
 
 public class CountryCreatedEventConsumer: IConsumer<CountryCreatedDomainEvent>
 {
-    public async Task Consume(ConsumeContext<CountryCreatedDomainEvent> context)
+    readonly ILogger<CountryCreatedEventConsumer> _logger;
+
+    public CountryCreatedEventConsumer(ILogger<CountryCreatedEventConsumer> logger)
     {
-        throw new NotImplementedException();
+        _logger = logger;
+    }
+    
+    public Task Consume(ConsumeContext<CountryCreatedDomainEvent> context)
+    {
+        _logger.LogInformation("Received CountryCreatedDomainEvent: {Text}", context.Message.Payload);
+        return Task.CompletedTask;
     }
 }

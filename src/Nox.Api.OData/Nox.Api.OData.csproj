@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>6.0.3.0</AssemblyVersion>
-    <FileVersion>6.0.3.0</FileVersion>
+    <AssemblyVersion>6.0.4.0</AssemblyVersion>
+    <FileVersion>6.0.4.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
@@ -18,13 +18,13 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.11" />
-    <PackageReference Include="Microsoft.OData.Core" Version="7.12.5" />
+    <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.11"/>
+    <PackageReference Include="Microsoft.OData.Core" Version="7.12.5"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Nox.Core\Nox.Core.csproj" />
+    <ProjectReference Include="..\Nox.Core\Nox.Core.csproj"/>
   </ItemGroup>
 </Project>

@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>6.0.3.0</AssemblyVersion>
-    <FileVersion>6.0.3.0</FileVersion>
+    <AssemblyVersion>6.0.4.0</AssemblyVersion>
+    <FileVersion>6.0.4.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
@@ -18,15 +18,15 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Nox.Core\Nox.Core.csproj" />
-    <ProjectReference Include="..\Nox.Data.MySql\Nox.Data.MySql.csproj" />
-    <ProjectReference Include="..\Nox.Data.Postgres\Nox.Data.Postgres.csproj" />
-    <ProjectReference Include="..\Nox.Data.SqlServer\Nox.Data.SqlServer.csproj" />
-    <ProjectReference Include="..\Nox.Entity.XtendedAttributes\Nox.Entity.XtendedAttributes.csproj" />
+    <ProjectReference Include="..\Nox.Core\Nox.Core.csproj"/>
+    <ProjectReference Include="..\Nox.Data.MySql\Nox.Data.MySql.csproj"/>
+    <ProjectReference Include="..\Nox.Data.Postgres\Nox.Data.Postgres.csproj"/>
+    <ProjectReference Include="..\Nox.Data.SqlServer\Nox.Data.SqlServer.csproj"/>
+    <ProjectReference Include="..\Nox.Entity.XtendedAttributes\Nox.Entity.XtendedAttributes.csproj"/>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.11" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.11" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.11"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.11"/>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0"/>
   </ItemGroup>
 </Project>
