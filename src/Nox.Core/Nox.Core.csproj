@@ -1,49 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DebugType>none</DebugType>
-        <DebugSymbols>false</DebugSymbols>
-        <PlatformTarget>x64</PlatformTarget>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <PlatformTarget>x64</PlatformTarget>
-    </PropertyGroup>
-    <ItemGroup>
-        <PackageReference Include="ETLBox" Version="2.6.6" />
-        <PackageReference Include="FluentValidation" Version="11.2.2" />
-        <PackageReference Include="Hangfire.Core" Version="1.7.31" />
-        <PackageReference Include="Humanizer.Core" Version="2.14.1" />
-        <PackageReference Include="MassTransit" Version="8.0.8" />
-        <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.11" />
-        <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.5" />
-        <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.11" />
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.0" />
-        <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.3.0" />
-        <PackageReference Include="Microsoft.OData.Edm" Version="7.12.2" />
-        <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.9" />
-        <PackageReference Include="Nox.Cron" Version="1.0.10" />
-        <PackageReference Include="SqlKata" Version="2.4.0" />
-        <PackageReference Include="YamlDotNet" Version="12.0.2" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Constants" />
-      <Folder Include="Exceptions" />
-    </ItemGroup>
-    <ItemGroup>
-      <Reference Include="Serilog">
-        <HintPath>..\..\..\..\..\.nuget\packages\serilog\2.10.0\lib\netstandard2.1\Serilog.dll</HintPath>
-      </Reference>
-    </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyVersion>6.0.5.0</AssemblyVersion>
+    <FileVersion>6.0.5.0</FileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="ETLBox" Version="2.6.6"/>
+    <PackageReference Include="FluentValidation" Version="11.4.0"/>
+    <PackageReference Include="Hangfire.Core" Version="1.7.32"/>
+    <PackageReference Include="Humanizer.Core" Version="2.14.1"/>
+    <PackageReference Include="MassTransit" Version="8.0.9"/>
+    <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.11"/>
+    <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.5"/>
+    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.11"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="7.0.0"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="7.0.0"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="7.0.0"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0"/>
+    <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.3.0"/>
+    <PackageReference Include="Microsoft.OData.Core" Version="7.12.5"/>
+    <PackageReference Include="Microsoft.OData.Edm" Version="7.12.5"/>
+    <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.9"/>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2"/>
+    <PackageReference Include="Nox.Cron" Version="1.0.10"/>
+    <PackageReference Include="Serilog" Version="2.12.0"/>
+    <PackageReference Include="SqlKata" Version="2.4.0"/>
+    <PackageReference Include="YamlDotNet" Version="12.1.0"/>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Constants"/>
+    <Folder Include="Exceptions"/>
+  </ItemGroup>
 </Project>

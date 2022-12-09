@@ -24,7 +24,7 @@ public static class ServiceExtensions
         }
 
         services
-            .AddNoxConfiguration(_configuration["Nox:DefinitionRootPath"])
+            .AddNoxConfiguration(_configuration["Nox:DefinitionRootPath"]!)
             .AddDatabaseProviderFactory()
             .AddDynamicApi(_configuration)
             .AddData()

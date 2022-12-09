@@ -1,27 +1,29 @@
+<?xml version="1.0"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DebugType>none</DebugType>
-        <DebugSymbols>false</DebugSymbols>
-        <PlatformTarget>x64</PlatformTarget>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <PlatformTarget>x64</PlatformTarget>
-    </PropertyGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\Nox.Core\Nox.Core.csproj" />
-      <ProjectReference Include="..\Nox.Data\Nox.Data.csproj" />
-      <ProjectReference Include="..\Nox.Messaging\Nox.Messaging.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="ETLBox" Version="2.6.6" />
-      <PackageReference Include="SqlKata" Version="2.4.0" />
-    </ItemGroup>
-
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyVersion>6.0.5.0</AssemblyVersion>
+    <FileVersion>6.0.5.0</FileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Nox.Core\Nox.Core.csproj"/>
+    <ProjectReference Include="..\Nox.Data\Nox.Data.csproj"/>
+    <ProjectReference Include="..\Nox.Messaging\Nox.Messaging.csproj"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ETLBox" Version="2.6.6"/>
+    <PackageReference Include="SqlKata" Version="2.4.0"/>
+  </ItemGroup>
 </Project>

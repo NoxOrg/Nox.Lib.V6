@@ -1,6 +1,7 @@
 using MassTransit;
 using Nox.Core.Interfaces;
 
+
 namespace Samples.Api.Consumers;
 
 public class HeartbeatConsumer : IConsumer<IHeartbeatMessage>

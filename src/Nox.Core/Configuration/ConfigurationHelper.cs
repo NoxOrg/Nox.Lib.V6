@@ -23,7 +23,7 @@ public class ConfigurationHelper
 
         if (string.IsNullOrEmpty(config["Nox:DefinitionRootPath"]))
         {
-            throw new ConfigurationException("Could not find 'Nox:DefinitionRootPath' in environment or appsettings");
+            config["Nox:DefinitionRootPath"] = "./";
         }
 
         config = configBuilder.Build();
@@ -48,7 +48,7 @@ public class ConfigurationHelper
         //Api endpoint config
         secrets.Add(new KeyValuePair<string, string>("ServiceApiEndpointProvider", ""));
         
-        configBuilder.AddInMemoryCollection(secrets);
+        configBuilder.AddInMemoryCollection(secrets!);
         
         LicenseCheck.LicenseKey = secrets.First(s => s.Key.Equals("EtlBox:LicenseKey")).Value;
 
@@ -88,17 +88,13 @@ public class ConfigurationHelper
     {
         var env = GetEnvironment();
         var pathToContentRoot = Directory.GetCurrentDirectory();
+        //AppSettings
         var json = Path.Combine(pathToContentRoot, "appsettings.json");
+        //AppSettings.Env
+        var envJson = "";
         if (!string.IsNullOrEmpty(env))
         {
-            var envJson = Path.Combine(pathToContentRoot, $"appsettings.{env}.json");
-            if (File.Exists(envJson)) json = envJson;
-        }
-
-        if (!File.Exists(json))
-        {
-            var pathToExe = Process.GetCurrentProcess()?.MainModule?.FileName;
-            pathToContentRoot = Path.GetDirectoryName(pathToExe);
+            envJson = Path.Combine(pathToContentRoot, $"appsettings.{env}.json");
         }
         
         var builder = new ConfigurationBuilder()
@@ -106,6 +102,8 @@ public class ConfigurationHelper
             .AddJsonFile(json, true, true)
             .AddEnvironmentVariables()
             .AddCommandLine(args);
+        if (File.Exists(json)) builder.AddJsonFile(json);
+        if (!string.IsNullOrEmpty(envJson) && File.Exists(envJson)) builder.AddJsonFile(envJson);
 
         if (IsDevelopment())
         {

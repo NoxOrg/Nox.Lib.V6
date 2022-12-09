@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Nox.Core.Exceptions;
 using Nox.Core.Interfaces;
 
 namespace Nox.Core.Configuration;
