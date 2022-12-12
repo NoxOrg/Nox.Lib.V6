@@ -16,13 +16,6 @@ public class NoxDynamicGenerator : ISourceGenerator
 {
     public void Execute(GeneratorExecutionContext context)
     {
-
-#if DEBUG
-        if (!Debugger.IsAttached)
-        {
-            Debugger.Launch();
-        }
-#endif
         var assemblyName = context.Compilation.AssemblyName;
         var mainSyntaxTree = context.Compilation.SyntaxTrees
             .FirstOrDefault(x => x.FilePath.EndsWith("Program.cs"));
