@@ -98,7 +98,7 @@ $goo.Command.Add( 'clean', {
 # command: goo build | Builds the solution and command line app. 
 $goo.Command.Add( 'build', {
     $goo.Console.WriteInfo("Building solution...")
-    $goo.Command.RunExternal('dotnet','build /clp:ErrorsOnly --configuration Release', $script:SolutionFolder)
+    $goo.Command.RunExternal('dotnet','build /clp:ErrorsOnly --warnaserror --configuration Release', $script:SolutionFolder)
     $goo.StopIfError("Failed to build solution. (Release)")
     $goo.Command.RunExternal('dotnet','publish --configuration Release --output ..\dist --no-build', $script:ProjectFolder )
     $goo.StopIfError("Failed to publish CLI project. (Release)")
@@ -246,13 +246,23 @@ $goo.Command.Add( 'bump-project-version', {
 
 # command: goo publish | Build and publish Nox nuget packages
 $goo.Command.Add( 'publish', { 
+
+    $goo.Console.WriteInfo("Updating version for ($script:SourceFolder\Nox.Lib) and dependancies...")
     $goo.Command.Run( 'bump-project-version' )
-	$goo.Console.WriteInfo("Packing project ($script:SourceFolder\Nox.Lib)...")
-    $goo.Command.RunExternal('dotnet','pack /clp:ErrorsOnly --configuration Release', "$script:SourceFolder\Nox.Lib")
+
+    $goo.Console.WriteInfo("Compiling project ($script:SourceFolder\Nox.Lib)...")
+    $goo.Command.RunExternal('dotnet','build /clp:ErrorsOnly --warnaserror --configuration Release', "$script:SourceFolder\Nox.Lib")
+    $goo.StopIfError("Failed to build solution. (Release)")
+
+    $goo.Console.WriteInfo("Packing project ($script:SourceFolder\Nox.Lib)...")
+    $goo.Command.RunExternal('dotnet','pack /clp:ErrorsOnly --no-build --configuration Release', "$script:SourceFolder\Nox.Lib")
     $goo.StopIfError("Failed to pack Nox.Lib (Release)")
+
+    $goo.Console.WriteInfo("Publishing project ($script:SourceFolder\Nox.Lib) to Nuget.org...")
     $nupkgFile = Get-ChildItem "$script:SourceFolder\Nox.Lib\bin\Release\Nox.Lib.*.nupkg" | Sort-Object -Property LastWriteTime | Select-Object -Last 1
     $goo.Command.RunExternal('dotnet',"nuget push $($nupkgFile.FullName) --api-key $Env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json", "$script:SourceFolder\Nox.Lib")
-    $goo.StopIfError("Failed to publish Nox.Microservice to nuget. (Release)")
+    $goo.StopIfError("Failed to publish Nox.Lib to nuget. (Release)")
+
 })
 
 $goo.Command.Add( 'waitfordb', {
