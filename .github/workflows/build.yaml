@@ -7,6 +7,10 @@ on:
 jobs:
   build:
 
+    defaults:
+      run:
+        working-directory: src
+
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -22,5 +26,7 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build --warnaserror --configuration Release --no-restore
+
+# Removed comments once tests all run
 #      - name: Test
 #        run: dotnet test --no-restore --verbosity normal
