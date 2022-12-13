@@ -213,14 +213,45 @@ $goo.Command.Add( 'main', { param( $featureName )
     $goo.Git.CheckoutMain()
 })
 
+$goo.Command.Add( 'bump-project-version', {
+    $files = (Get-ChildItem "*.csproj" -Recurse)
+    $xpaths = @(
+        "//AssemblyVersion",
+        "//FileVersion",
+        "//PackageVersion",
+        "//PackageReference[@Include='Nox.Lib']/@Version"
+    )
+
+    $xml = New-Object XML
+    foreach($file in $files){
+        $updated = $false
+        $versionNew = $null
+        $xml.Load($file)
+        foreach($p in $xpaths){ 
+            $node = $xml.SelectSingleNode($p)
+            if($null -ne $node){
+                $version = (($node.InnerText ?? $node.Value) -split '\.')
+                $version[2] = [int]($version[2])+1
+                $versionNew = ($version -join '.')
+                $node.InnerText = $versionNew
+                $updated = $true
+        }
+        }
+        if ($updated) {
+            $goo.Console.WriteLine("Bumping version for $($file.Name) to $versionNew..." )
+            $xml.Save($file)
+        }
+    }
+})
+
 # command: goo publish | Build and publish Nox nuget packages
 $goo.Command.Add( 'publish', { 
-	#Nox.Microservice
-	$goo.Console.WriteInfo("Packing project ($script:SourceFolder\Nox.Microservice)...")
-    $goo.Command.RunExternal('dotnet','pack /clp:ErrorsOnly --configuration Release', "$script:SourceFolder\Nox.Microservice")
-    $goo.StopIfError("Failed to pack Nox.Microservice (Release)")
-    $nupkgFile = Get-ChildItem "$script:SourceFolder\Nox.Microservice\bin\Release\Nox.Microservice.*.nupkg" | Sort-Object -Property LastWriteTime | Select-Object -Last 1
-    $goo.Command.RunExternal('dotnet',"nuget push $($nupkgFile.FullName) --api-key $Env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json", "$script:SourceFolder\Nox.Microservice")
+    $goo.Command.Run( 'bump-project-version' )
+	$goo.Console.WriteInfo("Packing project ($script:SourceFolder\Nox.Lib)...")
+    $goo.Command.RunExternal('dotnet','pack /clp:ErrorsOnly --configuration Release', "$script:SourceFolder\Nox.Lib")
+    $goo.StopIfError("Failed to pack Nox.Lib (Release)")
+    $nupkgFile = Get-ChildItem "$script:SourceFolder\Nox.Lib\bin\Release\Nox.Lib.*.nupkg" | Sort-Object -Property LastWriteTime | Select-Object -Last 1
+    $goo.Command.RunExternal('dotnet',"nuget push $($nupkgFile.FullName) --api-key $Env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json", "$script:SourceFolder\Nox.Lib")
     $goo.StopIfError("Failed to publish Nox.Microservice to nuget. (Release)")
 })
 
@@ -244,6 +275,7 @@ $goo.Command.Add( 'waitfordb', {
 <# --- START GOO EXECUTION --- #>
 
 $goo.Start()
+
 
 
 <# --- EOF --- #>
