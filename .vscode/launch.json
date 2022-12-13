@@ -9,7 +9,7 @@
             "type": "PowerShell",
             "request": "launch",
             "script": "${file}",
-            "args": ["init"],
+            "args": ["pp"],
             "cwd": "${file}"
         }
     ]
