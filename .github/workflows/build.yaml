@@ -8,8 +8,8 @@ jobs:
   build:
 
     defaults:
-    run:
-      working-directory: src
+      run:
+        working-directory: src
 
     runs-on: ubuntu-latest
     strategy:
