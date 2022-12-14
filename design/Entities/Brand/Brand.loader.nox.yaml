@@ -21,10 +21,10 @@ Target:
   Entity: Brand
   
 Messaging:
-  - Name: Bunny  
+  - MessagingProvider: Bunny  
 
 Sources:
-  - Name: BusinessSystem
+  - DataSource: BusinessSystem
     MinimumExpectedRecords: 30 
     Query: >-
       SELECT 

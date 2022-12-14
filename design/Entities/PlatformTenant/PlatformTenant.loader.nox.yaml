@@ -16,7 +16,7 @@ Target:
   Entity: PlatformTenant
 
 Sources:
-  - Name: BusinessSystem
+  - DataSource: BusinessSystem
     MinimumExpectedRecords: 2
     Query: >-
       SELECT 1 AS [Id], 'International Workplace Group (IWG) PLC' AS [Name]

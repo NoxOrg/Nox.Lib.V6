@@ -21,10 +21,10 @@ Target:
   Entity: Country
   
 Messaging:
-  - Name: InProcess    
+  - MessagingProvider: InProcess    
 
 Sources:
-  - Name: BusinessSystem
+  - DataSource: BusinessSystem
     MinimumExpectedRecords: 242 
     Query: >-
       SELECT 
