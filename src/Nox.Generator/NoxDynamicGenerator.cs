@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
@@ -14,6 +15,13 @@ namespace Nox.Generator;
 [Generator]
 public class NoxDynamicGenerator : ISourceGenerator
 {
+    private readonly DiagnosticDescriptor NI0001 = new("NI0001", "No yaml definitions",
+        "Nox.Generator will not contribute to your project as no yaml definitions were found", "Design",
+        DiagnosticSeverity.Info, true);
+    private readonly DiagnosticDescriptor NI0002 = new("NI0002", "Found yaml definitions",
+        "Nox.Generator will generate classes for {0} yaml definitions", "Design",
+        DiagnosticSeverity.Info, true);
+    
     public void Execute(GeneratorExecutionContext context)
     {
         var assemblyName = context.Compilation.AssemblyName;
@@ -21,29 +29,36 @@ public class NoxDynamicGenerator : ISourceGenerator
             .FirstOrDefault(x => x.FilePath.EndsWith("Program.cs"));
         
         if (mainSyntaxTree == null) return;
+        
+        Console.WriteLine(mainSyntaxTree.FilePath);
 
         var programPath = Path.GetDirectoryName(mainSyntaxTree.FilePath);
-        var designRoot = programPath;
+        string? designRoot = null;
         
         var json = Path.Combine(programPath!, "appsettings.json");
         if (File.Exists(json))
         {
             var config = JObject.Parse(File.ReadAllText(json));
-            designRoot = config["Nox"]?["DefinitionRootPath"]!.ToString();
-        }        
+            designRoot = config["Nox"]?["DefinitionRootPath"]?.ToString();
+        }  
         
         var env = GetEnvironment();
         if (!string.IsNullOrEmpty(env))
         {
-            var envJson = Path.Combine(programPath, $"appsettings.{env}.json");
+            var envJson = Path.Combine(programPath!, $"appsettings.{env}.json");
             if (File.Exists(envJson))
             {
                 var envConfig = JObject.Parse(File.ReadAllText(envJson));
-                designRoot = envConfig["Nox"]?["DefinitionRootPath"]!.ToString();
+                designRoot = envConfig["Nox"]?["DefinitionRootPath"]?.ToString();
             }
         }
+
+        if (string.IsNullOrEmpty(designRoot))
+        {
+            designRoot = programPath;
+        }
         
-        var designRootFullPath = Path.GetFullPath(Path.Combine(programPath, designRoot));
+        var designRootFullPath = Path.GetFullPath(Path.Combine(programPath!, designRoot));
 
         var deserializer = new DeserializerBuilder().Build();
 
@@ -52,14 +67,20 @@ public class NoxDynamicGenerator : ISourceGenerator
             .Select(f => deserializer.Deserialize(new StringReader(File.ReadAllText(f))))
             .ToList();
 
-
-        foreach (Dictionary<object, object> entity in entities)
+        if (!entities.Any())
         {
-            AddEntity(context, assemblyName, entity);
-            AddDomainEvent(context, assemblyName, GeneratorEventTypeEnum.Created, entity);
-            AddDomainEvent(context, assemblyName, GeneratorEventTypeEnum.Updated, entity);
-            AddDomainEvent(context, assemblyName, GeneratorEventTypeEnum.Deleted, entity);
+            context.ReportDiagnostic(Diagnostic.Create(NI0001, null, DiagnosticSeverity.Info));
         }
+
+        context.ReportDiagnostic(Diagnostic.Create(NI0002, null, DiagnosticSeverity.Info, entities.Count));
+        
+        foreach (Dictionary<object, object>? entity in entities)
+        {
+            AddEntity(context, assemblyName!, entity!);
+            AddDomainEvent(context, assemblyName!, GeneratorEventTypeEnum.Created, entity!);
+            AddDomainEvent(context, assemblyName!, GeneratorEventTypeEnum.Updated, entity!);
+            AddDomainEvent(context, assemblyName!, GeneratorEventTypeEnum.Deleted, entity!);
+        }    
     }
 
     public void Initialize(GeneratorInitializationContext context)
@@ -102,7 +123,7 @@ public class NoxDynamicGenerator : ISourceGenerator
 
     }
 
-    private void AddEntity(GeneratorExecutionContext context, string assemblyName, Dictionary<object, object> entity)
+    private void AddEntity(GeneratorExecutionContext context, string assemblyName, Dictionary<object, object>? entity)
     {
         var sb = new StringBuilder();
 
@@ -111,7 +132,7 @@ public class NoxDynamicGenerator : ISourceGenerator
         sb.AppendLine($@"");
         sb.AppendLine($@"namespace Nox;");
         sb.AppendLine($@"");
-        sb.AppendLine($@"public class {entity["Name"]} : IDynamicEntity");
+        sb.AppendLine($@"public class {entity!["Name"]} : IDynamicEntity");
         sb.AppendLine($@"{{");
 
         var attributes = (List<object>)entity["Attributes"];
@@ -128,7 +149,7 @@ public class NoxDynamicGenerator : ISourceGenerator
         context.AddSource(hintName, source);
     }
 
-    private void AddDomainEvent(GeneratorExecutionContext context, string assemblyName, GeneratorEventTypeEnum generatorEventType, Dictionary<object, object> entity)
+    private void AddDomainEvent(GeneratorExecutionContext context, string assemblyName, GeneratorEventTypeEnum generatorEventType, Dictionary<object, object>? entity)
     {
         var sb = new StringBuilder();
 
@@ -146,7 +167,7 @@ public class NoxDynamicGenerator : ISourceGenerator
                 break;
         }
 
-        var className = $"{entity["Name"]}{eventTypeName}dDomainEvent";
+        var className = $"{entity!["Name"]}{eventTypeName}dDomainEvent";
 
         sb.AppendLine($@"// autogenerated");
         sb.AppendLine($@"using Nox.Messaging.Events;");
@@ -163,7 +184,7 @@ public class NoxDynamicGenerator : ISourceGenerator
         context.AddSource(hintName, source);
     }
     
-    private static string GetEnvironment()
+    private static string? GetEnvironment()
     {
         var env = Environment.GetEnvironmentVariable("ENVIRONMENT");
         env ??= Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
