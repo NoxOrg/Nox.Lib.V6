@@ -13,22 +13,22 @@ namespace Nox.Generator;
 public class NoxDynamicGenerator : ISourceGenerator
 {
     //Info
-    private readonly DiagnosticDescriptor NI0000 = new("NI0000", "Debug Info",
+    public static readonly DiagnosticDescriptor NI0000 = new("NI0000", "Debug Info",
         "Debug: {0} {1}", "Debug",
         DiagnosticSeverity.Info, true);
-    private readonly DiagnosticDescriptor NI0001 = new("NI0001", "Found yaml definitions",
+    public static readonly DiagnosticDescriptor NI0001 = new("NI0001", "Found yaml definitions",
         "Nox.Generator will generate classes for {0} yaml definitions", "Design",
         DiagnosticSeverity.Info, true);
     //Warnings
-    private readonly DiagnosticDescriptor NW0001 = new("NW0001", "No yaml definitions",
+    public static readonly DiagnosticDescriptor NW0001 = new("NW0001", "No yaml definitions",
         "Nox.Generator will not contribute to your project as no yaml definitions were found", "Design",
         DiagnosticSeverity.Warning, true);
     
-    private readonly DiagnosticDescriptor NW0002 = new("NW0002", "AppSettings",
+    public static readonly DiagnosticDescriptor NW0002 = new("NW0002", "AppSettings",
         "DefinitionRootPath value not found in appsettings.json", "Design",
         DiagnosticSeverity.Warning, true);
     //Errors
-    private readonly DiagnosticDescriptor NE0001 = new("NE0001", "Duplicate Entity",
+    public static readonly DiagnosticDescriptor NE0001 = new("NE0001", "Duplicate Entity",
         "Duplicate entity detected in yaml configuration: {0}", "Design",
         DiagnosticSeverity.Error, true);
 
