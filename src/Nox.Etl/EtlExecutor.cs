@@ -74,7 +74,7 @@ public class EtlExecutor : IEtlExecutor
         var loaderInstance = (Loader)loader;
         foreach (var loaderSource in loaderInstance.Sources!)
         {
-            var dataSource = service.DataSources!.First(ds => ds.Name == loaderSource.Name);
+            var dataSource = service.DataSources!.First(ds => ds.Name == loaderSource.DataSource);
             
             var sourceDb = dataSource.DatabaseProvider!.ConnectionManager;
 

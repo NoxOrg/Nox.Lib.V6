@@ -42,7 +42,7 @@ public class NoxMessenger: INoxMessenger
                 try
                 {
                     if (_config.MessagingProviders == null) throw new ConfigurationException("Cannot add messaging if messaging providers not present in configuration!");
-                    var providerInstance = _config.MessagingProviders.First(p => p.Name == loaderMsg.Name);
+                    var providerInstance = _config.MessagingProviders.First(p => p.Name == loaderMsg.MessagingProvider);
                     switch (providerInstance.Provider!.ToLower())
                     {
                         case "rabbitmq":
