@@ -33,7 +33,7 @@
 <h3 align="center">Nox</h3>
 -->
   <p align="center">
-    Production-grade Microservices without the fuss!
+    Build and deploy enterprise-grade Microservices in under an hour
     <br />
     <br />
     <a href="https://github.com/noxorg/nox"><strong>View the documentation »</strong></a>
