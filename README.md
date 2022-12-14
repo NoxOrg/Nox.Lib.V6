@@ -80,7 +80,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Nox is a .NET microservice framework that allows developers to develop enterprise-grade, production-ready microservices in under an hour. 
+Nox is a .NET microservice framework that allows developers to build and deploy enterprise-grade, production-ready microservices in under an hour. 
 
 It removes all the ceremony, repition and technical details associated with building and maintaining applications without constraining developer creativity or control in any way.
 
@@ -121,13 +121,22 @@ Nox lets you focus on your business problem and domain, and provides you with th
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Create a standard .NET 6.0 web api project at the command line.
+### Prerequisites
+
+Make sure you have .NET 6 and Docker installed on your PC.
 ```powershell
-cd repos
+PS> dotnet --version
+6.0.404
 
-dotnet new webapi -o MyCurrencyApi
+PS> docker-compose --version
+Docker Compose version v2.13.0
+```
+### Creating your first Nox-powered microservice
+Create a standard .NET 6.0 web api project at the command line in your repositories folder and add the Nox.Lib nuget package.
+```powershell
+dotnet new webapi -o MyCurrencyService
 
-cd MyCurrencyApi
+cd MyCurrencyService
 
 dotnet add package Nox.Lib
 ```
@@ -136,73 +145,148 @@ At this point you can do a normal `dotnet run` which will present you with the s
 Next, create a new file to define your service called `currency.service.nox.yaml`:
 ```yaml
 #
-# myapi.service.nox.yaml
+# currency.service.nox.yaml
 #
 
-Name: MyCurrencyApi
+Name: MyCurrencyService
 
 Description: My Currency Microservice
 
 Database:
   Name: MyCurrencyApiDb
   Provider: SqlServer
-  Options: Trusted_Connection=no;connection timeout=120;
   Server: localhost
   User: sa
   Password: Developer*123
-     
+
+MessagingProviders:
+  - Name: InProcess
+    Provider: Mediator      
 ```
+Create an entity definition in `currency.entity.nox.yaml`
 
+```yaml
+#
+# currency.entity.nox.yaml
+#
 
+Name: Currency
+Description: Currency definition and related data
+
+Attributes:
+
+  - Name: Id
+    Description: The currency's unique identifier 
+    IsPrimaryKey: true
+    Type: int
+
+  - Name: Name
+    Description: The currency's name 
+    IsRequired: true
+    Type: string
+    MaxWidth: 128
+
+  - Name: ISO_Alpha3
+    Description: The currency's official ISO 4217 alpha-3 code
+    IsRequired: true
+    IsUnicode: false
+    Type: char
+    MinWidth: 3
+    MaxWidth: 3
+
+  - Name: Symbol
+    Description: The currency's well known symbol
+    Type: string
+    MaxWidth: 5
+```
+Edit your Program.cs file and add the following three lines..
+```csharp
+using Nox.Lib; // <--- Add this (1) <---
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddNox(); // <--- Add this (2) <---
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+app.UseNox(); // <--- Add this (3) <---
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
+```
+Create a `docker-compose.yaml` for running a Sql Server conatainer
+```YAML
+version: '3.7'
+
+services:
+  sqlserver:
+    container_name: sqlserver_container
+    image: "mcr.microsoft.com/azure-sql-edge:latest"
+    user: root
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "Developer*123"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    volumes:
+      - ./.docker-data/sqlserver:/var/opt/mssql/data
+```
+Then start your database with:
+```bash
+docker-compose up -d
+```
+And finally, start your API with:
 ```powershell
 dotnet run
 ```
-### Prerequisites
+The application will start up, using Nox and process the YAML files. Take note of the port that `dotnet new webapi` assigned to your project.
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+![Http Port](docs/images/nox-startup-port.png)
 
-### Installation
+### Exploring your new API
+Startup [Postman](https://www.postman.com/), tour favourite API Explore or your browser and navigate to `http://localhoast:(your port)/WeatherController` to see that the Microsoft standard controller works.
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-   ```sh
-   git clone https://github.com/noxorg/Nox.git
-   ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+![Explore 01](docs/images/nox-explore-01.png)
 
 
 
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Feature 1
-- [ ] Feature 2
-- [ ] Feature 3
-    - [ ] Nested Feature
+- [ ] Model-driven gRPC API's automatically for high-performance inter-service communication
+- [ ] GraphQL API automatically from YAML definitions
+- [ ] Health monitoring and observability as a first class features
+- [ ] ETL from files, API's and other database types
+- [ ] Production caching usin ElasticSearch
+- [ ] Full DevOps automation for creating, deploying and apgrading applications
+- [ ] Multi-environment support (dev/test/uat/prod/...)
+- [ ] Proper versioning of application changes accross deployments
+- [ ] DotNet command line tooling for Nox to interactively create YAML files, Helm charts and other required DevOps artifacts
+- [ ] E-Mail and other notification mechanisms for applications
+- [ ] Automated Backend-for-Frontend (BFF) creation
+- [ ] A universal Blazor-based UX that is dynamic rendered from the YAML definition
+- [ ] Better Swagger and user project documentation generation
+- [ ] A universal admin console to combine the various underlying library frontends (eg Hangfire) 
+
 
 See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues).
 
@@ -240,7 +324,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Andre Sharpe - [@twitter_handle](https://twitter.com/AndreSharpe72) 
+Twitter: [@AndreSharpe72](https://twitter.com/AndreSharpe72) 
 
 Project Link: [https://github.com/noxorg/nox](https://github.com/github_username/repo_name)
 
@@ -251,9 +335,8 @@ Project Link: [https://github.com/noxorg/nox](https://github.com/github_username
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* []()
-* []()
-* []()
+* Nox was inspired and draws heavily from [Paul DeVito](https://github.com/pdevito3)'s very impressive [Wrapt](https://wrapt.dev/) project. Nox is essentially (a less feature-rich) Wrapt without the code generation and aims to keep developer code 100% separate from the framework, and imposes no constraints on application architechture.
+* Nox would not have been possible without the many open-source projects that it draws from. The goal is to build on top of an already rich ecosystem of great libraries and tools like Microsoft's .NetCore, YamlDotNet, NewtonSoft.Json, Hangfire, Serilog, SqlKata, ETLBox, Entity Framework, MassTransit and others.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
