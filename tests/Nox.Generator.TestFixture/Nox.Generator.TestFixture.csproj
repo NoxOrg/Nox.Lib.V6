@@ -21,21 +21,6 @@
 
     <ItemGroup>
       <None Update="TestExecutable\appsettings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="TestExecutable\Design\Entities\Person\Person.entity.nox.yaml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="TestExecutable\Design\Entities\Person\Person.loader.nox.yaml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="TestExecutable\Design\Entities\Vehicle\Vehicle.entity.nox.yaml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="TestExecutable\Design\Entities\Vehicle\Vehicle.loader.nox.yaml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="TestExecutable\Design\test.service.nox.yaml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="TestExecutable\appsettings.Test.json">
@@ -59,16 +44,28 @@
       <None Update="TestExecutable\Test\Entities\Vehicle\Vehicle.loader.nox.yaml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="TestExecutable\TestDesign\test.service.nox.yaml">
+      <None Update="TestExecutable\appsettings.Empty.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="TestExecutable\TestDesign\test.api.nox.yaml">
+      <None Update="Design\test.service.nox.yaml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="TestExecutable\TestDesign\Entities\Person\Person.entity.nox.yaml">
+      <None Update="Design\Entities\Person\Person.loader.nox.yaml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="TestExecutable\TestDesign\Entities\Person\Person.loader.nox.yaml">
+      <None Update="Design\Entities\Person\Person.entity.nox.yaml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="TestDesign\Entities\Person\Person.entity.nox.yaml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="TestDesign\Entities\Person\Person.loader.nox.yaml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="TestDesign\test.api.nox.yaml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="TestDesign\test.service.nox.yaml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
