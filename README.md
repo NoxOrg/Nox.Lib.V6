@@ -262,8 +262,10 @@ The application will start up, using Nox and process the YAML files. Take note o
 
 ![Http Port](docs/images/nox-startup-port.png)
 
+In this case the port is `5237` and we will use it below (use your port number wherever you see `5237` instead).
+
 ### Exploring your new API
-Startup [Postman](https://www.postman.com/), tour favourite API Explore or your browser and navigate to `http://localhoast:(your port)/WeatherController` to see that the Microsoft standard controller works.
+Startup [Postman](https://www.postman.com/), tour favourite API Explore or your browser and navigate to `http://localhoast:5237/WeatherController` to see that the Microsoft standard controller works.
 
 ![Explore 01](docs/images/nox-explore-01.png)
 
