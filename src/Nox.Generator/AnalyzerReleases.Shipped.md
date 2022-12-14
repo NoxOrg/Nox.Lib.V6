@@ -16,4 +16,5 @@ Rule ID | Category | Severity | Notes
 NI0000  | Debug    | Info     | General use debug message 
 NW0002  | Design   | Warning  | DefinitionRootPath not found in appsettings.json
 NE0001  | Design   | Error    | Duplicate entity detected
+NE0002  | Design   | Error    | Invalid design root path
                   

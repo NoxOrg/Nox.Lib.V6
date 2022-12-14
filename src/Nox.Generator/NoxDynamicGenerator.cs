@@ -31,6 +31,9 @@ public class NoxDynamicGenerator : ISourceGenerator
     private readonly DiagnosticDescriptor NE0001 = new("NE0001", "Duplicate Entity",
         "Duplicate entity detected in yaml configuration: {0}", "Design",
         DiagnosticSeverity.Error, true);
+    private readonly DiagnosticDescriptor NE0002 = new("NE0002", "Invalid Design Root",
+        "Design root path {0} invalid!", "Design",
+        DiagnosticSeverity.Error, true);
 
     private List<string>? _entityNames;
     
@@ -48,7 +51,11 @@ public class NoxDynamicGenerator : ISourceGenerator
         if (mainSyntaxTree == null) return;
         
         var programPath = Path.GetDirectoryName(mainSyntaxTree.FilePath);
-        var designRootFullPath = Path.GetFullPath(programPath!);
+        if (programPath == null)
+        {
+            return;
+        }
+        var designRootFullPath = Path.GetFullPath(programPath!);    
         
         var json = Path.Combine(programPath!, "appsettings.json");
         if (File.Exists(json))
@@ -61,9 +68,16 @@ public class NoxDynamicGenerator : ISourceGenerator
             }
             else
             {
-                designRootFullPath = Path.GetFullPath(Path.Combine(programPath!, designRoot));    
+                if (!Directory.Exists(Path.Combine(programPath, designRoot)))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(NE0002, null));
+                    return;
+                }
+                designRootFullPath = Path.GetFullPath(Path.Combine(programPath, designRoot));    
             }
-        }  
+        } 
+        
+        
         
         var deserializer = new DeserializerBuilder().Build();
 
