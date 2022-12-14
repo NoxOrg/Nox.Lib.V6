@@ -101,7 +101,7 @@ public class ConfigurationTests
         Assert.That(config.Loaders![0].Schedule!.Start, Is.EqualTo("Daily at 2am UTC"));
         Assert.That(config.Loaders![0].Sources, Is.Not.Empty);
         Assert.That(config.Loaders![0].Sources!.Count, Is.EqualTo(1));
-        Assert.That(config.Loaders![0].Sources![0].Name, Is.EqualTo("TestDataSource2"));
+        Assert.That(config.Loaders![0].Sources![0].DataSource, Is.EqualTo("TestDataSource2"));
         Assert.That(config.Loaders![0].Sources![0].MinimumExpectedRecords, Is.EqualTo(30));
         Assert.That(config.Loaders![0].Sources![0].Query, Is.Not.Empty);
         

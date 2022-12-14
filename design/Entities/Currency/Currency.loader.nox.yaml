@@ -21,11 +21,11 @@ Target:
   Entity: Currency
   
 Messaging:
-  - Name: Bunny
-  - Name: InProcess  
+  - MessagingProvider: Bunny
+  - MessagingProvider: InProcess  
 
 Sources:
-  - Name: BusinessSystem
+  - DataSource: BusinessSystem
     MinimumExpectedRecords: 160
     Query: >-
       SELECT [CurrencyID] AS [Id]

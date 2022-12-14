@@ -3,6 +3,7 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using Nox;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Messaging;
 using Nox.Messaging;
 
 namespace Samples.Cli.Commands;

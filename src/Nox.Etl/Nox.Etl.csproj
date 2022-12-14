@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>6.0.10.0</AssemblyVersion>
-    <FileVersion>6.0.10.0</FileVersion>
+    <AssemblyVersion>6.0.12.0</AssemblyVersion>
+    <FileVersion>6.0.12.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
@@ -18,12 +18,12 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Nox.Core\Nox.Core.csproj"/>
-    <ProjectReference Include="..\Nox.Data\Nox.Data.csproj"/>
-    <ProjectReference Include="..\Nox.Messaging\Nox.Messaging.csproj"/>
+    <ProjectReference Include="..\Nox.Core\Nox.Core.csproj" />
+    <ProjectReference Include="..\Nox.Data\Nox.Data.csproj" />
+    <ProjectReference Include="..\Nox.Messaging\Nox.Messaging.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ETLBox" Version="2.6.6"/>
-    <PackageReference Include="SqlKata" Version="2.4.0"/>
+    <PackageReference Include="ETLBox" Version="2.6.6" />
+    <PackageReference Include="SqlKata" Version="2.4.0" />
   </ItemGroup>
 </Project>

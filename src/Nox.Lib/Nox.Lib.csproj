@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -21,78 +21,78 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Copyright>Copyright (c) Andre Sharpe 2022</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>6.0.10.0</AssemblyVersion>
-    <FileVersion>6.0.10.0</FileVersion>
-    <PackageVersion>6.0.10</PackageVersion>
+    <AssemblyVersion>6.0.12.0</AssemblyVersion>
+    <FileVersion>6.0.12.0</FileVersion>
+    <PackageVersion>6.0.12</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>nox.png</PackageIcon>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="12.0.0"/>
-    <PackageReference Include="ETLBox" Version="2.6.6"/>
-    <PackageReference Include="ETLBox.MySql" Version="2.6.6"/>
-    <PackageReference Include="ETLBox.Postgres" Version="2.6.6"/>
-    <PackageReference Include="ETLBox.SqlServer" Version="2.6.6"/>
-    <PackageReference Include="FluentValidation" Version="11.4.0"/>
-    <PackageReference Include="Hangfire" Version="1.7.32"/>
-    <PackageReference Include="Hangfire.Core" Version="1.7.32"/>
-    <PackageReference Include="Hangfire.MySqlStorage" Version="2.0.3"/>
-    <PackageReference Include="Hangfire.PostgreSql" Version="1.9.9"/>
-    <PackageReference Include="Hangfire.SqlServer" Version="1.7.32"/>
-    <PackageReference Include="Humanizer.Core" Version="2.14.1"/>
-    <PackageReference Include="MassTransit" Version="8.0.9"/>
-    <PackageReference Include="MassTransit.Abstractions" Version="8.0.9"/>
-    <PackageReference Include="MassTransit.AmazonSQS" Version="8.0.9"/>
-    <PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="8.0.9"/>
-    <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.9"/>
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0"/>
-    <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.11"/>
-    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2"/>
-    <PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.2.0"/>
-    <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.5"/>
-    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.11"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.11"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.11"/>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0"/>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0"/>
-    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="7.0.0"/>
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="7.0.0"/>
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="7.0.0"/>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0"/>
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0"/>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0"/>
-    <PackageReference Include="Microsoft.OData.Core" Version="7.12.5"/>
-    <PackageReference Include="Microsoft.OData.Edm" Version="7.12.5"/>
-    <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.9"/>
-    <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.3.0"/>
-    <PackageReference Include="MySql.EntityFrameworkCore" Version="6.0.7"/>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2"/>
-    <PackageReference Include="Nox.Cron" Version="1.0.10"/>
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7"/>
-    <PackageReference Include="Serilog" Version="2.12.0"/>
-    <PackageReference Include="SqlKata" Version="2.4.0"/>
-    <PackageReference Include="YamlDotNet" Version="12.1.0"/>
+    <PackageReference Include="AutoMapper" Version="12.0.0" />
+    <PackageReference Include="ETLBox" Version="2.6.6" />
+    <PackageReference Include="ETLBox.MySql" Version="2.6.6" />
+    <PackageReference Include="ETLBox.Postgres" Version="2.6.6" />
+    <PackageReference Include="ETLBox.SqlServer" Version="2.6.6" />
+    <PackageReference Include="FluentValidation" Version="11.4.0" />
+    <PackageReference Include="Hangfire" Version="1.7.32" />
+    <PackageReference Include="Hangfire.Core" Version="1.7.32" />
+    <PackageReference Include="Hangfire.MySqlStorage" Version="2.0.3" />
+    <PackageReference Include="Hangfire.PostgreSql" Version="1.9.9" />
+    <PackageReference Include="Hangfire.SqlServer" Version="1.7.32" />
+    <PackageReference Include="Humanizer.Core" Version="2.14.1" />
+    <PackageReference Include="MassTransit" Version="8.0.9" />
+    <PackageReference Include="MassTransit.Abstractions" Version="8.0.9" />
+    <PackageReference Include="MassTransit.AmazonSQS" Version="8.0.9" />
+    <PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="8.0.9" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.5" />
+    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.OData.Core" Version="7.12.5" />
+    <PackageReference Include="Microsoft.OData.Edm" Version="7.12.5" />
+    <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.9" />
+    <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.3.0" />
+    <PackageReference Include="MySql.EntityFrameworkCore" Version="6.0.7" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="Nox.Cron" Version="1.0.10" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
+    <PackageReference Include="Serilog" Version="2.12.0" />
+    <PackageReference Include="SqlKata" Version="2.4.0" />
+    <PackageReference Include="YamlDotNet" Version="12.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Nox.Api\Nox.Api.csproj" PrivateAssets="all"/>
-    <ProjectReference Include="..\Nox.Core\Nox.Core.csproj" PrivateAssets="all"/>
-    <ProjectReference Include="..\Nox.Data\Nox.Data.csproj" PrivateAssets="all"/>
-    <ProjectReference Include="..\Nox.Etl\Nox.Etl.csproj" PrivateAssets="all"/>
-    <ProjectReference Include="..\Nox.Generator\Nox.Generator.csproj" PrivateAssets="all"/>
-    <ProjectReference Include="..\Nox.Jobs\Nox.Jobs.csproj" PrivateAssets="all"/>
-    <ProjectReference Include="..\Nox.Messaging\Nox.Messaging.csproj" PrivateAssets="all"/>
+    <ProjectReference Include="..\Nox.Api\Nox.Api.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\Nox.Core\Nox.Core.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\Nox.Data\Nox.Data.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\Nox.Etl\Nox.Etl.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\Nox.Generator\Nox.Generator.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\Nox.Jobs\Nox.Jobs.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\Nox.Messaging\Nox.Messaging.csproj" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="OData\Commands\**"/>
-    <Compile Remove="OData\Notifications\**"/>
-    <Compile Remove="OData\Queries\**"/>
-    <EmbeddedResource Remove="OData\Commands\**"/>
-    <EmbeddedResource Remove="OData\Notifications\**"/>
-    <EmbeddedResource Remove="OData\Queries\**"/>
-    <None Remove="OData\Commands\**"/>
-    <None Remove="OData\Notifications\**"/>
-    <None Remove="OData\Queries\**"/>
+    <Compile Remove="OData\Commands\**" />
+    <Compile Remove="OData\Notifications\**" />
+    <Compile Remove="OData\Queries\**" />
+    <EmbeddedResource Remove="OData\Commands\**" />
+    <EmbeddedResource Remove="OData\Notifications\**" />
+    <EmbeddedResource Remove="OData\Queries\**" />
+    <None Remove="OData\Commands\**" />
+    <None Remove="OData\Notifications\**" />
+    <None Remove="OData\Queries\**" />
   </ItemGroup>
   <ItemGroup>
     <None Update="tools\install.ps1">
@@ -163,11 +163,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\nox.png" Pack="true" PackagePath=""/>
+    <None Include="..\..\nox.png" Pack="true" PackagePath="" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath=""/>
-    <None Include="$(OutputPath)\Nox.Generator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+    <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
+    <None Include="$(OutputPath)\Nox.Generator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\src\Nox.Generator\bin\$(Configuration)\netstandard2.0\Newtonsoft.Json.dll">

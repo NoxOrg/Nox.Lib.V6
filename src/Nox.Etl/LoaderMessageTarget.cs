@@ -6,5 +6,5 @@ namespace Nox.Etl;
 
 public sealed class LoaderMessageTarget: MetaBase, ILoaderMessageTarget
 {
-    public string Name { get; set; } = string.Empty;
+    public string MessagingProvider { get; set; } = string.Empty;
 }
