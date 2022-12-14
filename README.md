@@ -33,7 +33,7 @@
 <h3 align="center">Nox</h3>
 -->
   <p align="center">
-    Build and deploy enterprise-grade Microservices in under an hour
+    Build and deploy enterprise-grade microservices in under an hour
     <br />
     <br />
     <a href="https://github.com/noxorg/nox"><strong>View the documentation »</strong></a>
@@ -47,7 +47,6 @@
   </p>
 </div>
     <br />
-
 
 
 <!-- TABLE OF CONTENTS -->
@@ -85,6 +84,11 @@ Nox is a .NET microservice framework that allows developers to develop enterpris
 
 It removes all the ceremony, repition and technical details associated with building and maintaining applications without constraining developer creativity or control in any way.
 
+<div align="center">
+    <img src="docs/images/nox_overview.png" alt="Overview" width="100%">
+</div>
+<br />
+
 ## Main Features
 
 Nox lets you focus on your business problem and domain, and provides you with the following auto-magic features:-
@@ -104,56 +108,49 @@ Nox lets you focus on your business problem and domain, and provides you with th
 
 ### Built With
 
-* [![.NET][.NET]][.NET-url]
-* [![ETLBox][ETLBox]][ETLBox-url]
-* [![Hangfire][Hangfire.io]][Hangfire-url]
+[![.NET][.NET]][.NET-url]
+[![ETLBox][ETLBox]][ETLBox-url]
+[![AutoMapper][AutoMapper]][AutoMapper-url]
+[![Hangfire][Hangfire.io]][Hangfire-url]
+[![MassTransit][MassTransit]][MassTransit-url]
+[![YamlDotNet][YamlDotNet]][YamlDotNet-url]
+[![FluentValidation][FluentValidation]][FluentValidation-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Create a standard .NET 6.0 web api project
+Create a standard .NET 6.0 web api project at the command line.
 ```powershell
 cd repos
 
-dotnet new webapi -o MyApi
+dotnet new webapi -o MyCurrencyApi
 
-cd MyApi
+cd MyCurrencyApi
 
 dotnet add package Nox.Lib
 ```
 At this point you can do a normal `dotnet run` which will present you with the standard Microsoft WeatherController.
 
-Next, create a new file to define your service called `myapi.service.nox.yaml`:
+Next, create a new file to define your service called `currency.service.nox.yaml`:
 ```yaml
 #
 # myapi.service.nox.yaml
 #
 
-Name: MyApi
+Name: MyCurrencyApi
 
-Description: My Best Microservice
+Description: My Currency Microservice
 
 Database:
-  Name: MyApiDb
+  Name: MyCurrencyApiDb
   Provider: SqlServer
   Options: Trusted_Connection=no;connection timeout=120;
   Server: localhost
   User: sa
   Password: Developer*123
-
-MessagingProviders:
-  - Name: MyApiMessageBus
-    Provider: RabbitMQ
-    ConnectionString: rabbitmq://guest:guest@localhost/
-  - Name: InProcess
-    Provider: Mediator  
-      
-DataSources:
-  - Name: BusinessSystem
-    ConnectionVariable: ConnectionString:MasterDataSource
-    Provider: SqlServer
+     
 ```
 
 
@@ -286,3 +283,11 @@ Project Link: [https://github.com/noxorg/nox](https://github.com/github_username
 [Hangfire-url]: https://www.hangfire.io/ 
 [.NET]: https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=dotnet&logoColor=white
 [.NET-url]: https://dotnet.microsoft.com/
+[MassTransit]: https://img.shields.io/badge/MassTransit-0EA5E9?style=for-the-badge
+[MassTransit-url]: https://masstransit-project.com/
+[YamlDotNet]: https://img.shields.io/badge/YamlDotNet-8B0000?style=for-the-badge
+[YamlDotNet-url]: https://github.com/aaubry/YamlDotNet
+[AutoMapper]: https://img.shields.io/badge/AutoMapper-BE161D?style=for-the-badge
+[AutoMapper-url]: https://automapper.org/
+[FluentValidation]: https://img.shields.io/badge/FluentValidation-2980B9?style=for-the-badge
+[FluentValidation-url]: https://docs.fluentvalidation.net/
