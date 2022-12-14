@@ -1,4 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Nox.Core.Interfaces.Api;
+using Nox.Core.Interfaces.Entity;
+using Nox.Core.Interfaces.Etl;
 
 namespace Nox.Core.Interfaces
 {

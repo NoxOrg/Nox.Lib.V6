@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Reflection.Emit;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Entity;
 
 namespace Nox.Data;
 

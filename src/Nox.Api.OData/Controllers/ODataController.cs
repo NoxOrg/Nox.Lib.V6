@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.OData.UriParser;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Database;
 
 namespace Nox.Api.OData.Controllers
 {

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Nox.Core.Components;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Entity;
 
 namespace Nox.Core.Models;
 

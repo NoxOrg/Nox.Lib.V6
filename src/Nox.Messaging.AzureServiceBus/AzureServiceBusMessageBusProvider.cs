@@ -1,5 +1,6 @@
 using MassTransit;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Messaging;
 
 namespace Nox.Messaging.AzureServiceBus;
 

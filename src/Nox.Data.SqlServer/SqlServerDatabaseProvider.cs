@@ -5,6 +5,8 @@ using Hangfire.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces.Entity;
 using SqlKata.Compilers;
 
 namespace Nox.Data.SqlServer;

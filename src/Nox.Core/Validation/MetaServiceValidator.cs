@@ -1,8 +1,9 @@
 using FluentValidation;
+using Nox.Core.Interfaces;
 
-namespace Nox.Lib.Validation;
+namespace Nox.Core.Validation;
 
-public class MetaServiceValidator : AbstractValidator<MetaService>
+public class MetaServiceValidator : AbstractValidator<IMetaService>
 {
     public MetaServiceValidator()
     {

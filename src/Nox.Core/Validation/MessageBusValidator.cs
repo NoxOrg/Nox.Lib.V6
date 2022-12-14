@@ -1,7 +1,7 @@
 using FluentValidation;
 using Nox.Core.Components;
 
-namespace Nox.Lib.Validation;
+namespace Nox.Core.Validation;
 
 public class MessageBusValidator : AbstractValidator<MessagingProviderBase>
 {

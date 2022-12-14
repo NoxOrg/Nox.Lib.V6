@@ -2,6 +2,9 @@ using MassTransit;
 using MassTransit.Mediator;
 using Microsoft.Extensions.Logging;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Configuration;
+using Nox.Core.Interfaces.Etl;
+using Nox.Core.Interfaces.Messaging;
 
 namespace Nox.Messaging;
 

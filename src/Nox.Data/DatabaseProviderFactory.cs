@@ -1,4 +1,5 @@
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Database;
 
 namespace Nox.Data;
 

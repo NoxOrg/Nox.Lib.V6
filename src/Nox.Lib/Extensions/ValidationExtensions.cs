@@ -1,5 +1,5 @@
 using FluentValidation;
-using Nox.Lib.Validation;
+using Nox.Core.Validation;
 
 namespace Nox.Lib;
 

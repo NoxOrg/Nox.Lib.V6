@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Messaging;
 using Nox.Messaging;
 
 namespace Nox.Lib;

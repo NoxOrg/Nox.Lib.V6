@@ -3,6 +3,8 @@ using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Nox.Core.Configuration;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Configuration;
+using Nox.Core.Interfaces.Messaging;
 using Nox.Messaging.AmazonSQS;
 using Nox.Messaging.AzureServiceBus;
 using Nox.Messaging.Events;

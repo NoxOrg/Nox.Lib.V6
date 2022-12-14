@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Etl;
 using Nox.TestFixtures;
 using NUnit.Framework;
 
