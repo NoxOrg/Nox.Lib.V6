@@ -27,22 +27,11 @@ public class GeneratorTests: GeneratorTestFixture
         var appSetFile = "./TestExecutable/appsettings.json";
         if (File.Exists($"{appSetFile}.tmp")) File.Delete($"{appSetFile}.tmp");
         File.Move(appSetFile, $"{appSetFile}.tmp");
-        Environment.SetEnvironmentVariable("ENVIRONMENT", "Empty");
         var compilation = GenerateTestExeCompilation();
         Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
         var updatedComp = RunGenerators(compilation, out var generatorDiags, new NoxDynamicGenerator());
         Assert.That(updatedComp.SyntaxTrees.Count(), Is.EqualTo(1));
         File.Move($"{appSetFile}.tmp", appSetFile);
-    }
-    
-    [Test]
-    public void Can_Generate_Dynamic_Entity_Sources_From_Env_AppSettings()
-    {
-        Environment.SetEnvironmentVariable("ENVIRONMENT", "Test");
-        var compilation = GenerateTestExeCompilation();
-        Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
-        var updatedComp = RunGenerators(compilation, out var generatorDiags, new NoxDynamicGenerator());
-        Assert.That(updatedComp.SyntaxTrees.Count(), Is.EqualTo(5));
     }
     
     [Test]
@@ -51,12 +40,26 @@ public class GeneratorTests: GeneratorTestFixture
         var appSetFile = "./TestExecutable/appsettings.json";
         if (File.Exists($"{appSetFile}.tmp")) File.Delete($"{appSetFile}.tmp");
         File.Move(appSetFile, $"{appSetFile}.tmp");
-        Environment.SetEnvironmentVariable("ENVIRONMENT", "Empty");
         var compilation = GenerateTestExeCompilation();
         Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
         var updatedComp = RunGenerators(compilation, out var generatorDiags, new NoxDynamicGenerator());
         Assert.That(updatedComp.SyntaxTrees.Count(), Is.EqualTo(1));
         File.Move($"{appSetFile}.tmp", appSetFile);
+    }
+    
+    [Test]
+    public void Can_Generate_Dynamic_Entity_Sources_From_Bloated_AppSettings()
+    {
+        var appSetFile = "./TestExecutable/appsettings.json";
+        var bloatFile = "./TestExecutable/appsettings.bloated.json";
+        if (File.Exists($"{appSetFile}.tmp")) File.Delete($"{appSetFile}.tmp");
+        File.Move(appSetFile, $"{appSetFile}.tmp");
+        File.Copy(bloatFile, appSetFile, true);
+        var compilation = GenerateTestExeCompilation();
+        Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
+        var updatedComp = RunGenerators(compilation, out var generatorDiags, new NoxDynamicGenerator());
+        Assert.That(updatedComp.SyntaxTrees.Count(), Is.EqualTo(5));
+        File.Move($"{appSetFile}.tmp", appSetFile, true);
     }
 
     private Compilation RunGenerators(Compilation c, out ImmutableArray<Diagnostic> diagnostics, params ISourceGenerator[] generators)

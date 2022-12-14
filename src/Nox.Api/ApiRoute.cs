@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using Nox.Core.Components;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Api;
 
 namespace Nox.Api
 {

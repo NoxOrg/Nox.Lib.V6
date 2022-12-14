@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>6.0.9.0</AssemblyVersion>
-    <FileVersion>6.0.9.0</FileVersion>
+    <AssemblyVersion>6.0.10.0</AssemblyVersion>
+    <FileVersion>6.0.10.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
@@ -46,13 +46,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MassTransit" Version="8.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    <PackageReference Include="MassTransit" Version="8.0.9"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0"/>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Nox.Messaging.AmazonSQS\Nox.Messaging.AmazonSQS.csproj" />
-    <ProjectReference Include="..\Nox.Messaging.AzureServiceBus\Nox.Messaging.AzureServiceBus.csproj" />
-    <ProjectReference Include="..\Nox.Messaging.RabbitMQ\Nox.Messaging.RabbitMQ.csproj" />
+    <ProjectReference Include="..\Nox.Messaging.AmazonSQS\Nox.Messaging.AmazonSQS.csproj"/>
+    <ProjectReference Include="..\Nox.Messaging.AzureServiceBus\Nox.Messaging.AzureServiceBus.csproj"/>
+    <ProjectReference Include="..\Nox.Messaging.RabbitMQ\Nox.Messaging.RabbitMQ.csproj"/>
   </ItemGroup>
 </Project>

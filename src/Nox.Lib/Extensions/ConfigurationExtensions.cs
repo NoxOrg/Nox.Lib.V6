@@ -1,6 +1,7 @@
 using AutoMapper;
 using Nox.Core.Configuration;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Configuration;
 using Nox.Core.Models;
 using Nox.Data;
 using Nox.Etl;

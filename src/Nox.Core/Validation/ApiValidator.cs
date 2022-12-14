@@ -1,8 +1,9 @@
 using FluentValidation;
+using Nox.Core.Interfaces.Api;
 
-namespace Nox.Lib.Validation;
+namespace Nox.Core.Validation;
 
-public class ApiValidator : AbstractValidator<Api.Api>
+public class ApiValidator : AbstractValidator<IApi>
 {
     public ApiValidator()
     {

@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Dynamic;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Entity;
 using Nox.Messaging.Enumerations;
 using Nox.Messaging.Events;
 

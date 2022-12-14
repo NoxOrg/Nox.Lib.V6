@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Database;
 using Nox.Data.MySql;
 using Nox.Data.Postgres;
 using Nox.Data.SqlServer;

@@ -1,4 +1,6 @@
-namespace Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Etl;
+
+namespace Nox.Core.Interfaces.Messaging;
 
 public interface INoxMessenger
 {

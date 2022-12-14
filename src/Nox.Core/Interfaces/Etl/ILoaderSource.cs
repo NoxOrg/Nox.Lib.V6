@@ -1,4 +1,4 @@
-namespace Nox.Core.Interfaces;
+namespace Nox.Core.Interfaces.Etl;
 
 public interface ILoaderSource: IMetaBase
 {

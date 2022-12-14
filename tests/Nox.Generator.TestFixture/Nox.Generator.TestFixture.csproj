@@ -23,9 +23,6 @@
       <None Update="TestExecutable\appsettings.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="TestExecutable\appsettings.Test.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
       <None Update="TestExecutable\Test\test.api.nox.yaml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
@@ -42,9 +39,6 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="TestExecutable\Test\Entities\Vehicle\Vehicle.loader.nox.yaml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="TestExecutable\appsettings.Empty.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Design\test.service.nox.yaml">
@@ -66,6 +60,9 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="TestDesign\test.service.nox.yaml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="TestExecutable\appsettings.bloated.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using Nox.Core.Components;
 using Nox.Core.Constants;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Configuration;
 
 namespace Nox.Core.Configuration;
 

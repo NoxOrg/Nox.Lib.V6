@@ -1,6 +1,6 @@
 using Nox.Core.Configuration;
 
-namespace Nox.Core.Interfaces;
+namespace Nox.Core.Interfaces.Configuration;
 
 public interface INoxConfiguration
 {

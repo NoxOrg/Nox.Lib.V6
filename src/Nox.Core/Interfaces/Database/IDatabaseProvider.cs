@@ -2,9 +2,10 @@
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Nox.Core.Interfaces.Entity;
 using SqlKata.Compilers;
 
-namespace Nox.Core.Interfaces
+namespace Nox.Core.Interfaces.Database
 {
     public interface IDatabaseProvider
     {

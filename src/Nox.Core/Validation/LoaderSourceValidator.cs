@@ -1,7 +1,7 @@
 using FluentValidation;
-using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Etl;
 
-namespace Nox.Lib.Validation;
+namespace Nox.Core.Validation;
 
 public class LoaderSourceValidator : AbstractValidator<ILoaderSource>
 {

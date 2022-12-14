@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
@@ -15,12 +12,32 @@ namespace Nox.Generator;
 [Generator]
 public class NoxDynamicGenerator : ISourceGenerator
 {
-    private readonly DiagnosticDescriptor NI0001 = new("NI0001", "No yaml definitions",
-        "Nox.Generator will not contribute to your project as no yaml definitions were found", "Design",
+    //Info
+    private readonly DiagnosticDescriptor NI0000 = new("NI0000", "Debug Info",
+        "Debug: {0} {1}", "Debug",
         DiagnosticSeverity.Info, true);
-    private readonly DiagnosticDescriptor NI0002 = new("NI0002", "Found yaml definitions",
+    private readonly DiagnosticDescriptor NI0001 = new("NI0001", "Found yaml definitions",
         "Nox.Generator will generate classes for {0} yaml definitions", "Design",
         DiagnosticSeverity.Info, true);
+    //Warnings
+    private readonly DiagnosticDescriptor NW0001 = new("NW0001", "No yaml definitions",
+        "Nox.Generator will not contribute to your project as no yaml definitions were found", "Design",
+        DiagnosticSeverity.Warning, true);
+    
+    private readonly DiagnosticDescriptor NW0002 = new("NW0002", "AppSettings",
+        "DefinitionRootPath value not found in appsettings.json", "Design",
+        DiagnosticSeverity.Warning, true);
+    //Errors
+    private readonly DiagnosticDescriptor NE0001 = new("NE0001", "Duplicate Entity",
+        "Duplicate entity detected in yaml configuration: {0}", "Design",
+        DiagnosticSeverity.Error, true);
+
+    private List<string>? _entityNames;
+    
+    public void Initialize(GeneratorInitializationContext context)
+    {
+        
+    }
     
     public void Execute(GeneratorExecutionContext context)
     {
@@ -30,36 +47,24 @@ public class NoxDynamicGenerator : ISourceGenerator
         
         if (mainSyntaxTree == null) return;
         
-        Console.WriteLine(mainSyntaxTree.FilePath);
-
         var programPath = Path.GetDirectoryName(mainSyntaxTree.FilePath);
-        string? designRoot = null;
+        var designRootFullPath = Path.GetFullPath(programPath!);
         
         var json = Path.Combine(programPath!, "appsettings.json");
         if (File.Exists(json))
         {
             var config = JObject.Parse(File.ReadAllText(json));
-            designRoot = config["Nox"]?["DefinitionRootPath"]?.ToString();
+            var designRoot = config["Nox"]?["DefinitionRootPath"]?.ToString();
+            if (string.IsNullOrEmpty(designRoot))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(NW0002, null));
+            }
+            else
+            {
+                designRootFullPath = Path.GetFullPath(Path.Combine(programPath!, designRoot));    
+            }
         }  
         
-        var env = GetEnvironment();
-        if (!string.IsNullOrEmpty(env))
-        {
-            var envJson = Path.Combine(programPath!, $"appsettings.{env}.json");
-            if (File.Exists(envJson))
-            {
-                var envConfig = JObject.Parse(File.ReadAllText(envJson));
-                designRoot = envConfig["Nox"]?["DefinitionRootPath"]?.ToString();
-            }
-        }
-
-        if (string.IsNullOrEmpty(designRoot))
-        {
-            designRoot = programPath;
-        }
-        
-        var designRootFullPath = Path.GetFullPath(Path.Combine(programPath!, designRoot));
-
         var deserializer = new DeserializerBuilder().Build();
 
         var entities = Directory
@@ -69,22 +74,23 @@ public class NoxDynamicGenerator : ISourceGenerator
 
         if (!entities.Any())
         {
-            context.ReportDiagnostic(Diagnostic.Create(NI0001, null, DiagnosticSeverity.Info));
+            context.ReportDiagnostic(Diagnostic.Create(NW0001, null));
         }
-
-        context.ReportDiagnostic(Diagnostic.Create(NI0002, null, DiagnosticSeverity.Info, entities.Count));
-        
-        foreach (Dictionary<object, object>? entity in entities)
+        else
         {
-            AddEntity(context, assemblyName!, entity!);
-            AddDomainEvent(context, assemblyName!, GeneratorEventTypeEnum.Created, entity!);
-            AddDomainEvent(context, assemblyName!, GeneratorEventTypeEnum.Updated, entity!);
-            AddDomainEvent(context, assemblyName!, GeneratorEventTypeEnum.Deleted, entity!);
-        }    
-    }
-
-    public void Initialize(GeneratorInitializationContext context)
-    {
+            _entityNames = new List<string>();
+            context.ReportDiagnostic(Diagnostic.Create(NI0001, null, entities.Count));
+        
+            foreach (Dictionary<object, object>? entity in entities)
+            {
+                if (AddEntity(context, assemblyName!, entity!))
+                {
+                    AddDomainEvent(context, assemblyName!, GeneratorEventTypeEnum.Created, entity!);
+                    AddDomainEvent(context, assemblyName!, GeneratorEventTypeEnum.Updated, entity!);
+                    AddDomainEvent(context, assemblyName!, GeneratorEventTypeEnum.Deleted, entity!);    
+                }
+            }    
+        }
     }
 
     private string ClassDataType(string type)
@@ -123,17 +129,24 @@ public class NoxDynamicGenerator : ISourceGenerator
 
     }
 
-    private void AddEntity(GeneratorExecutionContext context, string assemblyName, Dictionary<object, object>? entity)
+    private bool AddEntity(GeneratorExecutionContext context, string assemblyName, Dictionary<object, object>? entity)
     {
+        var entityName = entity!["Name"].ToString();
+        if (_entityNames!.Any(n => n == entityName))
+        {
+            context.ReportDiagnostic(Diagnostic.Create(NE0001, null, entityName));
+            return false;
+        }
+        _entityNames!.Add(entityName);
         var sb = new StringBuilder();
 
-        sb.AppendLine($@"// autogenerated");
-        sb.AppendLine($@"using Nox.Core.Interfaces;");
-        sb.AppendLine($@"");
-        sb.AppendLine($@"namespace Nox;");
-        sb.AppendLine($@"");
-        sb.AppendLine($@"public class {entity!["Name"]} : IDynamicEntity");
-        sb.AppendLine($@"{{");
+        sb.AppendLine(@"// autogenerated");
+        sb.AppendLine(@"using Nox.Core.Interfaces.Entity;");
+        sb.AppendLine(@"");
+        sb.AppendLine(@"namespace Nox;");
+        sb.AppendLine(@"");
+        sb.AppendLine($@"public class {entityName} : IDynamicEntity");
+        sb.AppendLine(@"{");
 
         var attributes = (List<object>)entity["Attributes"];
         foreach (Dictionary<object, object> attr in attributes)
@@ -141,12 +154,13 @@ public class NoxDynamicGenerator : ISourceGenerator
             sb.AppendLine($@"   public {ClassDataType((string)attr["Type"])} {attr["Name"]} {{get; set;}}");
         }
 
-        sb.AppendLine($@"}}");
+        sb.AppendLine(@"}");
 
-        var hintName = $"{entity["Name"]}.g.cs";
+        var hintName = $"{entityName}.g.cs";
         var source = SourceText.From(sb.ToString(), Encoding.UTF8);
 
         context.AddSource(hintName, source);
+        return true;
     }
 
     private void AddDomainEvent(GeneratorExecutionContext context, string assemblyName, GeneratorEventTypeEnum generatorEventType, Dictionary<object, object>? entity)
@@ -182,13 +196,5 @@ public class NoxDynamicGenerator : ISourceGenerator
         var source = SourceText.From(sb.ToString(), Encoding.UTF8);
 
         context.AddSource(hintName, source);
-    }
-    
-    private static string? GetEnvironment()
-    {
-        var env = Environment.GetEnvironmentVariable("ENVIRONMENT");
-        env ??= Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
-        env ??= Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-        return env;
     }
 }
