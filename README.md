@@ -350,6 +350,7 @@ To display the currencies you've just added send a `GET` request to `http://loca
 
 
 ### Filtering and Pagination
+---
 
 You can try the following url's with `GET` to further explore the API.
 
@@ -365,6 +366,7 @@ http://localhost:5237/odata/Currencies?$filter=Name ne 'US Dollar'
 You can read up more about the many features of OData at https://www.odata.org/
 
 ### Next Steps
+---
 
 This quick-start is really just the tip of the Nox iceberg. To develop serious microservices for business requires quite a bit more than a quick API.
 
