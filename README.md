@@ -305,13 +305,13 @@ You will then be able to follow the exploration section of these docs using the 
 
 ### Exploring Your New API
 ---
-Startup [Postman](https://www.postman.com/) or your browser and navigate to `http://localhoast:5237/WeatherController` to see that the Microsoft standard controller works.
+Startup [Postman](https://www.postman.com/) or your browser and navigate to `http://localhost:5237/WeatherController` to see that the Microsoft standard controller works.
 
 ![Explore 01](docs/images/nox-explore-01.png)
 
 ### Swagger Docs
 ---
-To view the dynamic endpoints that Nox added to your project,browse to `http://localhoast:5237/swagger`.
+To view the dynamic endpoints that Nox added to your project,browse to `http://localhost:5237/swagger`.
 ![Swagger](docs/images/nox-explore-swagger.png)
 
 ### Add a Currency
@@ -330,7 +330,7 @@ When you click on the `Send` button, you should get a `201` (Created) response.
 
 ![Swagger](docs/images/nox-explore-created.png)
 
-You can reate an entry for US Dollars by replacing the body with:-
+You can create an entry for US Dollars by replacing the body with:-
 
 ```json
 {
@@ -370,7 +370,7 @@ You can read up more about the many features of OData at https://www.odata.org/
 
 This quick-start is really just the tip of the Nox iceberg. To develop serious microservices for business requires quite a bit more than a quick API.
 
-More documentation will be added shortly to help illustrate the broaded feature-set of Nox-enabled applications.
+More documentation will be added shortly to help illustrate the broader feature-set of Nox-enabled applications.
 
 <!-- ROADMAP -->
 ## Roadmap
@@ -414,7 +414,7 @@ Don't forget to give the project a star! Thanks again!
 ### Hassle-free Development
 ---
 
-The Nox project uses the [goo](https://goo.dev/) cross-platfoerm development to make building and testing code hassle free.
+The Nox project uses the [goo](https://goo.dev/) cross-platform development to make building and testing code hassle free.
 
 ```powershell
 git clone https://github.com/NoxOrg/Nox.git
