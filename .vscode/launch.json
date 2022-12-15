@@ -9,7 +9,7 @@
             "type": "PowerShell",
             "request": "launch",
             "script": "${file}",
-            "args": ["pp"],
+            "args": ["bump-version"],
             "cwd": "${file}"
         }
     ]
