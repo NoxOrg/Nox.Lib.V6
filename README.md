@@ -64,10 +64,19 @@
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
+        <li><a href="#creating-a-project">Creating a Project</a></li>
+        <li><a href="#adding-nox">Adding Nox</a></li>
+        <li><a href="#define-your-service-and-entities">Define Your Service and Entities</a></li>
+        <li><a href="#setup-sqlServer-with-docker">Setup SqlServer with Docker</a></li>
+        <li><a href="#start-your-service">Start Your Service</a></li>
+        <li><a href="#exploring-your-new-aPI">Exploring Your New API</a></li>
+        <li><a href="#swagger-docs">Swagger Docs</a></li>
+        <li><a href="#add-a-currency">Add a Currency</a></li>
+        <li><a href="#display-curriencies">Display Currencie</a></li>
+        <li><a href="#filtering-and-pagination">Filtering and Pagination</a></li>
+        <li><a href="#next-steps">Next Steps</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -133,7 +142,7 @@ PS> dotnet --version
 PS> docker-compose --version
 Docker Compose version v2.13.0
 ```
-### Creating A Standard WebApi Project
+### Creating A Project
 ---
 Create .NET 6.0 web api project at the command line in your repositories using `dotnet`.
 ```powershell
@@ -241,7 +250,7 @@ Attributes:
     Type: string
     MaxWidth: 5
 ```
-### Setup a SqlServer with Docker
+### Setup SqlServer with Docker
 ---
 Create a `docker-compose.yaml` for running a Sql Server conatainer
 ```YAML
