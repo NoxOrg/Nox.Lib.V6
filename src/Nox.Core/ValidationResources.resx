@@ -105,4 +105,13 @@
     <data name="LoadStrategyTypeEmpty" xml:space="preserve">
         <value>Loader load strategy must have a type specified in {0}</value>
     </data>
+    <data name="LoaderTargetEntityMissing" xml:space="preserve">
+        <value>The loader targets a non existing entity {0} in {1}</value>
+    </data>
+    <data name="LoaderDataSourceMissing" xml:space="preserve">
+        <value>The Loader data source {0} in {1} does not exist in the service definition yaml</value>
+    </data>
+    <data name="LoaderMessageTargetMissing" xml:space="preserve">
+        <value>The Loader messaging target {0} in {1} does not exist in the service definition yaml</value>
+    </data>
 </root>

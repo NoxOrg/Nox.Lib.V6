@@ -5,7 +5,7 @@ namespace Nox.Core.Validation.Configuration;
 
 public class LoaderSourceConfigValidator: AbstractValidator<LoaderSourceConfiguration>
 {
-    public LoaderSourceConfigValidator()
+    public LoaderSourceConfigValidator(List<DatabaseConfiguration>? dataSources)
     {
         RuleFor( ls => ls.DataSource)
             .NotEmpty()
@@ -14,5 +14,9 @@ public class LoaderSourceConfigValidator: AbstractValidator<LoaderSourceConfigur
         RuleFor( ls => ls.Query)
             .NotEmpty()
             .WithMessage(ls => string.Format(ValidationResources.LoaderQueryEmpty, ls.DefinitionFileName));
+        
+        RuleFor(ls => ls!.DataSource)
+            .Must(dsName => dataSources != null && dataSources.Exists(ec => ec.Name == dsName))
+            .WithMessage(ls => string.Format(ValidationResources.LoaderDataSourceMissing, ls.DataSource, ls.DefinitionFileName));
     }
 }

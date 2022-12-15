@@ -97,7 +97,7 @@ public class EmptyConfigValidationTests
     public void Must_validate_empty_loader_config()
     {
         var config = new LoaderConfiguration();
-        var validator = new LoaderConfigValidator();
+        var validator = new LoaderConfigValidator(null, null, null);
         var result = validator.Validate(config);
         Assert.That(result.IsValid, Is.False);
         Assert.That(result.Errors.Count, Is.EqualTo(5));
@@ -135,7 +135,7 @@ public class EmptyConfigValidationTests
     public void Must_validate_empty_loader_target_config()
     {
         var config = new LoaderTargetConfiguration();
-        var validator = new LoaderTargetConfigValidator();
+        var validator = new LoaderTargetConfigValidator(null);
         var result = validator.Validate(config);
         Assert.That(result.IsValid, Is.False);
         Assert.That(result.Errors.Count, Is.EqualTo(1));
@@ -146,7 +146,7 @@ public class EmptyConfigValidationTests
     public void Must_validate_empty_loader_message_target_config()
     {
         var config = new LoaderMessageTargetConfiguration();
-        var validator = new LoaderMessageTargetConfigValidator();
+        var validator = new LoaderMessageTargetConfigValidator(null);
         var result = validator.Validate(config);
         Assert.That(result.IsValid, Is.False);
         Assert.That(result.Errors.Count, Is.EqualTo(1));
@@ -157,7 +157,7 @@ public class EmptyConfigValidationTests
     public void Must_validate_empty_loader_source_config()
     {
         var config = new LoaderSourceConfiguration();
-        var validator = new LoaderSourceConfigValidator();
+        var validator = new LoaderSourceConfigValidator(null);
         var result = validator.Validate(config);
         Assert.That(result.IsValid, Is.False);
         Assert.That(result.Errors.Count, Is.EqualTo(2));

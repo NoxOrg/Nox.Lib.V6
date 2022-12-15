@@ -218,5 +218,23 @@ namespace Nox.Core {
                 return ResourceManager.GetString("LoadStrategyTypeEmpty", resourceCulture);
             }
         }
+        
+        internal static string LoaderTargetEntityMissing {
+            get {
+                return ResourceManager.GetString("LoaderTargetEntityMissing", resourceCulture);
+            }
+        }
+        
+        internal static string LoaderDataSourceMissing {
+            get {
+                return ResourceManager.GetString("LoaderDataSourceMissing", resourceCulture);
+            }
+        }
+        
+        internal static string LoaderMessageTargetMissing {
+            get {
+                return ResourceManager.GetString("LoaderMessageTargetMissing", resourceCulture);
+            }
+        }
     }
 }

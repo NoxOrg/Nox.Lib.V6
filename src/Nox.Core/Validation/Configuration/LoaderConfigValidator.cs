@@ -5,7 +5,7 @@ namespace Nox.Core.Validation.Configuration;
 
 public class LoaderConfigValidator: AbstractValidator<LoaderConfiguration>
 {
-    public LoaderConfigValidator()
+    public LoaderConfigValidator(List<EntityConfiguration>? entities, List<DatabaseConfiguration>? dataSources, List<MessagingProviderConfiguration>? msgProviders)
     {
         RuleFor( loader => loader.Name)
             .NotEmpty()
@@ -26,13 +26,16 @@ public class LoaderConfigValidator: AbstractValidator<LoaderConfiguration>
             .NotEmpty()
             .WithMessage(loader => string.Format(ValidationResources.LoaderTargetEmpty, loader.Name, loader.DefinitionFileName));
 
-        // RuleFor(loader => loader.Target)
-        //     .SetValidator(new LoaderTargetConfigValidator(loader => new ));
+        RuleFor(loader => loader.Target)
+            .SetValidator(_ => new LoaderTargetConfigValidator(entities));
         
         RuleForEach(loader => loader.Messaging)
-            .SetValidator(new LoaderMessageTargetConfigValidator());
+            .SetValidator(new LoaderMessageTargetConfigValidator(msgProviders));
         
         RuleForEach(loader => loader.Sources)
-            .SetValidator(new LoaderSourceConfigValidator());
+            .SetValidator(new LoaderSourceConfigValidator(dataSources));
+        
+        RuleForEach(loader => loader.Messaging)
+            .SetValidator(new LoaderMessageTargetConfigValidator(msgProviders));
     }
 }
