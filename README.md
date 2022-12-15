@@ -56,6 +56,7 @@
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
+        <li><a href="#main-features">Main Features</a></li>
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
@@ -79,8 +80,8 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-
-Nox is a .NET microservice framework that allows developers to build and deploy enterprise-grade, production-ready microservices in under an hour. 
+***
+Nox is a .NET microservice framework that allows developers to rapidly build, maintain and deploy enterprise-grade, production-ready microservices. 
 
 It removes all the ceremony, repition and technical details associated with building and maintaining applications without constraining developer creativity or control in any way.
 
@@ -89,8 +90,8 @@ It removes all the ceremony, repition and technical details associated with buil
 </div>
 <br />
 
-## Main Features
-
+### Main Features
+---
 Nox lets you focus on your business problem and domain, and provides you with the following auto-magic features:-
 
 - Declaration of your core application and domain (models, data, entities, attributes and bounded contexts) in a declaritive and easily maintainable way (YAML, using YamlDotNet)
@@ -107,7 +108,7 @@ Nox lets you focus on your business problem and domain, and provides you with th
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
-
+---
 [![.NET][.NET]][.NET-url]
 [![ETLBox][ETLBox]][ETLBox-url]
 [![AutoMapper][AutoMapper]][AutoMapper-url]
@@ -120,8 +121,9 @@ Nox lets you focus on your business problem and domain, and provides you with th
 
 <!-- GETTING STARTED -->
 ## Getting Started
-
+***
 ### Prerequisites
+---
 
 Make sure you have .NET 6 and Docker installed on your PC.
 ```powershell
@@ -131,18 +133,58 @@ PS> dotnet --version
 PS> docker-compose --version
 Docker Compose version v2.13.0
 ```
-### Creating your first Nox-powered microservice
-Create a standard .NET 6.0 web api project at the command line in your repositories folder and add the Nox.Lib nuget package.
+### Creating A Standard WebApi Project
+---
+Create .NET 6.0 web api project at the command line in your repositories using `dotnet`.
 ```powershell
 dotnet new webapi -o MyCurrencyService
 
 cd MyCurrencyService
+```
+At this point you can do a normal `dotnet run` which will present you with the standard Microsoft demo WeatherController.
 
+### Adding Nox
+---
+Add the Nox.Lib nuget package to your project.
+```powershell
 dotnet add package Nox.Lib
 ```
-At this point you can do a normal `dotnet run` which will present you with the standard Microsoft WeatherController.
+Edit your Program.cs file and add the following three lines..
+```csharp
+using Nox.Lib; // <--- Add this (1) <---
 
-Next, create a new file to define your service called `currency.service.nox.yaml`:
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddNox(); // <--- Add this (2) <---
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+app.UseNox(); // <--- Add this (3) <---
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
+```
+### Define Your Service and Entities
+---
+Create a new file to define your service called `currency.service.nox.yaml`:
 ```yaml
 #
 # currency.service.nox.yaml
@@ -199,39 +241,8 @@ Attributes:
     Type: string
     MaxWidth: 5
 ```
-Edit your Program.cs file and add the following three lines..
-```csharp
-using Nox.Lib; // <--- Add this (1) <---
-
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
-builder.Services.AddNox(); // <--- Add this (2) <---
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-app.UseNox(); // <--- Add this (3) <---
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
-```
+### Setup a SqlServer with Docker
+---
 Create a `docker-compose.yaml` for running a Sql Server conatainer
 ```YAML
 version: '3.7'
@@ -254,26 +265,105 @@ Then start your database with:
 ```bash
 docker-compose up -d
 ```
-And finally, start your API with:
+### Start Your Service
+---
+Finally, start your API with:
 ```powershell
 dotnet run
 ```
-The application will start up, using Nox and process the YAML files. Take note of the port that `dotnet new webapi` assigned to your project.
+The application will start up, Nox will dynamically process the YAML files. Take note of the port that `dotnet new webapi` assigned to your project.
 
 ![Http Port](docs/images/nox-startup-port.png)
 
-In this case the port is `5237` and we will use it below (use your port number wherever you see `5237` instead).
+In this case the `http` port is `5237` and we will use it below (use your port number wherever you see `5237` instead).
 
-### Exploring your new API
-Startup [Postman](https://www.postman.com/), tour favourite API Explore or your browser and navigate to `http://localhoast:5237/WeatherController` to see that the Microsoft standard controller works.
+Alternatively, you can change the port your service uses by editing the `applicationUrl` in the `profiles` section in `.\Properties\launcgSettings.json` as follows.
+
+```json
+  "profiles": {
+    "MyCurrencyService": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "https://localhost:7237;http://localhost:5237",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+```
+You will then be able to follow the exploration section of these docs using the same port.
+
+### Exploring Your New API
+---
+Startup [Postman](https://www.postman.com/) or your browser and navigate to `http://localhoast:5237/WeatherController` to see that the Microsoft standard controller works.
 
 ![Explore 01](docs/images/nox-explore-01.png)
 
+### Swagger Docs
+---
+To view the dynamic endpoints that Nox added to your project,browse to `http://localhoast:5237/swagger`.
+![Swagger](docs/images/nox-explore-swagger.png)
 
+### Add a Currency
+---
+In Postman, setup a `POST` request to `http://localhost:5237/odata/Currencies`, and on the `Body` tab, set the `content-type` to `raw` and `JSON` and the body content to:
+
+```json
+{
+    "Id": 8383,
+    "Name": "Bitcoin",
+    "Symbol": "₿",
+    "ISO_Alpha3": "XBT"
+}
+```
+When you click on the `Send` button, you should get a `201` (Created) response.
+
+![Swagger](docs/images/nox-explore-created.png)
+
+You can reate an entry for US Dollars by replacing the body with:-
+
+```json
+{
+    "Id": 840,
+    "Name": "US Dollar",
+    "Symbol": "$",
+    "ISO_Alpha3": "USD"
+}
+```
+
+### Display Currencies
+---
+
+To display the currencies you've just added send a `GET` request to `http://localhost:5237/odata/Currencies`
+
+![Swagger](docs/images/nox-explore-display.png)
+
+
+### Filtering and Pagination
+
+You can try the following url's with `GET` to further explore the API.
+
+```
+http://localhost:5237/odata/Currencies(840)
+http://localhost:5237/odata/Currencies(840)/Name
+http://localhost:5237/odata/Currencies?$select=Id,Name
+http://localhost:5237/odata/Currencies?$select=Id,Name&$orderby=Name
+http://localhost:5237/odata/Currencies?$filter=Name eq 'US Dollar'
+http://localhost:5237/odata/Currencies?$filter=Name ne 'US Dollar'
+```
+
+You can read up more about the many features of OData at https://www.odata.org/
+
+### Next Steps
+
+This quick-start is really just the tip of the Nox iceberg. To develop serious microservices for business requires quite a bit more than a quick API.
+
+More documentation will be added shortly to help illustrate the broaded feature-set of Nox-enabled applications.
 
 <!-- ROADMAP -->
 ## Roadmap
-
+***
 - [ ] Model-driven gRPC API's automatically for high-performance inter-service communication
 - [ ] GraphQL API automatically from YAML definitions
 - [ ] Health monitoring and observability as a first class features
@@ -298,7 +388,7 @@ See the [open issues](https://github.com/github_username/repo_name/issues) for a
 
 <!-- CONTRIBUTING -->
 ## Contributing
-
+***
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
@@ -310,8 +400,30 @@ Don't forget to give the project a star! Thanks again!
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+### Hassle-free Development
+---
 
+The Nox project uses the [goo](https://goo.dev/) cross-platfoerm development to make building and testing code hassle free.
+
+```powershell
+git clone https://github.com/NoxOrg/Nox.git
+
+cd Nox
+
+.\.goo.ps1 init
+```
+This should guide you through the pre-requisites needed to productively build and change Nox.
+
+To view the project workflows, type:
+```
+.\.goo.ps1
+```
+and it'll display something like:
+
+![goo](docs/images/goo-goo.gif)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+You should then be able to simply type `goo` anywhere in your project folder structure to return you to the project root and display these options.
 
 
 <!-- LICENSE -->
