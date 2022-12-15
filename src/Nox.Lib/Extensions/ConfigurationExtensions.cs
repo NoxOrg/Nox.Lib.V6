@@ -1,13 +1,13 @@
 using AutoMapper;
 using Nox.Core.Configuration;
-using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Configuration;
 using Nox.Core.Models;
 using Nox.Data;
 using Nox.Etl;
+using Nox.Lib;
 using Nox.Messaging;
 
-namespace Nox.Lib;
+namespace Nox;
 
 public static class ConfigurationExtensions
 {

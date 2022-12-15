@@ -2,6 +2,7 @@ using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nox.Api;
+using Nox.Lib;
 using Nox.Core.Configuration;
 using Nox.Core.Interfaces;
 using Nox.Data;
@@ -9,7 +10,7 @@ using Nox.Etl;
 using Nox.Jobs;
 using Nox.Messaging;
 
-namespace Nox.Lib;
+namespace Nox;
 
 public static class ServiceExtensions
 {

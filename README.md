@@ -39,11 +39,11 @@
     <a href="https://github.com/noxorg/nox"><strong>View the documentation »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/noxorg/Nox">View Demo</a>
+    <a href="https://github.com/noxorg/nox">View Demo</a>
     ·
-    <a href="https://github.com/noxorg/Nox/issues">Report Bug</a>
+    <a href="https://github.com/noxorg/nox/issues">Report Bug</a>
     ·
-    <a href="https://github.com/noxorg/Nox/issues">Request Feature</a>
+    <a href="https://github.com/noxorg/nox/issues">Request Feature</a>
   </p>
 </div>
     <br />
@@ -160,7 +160,7 @@ dotnet add package Nox.Lib
 ```
 Edit your Program.cs file and add the following three lines..
 ```csharp
-using Nox.Lib; // <--- Add this (1) <---
+using Nox; // <--- Add this (1) <---
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -391,7 +391,7 @@ More documentation will be added shortly to help illustrate the broader feature-
 - [ ] A universal admin console to combine the various underlying library frontends (eg Hangfire) 
 
 
-See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/noxorg/nox/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -417,7 +417,7 @@ Don't forget to give the project a star! Thanks again!
 The Nox project uses the [goo](https://goo.dev/) cross-platform development to make building and testing code hassle free.
 
 ```powershell
-git clone https://github.com/NoxOrg/Nox.git
+git clone https://github.com/noxorg/nox.git
 
 cd Nox
 
@@ -451,7 +451,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 Twitter: [@AndreSharpe72](https://twitter.com/AndreSharpe72) 
 
-Project Link: [https://github.com/noxorg/nox](https://github.com/github_username/repo_name)
+Project Link: [https://github.com/noxorg/nox](https://github.com/noxorg/nox)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

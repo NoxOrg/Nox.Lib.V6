@@ -1,7 +1,8 @@
 using FluentValidation;
 using Nox.Core.Validation;
+using Nox.Lib;
 
-namespace Nox.Lib;
+namespace Nox;
 
 public static class ValidationExtensions
 {
