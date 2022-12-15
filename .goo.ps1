@@ -282,7 +282,7 @@ $goo.Command.Add( 'set-project-version', { param( $versionInfoTable, $version )
 
 })
 
-# command: goo bump-version <version>| Sets or increments the project version
+# command: goo bump-version [<version>]| Sets or increments the project version
 $goo.Command.Add( 'bump-version', { param($version)
     $versionInfoTable = $goo.Command.Run('get-project-version-table')
     $versionArray = $null;
