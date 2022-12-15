@@ -55,7 +55,7 @@ public static class MessageExtensions
                     {
                         prop.SetValue(payload, sourceVal);
                     }
-                    catch (Exception ex)
+                    catch 
                     {
                         throw new InvalidCastException(string.Format(ExceptionResources.MapInstanceCastException, template.GetType().Name, payload.GetType().Name, prop.Name, sourceVal.GetType().Name,
                             prop.PropertyType.Name, payload.GetType().Name));

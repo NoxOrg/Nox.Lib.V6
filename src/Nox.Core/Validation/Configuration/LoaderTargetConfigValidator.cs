@@ -12,7 +12,7 @@ public class LoaderTargetConfigValidator: AbstractValidator<LoaderTargetConfigur
             .WithMessage(lt => string.Format(ValidationResources.LoaderTargetEntityEmpty, lt!.DefinitionFileName));
         RuleFor(lt => lt!.Entity)
             .Must(entityName => entityConfig != null && entityConfig.Exists(ec => ec.Name == entityName))
-            .WithMessage(lt => string.Format(ValidationResources.LoaderTargetEntityMissing, lt.Entity, lt.DefinitionFileName));
+            .WithMessage(lt => string.Format(ValidationResources.LoaderTargetEntityMissing, lt!.Entity, lt.DefinitionFileName));
 
     }
     

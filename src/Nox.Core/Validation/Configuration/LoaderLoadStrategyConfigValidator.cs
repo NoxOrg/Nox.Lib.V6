@@ -11,9 +11,9 @@ public class LoaderLoadStrategyConfigValidator: AbstractValidator<LoaderLoadStra
             .NotEmpty()
             .WithMessage(lls => string.Format(ValidationResources.LoadStrategyTypeEmpty, lls!.DefinitionFileName));
         
-        var typeConditions = new List<string>() { "DropAndLoad", "MergeNew" };
+        var typeConditions = new List<string>() { "dropandload", "mergenew" };
         RuleFor(lls => lls!.Type.ToLower())
             .Must(x => typeConditions.Contains(x.ToLower()))
-            .WithMessage(lls => string.Format(ValidationResources.LoadStrategyTypeInvalid, string.Join("/", typeConditions), lls!.DefinitionFileName));
+            .WithMessage(lls => string.Format(ValidationResources.LoadStrategyTypeInvalid, "DropAndLoad/MergeNew", lls!.DefinitionFileName));
     }
 }
