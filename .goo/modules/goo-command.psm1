@@ -35,19 +35,20 @@ class GooCommand {
         $this.Commands.Add( $name.ToLower(), $scriptBlock )
     }    
 
-    [void] Run() {
-        $this.Run( $this.MainCommand, $this.Arguments )
+    [object] Run() {
+        return $this.Run( $this.MainCommand, $this.Arguments )
     }
     
-    [void] Run( [string]$command ) {
-        $this.Run( $command, $this.Arguments )
+    [object] Run( [string]$command ) {
+        return $this.Run( $command, $this.Arguments )
     }
 
-    [void] Run( [string]$command, [Object[]] $arguments ) {
+    [object] Run( [string]$command, [Object[]] $arguments ) {
         if ( -not ($this.Commands.ContainsKey($command) ) ) {
             $this.Goo.Error("No command '$command' is defined in goo file.")
         }
-        Invoke-Command -ScriptBlock $this.Commands[$command] -ArgumentList $arguments
+        $ret = (Invoke-Command -ScriptBlock $this.Commands[$command] -ArgumentList $arguments)
+        return $ret
     }
 
     [bool] RunExternal( [string]$cmd, [Object]$parameters ) {
