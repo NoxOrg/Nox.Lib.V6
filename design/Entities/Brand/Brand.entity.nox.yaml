@@ -15,7 +15,7 @@ Attributes:
   - Name: Id
     Description: The brand's unique identifier 
     IsPrimaryKey: true
-    Type: int
+    Type: string
     CanFilter: true
     CanSort: true
 

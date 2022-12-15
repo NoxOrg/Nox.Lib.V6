@@ -7,6 +7,12 @@ public class EntityAttributeConfigValidator: AbstractValidator<EntityAttributeCo
 {
     public EntityAttributeConfigValidator()
     {
-        
+        RuleFor(attribute => attribute.Name)
+            .NotEmpty()
+            .WithMessage(attribute => string.Format(ValidationResources.EntityAttributeNameEmpty, attribute.DefinitionFileName));
+
+        RuleFor(attribute => attribute.Type)
+            .NotEmpty()
+            .WithMessage(attribute => string.Format(ValidationResources.EntityAttributeTypeEmpty, attribute.Name, attribute.DefinitionFileName));
     }
 }

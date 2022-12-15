@@ -51,7 +51,15 @@ public static class MessageExtensions
                 foreach (var prop in payload.GetType().GetProperties())
                 {
                     var sourceVal = sourceDict[prop.Name];
-                    prop.SetValue(payload, sourceVal);
+                    try
+                    {
+                        prop.SetValue(payload, sourceVal);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidCastException(string.Format(ExceptionResources.MapInstanceCastException, template.GetType().Name, payload.GetType().Name, prop.Name, sourceVal.GetType().Name,
+                            prop.PropertyType.Name, payload.GetType().Name));
+                    }
                 }    
             }
             payloadProp.SetValue(result, payload);
