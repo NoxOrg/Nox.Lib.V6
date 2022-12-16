@@ -7,8 +7,8 @@
     <UserSecretsId>c85db8f6-e4ba-47a2-beb2-7cc33455348a</UserSecretsId>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>6.0.14.0</AssemblyVersion>
-    <FileVersion>6.0.14.0</FileVersion>
+    <AssemblyVersion>6.0.15.0</AssemblyVersion>
+    <FileVersion>6.0.15.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
