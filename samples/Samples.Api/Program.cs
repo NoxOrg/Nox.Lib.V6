@@ -1,4 +1,4 @@
-using Nox.Lib;
+using Nox;
 
 var builder = WebApplication.CreateBuilder(args);
 
