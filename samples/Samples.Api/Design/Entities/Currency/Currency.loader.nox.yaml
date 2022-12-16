@@ -21,7 +21,7 @@ Target:
   Entity: Currency
   
 Messaging:
-  - MessagingProvider: Bunny
+  - MessagingProvider: AppServiceBus
   - MessagingProvider: InProcess  
 
 Sources:

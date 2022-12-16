@@ -21,7 +21,7 @@ Target:
   Entity: Brand
   
 Messaging:
-  - MessagingProvider: Bunny  
+  - MessagingProvider: AppServiceBus  
 
 Sources:
   - DataSource: BusinessSystem

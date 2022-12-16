@@ -18,7 +18,7 @@ Database:
 
 MessagingProviders:
 
-  - Name: Bunny
+  - Name: AppServiceBus
     #Provider: AzureServiceBus
     #ConnectionVariable: ConnectionString:AzureServiceBus
     Provider: RabbitMQ
