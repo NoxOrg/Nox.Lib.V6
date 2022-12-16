@@ -8,10 +8,10 @@ public interface INoxConfiguration
     string Description { get; set; }
     string KeyVaultUri { get; set; }
     string EndpointProvider { get; set; }
-    DatabaseConfiguration? Database { get; set; }
+    DataConfiguration? Database { get; set; }
     List<MessagingProviderConfiguration>? MessagingProviders { get; set; }
     List<ApiConfiguration>? Apis { get; set; }
     List<EntityConfiguration>? Entities { get; set; }
     List<LoaderConfiguration>? Loaders { get; set; }
-    List<DatabaseConfiguration>? DataSources { get; set; }
+    List<DataConfiguration>? DataSources { get; set; }
 }

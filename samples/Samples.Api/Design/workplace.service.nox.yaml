@@ -17,16 +17,23 @@ Database:
   Password: Developer*123
 
 MessagingProviders:
+
   - Name: Bunny
     #Provider: AzureServiceBus
     #ConnectionVariable: ConnectionString:AzureServiceBus
     Provider: RabbitMQ
     ConnectionString: rabbitmq://guest:guest@localhost/
+
   - Name: InProcess
     Provider: Mediator  
       
 DataSources:
+
   - Name: BusinessSystem
     ConnectionVariable: ConnectionString:MasterDataSource
     Provider: SqlServer
+  
+  - Name: CurrencySeedData
+    Provider: JsonFile
+    Path: ../../docs/sample-data/currency-seeddata.json
   

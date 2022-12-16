@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Nox.Core.Components;
+using Nox.Core.Constants;
 using Nox.Core.Exceptions;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Api;
@@ -198,7 +199,9 @@ public class DynamicService : IDynamicService
         private IMetaService? _service;
         private IConfiguration? _appConfig;
         private INoxConfiguration? _noxConfig;
+#pragma warning disable IDE0052 // Remove unread private members
         private INoxMessenger? _messenger;
+#pragma warning restore IDE0052 // Remove unread private members
         
         public Configurator(DynamicService dynamicService)
         {
@@ -244,7 +247,7 @@ public class DynamicService : IDynamicService
 
             _service.Validate();
             _service.Configure();
-            //if (_messenger != null) _messenger.Configure(_service.MessagingProviders);
+            // if (_messenger != null) _messenger.Configure(_service.MessagingProviders);
             
             serviceDatabases.ToList().ForEach(db =>
             {
@@ -336,7 +339,6 @@ public class DynamicService : IDynamicService
                 {
                     _logger!.LogInformation("...Resolving variable [{key}] from secrets vault {vault}", key, vaultUri);
                     variables[key] = keyVault.GetSecretAsync(vaultUri, key.Replace(":", "--")).GetAwaiter().GetResult().Value;
-                    _logger!.LogInformation($"Variable [{key}] resolved to: {variables[key]}");
                 }
                 else
                 {
@@ -355,6 +357,8 @@ public class DynamicService : IDynamicService
 
             foreach (var dataSource in _service.DataSources!)
             {
+                if (dataSource.Provider.Equals(DataProvider.JsonFile,StringComparison.OrdinalIgnoreCase)) continue;
+
                 serviceDatabases.Add(dataSource);
             }
 

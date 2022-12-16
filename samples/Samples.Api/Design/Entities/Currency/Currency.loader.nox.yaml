@@ -25,18 +25,5 @@ Messaging:
   - MessagingProvider: InProcess  
 
 Sources:
-  - DataSource: BusinessSystem
+  - DataSource: CurrencySeedData
     MinimumExpectedRecords: 160
-    Query: >-
-      SELECT [CurrencyID] AS [Id]
-          ,[CurrencyName] AS [Name]
-          ,[CurrencyCode] AS [ISO_Alpha3]
-          ,[CurrencySymbol] AS [Symbol]
-          ,[NameSingular] AS [SingularName]
-          ,[NameMultiple] AS [PluralName]
-          ,[NameSingularDecimal] AS [DecimalSingularName]
-          ,[NameMultipleDecimal] AS [DecimalPluralName]
-          ,[IsCurrencySymbolFirst] AS [IsSymbolPrefixed]
-          ,[CreateDate]
-          ,[EditDate]
-      FROM dbo.Currency WITH (NOLOCK)

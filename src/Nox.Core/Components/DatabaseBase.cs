@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using Nox.Core.Constants;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Database;
 
@@ -27,16 +28,19 @@ public class DatabaseBase : MetaBase, IServiceDatabase
 
         switch (Provider)
         {
-            case "sqlserver":
+            case DataProvider.SqlServer:
                 if (Port == 0) Port = 1433;
                 break;
 
-            case "postgres":
+            case DataProvider.Postgres:
                 if (Port == 0) Port = 5432;
                 break;
 
-            case "mysql":
+            case DataProvider.MySql:
                 if (Port == 0) Port = 3306;
+                break;
+
+            case DataProvider.JsonFile:
                 break;
 
             default:
