@@ -8,6 +8,8 @@ using Nox.Messaging;
 
 namespace Samples.Cli.Commands;
 
+// Heartbeat Events
+
 public class HeartbeatConsumer : IConsumer<IHeartbeatMessage>
 {
     readonly ILogger<HeartbeatConsumer> _logger;
@@ -31,6 +33,8 @@ public class HeartbeatConsumerDefinition : ConsumerDefinition<HeartbeatConsumer>
         endpointConfigurator.UseMessageRetry(r => r.Intervals(500, 1000));
     }
 }
+
+// Country Created Events
 
 public class CountryCreatedEventConsumer : IConsumer<CountryCreatedDomainEvent>
 {
@@ -56,6 +60,8 @@ public class CountryCreatedEventConsumerDefinition : ConsumerDefinition<CountryC
     }
 }
 
+// Currency Created Events
+
 public class CurrencyCreatedEventConsumer : IConsumer<CurrencyCreatedDomainEvent>
 {
     readonly ILogger<CurrencyCreatedEventConsumer> _logger;
@@ -67,7 +73,7 @@ public class CurrencyCreatedEventConsumer : IConsumer<CurrencyCreatedDomainEvent
     
     public Task Consume(ConsumeContext<CurrencyCreatedDomainEvent> context)
     {
-        _logger.LogInformation("Country Created: {Text}", JsonSerializer.Serialize(context.Message.Payload));
+        _logger.LogInformation("Currency Created: {Text}", JsonSerializer.Serialize(context.Message.Payload));
         return Task.CompletedTask;
     }
 }
@@ -79,6 +85,35 @@ public class CurrencyCreatedEventConsumerDefinition : ConsumerDefinition<Currenc
         endpointConfigurator.UseMessageRetry(r => r.Intervals(500, 1000));
     }
 }
+
+// Currency Updated Events
+
+public class CurrencyUpdatedEventConsumer : IConsumer<CurrencyUpdatedDomainEvent>
+{
+    readonly ILogger<CurrencyUpdatedEventConsumer> _logger;
+
+    public CurrencyUpdatedEventConsumer(ILogger<CurrencyUpdatedEventConsumer> logger)
+    {
+        _logger = logger;
+    }
+
+    public Task Consume(ConsumeContext<CurrencyUpdatedDomainEvent> context)
+    {
+        _logger.LogInformation("Currency Updated: {Text}", JsonSerializer.Serialize(context.Message.Payload));
+        return Task.CompletedTask;
+    }
+}
+
+public class CurrencyUpdatedEventConsumerDefinition : ConsumerDefinition<CurrencyUpdatedEventConsumer>
+{
+    protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<CurrencyUpdatedEventConsumer> consumerConfigurator)
+    {
+        endpointConfigurator.UseMessageRetry(r => r.Intervals(500, 1000));
+    }
+}
+
+
+// Workplace Created Events
 
 public class WorkplaceCreatedEventConsumer : IConsumer<WorkplaceCreatedDomainEvent>
 {
@@ -104,6 +139,8 @@ public class WorkplaceCreatedEventConsumerDefinition : ConsumerDefinition<Workpl
     }
 }
 
+// Brand Created Events
+
 public class BrandCreatedEventConsumer: IConsumer<BrandCreatedDomainEvent>
 {
     readonly ILogger<BrandCreatedEventConsumer> _logger;
@@ -127,6 +164,8 @@ public class BrandCreatedEventConsumerDefinition : ConsumerDefinition<BrandCreat
         endpointConfigurator.UseMessageRetry(r => r.Intervals(500, 1000));
     }
 }
+
+// Platform Tenant Created Events
 
 public class PlatformTenantCreatedEventConsumer: IConsumer<PlatformTenantCreatedDomainEvent>
 {

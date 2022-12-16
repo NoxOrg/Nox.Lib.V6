@@ -187,6 +187,15 @@ public class EtlExecutor : IEtlExecutor
         int updates = 0;
         int nochanges = 0;
 
+        // Resolve events
+        INoxEvent? entityCreateMsg = null, entityUpdateMsg = null;
+
+        if (loader.Messaging != null && loader.Messaging.Any())
+        {
+            entityCreateMsg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Create);
+            entityUpdateMsg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Update);
+        }
+
         analytics.WriteAction = (row, _) =>
         {
             dynamic r = row;
@@ -196,11 +205,10 @@ public class EtlExecutor : IEtlExecutor
             if (r.ChangeAction == ChangeAction.Insert)
             {
                 inserts++;
-                var msg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Create);
-                
-                if (loader.Messaging != null && loader.Messaging.Any() && msg != null)
+                if (entityCreateMsg is not null)
                 {
-                    var toSend = msg.MapInstance(row);
+                    var toSend = entityCreateMsg.MapInstance(row);
+                    _logger.LogInformation($"Publishing bus message: {Name}", toSend.GetType().Name);
                     _messenger?.SendMessage(loader, toSend);
                 }
                 
@@ -225,11 +233,9 @@ public class EtlExecutor : IEtlExecutor
             {
                 updates++;
                 
-                var msg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Update);
-                
-                if (loader.Messaging != null && loader.Messaging.Any() && msg != null)
+                if (entityUpdateMsg is not null)
                 {
-                    var toSend = msg.MapInstance(row);
+                    var toSend = entityUpdateMsg.MapInstance(row);
                     _logger.LogInformation($"Publishing bus message: {Name}", toSend.GetType().Name);
                     _messenger?.SendMessage(loader, toSend);
                 }
