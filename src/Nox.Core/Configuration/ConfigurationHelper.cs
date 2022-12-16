@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using ETLBoxOffice.LicenseManager;
-using Microsoft.Azure.KeyVault;
+﻿using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
 using Nox.Core.Constants;
@@ -35,7 +33,6 @@ public class ConfigurationHelper
             "ConnectionString:MasterDataSource",
             "XECurrency:ApiPassword",
             "XECurrency:ApiUser"
-            // "EtlBox:LicenseKey",
         };
         
         var secrets = GetSecrets(keyVaultUri, keys).GetAwaiter().GetResult();
@@ -50,8 +47,6 @@ public class ConfigurationHelper
         
         configBuilder.AddInMemoryCollection(secrets!);
         
-        // LicenseCheck.LicenseKey = secrets.First(s => s.Key.Equals("EtlBox:LicenseKey")).Value;
-
         return configBuilder.Build();
     }
 

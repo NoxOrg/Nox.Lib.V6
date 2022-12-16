@@ -29,7 +29,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.0" />
-    <PackageReference Include="ETLBox" Version="2.6.6.1" />
     <PackageReference Include="FluentValidation" Version="11.4.0" />
     <PackageReference Include="Hangfire" Version="1.7.32" />
     <PackageReference Include="Hangfire.Core" Version="1.7.32" />
@@ -79,6 +78,11 @@
     <ProjectReference Include="..\Nox.Generator\Nox.Generator.csproj" PrivateAssets="all" />
     <ProjectReference Include="..\Nox.Jobs\Nox.Jobs.csproj" PrivateAssets="all" />
     <ProjectReference Include="..\Nox.Messaging\Nox.Messaging.csproj" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="EtlBox">
+      <HintPath>..\Nox.Tle\ETLBox.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Update="tools\install.ps1">
