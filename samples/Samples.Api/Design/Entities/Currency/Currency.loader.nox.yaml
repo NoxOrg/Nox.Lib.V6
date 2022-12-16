@@ -25,5 +25,6 @@ Messaging:
   - MessagingProvider: InProcess  
 
 Sources:
-  - DataSource: CurrencySeedData
+  - DataSource: JsonSeedData
     MinimumExpectedRecords: 160
+    Query: currency-seeddata.json 

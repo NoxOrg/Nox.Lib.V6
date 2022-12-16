@@ -17,6 +17,7 @@ using Nox.Messaging.Enumerations;
 using Nox.Messaging.Events;
 using SqlKata;
 using SqlKata.Compilers;
+using System.Dynamic;
 
 namespace Nox.Etl;
 
@@ -65,20 +66,20 @@ public class EtlExecutor : IEtlExecutor
 
     private async Task LoadDataFromSource(IMetaService service, ILoader loader, IEntity entity)
     {
-        var destinationDb = service.Database!.DatabaseProvider!.ConnectionManager;
 
-        var destinationTable = service.Database!.DatabaseProvider!.ToTableNameForSql(entity.Table, entity.Schema);
+        var destinationDb = service.Database!.DataProvider!.ConnectionManager;
 
-        var destinationSqlCompiler = service.Database!.DatabaseProvider!.SqlCompiler;
+        var destinationTable = service.Database!.DataProvider!.ToTableNameForSql(entity.Table, entity.Schema);
+
+        var destinationSqlCompiler = service.Database!.DataProvider!.SqlCompiler;
 
         var loaderInstance = (Loader)loader;
+
         foreach (var loaderSource in loaderInstance.Sources!)
         {
             var dataSource = service.DataSources!.First(ds => ds.Name == loaderSource.DataSource);
-            
-            var sourceDb = dataSource.DatabaseProvider!.ConnectionManager;
 
-            var sourceSqlCompiler = dataSource.DatabaseProvider.SqlCompiler;
+            var source = dataSource.DataProvider!.DataFlowSource(loaderSource);
 
             var loadStrategy = loaderInstance.LoadStrategy?.Type.Trim().ToLower();
 
@@ -87,12 +88,14 @@ public class EtlExecutor : IEtlExecutor
                 case "dropandload":
                     _logger.LogInformation("Dropping and loading data for entity {entity}...", entity.Name);
 
-                    await DropAndLoadData(sourceDb, destinationDb, loaderSource, destinationTable);
+                    await DropAndLoadData(source, destinationDb, destinationTable);
 
                     break;
 
                 case "mergenew":
                     _logger.LogInformation("Merging new data for entity {entity}...", entity.Name);
+
+                    var dateTimeStamps = GetAllLastMergeDateTimeStamps(loaderInstance, service.Database!.DataProvider!);
 
                     await MergeNewData(sourceDb, destinationDb,
                         loaderSource, service, loaderInstance, destinationTable, entity,
@@ -112,16 +115,10 @@ public class EtlExecutor : IEtlExecutor
     }
 
     private async Task DropAndLoadData(
-        IConnectionManager sourceDb,
+        IDataFlowExecutableSource<ExpandoObject> source,
         IConnectionManager destinationDb,
-        LoaderSource loaderSource, string destinationTable)
+        string destinationTable)
     {
-        var source = new DbSource()
-        {
-            ConnectionManager = sourceDb,
-            Sql = loaderSource.Query,
-        };
-
         var destination = new DbDestination()
         {
             ConnectionManager = destinationDb,
@@ -132,15 +129,67 @@ public class EtlExecutor : IEtlExecutor
 
         SqlTask.ExecuteNonQuery(destinationDb, $"DELETE FROM {destinationTable};");
 
-        await Network.ExecuteAsync(source);
+        await Network.ExecuteAsync((DataFlowExecutableSource<ExpandoObject>)source);
 
         int rowCount = RowCountTask.Count(destinationDb, destinationTable);
 
         _logger.LogInformation("...copied {rowCount} records", rowCount);
     }
 
+    private LastMergeDateTimeStampInfo GetAllLastMergeDateTimeStamps(Loader loader, IDataProvider dataProvider)
+    {
+        var lastMergeDateTimeStampInfo = new LastMergeDateTimeStampInfo();
 
-    private async Task MergeNewData(IConnectionManager sourceDb,
+        foreach (var dateColumn in loader.LoadStrategy!.Columns)
+        {
+            var lastMergeDateTimeStamp = GetLastMergeDateTimeStamp(loader.Name, dateColumn, dataProvider);
+
+            lastMergeDateTimeStampInfo[dateColumn] = new LastMergeDateTimeStamp(lastMergeDateTimeStamp);
+        }
+
+        return lastMergeDateTimeStampInfo;
+    }
+
+
+    private LastMergeDateTimeStampInfo GetAllLastMergeDateTimeStamps2(
+        ILoaderSource loaderSource,
+        LastMergeDateTimeStampInfo lastMergeDateTimeStampInfo,
+        string[] dateTimeStampColumns,
+        IEntity entity,
+        Compiler sourceSqlCompiler)
+    {
+        var newLastMergeDateTimeStamp = new LastMergeDateTimeStampInfo();
+
+        var targetColumns = entity.Attributes.Where(a => a.IsMappedAttribute()).Select(a => a.Name)
+                .Concat(entity.RelatedParents.Select(p => p + "Id"))
+                .Concat(dateTimeStampColumns.Select(c => c))
+                .ToArray();
+
+        var query = new Query().FromRaw($"({loaderSource.Query}) AS tmp")
+            .Select(targetColumns);
+
+        foreach (var dateColumn in dateTimeStampColumns)
+        {
+            if (!lastMergeDateTimeStampInfo[dateColumn].Equals(DateTime.MinValue))
+            {
+                query = query.Where(
+                    q => q.WhereNotNull(dateColumn).Where(dateColumn, ">", lastMergeDateTimeStampInfo[dateColumn])
+                );
+            }
+        }
+
+        var compiledQuery = sourceSqlCompiler.Compile(query);
+
+        var finalQuerySql = compiledQuery.Sql;
+
+        var finalQueryParams = compiledQuery.NamedBindings.Select(nb => new QueryParameter(nb.Key, nb.Value));
+
+        return newLastMergeDateTimeStamp;
+    }
+
+
+    private async Task MergeNewData(
+        IConnectionManager sourceDb,
         IConnectionManager destinationDb,
         ILoaderSource loaderSource,
         IMetaService service,
@@ -164,13 +213,12 @@ public class EtlExecutor : IEtlExecutor
 
         foreach (var dateColumn in loader.LoadStrategy.Columns)
         {
-            lastMergeDateTimeStamp = GetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, destinationSqlCompiler, service.Database!.DatabaseProvider!);
+            lastMergeDateTimeStamp = GetLastMergeDateTimeStamp(loader.Name, dateColumn, service.Database!.DataProvider!);
 
             if (!lastMergeDateTimeStamp.Equals(DateTime.MinValue))
             {
-                var stamp = lastMergeDateTimeStamp;
                 query = query.Where(
-                    q => q.WhereNotNull(dateColumn).Where(dateColumn, ">", stamp)
+                    q => q.WhereNotNull(dateColumn).Where(dateColumn, ">", lastMergeDateTimeStamp)
                 );
             }
 
@@ -323,13 +371,13 @@ public class EtlExecutor : IEtlExecutor
         {
             if (updated)
             {
-                SetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, timeStamp, destinationSqlCompiler, service.Database!.DatabaseProvider!);
+                SetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, timeStamp, destinationSqlCompiler, service.Database!.DataProvider!);
             }
         }
     }
 
-    private static DateTime GetLastMergeDateTimeStamp(IConnectionManager destinationDb, string loaderName, string dateColumn, 
-        Compiler destinationSqlCompiler, IDatabaseProvider destinationDbProvider)
+    private static DateTime GetLastMergeDateTimeStamp(string loaderName, string dateColumn, 
+        IDataProvider destinationDbProvider)
     {
         var lastMergeDateTime = DateTime.MinValue;
 
@@ -340,10 +388,10 @@ public class EtlExecutor : IEtlExecutor
                 .Where("Loader", loaderName)
                 .Select("LastDateLoadedUtc");
 
-        var findSql = destinationSqlCompiler.Compile(findQuery).ToString();
+        var findSql = destinationDbProvider.SqlCompiler.Compile(findQuery).ToString();
 
         object? resultDate = null;
-        SqlTask.ExecuteReader(destinationDb, findSql, r => resultDate = r);
+        SqlTask.ExecuteReader(destinationDbProvider.ConnectionManager, findSql, r => resultDate = r);
         if (resultDate is not null)
         {
             return (DateTime)resultDate;
@@ -357,9 +405,9 @@ public class EtlExecutor : IEtlExecutor
             LastDateLoadedUtc = lastMergeDateTime
         });
 
-        var insertSql = destinationSqlCompiler.Compile(insertQuery).ToString();
+        var insertSql = destinationDbProvider.SqlCompiler.Compile(insertQuery).ToString();
 
-        SqlTask.ExecuteNonQuery(destinationDb, insertSql);
+        SqlTask.ExecuteNonQuery(destinationDbProvider.ConnectionManager, insertSql);
 
         return lastMergeDateTime;
 
@@ -367,7 +415,7 @@ public class EtlExecutor : IEtlExecutor
 
     private bool SetLastMergeDateTimeStamp(IConnectionManager destinationDb, string loaderName,
         string dateColumn, DateTime lastMergeDateTime, Compiler destinationSqlCompiler,
-        IDatabaseProvider destinationDbProvider)
+        IDataProvider destinationDbProvider)
     {
         var mergeStateTableName = destinationDbProvider.ToTableNameForSqlRaw(DatabaseObject.MergeStateTableName, DatabaseObject.MetadataSchemaName);
 
@@ -388,4 +436,20 @@ public class EtlExecutor : IEtlExecutor
 
         return result == 1;
     }
+
+    private class LastMergeDateTimeStampInfo : Dictionary<string, LastMergeDateTimeStamp>{}
+
+    private class LastMergeDateTimeStamp
+    {
+        public DateTime DateTimeStamp;
+
+        public bool Updated = false;
+
+        public LastMergeDateTimeStamp(DateTime lastMergeDateTimeStamp)
+        {
+            DateTimeStamp = lastMergeDateTimeStamp;
+        }
+    }
+
+
 }

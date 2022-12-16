@@ -1,5 +1,8 @@
+using System.Dynamic;
 using System.Transactions;
 using ETLBox.Connection;
+using ETLBox.DataFlow;
+using ETLBox.DataFlow.Connectors;
 using Hangfire;
 using Hangfire.MySql;
 using Microsoft.EntityFrameworkCore;
@@ -8,137 +11,148 @@ using MySql.Data.MySqlClient;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
+using Nox.Core.Interfaces.Etl;
 using SqlKata.Compilers;
 
 namespace Nox.Data.MySql;
 
-public class MySqlDatabaseProvider: IDatabaseProvider
+public class MySqlDatabaseProvider: IDataProvider
 {
     private string _connectionString = string.Empty;
         
-        private readonly IConnectionManager _connectionManager = new MySqlConnectionManager();
+    private readonly IConnectionManager _connectionManager = new MySqlConnectionManager();
 
-        private readonly Compiler _sqlCompiler = new MySqlCompiler();
+    private readonly Compiler _sqlCompiler = new MySqlCompiler();
 
-        public string ConnectionString
-        {
-            get { return _connectionString; }
+    public string ConnectionString
+    {
+        get { return _connectionString; }
          
-            set { SetConnectionString(value); }
-        }
+        set { SetConnectionString(value); }
+    }
 
-        public string Name => "mysql";
+    public string Name => "mysql";
 
-        public IConnectionManager ConnectionManager => _connectionManager;
+    public IConnectionManager ConnectionManager => _connectionManager;
 
-        public Compiler SqlCompiler => _sqlCompiler;
+    public Compiler SqlCompiler => _sqlCompiler;
 
-        public void ConfigureServiceDatabase(IServiceDatabase serviceDb, string applicationName)
+
+    public void ConfigureServiceDatabase(IServiceDataSource serviceDb, string applicationName)
+    {
+        MySqlConnectionStringBuilder csb;
+
+        if (string.IsNullOrEmpty(serviceDb.ConnectionString))
         {
-            MySqlConnectionStringBuilder csb;
-
-            if (string.IsNullOrEmpty(serviceDb.ConnectionString))
+            csb = new MySqlConnectionStringBuilder(serviceDb.Options)
             {
-                csb = new MySqlConnectionStringBuilder(serviceDb.Options)
-                {
-                    Server = serviceDb.Server,
-                    Port = (uint)serviceDb.Port,
-                    UserID = serviceDb.User,
-                    Password = serviceDb.Password,
-                    Database = serviceDb.Name
-                };
-            }
-            else
-            {
-                csb = new MySqlConnectionStringBuilder(serviceDb.ConnectionString);
-            }
-
-            serviceDb.ConnectionString = csb.ToString();
-
-            SetConnectionString(serviceDb.ConnectionString);
-        }
-
-        private void SetConnectionString(string connectionString)
-        {
-            _connectionString = connectionString;
-
-            _connectionManager.ConnectionString = new MySqlConnectionString(_connectionString);
-        }
-
-        public DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
-        {
-            return optionsBuilder.UseMySQL(_connectionString);
-        }
-
-        public string ToDatabaseColumnType(IEntityAttribute entityAttribute)
-        {
-            var propType = entityAttribute.Type?.ToLower() ?? "string";
-            var propWidth = entityAttribute.MaxWidth < 1 ? "65535" : entityAttribute.MaxWidth.ToString();
-            var propPrecision = entityAttribute.Precision.ToString();
-            var isFixedWidth = entityAttribute.MaxWidth == entityAttribute.MinWidth;
-
-            //     "real" => typeof(Single),
-            //     "float" => typeof(Single),
-            //     "bigreal" => typeof(Double),
-            //     "bigfloat" => typeof(Double),
-
-            return propType switch
-            {
-                "string" => isFixedWidth ? $"char({propWidth})" : $"varchar({propWidth})",
-                "varchar" => $"varchar({propWidth})",
-                "nvarchar" => $"varchar({propWidth})",
-                "url" => "varchar(2048)",
-                "email" => "varchar(320)",
-                "char" => $"char({propWidth})",
-                "guid" => "binary(16)",
-                "date" => "date",
-                "datetime" => "datetime",
-                "time" => "timestamp",
-                "timespan" => "timestamp",
-                "bool" => "tinyint(1)",
-                "boolean" => "tinyint(1)",
-                "object" => null!,
-                "int" => "integer",
-                "uint" => "integer",
-                "bigint" => "bigint",
-                "smallint" => "smallint",
-                "decimal" => $"decimal({propWidth},{propPrecision})",
-                "money" => $"decimal({propWidth},{propPrecision})",
-                "smallmoney" => $"decimal({propWidth},{propPrecision})",
-                _ => "varchar"
+                Server = serviceDb.Server,
+                Port = (uint)serviceDb.Port,
+                UserID = serviceDb.User,
+                Password = serviceDb.Password,
+                Database = serviceDb.Name
             };
         }
-
-        public IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration)
+        else
         {
-            configuration.UseStorage(
-                new MySqlStorage(_connectionString, new MySqlStorageOptions
-                {
-                    TransactionIsolationLevel = IsolationLevel.ReadCommitted,
-                    QueuePollInterval = TimeSpan.FromSeconds(15),
-                    JobExpirationCheckInterval = TimeSpan.FromHours(1),
-                    CountersAggregateInterval = TimeSpan.FromMinutes(5),
-                    PrepareSchemaIfNecessary = true,
-                    DashboardJobListLimit = 50000,
-                    TransactionTimeout = TimeSpan.FromMinutes(1),
-                    TablesPrefix = "jobs_",
-                }));
-            return configuration;
+            csb = new MySqlConnectionStringBuilder(serviceDb.ConnectionString);
         }
 
-        public string ToTableNameForSql(string table, string schema)
-        {
-            return $"`{schema}_{table}`";
-        }
+        serviceDb.ConnectionString = csb.ToString();
 
-        public string ToTableNameForSqlRaw(string table, string schema)
-        {
-            return $"{schema}_{table}";
-        }
+        SetConnectionString(serviceDb.ConnectionString);
+    }
 
-        public EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema)
+    private void SetConnectionString(string connectionString)
+    {
+        _connectionString = connectionString;
+
+        _connectionManager.ConnectionString = new MySqlConnectionString(_connectionString);
+    }
+
+    public DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
+    {
+        return optionsBuilder.UseMySQL(_connectionString);
+    }
+
+    public string ToDatabaseColumnType(IEntityAttribute entityAttribute)
+    {
+        var propType = entityAttribute.Type?.ToLower() ?? "string";
+        var propWidth = entityAttribute.MaxWidth < 1 ? "65535" : entityAttribute.MaxWidth.ToString();
+        var propPrecision = entityAttribute.Precision.ToString();
+        var isFixedWidth = entityAttribute.MaxWidth == entityAttribute.MinWidth;
+
+        //     "real" => typeof(Single),
+        //     "float" => typeof(Single),
+        //     "bigreal" => typeof(Double),
+        //     "bigfloat" => typeof(Double),
+
+        return propType switch
         {
-            builder.ToTable($"{schema}_{table}");
-            return builder;
-        }
+            "string" => isFixedWidth ? $"char({propWidth})" : $"varchar({propWidth})",
+            "varchar" => $"varchar({propWidth})",
+            "nvarchar" => $"varchar({propWidth})",
+            "url" => "varchar(2048)",
+            "email" => "varchar(320)",
+            "char" => $"char({propWidth})",
+            "guid" => "binary(16)",
+            "date" => "date",
+            "datetime" => "datetime",
+            "time" => "timestamp",
+            "timespan" => "timestamp",
+            "bool" => "tinyint(1)",
+            "boolean" => "tinyint(1)",
+            "object" => null!,
+            "int" => "integer",
+            "uint" => "integer",
+            "bigint" => "bigint",
+            "smallint" => "smallint",
+            "decimal" => $"decimal({propWidth},{propPrecision})",
+            "money" => $"decimal({propWidth},{propPrecision})",
+            "smallmoney" => $"decimal({propWidth},{propPrecision})",
+            _ => "varchar"
+        };
+    }
+
+    public IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration)
+    {
+        configuration.UseStorage(
+            new MySqlStorage(_connectionString, new MySqlStorageOptions
+            {
+                TransactionIsolationLevel = IsolationLevel.ReadCommitted,
+                QueuePollInterval = TimeSpan.FromSeconds(15),
+                JobExpirationCheckInterval = TimeSpan.FromHours(1),
+                CountersAggregateInterval = TimeSpan.FromMinutes(5),
+                PrepareSchemaIfNecessary = true,
+                DashboardJobListLimit = 50000,
+                TransactionTimeout = TimeSpan.FromMinutes(1),
+                TablesPrefix = "jobs_",
+            }));
+        return configuration;
+    }
+
+    public string ToTableNameForSql(string table, string schema)
+    {
+        return $"`{schema}_{table}`";
+    }
+
+    public string ToTableNameForSqlRaw(string table, string schema)
+    {
+        return $"{schema}_{table}";
+    }
+
+    public EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema)
+    {
+        builder.ToTable($"{schema}_{table}");
+        return builder;
+    }
+
+    public IDataFlowExecutableSource<ExpandoObject> DataFlowSource(ILoaderSource loaderSource)
+    {
+        return new DbSource<ExpandoObject>()
+        {
+            ConnectionManager = _connectionManager,
+            Sql = loaderSource.Query
+        };
+    }
 }

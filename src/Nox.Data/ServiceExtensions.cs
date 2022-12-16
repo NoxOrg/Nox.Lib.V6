@@ -16,11 +16,11 @@ public static class ServiceExtensions
             .AddPostgresDatabaseProvider()
             .AddMySqlDatabaseProvider();
 
-        services.AddSingleton<Func<IEnumerable<IDatabaseProvider>>>(x => 
-            () => x.GetService<IEnumerable<IDatabaseProvider>>()!
+        services.AddSingleton<Func<IEnumerable<IDataProvider>>>(x => 
+            () => x.GetService<IEnumerable<IDataProvider>>()!
         );
 
-        services.AddSingleton<IDatabaseProviderFactory, DatabaseProviderFactory>();
+        services.AddSingleton<IDataProviderFactory, DatabaseProviderFactory>();
 
         return services;
     }

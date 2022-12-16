@@ -2,7 +2,7 @@ using Nox.Core.Components;
 
 namespace Nox.Core.Configuration;
 
-public class DataConfiguration: MetaBase
+public class DataSourceConfiguration: MetaBase
 {
     public string Name { get; set; } = string.Empty;
     public string Provider { get; set; } = string.Empty;
@@ -13,6 +13,4 @@ public class DataConfiguration: MetaBase
     public string Options { get; set; } = "";
     public string? ConnectionString { get; set; }
     public string? ConnectionVariable { get; set; }
-    public string Path { get; set; } = "";
-
 }

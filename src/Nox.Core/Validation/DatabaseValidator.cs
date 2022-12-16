@@ -3,7 +3,7 @@ using Nox.Core.Interfaces.Database;
 
 namespace Nox.Core.Validation;
 
-public class DatabaseValidator : AbstractValidator<IServiceDatabase>
+public class DatabaseValidator : AbstractValidator<IServiceDataSource>
 {
     public DatabaseValidator()
     {

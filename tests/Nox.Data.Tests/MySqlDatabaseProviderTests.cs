@@ -35,7 +35,7 @@ public class MySqlDatabaseProviderTests : DataTestFixture
     [TestCase("unknown")]
     public void Can_Convert_Database_Column_Type(string typeName, int width = 0, int precision = 0)
     {
-        var factory = TestServiceProvider!.GetRequiredService<IDatabaseProviderFactory>();
+        var factory = TestServiceProvider!.GetRequiredService<IDataProviderFactory>();
         var provider = factory.Create("mysql");
         var attr = new EntityAttribute
         {
@@ -105,7 +105,7 @@ public class MySqlDatabaseProviderTests : DataTestFixture
     [Test]
     public void Can_Convert_a_Table_Name()
     {
-        var factory = TestServiceProvider!.GetRequiredService<IDatabaseProviderFactory>();
+        var factory = TestServiceProvider!.GetRequiredService<IDataProviderFactory>();
         var provider = factory.Create("mysql");
         var result = provider.ToTableNameForSql("MyTable", "MySchema");
         Assert.AreEqual("`MySchema_MyTable`", result);
@@ -114,7 +114,7 @@ public class MySqlDatabaseProviderTests : DataTestFixture
     [Test]
     public void Can_Convert_a_raw_Table_Name()
     {
-        var factory = TestServiceProvider!.GetRequiredService<IDatabaseProviderFactory>();
+        var factory = TestServiceProvider!.GetRequiredService<IDataProviderFactory>();
         var provider = factory.Create("mysql");
         var result = provider.ToTableNameForSqlRaw("MyTable", "MySchema");
         Assert.AreEqual("MySchema_MyTable", result);

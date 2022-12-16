@@ -21,7 +21,7 @@ public sealed class MetaService : MetaBase, IMetaService
     public string EndpointProvider { get; set; } = string.Empty;
     public string KeyVaultUri { get; set; } = KeyVault.DefaultKeyVaultUri;
 
-    IServiceDatabase? IMetaService.Database
+    IServiceDataSource? IMetaService.Database
     {
         get => Database;
         set => Database = value as ServiceDatabase;
@@ -36,9 +36,9 @@ public sealed class MetaService : MetaBase, IMetaService
     
     public ICollection<MessagingProvider>? MessagingProviders { get; set; }
 
-    ICollection<IServiceDatabase>? IMetaService.DataSources
+    ICollection<IServiceDataSource>? IMetaService.DataSources
     {
-        get => DataSources?.ToList<IServiceDatabase>();
+        get => DataSources?.ToList<IServiceDataSource>();
         set => DataSources = value as ICollection<ServiceDatabase>;
     }
 

@@ -30,10 +30,11 @@ MessagingProviders:
 DataSources:
 
   - Name: BusinessSystem
-    ConnectionVariable: ConnectionString:MasterDataSource
     Provider: SqlServer
+    ConnectionVariable: ConnectionString:MasterDataSource
   
-  - Name: CurrencySeedData
+  - Name: JsonSeedData
     Provider: JsonFile
-    Path: ../../docs/sample-data/currency-seeddata.json
+    Options: Path=../../docs/sample-data/;
+
   
