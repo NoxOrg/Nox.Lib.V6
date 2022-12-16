@@ -213,42 +213,94 @@ $goo.Command.Add( 'main', { param( $featureName )
     $goo.Git.CheckoutMain()
 })
 
-$goo.Command.Add( 'bump-project-version', {
-    $files = (Get-ChildItem "*.csproj" -Recurse)
-    $xpaths = @(
-        "//AssemblyVersion",
-        "//FileVersion",
-        "//PackageVersion",
-        "//PackageReference[@Include='Nox.Lib']/@Version"
-    )
+### some versioning helpers. TODO: move to goo project at some point
 
+## extract a version object (file, xpath, value) table from all csproj files
+$goo.Command.Add( 'get-project-version-table', {
+    $files = (Get-ChildItem "*.csproj" -Recurse)
     $xml = New-Object XML
+    $xpaths = @("//AssemblyVersion","//FileVersion","//PackageVersion","//PackageReference[@Include='Nox.Lib']/@Version")
+    $versionInfoTable = @()
     foreach($file in $files){
-        $updated = $false
-        $versionNew = $null
         $xml.Load($file)
-        foreach($p in $xpaths){ 
-            $node = $xml.SelectSingleNode($p)
+        foreach($xpath in $xpaths){ 
+            $node = $xml.SelectSingleNode($xpath)
             if($null -ne $node){
                 $version = (($node.InnerText ?? $node.Value) -split '\.')
-                $version[2] = [int]($version[2])+1
-                $versionNew = ($version -join '.')
-                $node.InnerText = $versionNew
-                $updated = $true
-        }
-        }
-        if ($updated) {
-            $goo.Console.WriteLine("Bumping version for $($file.Name) to $versionNew..." )
-            $xml.Save($file)
+                $versionInfo = [pscustomobject]@{file=$file;xpath=$xpath;version=$version}
+                $versionInfoTable += $versionInfo
+            }
         }
     }
+    return $versionInfoTable;
+})
+
+## get highest frequency version, first three segments only
+$goo.Command.Add( 'get-project-version-vote', { param($versionInfoTable)
+    $versionCounter = @{}
+    foreach($versionInfo in $versionInfoTable){
+        $version = ($versionInfo.version[0..2] -join '.')
+        if($versionCounter.ContainsKey($version)){
+            $versionCounter[$version]++
+        } else {
+            $versionCounter[$version] = 0
+        }
+    }
+    $maxVal = -1
+    $maxKey = $null
+    foreach($key in $versionCounter.Keys){
+        if($versionCounter[$key] -gt $maxVal){
+            $maxVal = $versionCounter[$key]
+            $maxKey = $key
+        }
+    }
+    return $maxKey
+})
+
+## set the version from version table
+$goo.Command.Add( 'set-project-version', { param( $versionInfoTable, $version )
+    $xml = New-Object XML
+    $currentFile = $null
+    foreach($versionInfo in $versionInfoTable){
+        if($currentFile -ne $versionInfo.file){
+            if($null -ne $currentFile) { $xml.Save($currentFile) }
+            $currentFile = $versionInfo.file
+            $xml.Load($currentFile)
+        }
+        $node = $xml.SelectSingleNode($versionInfo.xpath)
+        if($null -ne $node){
+            $versionNew = (($node.InnerText ?? $node.Value) -split '\.')
+            for($i=0; ($i -lt $versionNew.Length) -and ($i -lt $version.Length); $i++){
+                $versionNew[$i] = $version[$i]
+            }
+            $node.InnerText = ($versionNew -join '.')
+        }
+        $relativePath = Resolve-Path -Path $versionInfo.file -Relative 
+        $goo.Console.WriteLine("Bumping $relativePath to version $($versionNew -join '.') ($($versionInfo.xpath))..." )
+    }
+    if($null -ne $currentFile) { $xml.Save($currentFile) }
+
+})
+
+# command: goo bump-version [<version>]| Sets or increments the project version
+$goo.Command.Add( 'bump-version', { param($version)
+    $versionInfoTable = $goo.Command.Run('get-project-version-table')
+    $versionArray = $null;
+    if($null -eq $version){
+        $version = $goo.Command.Run('get-project-version-vote', $versionInfoTable)
+        $versionArray = ($version -split '\.')
+        $versionArray[2] = [string]([int]$versionArray[2]+1)
+    } else {
+        $versionArray = ($version -split '\.')
+    }
+    $goo.Command.Run('set-project-version', @($versionInfoTable, $versionArray))
 })
 
 # command: goo publish | Build and publish Nox nuget packages
 $goo.Command.Add( 'publish', { 
 
     $goo.Console.WriteInfo("Updating version for ($script:SourceFolder\Nox.Lib) and dependancies...")
-    $goo.Command.Run( 'bump-project-version' )
+    $goo.Command.Run( 'bump-version' )
 
     $goo.Console.WriteInfo("Compiling project ($script:SourceFolder\Nox.Lib)...")
     $goo.Command.RunExternal('dotnet','build /clp:ErrorsOnly --warnaserror --configuration Release', "$script:SourceFolder\Nox.Lib")
