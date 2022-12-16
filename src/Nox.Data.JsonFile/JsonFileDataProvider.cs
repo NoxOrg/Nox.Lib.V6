@@ -20,19 +20,24 @@ public class JsonFileDataProvider : IDataProvider
 
     public string Name => "jsonfile";
 
+    private string _options = @"Path=.\";
+
     private string _folderPath = string.Empty;
 
-    public string ConnectionString { get; set; } = string.Empty;
-
-    public Compiler SqlCompiler => throw new NotImplementedException();
-
-    public IConnectionManager ConnectionManager => throw new NotImplementedException();
-
-    public void Configure(IServiceDataSource serviceDb, string applicationName)
+    public string ConnectionString
     {
-        var options = serviceDb.Options.Split(';', StringSplitOptions.RemoveEmptyEntries)
-            .Select(e => e.Split('=',2))
-            .ToDictionary(e => e[0], e => e[1], StringComparer.OrdinalIgnoreCase);
+        get { return _options; }
+
+        set { SetConnectionString(value); }
+    }
+
+    protected virtual void SetConnectionString(string connectionString)
+    {
+        _options = connectionString;
+
+        var options = _options.Split(';', StringSplitOptions.RemoveEmptyEntries)
+                .Select(e => e.Split('=', 2))
+                .ToDictionary(e => e[0], e => e[1], StringComparer.OrdinalIgnoreCase);
 
         if (!options.ContainsKey("path"))
         {
@@ -41,6 +46,18 @@ public class JsonFileDataProvider : IDataProvider
 
         _folderPath = Path.GetFullPath(options["path"]);
 
+    }
+
+    public Compiler SqlCompiler => null!;
+
+    public IConnectionManager ConnectionManager => null!;
+
+    public void Configure(IServiceDataSource serviceDb, string applicationName)
+    {
+
+        _options = serviceDb.Options;
+
+        SetConnectionString(_options);
     }
 
     public void ApplyMergeInfo(ILoaderSource loaderSource, LoaderMergeStates lastMergeDateTimeStampInfo, string[] dateTimeStampColumns, string[] targetColumns)

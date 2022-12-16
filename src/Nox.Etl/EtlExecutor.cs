@@ -109,6 +109,9 @@ public class EtlExecutor : IEtlExecutor
 
                     await MergeNewData(source, destinationDb, destinationTable, targetColumns, loader, entity, lastMergeDateTimeStampInfo);
 
+                    SetAllLastMergeDateTimeStamps(loaderInstance, targetProvider, lastMergeDateTimeStampInfo);
+
+
                     break;
 
                 default:
@@ -281,7 +284,7 @@ public class EtlExecutor : IEtlExecutor
             return;
         }
 
-        var lastMergeDateTimeStamp = lastMergeDateTimeStampInfo.Values
+        var lastMergeDateTimeStamp = lastMergeDateTimeStampInfo.Count == 0 ? DateTime.MinValue : lastMergeDateTimeStampInfo.Values
             .Where(v => v.Updated)
             .Select(v => v.LastDateLoadedUtc)
             .Max();
