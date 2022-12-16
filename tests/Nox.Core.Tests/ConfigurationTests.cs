@@ -1,26 +1,13 @@
 using System;
-using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Nox.Core.Configuration;
 using Nox.Core.Exceptions;
-using Nox.Core.Validation.Configuration;
 using NUnit.Framework;
 
 namespace Nox.Core.Tests;
 
 public class ConfigurationTests
 {
-    [Test]
-    public void Can_Load_Nox_ApplicationSettings()
-    {
-        var appSettings = ConfigurationHelper.GetNoxAppSettings();
-        Assert.AreEqual("Endpoint=sb://nox-msg.servicebus.windows.net/;SharedAccessKeyName=ApplicationTesterKey;SharedAccessKey=oXL4Rvc2xqs7krGy0DQLeNuy0hohSfp2uKUfold/bYo=", appSettings!.GetValue<string>("ConnectionString:AzureServiceBus"));
-        Assert.AreEqual("user id=data_factory_service;password=d4t4_f4ct0ry_s3rv1c3;server=10.255.187.20,1433;database=TitanProduction;Trusted_Connection=no;connection timeout=120;ApplicationIntent=ReadOnly;", appSettings!.GetValue<string>("ConnectionString:MasterDataSource"));
-        Assert.AreEqual("569k1ec2qht2fu10u4s4hdno0p", appSettings!.GetValue<string>("XECurrency:ApiPassword"));
-        Assert.AreEqual("iwgplc510889972", appSettings!.GetValue<string>("XECurrency:ApiUser"));
-        Assert.AreEqual("2023-11-01|ENTERPRISE|IW047|IWG|Andre Sharpe|andre.sharpe@iwgplc.com||nKrp+FFlN2NRnpFEI0QObDQuFZs+jsuTrafG5wr7p+ZHYN13S+nbx5/pOpK9Kmnc33CCw5YlltdZ/mcd2gBEUGlW0Pi1/QsBq/IZBHRUuJfFztpOi6F6jWpAOSyMJaYn9scNY+daCp4cMpFHIeS6du0mUOatPWwjaTgA7s4Iv4U=", appSettings!.GetValue<string>("EtlBox:LicenseKey"));
-    }
-
     [Test]
     public void Must_Get_an_Exception_If_AppSettings_Are_Empty()
     {
@@ -121,28 +108,6 @@ public class ConfigurationTests
         Assert.That(config.MessagingProviders!.Count, Is.EqualTo(2));
         Assert.That(config.MessagingProviders![0].Name, Is.EqualTo("TestMessagingProvider1"));
         Assert.That(config.MessagingProviders![0].Provider, Is.EqualTo("InMemory"));
-    }
-
-    [Test]
-    public void Must_Get_an_Exception_if_invalid_load_Strategy_used_in_loader()
-    {
-        var lsConfig = new LoaderLoadStrategyConfiguration
-        {
-            DefinitionFileName = "test.yaml",
-            Type = "Unknown"
-        };
-        
-        var validator = new LoaderLoadStrategyConfigValidator();
-        var result = validator.Validate(lsConfig);
-        Assert.That(result.IsValid, Is.False);
-        Assert.That(result.Errors.Count, Is.EqualTo(1));
-        Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("Please only use: DropAndLoad/MergeNew for Load strategy Type in test.yaml")));
-        lsConfig.Type = "DropAndLoad";
-        result = validator.Validate(lsConfig);
-        Assert.That(result.IsValid, Is.True);
-        lsConfig.Type = "MergeNew";
-        result = validator.Validate(lsConfig);
-        Assert.That(result.IsValid, Is.True);
     }
     
 }
