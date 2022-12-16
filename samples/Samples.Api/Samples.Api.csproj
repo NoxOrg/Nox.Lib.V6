@@ -13,11 +13,19 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.0" />
-    <PackageReference Include="Nox.Lib" Version="6.0.14" />
     <PackageReference Include="Serilog" Version="2.12.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Nox.Generator\Nox.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Nox.Core\Nox.Core.csproj" />
+    <ProjectReference Include="..\..\src\Nox.Lib\Nox.Lib.csproj" />
+    <ProjectReference Include="..\..\src\Nox.Api.OData\Nox.Api.OData.csproj" />
+    <ProjectReference Include="..\..\src\Nox.Messaging\Nox.Messaging.csproj" />
   </ItemGroup>
 </Project>
