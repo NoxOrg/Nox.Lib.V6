@@ -275,12 +275,17 @@ public class EtlExecutor : IEtlExecutor
             throw;
         }
 
+        _logger.LogInformation("TheInfo:{info}", lastMergeDateTimeStampInfo);
+
+
+        var lastMergeDateTimeStamp = DateTime.MinValue;
+
         if (inserts == 0 && updates == 0)
         {
             if (nochanges > 0)
             {
                 _logger.LogInformation(
-                    "{nochanges} records found but no change found to merge, last merge at: {lastMergeDateTimeStamp}", nochanges);
+                    "{nochanges} records found but no change found to merge, last merge at: {lastMergeDateTimeStamp}", nochanges, lastMergeDateTimeStamp);
             }
             else
             {
@@ -290,10 +295,14 @@ public class EtlExecutor : IEtlExecutor
             return;
         }
 
-        var lastMergeDateTimeStamp = lastMergeDateTimeStampInfo.Count == 0 ? DateTime.MinValue : lastMergeDateTimeStampInfo.Values
+        var changes = lastMergeDateTimeStampInfo.Values
             .Where(v => v.Updated)
-            .Select(v => v.LastDateLoadedUtc)
-            .Max();
+            .Select(v => v.LastDateLoadedUtc);
+
+        if (changes.Any())
+        {
+            lastMergeDateTimeStamp = changes.Max();
+        }
 
         _logger.LogInformation("{inserts} records inserted, last merge at {lastMergeDateTimeStamp}", inserts, lastMergeDateTimeStamp);
 
