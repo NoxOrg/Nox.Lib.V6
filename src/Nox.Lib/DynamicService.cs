@@ -282,7 +282,7 @@ public class DynamicService : IDynamicService
                 }    
             }
             
-            variables.Add("EtlBox:LicenseKey", _appConfig?["EtlBox:LicenseKey"]);
+            // variables.Add("EtlBox:LicenseKey", _appConfig?["EtlBox:LicenseKey"]);
 
             // try key vault where app configuration is missing 
             if (variables.Any(v => v.Value == null))

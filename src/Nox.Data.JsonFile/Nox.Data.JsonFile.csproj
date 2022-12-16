@@ -22,5 +22,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="ETLBox.Json" Version="2.6.6" />
+    <PackageReference Include="ETLBox" Version="2.6.6.1" />
+		
 	</ItemGroup>
 </Project>

@@ -19,6 +19,7 @@
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Spectre.Console" Version="0.45.0" />
     <PackageReference Include="Spectre.Console.Cli" Version="0.45.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Nox.Generator\Nox.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />

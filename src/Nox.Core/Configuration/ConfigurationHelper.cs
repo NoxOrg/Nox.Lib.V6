@@ -34,8 +34,8 @@ public class ConfigurationHelper
             "ConnectionString:AzureServiceBus",
             "ConnectionString:MasterDataSource",
             "XECurrency:ApiPassword",
-            "XECurrency:ApiUser",
-            "EtlBox:LicenseKey",
+            "XECurrency:ApiUser"
+            // "EtlBox:LicenseKey",
         };
         
         var secrets = GetSecrets(keyVaultUri, keys).GetAwaiter().GetResult();
@@ -50,7 +50,7 @@ public class ConfigurationHelper
         
         configBuilder.AddInMemoryCollection(secrets!);
         
-        LicenseCheck.LicenseKey = secrets.First(s => s.Key.Equals("EtlBox:LicenseKey")).Value;
+        // LicenseCheck.LicenseKey = secrets.First(s => s.Key.Equals("EtlBox:LicenseKey")).Value;
 
         return configBuilder.Build();
     }

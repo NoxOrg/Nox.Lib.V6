@@ -29,10 +29,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.0" />
-    <PackageReference Include="ETLBox" Version="2.6.6" />
-    <PackageReference Include="ETLBox.MySql" Version="2.6.6" />
-    <PackageReference Include="ETLBox.Postgres" Version="2.6.6" />
-    <PackageReference Include="ETLBox.SqlServer" Version="2.6.6" />
+    <PackageReference Include="ETLBox" Version="2.6.6.1" />
     <PackageReference Include="FluentValidation" Version="11.4.0" />
     <PackageReference Include="Hangfire" Version="1.7.32" />
     <PackageReference Include="Hangfire.Core" Version="1.7.32" />
@@ -82,17 +79,6 @@
     <ProjectReference Include="..\Nox.Generator\Nox.Generator.csproj" PrivateAssets="all" />
     <ProjectReference Include="..\Nox.Jobs\Nox.Jobs.csproj" PrivateAssets="all" />
     <ProjectReference Include="..\Nox.Messaging\Nox.Messaging.csproj" PrivateAssets="all" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="OData\Commands\**" />
-    <Compile Remove="OData\Notifications\**" />
-    <Compile Remove="OData\Queries\**" />
-    <EmbeddedResource Remove="OData\Commands\**" />
-    <EmbeddedResource Remove="OData\Notifications\**" />
-    <EmbeddedResource Remove="OData\Queries\**" />
-    <None Remove="OData\Commands\**" />
-    <None Remove="OData\Notifications\**" />
-    <None Remove="OData\Queries\**" />
   </ItemGroup>
   <ItemGroup>
     <None Update="tools\install.ps1">
