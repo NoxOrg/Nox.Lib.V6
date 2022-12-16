@@ -18,7 +18,7 @@ namespace Nox.Core.Interfaces.Database
         IConnectionManager ConnectionManager { get; }
         Compiler SqlCompiler { get; }
 
-        void ConfigureServiceDatabase(IServiceDataSource serviceDb, string applicationName);
+        void Configure(IServiceDataSource serviceDb, string applicationName);
         DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder);
         EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema);
         IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration);

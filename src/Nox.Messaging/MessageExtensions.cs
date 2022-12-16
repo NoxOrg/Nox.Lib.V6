@@ -51,6 +51,7 @@ public static class MessageExtensions
                 foreach (var prop in payload.GetType().GetProperties())
                 {
                     var sourceVal = sourceDict[prop.Name];
+
                     try
                     {
                         prop.SetValue(payload, sourceVal);

@@ -7,6 +7,7 @@ using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
 using SqlKata.Compilers;
 using Nox.Core.Components;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Nox.Data.SqlServer;
 
@@ -19,10 +20,9 @@ public class SqlServerDatabaseProvider: DatabaseProviderBase
         _connectionManager = new SqlConnectionManager();
 
         _sqlCompiler = new SqlServerCompiler();
-
     }
 
-    public override void ConfigureServiceDatabase(IServiceDataSource serviceDb, string applicationName)
+    public override void Configure(IServiceDataSource serviceDb, string applicationName)
     {
         SqlConnectionStringBuilder csb;
 
@@ -96,6 +96,12 @@ public class SqlServerDatabaseProvider: DatabaseProviderBase
             "smallmoney" => $"decimal({propWidth},{propPrecision})",
             _ => "nvarchar(max)"
         };
+    }
+
+    public override EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema)
+    {
+        builder.ToTable(table, schema);
+        return builder;
     }
 
     public override IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration)

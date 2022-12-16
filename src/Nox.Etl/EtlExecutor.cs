@@ -14,8 +14,6 @@ using Nox.Core.Models;
 using Nox.Messaging;
 using Nox.Messaging.Enumerations;
 using Nox.Messaging.Events;
-using SqlKata;
-using SqlKata.Compilers;
 using System.Dynamic;
 using System.Linq;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -100,15 +98,11 @@ public class EtlExecutor : IEtlExecutor
 
                     var lastMergeDateTimeStampInfo = GetAllLastMergeDateTimeStamps(loaderInstance, targetProvider);
 
-                    var dateColumns = loaderInstance.LoadStrategy!.Columns.Select(c => c);
-
-                    var relatedParentColumns = entity.RelatedParents.Select(p => p + "Id");
-
                     var targetColumns = entity.Attributes
                         .Where(a => a.IsMappedAttribute())
                         .Select(a => a.Name)
-                        .Concat(relatedParentColumns)
-                        .Concat(dateColumns)
+                        .Concat(entity.RelatedParents.Select(p => p + "Id"))
+                        .Concat(loaderInstance.LoadStrategy!.Columns.Select(c => c))
                         .ToArray();
 
                     sourceProvider.ApplyMergeInfo(loaderSource, lastMergeDateTimeStampInfo, loaderInstance.LoadStrategy!.Columns, targetColumns);
@@ -355,7 +349,8 @@ public class EtlExecutor : IEtlExecutor
         {
             Loader = loaderName,
             Property = dateColumn,
-            LastDateLoadedUtc = lastMergeDateTime
+            LastDateLoadedUtc = lastMergeDateTime,
+            Updated = 1
         });
 
         var insertSql = destinationDbProvider.SqlCompiler.Compile(insertQuery).ToString();

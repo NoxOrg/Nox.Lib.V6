@@ -25,7 +25,7 @@ public class DataTestFixture
         services.AddSingleton<IConfiguration>(config);
         services.AddLogging();
         services
-            .AddDatabaseProviderFactory()
+            .AddDataProviderFactory()
             .AddDbContext<IDynamicDbContext, DynamicDbContext>()
             .AddSingleton<IDynamicModel, DynamicModel>()
             .AddSingleton<IDynamicService, DynamicService>();

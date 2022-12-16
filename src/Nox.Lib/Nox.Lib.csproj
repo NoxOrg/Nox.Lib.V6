@@ -133,6 +133,10 @@
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
+    <Content Include="$(OutputPath)\Nox.Data.JsonFile.dll">
+      <Pack>true</Pack>
+      <PackagePath>lib\$(TargetFramework)</PackagePath>
+    </Content>
     <Content Include="$(OutputPath)\Nox.Entity.XtendedAttributes.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>

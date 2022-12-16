@@ -41,10 +41,9 @@ public abstract class DatabaseProviderBase : IDataProvider
 
     protected readonly DbSource<ExpandoObject> _dataFlowExecutableSource = new();
 
-    public EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema)
+    public virtual EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema)
     {
-        builder.ToTable($"{schema}_{table}");
-        return builder;
+        throw new NotImplementedException();
     }
 
     public IDataFlowExecutableSource<ExpandoObject> DataFlowSource(ILoaderSource loaderSource)
@@ -84,7 +83,7 @@ public abstract class DatabaseProviderBase : IDataProvider
 
     }
 
-    public virtual void ConfigureServiceDatabase(IServiceDataSource serviceDb, string applicationName)
+    public virtual void Configure(IServiceDataSource serviceDb, string applicationName)
     {
         throw new NotImplementedException();
     }

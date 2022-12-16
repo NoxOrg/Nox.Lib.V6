@@ -7,6 +7,7 @@ using Nox.Core.Interfaces.Entity;
 using Npgsql;
 using SqlKata.Compilers;
 using Nox.Core.Components;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Nox.Data.Postgres;
 
@@ -23,7 +24,7 @@ public class PostgresDatabaseProvider: DatabaseProviderBase
     }
 
 
-    public override void ConfigureServiceDatabase(IServiceDataSource serviceDb, string applicationName)
+    public override void Configure(IServiceDataSource serviceDb, string applicationName)
     {
         NpgsqlConnectionStringBuilder csb;
 
@@ -100,6 +101,12 @@ public class PostgresDatabaseProvider: DatabaseProviderBase
             "smallmoney" => $"decimal({propWidth},{propPrecision})",
             _ => "varchar"
         };
+    }
+
+    public override EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema)
+    {
+        builder.ToTable(table, schema);
+        return builder;
     }
 
     public override IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration)

@@ -3,11 +3,11 @@ using Nox.Core.Interfaces.Database;
 
 namespace Nox.Data;
 
-public class DatabaseProviderFactory : IDataProviderFactory
+public class DataProviderFactory : IDataProviderFactory
 {
     private readonly Func<IEnumerable<IDataProvider>> _factory;
 
-    public DatabaseProviderFactory(Func<IEnumerable<IDataProvider>> factory)
+    public DataProviderFactory(Func<IEnumerable<IDataProvider>> factory)
     {
         _factory = factory;
     }

@@ -252,7 +252,7 @@ public class DynamicService : IDynamicService
             serviceDatabases.ToList().ForEach(db =>
             {
                 db.DataProvider = _factory!.Create(db.Provider);
-                db.DataProvider.ConfigureServiceDatabase(db, _service.Name);
+                db.DataProvider.Configure(db, _service.Name);
             });
 
             return _service;
@@ -357,8 +357,6 @@ public class DynamicService : IDynamicService
 
             foreach (var dataSource in _service.DataSources!)
             {
-                if (dataSource.Provider.Equals(DataProvider.JsonFile,StringComparison.OrdinalIgnoreCase)) continue;
-
                 serviceDatabases.Add(dataSource);
             }
 

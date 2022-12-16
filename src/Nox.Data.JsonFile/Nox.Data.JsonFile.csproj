@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+	<PropertyGroup>
+		<AssemblyVersion>6.0.14.0</AssemblyVersion>
+		<FileVersion>6.0.14.0</FileVersion>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugType>none</DebugType>
+		<DebugSymbols>false</DebugSymbols>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<PlatformTarget>AnyCPU</PlatformTarget>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Nox.Core\Nox.Core.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="ETLBox.Json" Version="2.6.6" />
+	</ItemGroup>
+</Project>
