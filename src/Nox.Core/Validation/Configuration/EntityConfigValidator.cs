@@ -9,11 +9,11 @@ public class EntityConfigValidator: AbstractValidator<EntityConfiguration>
     {
         RuleFor(entity => entity.Name)
             .NotEmpty()
-            .WithMessage(entity => $"The entity's name must be specified in {entity.DefinitionFileName}");
+            .WithMessage(entity => string.Format(ValidationResources.EntityNameEmpty, entity.DefinitionFileName));
 
         RuleFor(entity => entity.Attributes)
             .NotEmpty()
-            .WithMessage(entity => $"The entity must have at least one property defined in {entity.DefinitionFileName}");
+            .WithMessage(entity => string.Format(ValidationResources.EntityAttributesEmpty, entity.Name, entity.DefinitionFileName));
 
         RuleForEach(entity => entity.Attributes)
             .SetValidator(new EntityAttributeConfigValidator());

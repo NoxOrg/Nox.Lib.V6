@@ -1,6 +1,8 @@
+using Nox.Core.Components;
+
 namespace Nox.Core.Configuration;
 
-public class LoaderScheduleConfiguration
+public class LoaderScheduleConfiguration: MetaBase
 {
     public string Start { get; set; } = string.Empty;
     public string CronExpression { get; set; } = string.Empty;

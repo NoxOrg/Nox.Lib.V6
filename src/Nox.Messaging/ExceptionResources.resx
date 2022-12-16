@@ -19,6 +19,6 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="MapInstanceCastException" xml:space="preserve">
-        <value>Invalid type cast. {0}-&amp;gt;{1}. Property: {2} -&amp;gt; Source Type: {3} Destination Type: {4}. Fix the type defined in your entity definition yaml file for {5}.</value>
+        <value>Invalid type cast. {0}-&gt;{1}. Property: {2} -&gt; Source Type: {3} Destination Type: {4}. Fix the type defined in your entity definition yaml file for {5}.</value>
     </data>
 </root>

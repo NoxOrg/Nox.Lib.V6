@@ -336,7 +336,6 @@ public class DynamicService : IDynamicService
                 {
                     _logger!.LogInformation("...Resolving variable [{key}] from secrets vault {vault}", key, vaultUri);
                     variables[key] = keyVault.GetSecretAsync(vaultUri, key.Replace(":", "--")).GetAwaiter().GetResult().Value;
-                    _logger!.LogInformation($"Variable [{key}] resolved to: {variables[key]}");
                 }
                 else
                 {

@@ -1,7 +1,9 @@
 using System;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Nox.Core.Configuration;
 using Nox.Core.Exceptions;
+using Nox.Core.Validation.Configuration;
 using NUnit.Framework;
 
 namespace Nox.Core.Tests;
@@ -119,6 +121,28 @@ public class ConfigurationTests
         Assert.That(config.MessagingProviders!.Count, Is.EqualTo(2));
         Assert.That(config.MessagingProviders![0].Name, Is.EqualTo("TestMessagingProvider1"));
         Assert.That(config.MessagingProviders![0].Provider, Is.EqualTo("InMemory"));
+    }
+
+    [Test]
+    public void Must_Get_an_Exception_if_invalid_load_Strategy_used_in_loader()
+    {
+        var lsConfig = new LoaderLoadStrategyConfiguration
+        {
+            DefinitionFileName = "test.yaml",
+            Type = "Unknown"
+        };
+        
+        var validator = new LoaderLoadStrategyConfigValidator();
+        var result = validator.Validate(lsConfig);
+        Assert.That(result.IsValid, Is.False);
+        Assert.That(result.Errors.Count, Is.EqualTo(1));
+        Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("Please only use: DropAndLoad/MergeNew for Load strategy Type in test.yaml")));
+        lsConfig.Type = "DropAndLoad";
+        result = validator.Validate(lsConfig);
+        Assert.That(result.IsValid, Is.True);
+        lsConfig.Type = "MergeNew";
+        result = validator.Validate(lsConfig);
+        Assert.That(result.IsValid, Is.True);
     }
     
 }

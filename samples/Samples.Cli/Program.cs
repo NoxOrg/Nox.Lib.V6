@@ -1,10 +1,6 @@
-﻿using MassTransit;
-using MassTransit.Mediator;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Nox.Core.Configuration;
-using Nox.Core.Interfaces;
 using Nox.Messaging;
 using Samples.Cli.Commands;
 using Samples.Cli.Services;
