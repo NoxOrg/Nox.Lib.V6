@@ -1,4 +1,4 @@
-namespace Nox.Core.Models;
+namespace Nox.Core.Constants;
 
 public static class DatabaseObject
 {

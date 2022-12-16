@@ -1,40 +1,29 @@
 using ETLBox.Connection;
-using ETLBox.DataFlow.Connectors;
-using ETLBox.DataFlow;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
-using Nox.Core.Interfaces.Etl;
 using Npgsql;
 using SqlKata.Compilers;
-using System.Dynamic;
+using Nox.Core.Components;
 
 namespace Nox.Data.Postgres;
 
-public class PostgresDatabaseProvider: IDataProvider
+public class PostgresDatabaseProvider: DatabaseProviderBase
 {
-    private string _connectionString = string.Empty;
-
-    private readonly IConnectionManager _connectionManager = new PostgresConnectionManager();
-
-    private readonly Compiler _sqlCompiler = new PostgresCompiler();
-
-    public IConnectionManager ConnectionManager => _connectionManager;
-    public Compiler SqlCompiler => _sqlCompiler;
-    public string ConnectionString
+    public PostgresDatabaseProvider()
     {
-        get { return _connectionString; }
+        _name = "postgres";
 
-        set { SetConnectionString(value); }
+        _connectionManager = new PostgresConnectionManager();
+
+        _sqlCompiler = new PostgresCompiler();
+
     }
 
-    public string Name => "postgres";
 
-    public void ConfigureServiceDatabase(IServiceDataSource serviceDb, string applicationName)
+    public override void ConfigureServiceDatabase(IServiceDataSource serviceDb, string applicationName)
     {
         NpgsqlConnectionStringBuilder csb;
 
@@ -62,19 +51,19 @@ public class PostgresDatabaseProvider: IDataProvider
 
     }
 
-    private void SetConnectionString(string connectionString)
+    protected override void SetConnectionString(string connectionString) 
     {
-        _connectionString = connectionString;
+        base.SetConnectionString(connectionString);
 
         _connectionManager.ConnectionString = new PostgresConnectionString(connectionString);
     }
 
-    public DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
+    public override DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
     {
         return optionsBuilder.UseNpgsql(_connectionString);
     }
 
-    public string ToDatabaseColumnType(IEntityAttribute entityAttribute)
+    public override string ToDatabaseColumnType(IEntityAttribute entityAttribute)
     {
         var propType = entityAttribute.Type?.ToLower() ?? "string";
         var propWidth = entityAttribute.MaxWidth < 1 ? "2048" : entityAttribute.MaxWidth.ToString();
@@ -113,7 +102,7 @@ public class PostgresDatabaseProvider: IDataProvider
         };
     }
 
-    public IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration)
+    public override IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration)
     {
         configuration.UsePostgreSqlStorage(_connectionString, new PostgreSqlStorageOptions
         {
@@ -123,29 +112,15 @@ public class PostgresDatabaseProvider: IDataProvider
         return configuration;
     }
 
-    public string ToTableNameForSql(string table, string schema)
+    public override string ToTableNameForSql(string table, string schema)
     {
         return $"\"{schema}\".\"{table}\"";
     }
 
-    public string ToTableNameForSqlRaw(string table, string schema)
+    public override string ToTableNameForSqlRaw(string table, string schema)
     {
         return $"{schema}.{table}";
     }
 
-    public EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema)
-    {
-        builder.ToTable(table, schema);
-        return builder;
-    }
-
-    public IDataFlowExecutableSource<ExpandoObject> DataFlowSource(ILoaderSource loaderSource)
-    {
-        return new DbSource<ExpandoObject>()
-        {
-            ConnectionManager = _connectionManager,
-            Sql = loaderSource.Query
-        };
-    }
 
 }

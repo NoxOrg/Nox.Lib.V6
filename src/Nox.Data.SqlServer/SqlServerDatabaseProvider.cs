@@ -1,44 +1,28 @@
 using System.Data.SqlClient;
 using ETLBox.Connection;
-using ETLBox.DataFlow.Connectors;
-using ETLBox.DataFlow;
 using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
-using Nox.Core.Interfaces.Etl;
 using SqlKata.Compilers;
-using System.Dynamic;
+using Nox.Core.Components;
 
 namespace Nox.Data.SqlServer;
 
-public class SqlServerDatabaseProvider: IDataProvider
+public class SqlServerDatabaseProvider: DatabaseProviderBase
 {
-    private string _connectionString = string.Empty;
-
-    private readonly IConnectionManager _connectionManager = new SqlConnectionManager();
-
-    private readonly Compiler _sqlCompiler = new SqlServerCompiler();
-
-    private readonly DbSource<ExpandoObject> _dataFlowExecutableSource = new();
-
-    public string ConnectionString
+    public SqlServerDatabaseProvider()
     {
-        get { return _connectionString; }
-         
-        set { SetConnectionString(value); }
+        _name = "sqlserver";
+
+        _connectionManager = new SqlConnectionManager();
+
+        _sqlCompiler = new SqlServerCompiler();
+
     }
 
-    public string Name => "sqlserver";
-
-    public IConnectionManager ConnectionManager => _connectionManager;
-
-    public Compiler SqlCompiler => _sqlCompiler;
-
-    public void ConfigureServiceDatabase(IServiceDataSource serviceDb, string applicationName)
+    public override void ConfigureServiceDatabase(IServiceDataSource serviceDb, string applicationName)
     {
         SqlConnectionStringBuilder csb;
 
@@ -64,19 +48,19 @@ public class SqlServerDatabaseProvider: IDataProvider
         SetConnectionString(serviceDb.ConnectionString);
     }
 
-    private void SetConnectionString(string connectionString)
+    protected override void SetConnectionString(string connectionString)
     {
-        _connectionString = connectionString;
+        base.SetConnectionString(connectionString);
 
         _connectionManager.ConnectionString = new SqlConnectionString(_connectionString);
     }
 
-    public DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
+    public override DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
     {
         return optionsBuilder.UseSqlServer(_connectionString);
     }
 
-    public string ToDatabaseColumnType(IEntityAttribute entityAttribute)
+    public override string ToDatabaseColumnType(IEntityAttribute entityAttribute)
     {
         var propType = entityAttribute.Type?.ToLower() ?? "string";
         var propWidth = entityAttribute.MaxWidth < 1 ? "max" : entityAttribute.MaxWidth.ToString();
@@ -114,7 +98,7 @@ public class SqlServerDatabaseProvider: IDataProvider
         };
     }
 
-    public IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration)
+    public override IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration)
     {
         configuration.UseSqlServerStorage(_connectionString, new SqlServerStorageOptions
         {
@@ -129,28 +113,14 @@ public class SqlServerDatabaseProvider: IDataProvider
         return configuration;
     }
 
-    public string ToTableNameForSql(string table, string schema)
+    public override string ToTableNameForSql(string table, string schema)
     {
         return $"[{schema}].[{table}]";
     }
 
-    public string ToTableNameForSqlRaw(string table, string schema)
+    public override string ToTableNameForSqlRaw(string table, string schema)
     {
         return $"{schema}.{table}";
     }
 
-    public EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema)
-    {
-        builder.ToTable(table,schema);
-        return builder;
-    }
-
-    public IDataFlowExecutableSource<ExpandoObject> DataFlowSource(ILoaderSource loaderSource)
-    {
-        _dataFlowExecutableSource.ConnectionManager ??= _connectionManager;
-
-        _dataFlowExecutableSource.Sql = loaderSource.Query;
-
-        return _dataFlowExecutableSource;
-    }
 }

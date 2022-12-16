@@ -7,6 +7,7 @@ namespace Nox.Core.Models
         public string Loader { get; set; } = String.Empty;
         public string Property { get; set; } = String.Empty;
         public DateTime LastDateLoadedUtc { get; set; }
+        public bool Updated { get; set; } = false;
             
     }
 }

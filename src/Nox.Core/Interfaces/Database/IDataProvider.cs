@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Etl;
+using Nox.Core.Models;
 using SqlKata.Compilers;
 using System.Dynamic;
 
@@ -12,18 +13,21 @@ namespace Nox.Core.Interfaces.Database
 {
     public interface IDataProvider
     {
-        public string Name { get; }
-        public string ConnectionString { get; }
-        public IDataFlowExecutableSource<ExpandoObject> DataFlowSource(ILoaderSource loaderSource);
-        public IConnectionManager ConnectionManager { get; }
-        public Compiler SqlCompiler { get; }
-        public void ConfigureServiceDatabase(IServiceDataSource serviceDb, string applicationName);
-        public DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder);
-        public IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration);
-        public string ToDatabaseColumnType(IEntityAttribute entityAttribute);
+        string Name { get; }
+        string ConnectionString { get; set; }
+        IConnectionManager ConnectionManager { get; }
+        Compiler SqlCompiler { get; }
+
+        void ConfigureServiceDatabase(IServiceDataSource serviceDb, string applicationName);
+        DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder);
+        EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema);
+        IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration);
+
+        string ToDatabaseColumnType(IEntityAttribute entityAttribute);
         string ToTableNameForSql(string table, string schema);
         string ToTableNameForSqlRaw(string table, string schema);
-        EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema);
 
+        IDataFlowExecutableSource<ExpandoObject> DataFlowSource(ILoaderSource loaderSource);
+        void ApplyMergeInfo(ILoaderSource loaderSource, LoaderMergeStates lastMergeDateTimeStampInfo, string[] dateTimeStampColumns, string[] targetColumns);
     }
 }
