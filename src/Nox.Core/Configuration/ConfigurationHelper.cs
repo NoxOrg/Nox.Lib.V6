@@ -27,7 +27,7 @@ public class ConfigurationHelper
         }
 
         config = configBuilder.Build();
-        var keyVaultUri = config["KeyValueUri"];
+        var keyVaultUri = config["KeyVaultUri"];
         if (string.IsNullOrEmpty(keyVaultUri)) keyVaultUri = KeyVault.DefaultKeyVaultUri;
 
         var keys = new[] {
