@@ -25,7 +25,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="ETLBox">
-      <HintPath>..\Nox.Tle\ETLBox.dll</HintPath>
+      <HintPath>..\Nox.Tle\EtlBox.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
