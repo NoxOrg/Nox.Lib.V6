@@ -146,9 +146,9 @@ Docker Compose version v2.13.0
 ---
 Create .NET 6.0 web api project at the command line in your repositories using `dotnet`.
 ```powershell
-dotnet new webapi -o MyCurrencyService
+dotnet new webapi -o SampleCurrencyService
 
-cd MyCurrencyService
+cd SampleCurrencyService
 ```
 At this point you can do a normal `dotnet run` which will present you with the standard Microsoft demo WeatherController.
 
@@ -193,18 +193,18 @@ app.Run();
 ```
 ### Define Your Service and Entities
 ---
-Create a new file to define your service called `currency.service.nox.yaml`:
+Create a new file to define your service called `SampleCurrency.service.nox.yaml`:
 ```yaml
 #
-# currency.service.nox.yaml
+# SampleCurrency.service.nox.yaml
 #
 
-Name: MyCurrencyService
+Name: SampleCurrencyService
 
-Description: My Currency Microservice
+Description: Sample Currency Microservice
 
 Database:
-  Name: MyCurrencyApiDb
+  Name: SampleCurrencyApiDb
   Provider: SqlServer
   Server: localhost
   User: sa
@@ -214,11 +214,11 @@ MessagingProviders:
   - Name: InProcess
     Provider: Mediator      
 ```
-Create an entity definition in `currency.entity.nox.yaml`
+Create an entity definition in `Currency.entity.nox.yaml`
 
 ```yaml
 #
-# currency.entity.nox.yaml
+# Currency.entity.nox.yaml
 #
 
 Name: Currency
@@ -290,7 +290,7 @@ Alternatively, you can change the port your service uses by editing the `applica
 
 ```json
   "profiles": {
-    "MyCurrencyService": {
+    "SampleCurrencyService": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

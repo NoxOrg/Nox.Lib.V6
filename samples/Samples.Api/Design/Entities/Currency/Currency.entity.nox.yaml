@@ -25,29 +25,8 @@ Attributes:
     CanFilter: true
     CanSort: true
 
-  - Name: SingularName
-    Description: The currency's singular name 
-    Type: string
-    MaxWidth: 128
-    CanFilter: true
-    CanSort: true
-
   - Name: PluralName
     Description: The currency's plural name
-    Type: string
-    MaxWidth: 128
-    CanFilter: true
-    CanSort: true
-
-  - Name: DecimalSingularName
-    Description: The currency's singular name for fractions/cents
-    Type: string
-    MaxWidth: 128
-    CanFilter: true
-    CanSort: true
-
-  - Name: DecimalPluralName
-    Description: The country's plural name for fractions/cents
     Type: string
     MaxWidth: 128
     CanFilter: true
@@ -66,7 +45,18 @@ Attributes:
     Type: string
     MaxWidth: 5
 
-  - Name: IsSymbolPrefixed
-    Description: Indicates whether the currency symbol is usually formatted before the value
-    Type: bool
-    Default: true
+  - Name: LocalSymbol
+    Description: The currency's well known symbol used locally
+    Type: string
+    MaxWidth: 5
+
+  - Name: DecimalDigits
+    Description: The number of decimal digits to display for monetary values
+    Type: int
+
+  - Name: DecimalRounding
+    Description: The decimal rounding to apply to monetary values
+    Type: decimal
+    MaxWidth: 4
+    Precision: 2
+

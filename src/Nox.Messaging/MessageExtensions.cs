@@ -55,14 +55,24 @@ public static class MessageExtensions
                     try
                     {
                         // when reading from json, numbers and booleans are long - will AutoMapper handle this better? A.S.
-                        
-                        if (sourceVal is long && prop.PropertyType.Equals(typeof(Int32)))
+                        if(sourceVal.GetType().Equals(prop.PropertyType))
                         {
-                            prop.SetValue(payload, Convert.ToInt32(sourceVal));
+                            prop.SetValue(payload, sourceVal);
                         }
-                        else if (sourceVal is long && prop.PropertyType.Equals(typeof(bool)))
+                        else if (sourceVal is long) 
                         {
-                            prop.SetValue(payload, Convert.ToBoolean(sourceVal));
+                            if (prop.PropertyType.Equals(typeof(Int32)))
+                            {
+                                prop.SetValue(payload, Convert.ToInt32(sourceVal));
+                            }
+                            else if (prop.PropertyType.Equals(typeof(bool)))
+                            {
+                                prop.SetValue(payload, Convert.ToBoolean(sourceVal));
+                            }
+                            else 
+                            {
+                                prop.SetValue(payload, Convert.ChangeType(sourceVal, prop.PropertyType));
+                            }
                         }
                         else if (sourceVal is int && prop.PropertyType.Equals(typeof(bool)))
                         {
@@ -70,7 +80,7 @@ public static class MessageExtensions
                         }
                         else
                         {
-                            prop.SetValue(payload, sourceVal);
+                            prop.SetValue(payload, Convert.ChangeType(sourceVal, prop.PropertyType));
                         }
                     }
                     catch 
