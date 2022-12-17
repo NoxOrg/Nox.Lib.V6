@@ -7,8 +7,8 @@
     <UserSecretsId>c85db8f6-e4ba-47a2-beb2-7cc33455348a</UserSecretsId>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>6.0.14.0</AssemblyVersion>
-    <FileVersion>6.0.14.0</FileVersion>
+    <AssemblyVersion>6.0.15.0</AssemblyVersion>
+    <FileVersion>6.0.15.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
@@ -19,6 +19,15 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Nox.Generator\Nox.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Nox.Core\Nox.Core.csproj" />
+    <ProjectReference Include="..\..\src\Nox.Lib\Nox.Lib.csproj" />
+    <ProjectReference Include="..\..\src\Nox.Api.OData\Nox.Api.OData.csproj" />
+    <ProjectReference Include="..\..\src\Nox.Messaging\Nox.Messaging.csproj" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Nox.Generator\Nox.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
