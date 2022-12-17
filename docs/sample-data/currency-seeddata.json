@@ -6,8 +6,8 @@
 		"Symbol" : "€",
 		"SingularName" : null,
 		"PluralName" : null,
-		"DecimalSingularName" : null,
-		"DecimalPluralName" : null,
+		"DecimalSingularName" : "Cent",
+		"DecimalPluralName" : "Cents",
 		"IsSymbolPrefixed" : 1,
 		"CreateDate" : "2018-03-24T08:19:18.610Z",
 		"EditDate" : "2018-09-29T06:28:33.443Z"

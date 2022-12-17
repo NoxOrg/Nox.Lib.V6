@@ -41,7 +41,7 @@ public class JsonFileDataProvider : IDataProvider
 
         if (!options.ContainsKey("path"))
         {
-            throw new ArgumentNullException("Path");
+            throw new Exception("'Path' is a required setting for JsonFile on 'Options'");
         }
 
         _folderPath = Path.GetFullPath(options["path"]);
