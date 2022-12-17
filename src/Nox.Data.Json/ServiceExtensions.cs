@@ -7,7 +7,7 @@ public static class ServiceExtensions
 {
     public static IServiceCollection AddJsonFileDatabaseProvider(this IServiceCollection services)
     {
-        services.AddTransient<IDataProvider, JsonFileDataProvider>();
+        services.AddTransient<IDataProvider, JsonDataProvider>();
         return services;
     }
 }

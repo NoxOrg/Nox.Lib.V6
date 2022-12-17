@@ -125,7 +125,7 @@
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
-    <Content Include="$(OutputPath)\Nox.Data.JsonFile.dll">
+    <Content Include="$(OutputPath)\Nox.Data.Json.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>

@@ -13,16 +13,18 @@ using System.Dynamic;
 
 namespace Nox.Data.JsonFile;
 
-public class JsonFileDataProvider : IDataProvider
+public class JsonDataProvider : IDataProvider
 {
 
     protected readonly JsonSource<ExpandoObject> _dataFlowExecutableSource = new();
 
-    public string Name => "jsonfile";
+    public string Name => "json";
 
     private string _options = @"Path=.\";
 
     private string _folderPath = string.Empty;
+
+    private ResourceType _resourceType = ResourceType.File;
 
     public string ConnectionString
     {
@@ -41,10 +43,27 @@ public class JsonFileDataProvider : IDataProvider
 
         if (!options.ContainsKey("path"))
         {
-            throw new Exception("'Path' is a required setting for JsonFile on 'Options'");
+            throw new Exception("'Path' is a required setting for Json data provider in 'Options'");
         }
-
         _folderPath = Path.GetFullPath(options["path"]);
+
+        if (options.ContainsKey("source"))
+        {
+            _resourceType = options["source"].ToLower() switch
+            {
+                "http" => ResourceType.Http,
+                "https" => ResourceType.Http,
+                "blob" => ResourceType.AzureBlob,
+                "azureblob" => ResourceType.AzureBlob,
+                "file" => ResourceType.File,
+                "filesystem" => ResourceType.File,
+                _ => throw new Exception($"Invalid Json source '{options["source"]}' specified in 'Options'")
+            };
+        }
+        else
+        {
+            _resourceType= ResourceType.File;
+        }
 
     }
 
@@ -82,11 +101,28 @@ public class JsonFileDataProvider : IDataProvider
 
     public IDataFlowExecutableSource<ExpandoObject> DataFlowSource(ILoaderSource loaderSource)
     {
-        var filePath = Path.Combine(_folderPath, loaderSource.Query);
+        switch (_resourceType)
+        {
+            case ResourceType.File:
+                var filePath = Path.Combine(_folderPath, loaderSource.Query);
+                _dataFlowExecutableSource.ResourceType = ResourceType.File;
+                _dataFlowExecutableSource.Uri = filePath;
+                break;
 
-        _dataFlowExecutableSource.ResourceType = ResourceType.File;
+            case ResourceType.Http:
+                var baseUri = new Uri(_folderPath);
+                var uri = new Uri(baseUri, loaderSource.Query);
+                _dataFlowExecutableSource.ResourceType = ResourceType.Http;
+                _dataFlowExecutableSource.Uri = uri.ToString();
+                break;
 
-        _dataFlowExecutableSource.Uri = filePath;
+            case ResourceType.AzureBlob:
+                throw new NotImplementedException();
+                // break;
+
+            default:
+                break;
+        }
 
         return _dataFlowExecutableSource;
     }

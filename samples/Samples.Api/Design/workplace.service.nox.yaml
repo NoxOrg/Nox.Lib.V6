@@ -34,7 +34,7 @@ DataSources:
     ConnectionVariable: ConnectionString:MasterDataSource
   
   - Name: JsonSeedData
-    Provider: JsonFile
-    Options: Path=../../docs/sample-data/;
+    Provider: Json
+    Options: Source=File;Path=../../docs/sample-data/;
 
   

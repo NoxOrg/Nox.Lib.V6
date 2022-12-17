@@ -59,7 +59,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nox.Messaging.Tests", "..\t
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nox.Generator", "Nox.Generator\Nox.Generator.csproj", "{6AD448DE-288C-469D-8717-BE0AB6FE93B8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nox.Data.JsonFile", "Nox.Data.JsonFile\Nox.Data.JsonFile.csproj", "{DAD7511E-0530-4B1A-B96B-E9A3D82D67FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nox.Data.Json", "Nox.Data.Json\Nox.Data.Json.csproj", "{DAD7511E-0530-4B1A-B96B-E9A3D82D67FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
