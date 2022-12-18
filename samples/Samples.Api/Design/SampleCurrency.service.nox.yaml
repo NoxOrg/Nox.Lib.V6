@@ -7,7 +7,7 @@ Name: SampleCurrency
 Description: Workplace Microservice
 
 Database:
-  Name: Workplace
+  Name: SampleCurrencyDb
   Provider: SqlServer
   Options: Trusted_Connection=no;connection timeout=120;
   #Provider: Postgres

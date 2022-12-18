@@ -1,0 +1,124 @@
+﻿#
+# Country.entity.nox.yaml
+#
+
+Name: Country
+Description: Countries and related data
+PluralName: Countries
+Table: Country
+Schema: dbo
+
+RelatedParents: [Currency]
+
+Attributes:
+
+  - Name: Id
+    Description: The country's unique identifier 
+    IsPrimaryKey: true
+    Type: int
+    CanFilter: true
+    CanSort: true
+
+  - Name: Name
+    Description: The country's common name 
+    IsRequired: true
+    Type: string
+    MaxWidth: 64
+    CanFilter: true
+    CanSort: true
+
+  - Name: FormalName
+    Description: The country's official name
+    Type: string
+    MaxWidth: 64
+    CanFilter: true
+    CanSort: true
+
+  - Name: ISO_Alpha3
+    Description: The country's official ISO 4217 alpha-3 code
+    IsRequired: true
+    IsUnicode: false
+    Type: char
+    MinWidth: 3
+    MaxWidth: 3
+
+  - Name: ISO_Alpha2
+    Description: The country's official ISO 4217 alpha-2 code
+    IsRequired: true
+    IsUnicode: false
+    Type: char
+    MinWidth: 2
+    MaxWidth: 2
+
+  - Name: ISO_Numeric
+    Description: The country's official ISO 4217 alpha-3 code
+    IsRequired: true
+    IsUnicode: false
+    Type: char
+    MinWidth: 3
+    MaxWidth: 3
+
+  - Name: DialingCodes
+    Description: The country's phone dialing codes (comma-delimited)
+    IsUnicode: false
+    Type: string
+    MaxWidth: 32
+
+  - Name: Capital
+    Description: The capital city of the country
+    Type: string
+    MaxWidth: 64
+
+  - Name: Demonym
+    Description: Noun denoting the natives of the country
+    Type: string
+    MaxWidth: 64
+
+  - Name: AreaInSquareKilometres
+    Description: Country area in square kilometers 
+    Type: int
+
+  - Name: GeoLattitude
+    Description: The the north–south position of the workplace's point on the surface of the Earth
+    Type: decimal
+    MaxWidth: 18
+    Precision: 15
+    IsRequired: true
+
+  - Name: GeoLongitude
+    Description: The the east-west position of the workplace's point on the surface of the Earth
+    Type: decimal
+    MaxWidth: 18
+    Precision: 15
+    IsRequired: true
+
+  - Name: GeoRegion
+    Description: The region the country is in
+    Type: string
+    IsUnicode: false
+    MaxWidth: 8
+    IsRequired: true
+
+  - Name: GeoSubRegion
+    Description: The sub-region the country is in
+    Type: string
+    IsUnicode: false
+    MaxWidth: 32
+    IsRequired: false
+
+  - Name: GeoWorldRegion
+    Description: The world region the country is in
+    Type: string
+    IsUnicode: false
+    MaxWidth: 4
+    IsRequired: true
+
+  - Name: Population
+    Description: The estimated population of the country
+    Type: int
+
+  - Name: TopLevelDomains
+    Description: The top level internet domains regitered to the country (comma-delimited)
+    Type: string
+    IsUnicode: true
+    MaxWidth: 32

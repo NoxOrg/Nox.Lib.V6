@@ -1,13 +1,13 @@
 ﻿#
-# Currency.loader.nox.yaml
+# Country.loader.nox.yaml
 #
 
-Name: CurrencyLoader
+Name: CountryLoader
 
-Description: Loads currency data 
+Description: Loads country data 
 
 Schedule:
-  Start: Every 2 minutes
+  Start: Every month on the 1st at 2am
   Retry:
     Limit: 10
     DelaySeconds: 60
@@ -18,13 +18,13 @@ LoadStrategy:
   Columns: [CreateDate,EditDate]
 
 Target:
-  Entity: Currency
+  Entity: Country
   
 Messaging:
+  - MessagingProvider: InProcess
   - MessagingProvider: AppServiceBus
-  - MessagingProvider: InProcess  
-
+  
 Sources:
   - DataSource: JsonSeedData
     MinimumExpectedRecords: 160
-    Query: currency-seeddata.json 
+    Query: country-seeddata.json 

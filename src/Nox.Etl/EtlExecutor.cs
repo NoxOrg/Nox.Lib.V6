@@ -134,7 +134,7 @@ public class EtlExecutor : IEtlExecutor
 
         var targetColumns = entity.Attributes
             .Where(a => a.IsMappedAttribute())
-        .Select(a => a.Name)
+            .Select(a => a.Name)
             .Concat(entity.RelatedParents.Select(p => p + "Id"))
             .Concat(loader.LoadStrategy!.Columns.Select(c => c))
             .ToArray();
@@ -160,8 +160,7 @@ public class EtlExecutor : IEtlExecutor
         var destination = new DbMerge(destinationDb, destinationTable)
         {
             CacheMode = ETLBox.DataFlow.Transformations.CacheMode.Partial,
-            MergeMode = MergeMode.InsertsAndUpdates,
-            BatchSize = 1,
+            MergeMode = MergeMode.InsertsAndUpdates
         };
 
         destination.MergeProperties.IdColumns =

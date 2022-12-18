@@ -204,7 +204,7 @@ Name: SampleCurrencyService
 Description: Sample Currency Microservice
 
 Database:
-  Name: SampleCurrencyApiDb
+  Name: SampleCurrencyDb
   Provider: SqlServer
   Server: localhost
   User: sa

@@ -16,7 +16,7 @@ namespace Nox.Data.JsonFile;
 public class JsonDataProvider : IDataProvider
 {
 
-    protected readonly JsonSource<ExpandoObject> _dataFlowExecutableSource = new();
+    protected JsonSource<ExpandoObject> _dataFlowExecutableSource = null!;
 
     public string Name => "json";
 
@@ -101,6 +101,8 @@ public class JsonDataProvider : IDataProvider
 
     public IDataFlowExecutableSource<ExpandoObject> DataFlowSource(ILoaderSource loaderSource)
     {
+        _dataFlowExecutableSource = new JsonSource<ExpandoObject>();
+
         switch (_resourceType)
         {
             case ResourceType.File:

@@ -3,18 +3,18 @@ using Nox;
 
 namespace Samples.Api.Consumers;
 
-public class CurrencyCreatedEventConsumer: IConsumer<CurrencyCreatedDomainEvent>
+public class CountryCreatedEventConsumer: IConsumer<CountryCreatedDomainEvent>
 {
-    readonly ILogger<CurrencyCreatedEventConsumer> _logger;
+    readonly ILogger<CountryCreatedEventConsumer> _logger;
 
-    public CurrencyCreatedEventConsumer(ILogger<CurrencyCreatedEventConsumer> logger)
+    public CountryCreatedEventConsumer(ILogger<CountryCreatedEventConsumer> logger)
     {
         _logger = logger;
     }
     
-    public Task Consume(ConsumeContext<CurrencyCreatedDomainEvent> context)
+    public Task Consume(ConsumeContext<CountryCreatedDomainEvent> context)
     {
-        _logger.LogInformation("Received CurrencyCreatedDomainEvent: {Text}", context.Message.Payload);
+        _logger.LogInformation("Received CountryCreatedDomainEvent: {Text}", context.Message.Payload);
         return Task.CompletedTask;
     }
 }
