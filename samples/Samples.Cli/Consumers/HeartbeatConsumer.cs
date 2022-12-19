@@ -2,7 +2,7 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using Nox.Core.Interfaces.Messaging;
 
-namespace Samples.Cli.Listeners;
+namespace Samples.Cli.Consumers;
 
 public class HeartbeatConsumer : IConsumer<IHeartbeatMessage>
 {

@@ -3,7 +3,7 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using Nox;
 
-namespace Samples.Cli.Listeners;
+namespace Samples.Cli.Consumers;
 
 public class CountryUpdatedEventConsumer : IConsumer<CountryUpdatedDomainEvent>
 {
