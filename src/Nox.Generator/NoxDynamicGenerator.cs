@@ -12,26 +12,6 @@ namespace Nox.Generator;
 [Generator]
 public class NoxDynamicGenerator : ISourceGenerator
 {
-    //Info
-    public static readonly DiagnosticDescriptor NI0000 = new("NI0000", "Debug Info",
-        "Debug: {0} {1}", "Debug",
-        DiagnosticSeverity.Info, true);
-    public static readonly DiagnosticDescriptor NI0001 = new("NI0001", "Found yaml definitions",
-        "Nox.Generator will generate classes for {0} yaml definitions", "Design",
-        DiagnosticSeverity.Info, true);
-    //Warnings
-    public static readonly DiagnosticDescriptor NW0001 = new("NW0001", "No yaml definitions",
-        "Nox.Generator will not contribute to your project as no yaml definitions were found", "Design",
-        DiagnosticSeverity.Warning, true);
-    
-    public static readonly DiagnosticDescriptor NW0002 = new("NW0002", "AppSettings",
-        "DefinitionRootPath value not found in appsettings.json", "Design",
-        DiagnosticSeverity.Warning, true);
-    //Errors
-    public static readonly DiagnosticDescriptor NE0001 = new("NE0001", "Duplicate Entity",
-        "Duplicate entity detected in yaml configuration: {0}", "Design",
-        DiagnosticSeverity.Error, true);
-
     private List<string>? _entityNames;
     
     public void Initialize(GeneratorInitializationContext context)
@@ -55,11 +35,7 @@ public class NoxDynamicGenerator : ISourceGenerator
         {
             var config = JObject.Parse(File.ReadAllText(json));
             var designRoot = config["Nox"]?["DefinitionRootPath"]?.ToString();
-            if (string.IsNullOrEmpty(designRoot))
-            {
-                context.ReportDiagnostic(Diagnostic.Create(NW0002, null));
-            }
-            else
+            if (!string.IsNullOrEmpty(designRoot))
             {
                 designRootFullPath = Path.GetFullPath(Path.Combine(programPath!, designRoot));    
             }
@@ -72,15 +48,10 @@ public class NoxDynamicGenerator : ISourceGenerator
             .Select(f => deserializer.Deserialize(new StringReader(File.ReadAllText(f))))
             .ToList();
 
-        if (!entities.Any())
-        {
-            context.ReportDiagnostic(Diagnostic.Create(NW0001, null));
-        }
-        else
+        if (entities.Any())
         {
             _entityNames = new List<string>();
-            context.ReportDiagnostic(Diagnostic.Create(NI0001, null, entities.Count));
-        
+
             foreach (Dictionary<object, object>? entity in entities)
             {
                 if (AddEntity(context, assemblyName!, entity!))
@@ -134,7 +105,6 @@ public class NoxDynamicGenerator : ISourceGenerator
         var entityName = entity!["Name"].ToString();
         if (_entityNames!.Any(n => n == entityName))
         {
-            context.ReportDiagnostic(Diagnostic.Create(NE0001, null, entityName));
             return false;
         }
         _entityNames!.Add(entityName);

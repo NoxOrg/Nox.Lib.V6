@@ -14,6 +14,7 @@ public class CountryCreatedEventConsumer: IConsumer<CountryCreatedDomainEvent>
     
     public Task Consume(ConsumeContext<CountryCreatedDomainEvent> context)
     {
+        var c = new Currency();
         _logger.LogInformation("Received CountryCreatedDomainEvent: {Text}", context.Message.Payload);
         return Task.CompletedTask;
     }
