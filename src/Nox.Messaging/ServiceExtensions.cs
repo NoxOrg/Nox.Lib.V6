@@ -112,7 +112,7 @@ public static class ServiceExtensions
     
     private static void AddAzureBus(this IServiceCollection services, MessagingProviderConfiguration config, bool isExternalListener)
     {
-        services.AddMassTransit<IRabbitMqBus>(mt =>
+        services.AddMassTransit<IAzureBus>(mt =>
         {
             mt.SetKebabCaseEndpointNameFormatter();
 
@@ -134,7 +134,7 @@ public static class ServiceExtensions
     
     private static void AddAmazonBus(this IServiceCollection services, MessagingProviderConfiguration config, bool isExternalListener)
     {
-        services.AddMassTransit<IRabbitMqBus>(mt =>
+        services.AddMassTransit<IAmazonBus>(mt =>
         {
             mt.SetKebabCaseEndpointNameFormatter();
 
