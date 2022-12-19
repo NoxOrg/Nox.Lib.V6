@@ -26,12 +26,12 @@ public static class ServiceExtensions
 
         services
             .AddNoxConfiguration(_configuration["Nox:DefinitionRootPath"]!)
+            .AddNoxMessaging(false)
             .AddDataProviderFactory()
             .AddDynamicApi(_configuration)
             .AddData()
             .AddEtl()
             .AddMicroservice()
-            .AddNoxMessaging(false)
             .AddJobScheduler();
             
         return services;
