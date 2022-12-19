@@ -5,7 +5,7 @@ namespace Nox.Data.JsonFile;
 
 public static class ServiceExtensions
 {
-    public static IServiceCollection AddJsonFileDatabaseProvider(this IServiceCollection services)
+    public static IServiceCollection AddJsonDataProvider(this IServiceCollection services)
     {
         services.AddTransient<IDataProvider, JsonDataProvider>();
         return services;

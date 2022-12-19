@@ -40,7 +40,7 @@ public class DataSourceBase : MetaBase, IServiceDataSource
                 if (Port == 0) Port = 3306;
                 break;
 
-            case Constants.DataProvider.JsonFile:
+            case Constants.DataProvider.Json:
                 break;
 
             default:

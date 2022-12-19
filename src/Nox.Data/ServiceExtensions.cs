@@ -16,7 +16,7 @@ public static class ServiceExtensions
             .AddSqlServerDatabaseProvider()
             .AddPostgresDatabaseProvider()
             .AddMySqlDatabaseProvider()
-            .AddJsonFileDatabaseProvider();
+            .AddJsonDataProvider();
 
         services.AddSingleton<Func<IEnumerable<IDataProvider>>>(x => 
             () => x.GetService<IEnumerable<IDataProvider>>()!
