@@ -8,6 +8,7 @@ using Npgsql;
 using SqlKata.Compilers;
 using Nox.Core.Components;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Nox.Core.Constants;
 
 namespace Nox.Data.Postgres;
 
@@ -15,7 +16,7 @@ public class PostgresDatabaseProvider: DatabaseProviderBase
 {
     public PostgresDatabaseProvider()
     {
-        _name = "postgres";
+        _name = DataProvider.Postgres;
 
         _connectionManager = new PostgresConnectionManager();
 

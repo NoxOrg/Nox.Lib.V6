@@ -9,6 +9,6 @@ public static class DataProvider
 
     public const string MySql = @"mysql";
 
-    public const string JsonFile = @"jsonfile";
+    public const string Json = @"json";
 }
 

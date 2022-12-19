@@ -8,6 +8,7 @@ using Nox.Core.Interfaces.Entity;
 using SqlKata.Compilers;
 using Nox.Core.Components;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Nox.Core.Constants;
 
 namespace Nox.Data.SqlServer;
 
@@ -15,7 +16,7 @@ public class SqlServerDatabaseProvider: DatabaseProviderBase
 {
     public SqlServerDatabaseProvider()
     {
-        _name = "sqlserver";
+        _name = DataProvider.SqlServer;
 
         _connectionManager = new SqlConnectionManager();
 

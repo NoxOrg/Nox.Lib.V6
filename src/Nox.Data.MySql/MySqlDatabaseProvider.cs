@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MySql.Data.MySqlClient;
 using Nox.Core.Components;
+using Nox.Core.Constants;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
 using SqlKata.Compilers;
@@ -17,7 +18,7 @@ public class MySqlDatabaseProvider: DatabaseProviderBase
 
     public MySqlDatabaseProvider()
     {
-        _name = "mysql";
+        _name = DataProvider.MySql;
 
         _connectionManager = new MySqlConnectionManager();
 
