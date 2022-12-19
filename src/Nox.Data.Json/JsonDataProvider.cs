@@ -4,6 +4,7 @@ using ETLBox.DataFlow.Connectors;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Nox.Core.Constants;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Etl;
@@ -18,7 +19,7 @@ public class JsonDataProvider : IDataProvider
 
     protected JsonSource<ExpandoObject> _dataFlowExecutableSource = null!;
 
-    public string Name => "json";
+    public string Name => DataProvider.Json;
 
     private string _options = @"Path=.\";
 
