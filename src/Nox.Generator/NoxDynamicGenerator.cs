@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using YamlDotNet.Serialization;
 
@@ -12,6 +13,8 @@ namespace Nox.Generator;
 [Generator]
 public class NoxDynamicGenerator : ISourceGenerator
 {
+    private readonly DiagnosticDescriptor NI0000 = new DiagnosticDescriptor("NI0000", "Nox Generator Debug", "{0}", "Debug", DiagnosticSeverity.Info, true);
+    
     private List<string>? _entityNames;
     
     public void Initialize(GeneratorInitializationContext context)
@@ -21,6 +24,8 @@ public class NoxDynamicGenerator : ISourceGenerator
     
     public void Execute(GeneratorExecutionContext context)
     {
+        _entityNames = new List<string>();
+        context.ReportDiagnostic(Diagnostic.Create(NI0000, null, $"Executing Nox Generator"));
         var assemblyName = context.Compilation.AssemblyName;
         var mainSyntaxTree = context.Compilation.SyntaxTrees
             .FirstOrDefault(x => x.FilePath.EndsWith("Program.cs"));
@@ -50,8 +55,8 @@ public class NoxDynamicGenerator : ISourceGenerator
 
         if (entities.Any())
         {
-            _entityNames = new List<string>();
-
+            context.ReportDiagnostic(Diagnostic.Create(NI0000, null, $"{entities.Count} entities found"));
+            
             foreach (Dictionary<object, object>? entity in entities)
             {
                 if (AddEntity(context, assemblyName!, entity!))
@@ -103,6 +108,7 @@ public class NoxDynamicGenerator : ISourceGenerator
     private bool AddEntity(GeneratorExecutionContext context, string assemblyName, Dictionary<object, object>? entity)
     {
         var entityName = entity!["Name"].ToString();
+        context.ReportDiagnostic(Diagnostic.Create(NI0000, null, $"Adding Entity class: {entityName} from assembly {assemblyName}"));
         if (_entityNames!.Any(n => n == entityName))
         {
             return false;
