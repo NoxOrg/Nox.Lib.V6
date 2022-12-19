@@ -14,6 +14,14 @@ namespace Nox.Messaging;
 
 public static class ServiceExtensions
 {
+
+    public static IServiceCollection AddNoxListeners(this IServiceCollection services)
+    {
+        services.AddNoxMessaging(true);
+
+        return services;
+    }
+
     public static IServiceCollection AddNoxMessaging(
         this IServiceCollection services,
         bool isExternalListener = true)
