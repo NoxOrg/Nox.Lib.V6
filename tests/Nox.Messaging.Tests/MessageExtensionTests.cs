@@ -14,7 +14,7 @@ public class MessageExtensionTests: MessagingTestFixture
     [Test]
     public void Can_Find_a_Create_Event_Implementation()
     {
-        TestServiceCollection!.AddNoxMessaging();
+        TestServices!.AddNoxMessaging();
         BuildServiceProvider();
         var personEntity = new Core.Models.Entity
         {
@@ -29,7 +29,7 @@ public class MessageExtensionTests: MessagingTestFixture
     [Test]
     public void Must_return_null_if_event_implementation_not_found()
     {
-        TestServiceCollection!.AddNoxEvents(Assembly.GetExecutingAssembly());
+        TestServices!.AddNoxEvents(Assembly.GetExecutingAssembly());
         BuildServiceProvider();
         var personEntity = new Core.Models.Entity
         {
@@ -44,7 +44,7 @@ public class MessageExtensionTests: MessagingTestFixture
     [Test]
     public void Can_Map_Expando_Object_to_Message()
     {
-        TestServiceCollection!.AddNoxEvents(Assembly.GetExecutingAssembly());
+        TestServices!.AddNoxEvents(Assembly.GetExecutingAssembly());
         BuildServiceProvider();
         var exObject = new ExpandoObject();
         exObject.AddProperty("Id", 1);

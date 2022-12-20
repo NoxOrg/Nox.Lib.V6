@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nox.Core.Configuration;
 using Nox.Core.Validation.Configuration;
+using Nox.TestFixtures;
 using NUnit.Framework;
 
 namespace Nox.Core.Tests;
