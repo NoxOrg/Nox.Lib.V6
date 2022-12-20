@@ -49,6 +49,13 @@ public class MySqlDatabaseProvider: DatabaseProviderBase
 
         SetConnectionString(serviceDb.ConnectionString);
     }
+    
+    protected override void SetConnectionString(string connectionString) 
+    {
+        base.SetConnectionString(connectionString);
+
+        _connectionManager.ConnectionString = new MySqlConnectionString(connectionString);
+    }
 
     public override DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
     {

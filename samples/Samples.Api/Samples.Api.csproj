@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -7,26 +7,26 @@
     <UserSecretsId>c85db8f6-e4ba-47a2-beb2-7cc33455348a</UserSecretsId>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>6.0.18.0</AssemblyVersion>
-    <FileVersion>6.0.18.0</FileVersion>
+    <AssemblyVersion>6.0.20.0</AssemblyVersion>
+    <FileVersion>6.0.20.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.0" />
-    <PackageReference Include="Serilog" Version="2.12.0" />
-    <PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.0"/>
+    <PackageReference Include="Serilog" Version="2.12.0"/>
+    <PackageReference Include="Serilog.AspNetCore" Version="6.1.0"/>
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0"/>
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0"/>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.0.0"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Nox.Generator\Nox.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\src\Nox.Generator\Nox.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Nox.Core\Nox.Core.csproj" />
-    <ProjectReference Include="..\..\src\Nox.Lib\Nox.Lib.csproj" />
-    <ProjectReference Include="..\..\src\Nox.Api.OData\Nox.Api.OData.csproj" />
-    <ProjectReference Include="..\..\src\Nox.Messaging\Nox.Messaging.csproj" />
+    <ProjectReference Include="..\..\src\Nox.Core\Nox.Core.csproj"/>
+    <ProjectReference Include="..\..\src\Nox.Lib\Nox.Lib.csproj"/>
+    <ProjectReference Include="..\..\src\Nox.Api.OData\Nox.Api.OData.csproj"/>
+    <ProjectReference Include="..\..\src\Nox.Messaging\Nox.Messaging.csproj"/>
   </ItemGroup>
 </Project>
