@@ -78,6 +78,10 @@ $goo.Command.Add( 'init', {
     $goo.Command.Run( 'clean' )
     $goo.Command.Run( 'build' )
     $goo.Command.Run( 'up' )
+    $goo.IO.EnsureRemoveFolder("$script:ProjectFolder\Migrations")
+    $goo.Command.Run( 'waitfordb' )
+    $goo.Command.Run( 'migr-add', "InitialCreate" )
+    $goo.Command.Run( 'migr-dbupdate' )
     $goo.Command.Run( 'run' )
 })
 
@@ -106,7 +110,7 @@ $goo.Command.Add( 'build', {
 # command: goo migr-add <name> | Add a migration to the project called "<name>"
 $goo.Command.Add( 'migr-add', { param([string]$name)
     if([string]::IsNullOrWhiteSpace($name)) { $goo.Error("You need to specify a migration name.") }
-    $goo.Console.WriteInfo("Adding migration...")
+    $goo.Console.WriteInfo("Adding migration [$name]...")
     $goo.Command.RunExternal('dotnet',"ef migrations add ""$name"" --context NoxDbContext", $script:ProjectFolder)
     $goo.StopIfError("Failed to add migration.")
 })
