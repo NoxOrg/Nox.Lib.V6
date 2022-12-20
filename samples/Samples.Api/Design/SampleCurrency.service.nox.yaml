@@ -29,10 +29,6 @@ MessagingProviders:
       
 DataSources:
 
-  - Name: BusinessSystem
-    Provider: SqlServer
-    ConnectionVariable: ConnectionString:MasterDataSource
-  
   - Name: JsonSeedData
     Provider: Json
     Options: Source=File;Path=../../docs/sample-data/;

@@ -34,19 +34,22 @@ public class ConfigurationHelper
             "XECurrency:ApiPassword",
             "XECurrency:ApiUser"
         };
-        
-        var secrets = GetSecrets(keyVaultUri, keys).GetAwaiter().GetResult();
-        
-        if (secrets == null)
+
+        try
         {
-            throw new ConfigurationException($"Error loading secrets from vault at '{keyVaultUri}'");
+            var secrets = GetSecrets(keyVaultUri, keys).GetAwaiter().GetResult();
+
+            //Api endpoint config
+            secrets!.Add(new KeyValuePair<string, string>("ServiceApiEndpointProvider", ""));
+
+            configBuilder.AddInMemoryCollection(secrets!);
+
         }
-        
-        //Api endpoint config
-        secrets.Add(new KeyValuePair<string, string>("ServiceApiEndpointProvider", ""));
-        
-        configBuilder.AddInMemoryCollection(secrets!);
-        
+        catch
+        {
+            // throw new ConfigurationException($"Error loading secrets from vault at '{keyVaultUri}'");
+        }
+
         return configBuilder.Build();
     }
 
