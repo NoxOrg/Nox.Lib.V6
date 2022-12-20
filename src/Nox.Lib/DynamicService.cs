@@ -183,8 +183,14 @@ public class DynamicService : IDynamicService
                     else if (typeString == "object")
                     {
                         var dbType = _metaService.Database.DataProvider!.ToDatabaseColumnType(new EntityAttribute() { Type = "object" });
-
-                        b.Property(prop.Name).HasColumnType(dbType);
+                        if (dbType == null)
+                        {
+                            b.Ignore(prop.Name);
+                        }
+                        else
+                        {
+                            b.Property(prop.Name).HasColumnType(dbType);
+                        }
                     }
                 }
             });

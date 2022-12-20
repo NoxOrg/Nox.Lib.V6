@@ -9,7 +9,6 @@ namespace Nox.Api
     {
         public string Name { get; set; } = string.Empty;
         public string Type { get; set; } = "string";
-        [NotMapped]
         public object? Default { get; set; }
         public int MinValue { get; set; } = int.MinValue;
         public int MaxValue { get; set; } = int.MaxValue;

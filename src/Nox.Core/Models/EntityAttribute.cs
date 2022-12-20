@@ -23,7 +23,6 @@ public sealed class EntityAttribute : MetaBase, IEntityAttribute
     public int MinValue { get; set; } = int.MinValue;
     public int MaxValue { get; set; } = int.MaxValue;
     public int Precision { get; set; } = 2;
-    [NotMapped]
     public object? Default { get; set; }
     [NotMapped]
     public string[] DefaultFromParents { get; set; } = Array.Empty<string>();
