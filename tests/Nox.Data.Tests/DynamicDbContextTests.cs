@@ -10,11 +10,12 @@ using NUnit.Framework;
 
 namespace Nox.Data.Tests;
 
-public class DynamicDbContextTests: SqlContainerTestFixture
+public class DynamicDbContextTests: DataTestFixture
 {
     [Test]
     public void Can_Get_a_Dynamic_Collection()
     {
+        BuildServiceProvider();
         var context = TestServiceProvider!.GetRequiredService<DynamicDbContext>();
         var dynamicQueryable = context.GetDynamicCollection("People");
         Assert.NotNull(dynamicQueryable);
@@ -27,6 +28,8 @@ public class DynamicDbContextTests: SqlContainerTestFixture
     [Test]
     public void Can_Get_Dynamic_Single_Result()
     {
+        AddSqlServerContainer();
+        BuildServiceProvider();
         var context = TestServiceProvider!.GetRequiredService<DynamicDbContext>();
         var result = context.GetDynamicSingleResult("People", 1);
         Assert.NotNull(result);
@@ -36,6 +39,8 @@ public class DynamicDbContextTests: SqlContainerTestFixture
     [Test]
     public async Task Can_Get_Dynamic_Navigation_and_property()
     {
+        AddSqlServerContainer();
+        BuildServiceProvider();
         TestServiceProvider!.GetRequiredService<IDynamicModel>();
         var testSeed = TestServiceProvider!.GetRequiredService<TestSqlSeed>();
         await testSeed.Execute();

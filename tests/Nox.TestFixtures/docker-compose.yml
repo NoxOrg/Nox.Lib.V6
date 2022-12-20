@@ -1,0 +1,71 @@
+version: '3.7'
+
+services:
+  sqlserver:
+    container_name: sqlserver_container
+    image: "mcr.microsoft.com/azure-sql-edge:latest"
+    user: root
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "Developer*123"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    volumes:
+      - ./.docker-data/sqlserver:/var/opt/mssql/data
+      
+  postgres:
+    container_name: postgres_container
+    image: postgres:14-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: SampleCurrencyDb
+      POSTGRES_USER: "sa"
+      POSTGRES_PASSWORD: "Developer*123"
+      PGDATA: ./data
+    ports:
+      - "54320:5432"
+    volumes:
+      - ./.docker-data/postgres:/var/lib/postgresql/data
+
+  mysql:
+    container_name: mysql_container
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_DATABASE: SampleCurrencyDb
+      MYSQL_USER: "sa"
+      MYSQL_PASSWORD: "Developer*123"
+      MYSQL_ROOT_PASSWORD: "Developer*123"
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - ./.docker-data/mysql:/var/lib/mysql
+
+  rabbitmq:
+      container_name: rabbitmq_container
+      image: masstransit/rabbitmq:latest
+      ports:
+        - "5672:5672"
+        - "15672:15672"
+
+  #elasticsearch:
+  #  container_name: elastic-container
+  #  image: docker.elastic.co/elasticsearch/elasticsearch:8.4.3
+  #  environment:
+  #    - xpack.security.enabled=false
+  #    - "discovery.type=single-node"
+  #  ports:
+  #    - "9200:9200"
+
+  #kibana:
+  #  container_name: kibana-container
+  #  image: docker.elastic.co/kibana/kibana:8.4.3
+  #  environment:
+  #    - ELASTICSEARCH_HOSTS=http://elastic-container:9200
+  #  depends_on:
+  #    - elasticsearch
+  #  ports:
+  #    - "5601:5601"
