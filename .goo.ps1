@@ -75,7 +75,6 @@ if($null -eq $Env:Environment)
 
 # command: goo init | Run this command first, or to reset project completely. 
 $goo.Command.Add( 'init', {
-    $goo.Command.Run( 'vpn' )
     $goo.Command.Run( 'clean' )
     $goo.Command.Run( 'build' )
     $goo.Command.Run( 'up' )
@@ -131,12 +130,6 @@ $goo.Command.Add( 'refreshDocker', {
 $goo.Command.Add( 'dockerDownIfUp', {
     $goo.Docker.Down( $script:RootFolder )
     $goo.StopIfError("Failed to stop container.")
-})
-
-$goo.Command.Add( 'vpn', {
-    $pricingServer = '10.45.141.36'
-    $goo.Console.WriteInfo( "Checking VPN connection [route to $pricingServer]..." )
-    $goo.Network.EnsureConnectionTo( $pricingServer )
 })
 
 # command: goo env | Show all environment variables
