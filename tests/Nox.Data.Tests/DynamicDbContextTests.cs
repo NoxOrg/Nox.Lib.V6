@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nox.Core.Configuration;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Database;
 using Nox.TestFixtures;
@@ -9,7 +10,7 @@ using NUnit.Framework;
 
 namespace Nox.Data.Tests;
 
-public class DynamicDbContextTests: DataTestFixture
+public class DynamicDbContextTests: SqlContainerTestFixture
 {
     [Test]
     public void Can_Get_a_Dynamic_Collection()

@@ -23,24 +23,20 @@ Database:
 
 MessagingProviders:
   - Name: TestMessagingProvider1
-    #Provider: AzureServiceBus
-    #ConnectionVariable: ConnectionString:AzureServiceBus
     Provider: InMemory
   - Name: TestMessagingProvider2
-    #Provider: AzureServiceBus
-    #ConnectionVariable: ConnectionString:AzureServiceBus
     Provider: InMemory
     
 DataSources:
   - Name: TestDataSource1
-    Provider: TestProvider
-    ConnectionString: TestConnectionString
+    Provider: SqlServer
+    ConnectionString: data source=localhost;user id=sa; password=Developer*123; database=Test;
   - Name: TestDataSource2
-    Provider: TestProvider
-    Server: Server1
-    Port: 111
-    User: TestUser
-    Password: TestPassword
+    Provider: SqlServer
+    Server: localhost
+    Port: 1433
+    User: sa
+    Password: Developer*123
   - Name: TestDataSource3
-    Provider: TestProvider
+    Provider: SqlServer
     ConnectionVariable: TestConnectionVariable

@@ -14,13 +14,14 @@ public class MessageExtensionTests: MessagingTestFixture
     [Test]
     public void Can_Find_a_Create_Event_Implementation()
     {
-        TestServices!.AddNoxMessaging();
-        BuildServiceProvider();
         var personEntity = new Core.Models.Entity
         {
             Id = 1,
             Name = "Person"
         };
+        TestServices!.AddNoxEvents(Assembly.GetExecutingAssembly());
+        BuildServiceProvider();
+        
         var messages = TestServiceProvider!.GetRequiredService<IEnumerable<INoxEvent>>();
         var msg = messages.FindEventImplementation(personEntity, NoxEventTypeEnum.Create);
         Assert.That(msg, Is.Not.Null);

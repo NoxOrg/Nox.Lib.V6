@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Immutable;
+using Ductus.FluentDocker.Builders;
+using Ductus.FluentDocker.Model.Builders;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nox.Core.Configuration;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Database;
 using Nox.Data;
@@ -18,11 +22,8 @@ public class DataTestFixture: ConfigurationTestFixture
     public void Setup()
     {
         TestServices.AddLogging();
-        TestServices
-            .AddDataProviderFactory()
-            .AddDbContext<IDynamicDbContext, DynamicDbContext>()
-            .AddSingleton<IDynamicModel, DynamicModel>()
-            .AddSingleton<IDynamicService, DynamicService>();
+        TestServices.AddNox();
+        TestServices.AddSingleton<TestSqlSeed>();
         TestServiceProvider = TestServices.BuildServiceProvider();
     }
 }
