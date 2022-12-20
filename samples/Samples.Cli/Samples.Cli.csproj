@@ -25,6 +25,7 @@
     <ProjectReference Include="..\..\src\Nox.Generator\Nox.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Nox.Data\Nox.Data.csproj"/>
     <ProjectReference Include="..\..\src\Nox.Core\Nox.Core.csproj"/>
     <ProjectReference Include="..\..\src\Nox.Lib\Nox.Lib.csproj"/>
     <ProjectReference Include="..\..\src\Nox.Api.OData\Nox.Api.OData.csproj"/>

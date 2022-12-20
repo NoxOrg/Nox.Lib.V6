@@ -6,7 +6,7 @@ using Nox.Core.Interfaces.Database;
 
 namespace Nox.Data;
 
-public sealed class DynamicDbContext: DbContext, IDynamicDbContext
+public class DynamicDbContext: DbContext, IDynamicDbContext
 {
     private readonly IDynamicModel _dynamicDbModel;
 

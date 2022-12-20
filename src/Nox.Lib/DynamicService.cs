@@ -176,9 +176,13 @@ public class DynamicService : IDynamicService
                     {
                         b.Property(prop.Name).HasMaxLength(128);
                     }
+                    if (typeString == "string")
+                    {
+                        b.Property(prop.Name).HasMaxLength(2048);
+                    }
                     else if (typeString == "decimal")
                     {
-                        b.Property(prop.Name).HasPrecision(9, 6);
+                        b.Property(prop.Name).HasPrecision(38, 18);
                     }
                     else if (typeString == "object")
                     {

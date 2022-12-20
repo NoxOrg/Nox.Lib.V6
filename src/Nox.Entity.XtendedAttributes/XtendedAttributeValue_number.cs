@@ -2,6 +2,6 @@
 
 public sealed class XtendedAttributeValue_number : XtendedAttributeValue
 {
-    public decimal? Value { get; set; }
+    public decimal Value { get; set; }
 }
 
