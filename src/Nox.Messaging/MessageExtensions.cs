@@ -45,12 +45,13 @@ public static class MessageExtensions
         if (payloadProp != null)
         {
             var payload = Activator.CreateInstance(payloadProp.PropertyType);
-            var sourceDict = source as IDictionary<string, object>;
+            var sourceDict = source as IDictionary<string, object?>;
             if (payload != null)
             {
                 foreach (var prop in payload.GetType().GetProperties())
                 {
                     var sourceVal = sourceDict[prop.Name];
+                    if (sourceVal == null) continue;
 
                     try
                     {
