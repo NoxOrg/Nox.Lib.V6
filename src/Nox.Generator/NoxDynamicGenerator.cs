@@ -149,6 +149,9 @@ public class NoxDynamicGenerator : ISourceGenerator
         sb.AppendLine(@"using Microsoft.EntityFrameworkCore;");
         sb.AppendLine(@"using Nox.Data;");
         sb.AppendLine(@"using Nox.Core.Interfaces.Database;");
+        sb.AppendLine(@"using Microsoft.EntityFrameworkCore.Design;");
+        sb.AppendLine(@"using MySql.EntityFrameworkCore.Extensions;");
+
         sb.AppendLine(@"");
         sb.AppendLine(@"namespace Nox;");
         sb.AppendLine(@"");
@@ -160,6 +163,20 @@ public class NoxDynamicGenerator : ISourceGenerator
         sb.AppendLine(@"    )");
         sb.AppendLine(@"    : base(options, dynamicDbModel) { }");
         sb.AppendLine(@"}");
+        sb.AppendLine(@"");
+        sb.AppendLine(@"");
+        sb.AppendLine(@"// https://www.svrz.com/unable-to-resolve-service-for-type-microsoft-entityframeworkcore-storage-typemappingsourcedependencies/");
+        sb.AppendLine(@"");
+        sb.AppendLine(@"public class MysqlEntityFrameworkDesignTimeServices : IDesignTimeServices");
+        sb.AppendLine(@"{");
+        sb.AppendLine(@"    public void ConfigureDesignTimeServices(IServiceCollection serviceCollection)");
+        sb.AppendLine(@"    {");
+        sb.AppendLine(@"        serviceCollection.AddEntityFrameworkMySQL();");
+        sb.AppendLine(@"        new EntityFrameworkRelationalDesignServicesBuilder(serviceCollection)");
+        sb.AppendLine(@"            .TryAddCoreServices();");
+        sb.AppendLine(@"    }");
+        sb.AppendLine(@"}");
+
 
         var hintName = $"NoxDbContext.g.cs";
         var source = SourceText.From(sb.ToString(), Encoding.UTF8);

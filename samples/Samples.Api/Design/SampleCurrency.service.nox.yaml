@@ -8,23 +8,26 @@ Description: Workplace Microservice
 
 Database:
   Name: SampleCurrencyDb
+  Server: localhost
 
-### Sql Server
-  Provider: SqlServer
+  ### Sql Server
+  #Provider: SqlServer
   Options: Trusted_Connection=no;connection timeout=120;
   User: sa  
-### Postgres
-#  Provider: Postgres
-#  Port: 54320
-#  User: sa  
-### MySql  
-#  Provider: MySql
-#  Port: 3306
-#  User: root
-  
-  Server: localhost
   Password: Developer*123
 
+  ### Postgres
+  #Provider: Postgres
+  #Port: 54320
+  #User: sa  
+  #Password: Developer*123
+
+  ### MySql  
+  #Provider: MySql
+  #Port: 3306
+  #User: root
+  #Password: Developer*123
+  
 MessagingProviders:
 
   - Name: AppServiceBus
