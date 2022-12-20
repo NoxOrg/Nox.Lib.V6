@@ -93,8 +93,12 @@ public class NoxMessenger: INoxMessenger
                         break;
                 }
 
-                await _mediator!.Publish(message, stoppingToken);
-                _logger.LogInformation($"Heartbeat sent to Mediator.");
+                if (_mediator != null)
+                {
+                    await _mediator.Publish(message, stoppingToken)!;
+                    _logger.LogInformation($"Heartbeat sent to Mediator.");    
+                }
+                
 
             }
             catch (Exception ex)
