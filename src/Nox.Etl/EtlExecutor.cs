@@ -318,7 +318,7 @@ public class EtlExecutor : IEtlExecutor
             Loader = loaderName,
             Property = dateColumn,
             LastDateLoadedUtc = lastMergeDateTime,
-            Updated = 1
+            Updated = '1'
         });
 
         var insertSql = destinationDbProvider.SqlCompiler.Compile(insertQuery).ToString();

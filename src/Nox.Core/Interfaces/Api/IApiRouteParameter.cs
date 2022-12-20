@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Nox.Core.Interfaces.Api;
 
 public interface IApiRouteParameter : IMetaBase

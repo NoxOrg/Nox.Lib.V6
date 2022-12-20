@@ -51,6 +51,9 @@
     <Reference Include="ETLBox">
       <HintPath>..\Nox.Tle\EtlBox.dll</HintPath>
     </Reference>
+    <Reference Include="ETLBox.MySql">
+      <HintPath>..\..\..\..\..\.nuget\packages\etlbox.mysql\2.6.6\lib\net6.0\ETLBox.MySql.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="ValidationResources.resx">

@@ -31,6 +31,7 @@ public abstract class DatabaseProviderBase : IDataProvider
     protected virtual void SetConnectionString(string connectionString)
     {
         _connectionString = connectionString;
+        _connectionManager.ConnectionString = new MySqlConnectionString(connectionString);
     }
 
     protected IConnectionManager _connectionManager = null!;
