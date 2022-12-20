@@ -29,4 +29,21 @@
     <ProjectReference Include="..\..\src\Nox.Api.OData\Nox.Api.OData.csproj" />
     <ProjectReference Include="..\..\src\Nox.Messaging\Nox.Messaging.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Design\SampleCurrency.service.nox.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Design\Entities\Currency\Currency.loader.nox.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Design\Entities\Currency\Currency.entity.nox.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Design\Entities\Country\Country.loader.nox.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Design\Entities\Country\Country.entity.nox.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
