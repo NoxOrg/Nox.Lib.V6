@@ -151,7 +151,7 @@ public class NoxDynamicGenerator : ISourceGenerator
         sb.AppendLine(@"using Nox.Core.Interfaces.Database;");
         sb.AppendLine(@"using Microsoft.EntityFrameworkCore.Design;");
         sb.AppendLine(@"using MySql.EntityFrameworkCore.Extensions;");
-
+        sb.AppendLine(@"using Microsoft.Extensions.DependencyInjection;");
         sb.AppendLine(@"");
         sb.AppendLine(@"namespace Nox;");
         sb.AppendLine(@"");
