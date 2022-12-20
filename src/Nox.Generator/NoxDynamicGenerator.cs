@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -32,9 +33,14 @@ public class NoxDynamicGenerator : ISourceGenerator
     
     public void Initialize(GeneratorInitializationContext context)
     {
-        
+        /* 
+        if (!Debugger.IsAttached)
+        {
+            Debugger.Launch();
+        }
+        */
     }
-    
+
     public void Execute(GeneratorExecutionContext context)
     {
         _entityNames = new List<string>();
