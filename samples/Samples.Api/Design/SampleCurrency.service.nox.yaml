@@ -11,7 +11,7 @@ Database:
   Server: localhost
 
   ### Sql Server
-  #Provider: SqlServer
+  Provider: SqlServer
   Options: Trusted_Connection=no;connection timeout=120;
   User: sa  
   Password: Developer*123
