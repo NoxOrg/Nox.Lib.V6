@@ -6,6 +6,8 @@ Name: SampleCurrency
 
 Description: Sample Currency Microservice
 
+AutoMigrations: false
+
 Database:
   Name: SampleCurrencyDb
   Server: localhost

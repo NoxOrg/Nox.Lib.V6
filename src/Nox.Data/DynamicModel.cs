@@ -78,7 +78,7 @@ public class DynamicModel : IDynamicModel
 
         var model = dbContext.Model;
 
-        _dynamicService.EnsureDatabaseCreated(dbContext);
+        _dynamicService.EnsureDatabaseCreatedIfAutoMigrationsIsSet(dbContext);
     }
 
     public IDataProvider GetDatabaseProvider() => _databaseProvider;

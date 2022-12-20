@@ -33,6 +33,7 @@ public class DynamicService : IDynamicService
     public string Name => _metaService.Name;
     public IMetaService MetaService => _metaService;
     public string KeyVaultUri => _metaService.KeyVaultUri;
+    public bool AutoMigrations => _metaService.AutoMigrations;
     public IReadOnlyDictionary<string, IEntity>? Entities
     {
         get
@@ -135,12 +136,15 @@ public class DynamicService : IDynamicService
         }
     }
 
-    public void EnsureDatabaseCreated(DbContext dbContext)
+    public void EnsureDatabaseCreatedIfAutoMigrationsIsSet(DbContext dbContext)
     {
-        if (dbContext.Database.EnsureCreated())
+        if (_metaService.AutoMigrations)
         {
-            dbContext.Add((MetaService)_metaService);
-            dbContext.SaveChanges();    
+            if (dbContext.Database.EnsureCreated())
+            {
+                dbContext.Add((MetaService)_metaService);
+                dbContext.SaveChanges();
+            }
         }
     }
 

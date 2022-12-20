@@ -103,6 +103,28 @@ $goo.Command.Add( 'build', {
     $goo.StopIfError("Failed to publish CLI project. (Release)")
 })
 
+# command: goo migr-add <name> | Add a migration to the project called "<name>"
+$goo.Command.Add( 'migr-add', { param([string]$name)
+    if([string]::IsNullOrWhiteSpace($name)) { $goo.Error("You need to specify a migration name.") }
+    $goo.Console.WriteInfo("Adding migration...")
+    $goo.Command.RunExternal('dotnet',"ef migrations add ""$name"" --context NoxDbContext", $script:ProjectFolder)
+    $goo.StopIfError("Failed to add migration.")
+})
+
+# command: goo migr-remove | Undo the last migration addition from the project
+$goo.Command.Add( 'migr-remove', { 
+    $goo.Console.WriteInfo("Removing last migration...")
+    $goo.Command.RunExternal('dotnet',"ef migrations remove --context NoxDbContext", $script:ProjectFolder)
+    $goo.StopIfError("Failed to remove migration.")
+})
+
+# command: goo migr-dbupdate | Update the database to the latest migration
+$goo.Command.Add( 'migr-dbupdate', { 
+    $goo.Console.WriteInfo("Migrating the the database...")
+    $goo.Command.RunExternal('dotnet',"ef database update --context NoxDbContext", $script:ProjectFolder)
+    $goo.StopIfError("Failed to migrate the databse.")
+})
+
 # command: goo up | Starts your local SQL Server in a Docker container
 $goo.Command.Add( 'up', {
     $goo.Console.WriteInfo('Starting containers...')
