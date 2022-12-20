@@ -11,30 +11,6 @@ namespace Nox.Core.Tests;
 public class ConfigurationTests: ConfigurationTestFixture
 {
     [Test]
-    public void Must_Get_an_Exception_If_AppSettings_Are_Empty()
-    {
-        Environment.SetEnvironmentVariable("ENVIRONMENT", "Empty");
-        var ex = Assert.Throws<ConfigurationException>(() => ConfigurationHelper.GetNoxAppSettings());
-        Assert.That(ex!.Message, Is.EqualTo("Could not find 'Nox:DefinitionRootPath' in environment or appsettings"));
-    }
-    
-    [Test]
-    public void Must_Get_an_Exception_If_Design_Folder_does_not_contain_a_yaml_file()
-    {
-        Environment.SetEnvironmentVariable("ENVIRONMENT", "NoService");
-        var ex = Assert.Throws<ConfigurationException>(() => ConfigurationHelper.GetNoxAppSettings());
-        Assert.That(ex!.Message, Is.EqualTo("Could not find any yaml files in /home/jan/Projects/IWG/Nox/src/Nox.Core.Tests/bin/Debug/net6.0/DesignFolders/EmptyDesign"));
-    }
-    
-    [Test]
-    public void Must_Get_an_Exception_If_Design_Folder_does_not_contain_entity_folders()
-    {
-        Environment.SetEnvironmentVariable("ENVIRONMENT", "NoEntities");
-        var ex = Assert.Throws<ConfigurationException>(() => ConfigurationHelper.GetNoxAppSettings());
-        Assert.That(ex!.Message, Is.EqualTo("Could not find any entity folders in /home/jan/Projects/IWG/Nox/src/Nox.Core.Tests/bin/Debug/net6.0/DesignFolders/NoEntities"));
-    }
-
-    [Test]
     public void Can_Load_Nox_Configuration_From_Yaml_Definitions()
     {
         var appSettings = ConfigurationHelper.GetNoxAppSettings();
