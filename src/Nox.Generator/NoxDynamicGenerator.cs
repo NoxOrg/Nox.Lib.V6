@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using YamlDotNet.Serialization;
 
@@ -12,35 +14,37 @@ namespace Nox.Generator;
 [Generator]
 public class NoxDynamicGenerator : ISourceGenerator
 {
-    //Info
-    public static readonly DiagnosticDescriptor NI0000 = new("NI0000", "Debug Info",
-        "Debug: {0} {1}", "Debug",
-        DiagnosticSeverity.Info, true);
-    public static readonly DiagnosticDescriptor NI0001 = new("NI0001", "Found yaml definitions",
-        "Nox.Generator will generate classes for {0} yaml definitions", "Design",
-        DiagnosticSeverity.Info, true);
+    private readonly DiagnosticDescriptor NI0000 = new DiagnosticDescriptor("NI0000", "Nox Generator Debug", "{0}", "Debug", DiagnosticSeverity.Info, true);
     //Warnings
-    public static readonly DiagnosticDescriptor NW0001 = new("NW0001", "No yaml definitions",
+    private readonly DiagnosticDescriptor NW0001 = new("NW0001", "No yaml definitions",
         "Nox.Generator will not contribute to your project as no yaml definitions were found", "Design",
         DiagnosticSeverity.Warning, true);
     
-    public static readonly DiagnosticDescriptor NW0002 = new("NW0002", "AppSettings",
+    private readonly DiagnosticDescriptor NW0002 = new("NW0002", "AppSettings",
         "DefinitionRootPath value not found in appsettings.json", "Design",
         DiagnosticSeverity.Warning, true);
     //Errors
-    public static readonly DiagnosticDescriptor NE0001 = new("NE0001", "Duplicate Entity",
+    private readonly DiagnosticDescriptor NE0001 = new("NE0001", "Duplicate Entity",
         "Duplicate entity detected in yaml configuration: {0}", "Design",
         DiagnosticSeverity.Error, true);
 
+    
     private List<string>? _entityNames;
     
     public void Initialize(GeneratorInitializationContext context)
     {
-        
+        /* 
+        if (!Debugger.IsAttached)
+        {
+            Debugger.Launch();
+        }
+        */
     }
-    
+
     public void Execute(GeneratorExecutionContext context)
     {
+        _entityNames = new List<string>();
+        context.ReportDiagnostic(Diagnostic.Create(NI0000, null, $"Executing Nox Generator"));
         var assemblyName = context.Compilation.AssemblyName;
         var mainSyntaxTree = context.Compilation.SyntaxTrees
             .FirstOrDefault(x => x.FilePath.EndsWith("Program.cs"));
@@ -78,9 +82,8 @@ public class NoxDynamicGenerator : ISourceGenerator
         }
         else
         {
-            _entityNames = new List<string>();
-            context.ReportDiagnostic(Diagnostic.Create(NI0001, null, entities.Count));
-        
+            context.ReportDiagnostic(Diagnostic.Create(NI0000, null, $"{entities.Count} entities found"));
+            
             foreach (Dictionary<object, object>? entity in entities)
             {
                 if (AddEntity(context, assemblyName!, entity!))
@@ -132,6 +135,7 @@ public class NoxDynamicGenerator : ISourceGenerator
     private bool AddEntity(GeneratorExecutionContext context, string assemblyName, Dictionary<object, object>? entity)
     {
         var entityName = entity!["Name"].ToString();
+        context.ReportDiagnostic(Diagnostic.Create(NI0000, null, $"Adding Entity class: {entityName} from assembly {assemblyName}"));
         if (_entityNames!.Any(n => n == entityName))
         {
             context.ReportDiagnostic(Diagnostic.Create(NE0001, null, entityName));

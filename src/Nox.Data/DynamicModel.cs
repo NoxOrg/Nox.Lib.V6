@@ -17,14 +17,14 @@ public class DynamicModel : IDynamicModel
 {
     private readonly IEdmModel _edmModel;
     private readonly IDynamicService _dynamicService;
-    private readonly IDatabaseProvider _databaseProvider;
+    private readonly IDataProvider _databaseProvider;
     private readonly Dictionary<string, DynamicDbEntity> _dynamicDbEntities = new();
 
     public DynamicModel(ILogger<DynamicModel> logger, IDynamicService dynamicService, IEtlExecutor etlExecutor)
     {
         _dynamicService = dynamicService;
 
-        _databaseProvider = dynamicService.MetaService.Database!.DatabaseProvider!;
+        _databaseProvider = dynamicService.MetaService.Database!.DataProvider!;
 
         var builder = new ODataConventionModelBuilder();
 
@@ -82,7 +82,7 @@ public class DynamicModel : IDynamicModel
         _dynamicService.EnsureDatabaseCreated(dbContext);
     }
 
-    public IDatabaseProvider GetDatabaseProvider() => _databaseProvider;
+    public IDataProvider GetDatabaseProvider() => _databaseProvider;
 
     public IDynamicService GetDynamicService() => _dynamicService;
 

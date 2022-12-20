@@ -14,11 +14,19 @@ namespace Nox.Messaging;
 
 public static class ServiceExtensions
 {
+
+    public static IServiceCollection AddNoxListeners(this IServiceCollection services)
+    {
+        services.AddNoxMessaging(true);
+
+        return services;
+    }
+
     public static IServiceCollection AddNoxMessaging(
         this IServiceCollection services,
-        bool loadAppConfig = true)
+        bool isExternalListener = true)
     {
-        if (loadAppConfig)
+        if (isExternalListener)
         {
             var appSettings = ConfigurationHelper.GetNoxAppSettings();
             services.AddNoxConfiguration((appSettings != null ? appSettings["Nox:DefinitionRootPath"] : "")!);
@@ -36,19 +44,19 @@ public static class ServiceExtensions
                 switch (msgProvider.Provider!.ToLower())
                 {
                     case "rabbitmq":
-                        services.AddRabbitMqBus(msgProvider);
+                        services.AddRabbitMqBus(msgProvider, isExternalListener); 
                         break;
                     case "azureservicebus":
-                        services.AddAzureBus(msgProvider);
+                        services.AddAzureBus(msgProvider, isExternalListener); 
                         break;
                     case "amazonsqs":
-                        services.AddAmazonBus(msgProvider);
+                        services.AddAmazonBus(msgProvider, isExternalListener); 
                         break;
-                    case "inmemory":
+                    case "inmemory": 
                         services.AddInMemoryBus();
                         break;
                     case "mediator":
-                        services.AddMediator();
+                        services.AddNoxMediator();
                         break;
                 }
             }
@@ -69,7 +77,19 @@ public static class ServiceExtensions
         return services;
     }
 
-    private static void AddRabbitMqBus(this IServiceCollection services, MessagingProviderConfiguration config)
+    private static void AddNoxMediator(this IServiceCollection services)
+    {
+        services.AddMediator( mt =>
+        {
+            var entryAssembly = Assembly.GetEntryAssembly();
+            mt.AddConsumers(entryAssembly);
+            mt.AddSagaStateMachines(entryAssembly);
+            mt.AddSagas(entryAssembly);
+            mt.AddActivities(entryAssembly);
+        });
+    }
+
+    private static void AddRabbitMqBus(this IServiceCollection services, MessagingProviderConfiguration config, bool isExternalListener)
     {
         services.AddMassTransit<IRabbitMqBus>(mt =>
         {
@@ -78,47 +98,58 @@ public static class ServiceExtensions
             //todo By default, sagas are in-memory, but should be changed to a durable saga repository.
             mt.SetInMemorySagaRepositoryProvider();
             
-            var entryAssembly = Assembly.GetEntryAssembly();
-            mt.AddConsumers(entryAssembly);
-            mt.AddSagaStateMachines(entryAssembly);
-            mt.AddSagas(entryAssembly);
-            mt.AddActivities(entryAssembly);
+            if(isExternalListener)
+            {
+                var entryAssembly = Assembly.GetEntryAssembly();
+                mt.AddConsumers(entryAssembly);
+                mt.AddSagaStateMachines(entryAssembly);
+                mt.AddSagas(entryAssembly);
+                mt.AddActivities(entryAssembly);
+            }
             mt.UseRabbitMq(config.ConnectionString!);
         });
     }
     
-    private static void AddAzureBus(this IServiceCollection services, MessagingProviderConfiguration config)
+    private static void AddAzureBus(this IServiceCollection services, MessagingProviderConfiguration config, bool isExternalListener)
     {
-        services.AddMassTransit<IRabbitMqBus>(mt =>
+        services.AddMassTransit<IAzureBus>(mt =>
         {
             mt.SetKebabCaseEndpointNameFormatter();
 
             //todo By default, sagas are in-memory, but should be changed to a durable saga repository.
             mt.SetInMemorySagaRepositoryProvider();
             
-            var entryAssembly = Assembly.GetEntryAssembly();
-            mt.AddConsumers(entryAssembly);
-            mt.AddSagaStateMachines(entryAssembly);
-            mt.AddSagas(entryAssembly);
-            mt.AddActivities(entryAssembly);
+            if(isExternalListener)
+            {
+                var entryAssembly = Assembly.GetEntryAssembly();
+                mt.AddConsumers(entryAssembly);
+                mt.AddSagaStateMachines(entryAssembly);
+                mt.AddSagas(entryAssembly);
+                mt.AddActivities(entryAssembly);
+            }
+
             mt.UseAzureServiceBus(config.ConnectionString!);
         });
     }
     
-    private static void AddAmazonBus(this IServiceCollection services, MessagingProviderConfiguration config)
+    private static void AddAmazonBus(this IServiceCollection services, MessagingProviderConfiguration config, bool isExternalListener)
     {
-        services.AddMassTransit<IRabbitMqBus>(mt =>
+        services.AddMassTransit<IAmazonBus>(mt =>
         {
             mt.SetKebabCaseEndpointNameFormatter();
 
             //todo By default, sagas are in-memory, but should be changed to a durable saga repository.
             mt.SetInMemorySagaRepositoryProvider();
             
-            var entryAssembly = Assembly.GetEntryAssembly();
-            mt.AddConsumers(entryAssembly);
-            mt.AddSagaStateMachines(entryAssembly);
-            mt.AddSagas(entryAssembly);
-            mt.AddActivities(entryAssembly);
+            if(isExternalListener)
+            {
+                var entryAssembly = Assembly.GetEntryAssembly();
+                mt.AddConsumers(entryAssembly);
+                mt.AddSagaStateMachines(entryAssembly);
+                mt.AddSagas(entryAssembly);
+                mt.AddActivities(entryAssembly);
+            }
+
             mt.UseAmazonSqs(config.ConnectionString!, config.AccessKey!, config.SecretKey!);
         });
     }

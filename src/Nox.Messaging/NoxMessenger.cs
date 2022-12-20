@@ -57,11 +57,11 @@ public class NoxMessenger: INoxMessenger
                             await _amazonBus!.Publish(message);
                             _logger.LogInformation($"{message.GetType().Name} sent to Amazon bus.");
                             break;
-                        case "mediator":
-                            await _mediator!.Publish(message);
-                            _logger.LogInformation($"{message.GetType().Name} sent to Mediator.");
-                            break;
                     }
+
+                    await _mediator!.Publish(message);
+                    _logger.LogInformation($"{message.GetType().Name} sent to Mediator.");
+
                 }
                 catch (Exception ex)
                 {
@@ -91,11 +91,11 @@ public class NoxMessenger: INoxMessenger
                         await _amazonBus!.Publish(message, stoppingToken);
                         _logger.LogInformation($"Heartbeat sent to Amazon bus.");
                         break;
-                    case "mediator":
-                        await _mediator!.Publish(message, stoppingToken);
-                        _logger.LogInformation($"Heartbeat sent to Mediator.");
-                        break;
                 }
+
+                await _mediator!.Publish(message, stoppingToken);
+                _logger.LogInformation($"Heartbeat sent to Mediator.");
+
             }
             catch (Exception ex)
             {

@@ -5,7 +5,7 @@ namespace Nox.Core.Validation.Configuration;
 
 public class LoaderSourceConfigValidator: AbstractValidator<LoaderSourceConfiguration>
 {
-    public LoaderSourceConfigValidator(List<DatabaseConfiguration>? dataSources)
+    public LoaderSourceConfigValidator(List<DataSourceConfiguration>? dataSources)
     {
         RuleFor( ls => ls.DataSource)
             .NotEmpty()

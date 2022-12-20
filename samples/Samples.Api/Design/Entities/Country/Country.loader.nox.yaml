@@ -1,5 +1,5 @@
 ﻿#
-# Country data loader definition
+# Country.loader.nox.yaml
 #
 
 Name: CountryLoader
@@ -7,7 +7,7 @@ Name: CountryLoader
 Description: Loads country data 
 
 Schedule:
-  Start: Daily at 2am UTC
+  Start: Every month on the 1st at 2am
   Retry:
     Limit: 10
     DelaySeconds: 60
@@ -21,20 +21,10 @@ Target:
   Entity: Country
   
 Messaging:
-  - MessagingProvider: InProcess    
-
+  - MessagingProvider: InProcess
+  - MessagingProvider: AppServiceBus
+  
 Sources:
-  - DataSource: BusinessSystem
-    MinimumExpectedRecords: 242 
-    Query: >-
-      SELECT 
-           [CountryISONumber] AS [Id]
-          ,[CountryName] AS [Name]
-          ,[CountryCodeISO2Alpha] AS [ISO_Alpha2]
-          ,[CountryCodeISO3Alpha] AS [ISO_Alpha3]
-          ,[CountryISONumber] AS [ISO_Numeric]
-          ,[CurrencyID] AS [CurrencyId]
-          ,[CreateDate]
-          ,[EditDate]
-      FROM dbo.Country WITH (NOLOCK)
-
+  - DataSource: JsonSeedData
+    MinimumExpectedRecords: 160
+    Query: country-seeddata.json 

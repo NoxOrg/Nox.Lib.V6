@@ -8,7 +8,7 @@ public static class ServiceExtensions
 {
     public static IServiceCollection AddPostgresDatabaseProvider(this IServiceCollection services)
     {
-        services.AddTransient<IDatabaseProvider, PostgresDatabaseProvider>();
+        services.AddTransient<IDataProvider, PostgresDatabaseProvider>();
         return services;
     }
 }

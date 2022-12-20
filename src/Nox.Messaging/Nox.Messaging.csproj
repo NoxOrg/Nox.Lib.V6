@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>6.0.15.0</AssemblyVersion>
-    <FileVersion>6.0.15.0</FileVersion>
+    <AssemblyVersion>6.0.16.0</AssemblyVersion>
+    <FileVersion>6.0.16.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
@@ -48,7 +48,7 @@
   <ItemGroup>
     <PackageReference Include="MassTransit" Version="8.0.9" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Nox.Messaging.AmazonSQS\Nox.Messaging.AmazonSQS.csproj" />

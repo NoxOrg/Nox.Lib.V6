@@ -2,12 +2,12 @@
 # Service definition
 #
 
-Name: Workplace
+Name: SampleCurrency
 
 Description: Workplace Microservice
 
 Database:
-  Name: Workplace
+  Name: SampleCurrencyDb
   Provider: SqlServer
   Options: Trusted_Connection=no;connection timeout=120;
   #Provider: Postgres
@@ -17,16 +17,20 @@ Database:
   Password: Developer*123
 
 MessagingProviders:
-  - Name: Bunny
+
+  - Name: AppServiceBus
     #Provider: AzureServiceBus
     #ConnectionVariable: ConnectionString:AzureServiceBus
     Provider: RabbitMQ
     ConnectionString: rabbitmq://guest:guest@localhost/
+
   - Name: InProcess
     Provider: Mediator  
       
 DataSources:
-  - Name: BusinessSystem
-    ConnectionVariable: ConnectionString:MasterDataSource
-    Provider: SqlServer
+
+  - Name: JsonSeedData
+    Provider: Json
+    Options: Source=File;Path=../../docs/sample-data/;
+
   

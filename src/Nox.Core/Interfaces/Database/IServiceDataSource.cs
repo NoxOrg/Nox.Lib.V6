@@ -1,7 +1,7 @@
 ﻿
 namespace Nox.Core.Interfaces.Database
 {
-    public interface IServiceDatabase: IMetaBase
+    public interface IServiceDataSource: IMetaBase
     {
         string? ConnectionString { get; set; }
         string? ConnectionVariable { get; set; }
@@ -12,7 +12,7 @@ namespace Nox.Core.Interfaces.Database
         string Server { get; set; }
         public int Port { get; set; }
         string User { get; set; }
-        public IDatabaseProvider? DatabaseProvider { get; set; }
+        public IDataProvider? DataProvider { get; set; }
         bool ApplyDefaults();
     }
 }

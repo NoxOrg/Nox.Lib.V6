@@ -1,11 +1,10 @@
 using ETLBox.Connection;
-using ETLBox.ControlFlow;
 using ETLBox.ControlFlow.Tasks;
 using ETLBox.DataFlow;
 using ETLBox.DataFlow.Connectors;
 using MassTransit;
-using MassTransit.Mediator;
 using Microsoft.Extensions.Logging;
+using Nox.Core.Constants;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
@@ -15,8 +14,8 @@ using Nox.Core.Models;
 using Nox.Messaging;
 using Nox.Messaging.Enumerations;
 using Nox.Messaging.Events;
-using SqlKata;
-using SqlKata.Compilers;
+using System.Dynamic;
+
 
 namespace Nox.Etl;
 
@@ -54,8 +53,8 @@ public class EtlExecutor : IEtlExecutor
 
     public async Task<bool> ExecuteLoaderAsync(IMetaService service, ILoader loader, IEntity entity)
     {
-
         entity.ApplyDefaults();
+        
         entity.Attributes.ToList().ForEach(a => a.ApplyDefaults());
 
         await LoadDataFromSource(service, loader, entity);
@@ -65,45 +64,32 @@ public class EtlExecutor : IEtlExecutor
 
     private async Task LoadDataFromSource(IMetaService service, ILoader loader, IEntity entity)
     {
-        var destinationDb = service.Database!.DatabaseProvider!.ConnectionManager;
-
-        var destinationTable = service.Database!.DatabaseProvider!.ToTableNameForSql(entity.Table, entity.Schema);
-
-        var destinationSqlCompiler = service.Database!.DatabaseProvider!.SqlCompiler;
-
         var loaderInstance = (Loader)loader;
+        var targetProvider = service.Database!.DataProvider!;
+        var destinationDb = targetProvider.ConnectionManager;
+        var destinationTable = targetProvider.ToTableNameForSql(entity.Table, entity.Schema);
+        var destinationSqlCompiler = targetProvider.SqlCompiler;
+
         foreach (var loaderSource in loaderInstance.Sources!)
         {
-            var dataSource = service.DataSources!.First(ds => ds.Name == loaderSource.DataSource);
-            
-            var sourceDb = dataSource.DatabaseProvider!.ConnectionManager;
-
-            var sourceSqlCompiler = dataSource.DatabaseProvider.SqlCompiler;
-
-            var loadStrategy = loaderInstance.LoadStrategy?.Type.Trim().ToLower();
+            var sourceProvider = service.DataSources!.First(ds => ds.Name == loaderSource.DataSource).DataProvider!;
+            var source = sourceProvider!.DataFlowSource(loaderSource);
+            var loadStrategy = loaderInstance.LoadStrategy?.Type.Trim().ToLower() ?? "unknown";
 
             switch (loadStrategy)
             {
                 case "dropandload":
                     _logger.LogInformation("Dropping and loading data for entity {entity}...", entity.Name);
-
-                    await DropAndLoadData(sourceDb, destinationDb, loaderSource, destinationTable);
-
+                    await DropAndLoadData(source, destinationDb, destinationTable);
                     break;
 
                 case "mergenew":
                     _logger.LogInformation("Merging new data for entity {entity}...", entity.Name);
-
-                    await MergeNewData(sourceDb, destinationDb,
-                        loaderSource, service, loaderInstance, destinationTable, entity,
-                        sourceSqlCompiler, destinationSqlCompiler);
-
+                    await MergeNewData(source, destinationDb, destinationTable, loader, loaderSource, entity, sourceProvider, targetProvider);
                     break;
 
                 default:
-
                     _logger.LogError("{message}",$"Unsupported load strategy '{loaderInstance.LoadStrategy!.Type}' in loader '{loaderInstance.Name}'.");
-
                     break;
 
             };
@@ -112,16 +98,10 @@ public class EtlExecutor : IEtlExecutor
     }
 
     private async Task DropAndLoadData(
-        IConnectionManager sourceDb,
+        IDataFlowExecutableSource<ExpandoObject> source,
         IConnectionManager destinationDb,
-        LoaderSource loaderSource, string destinationTable)
+        string destinationTable)
     {
-        var source = new DbSource()
-        {
-            ConnectionManager = sourceDb,
-            Sql = loaderSource.Query,
-        };
-
         var destination = new DbDestination()
         {
             ConnectionManager = destinationDb,
@@ -132,69 +112,55 @@ public class EtlExecutor : IEtlExecutor
 
         SqlTask.ExecuteNonQuery(destinationDb, $"DELETE FROM {destinationTable};");
 
-        await Network.ExecuteAsync(source);
+        await Network.ExecuteAsync((DataFlowExecutableSource<ExpandoObject>)source);
 
         int rowCount = RowCountTask.Count(destinationDb, destinationTable);
 
         _logger.LogInformation("...copied {rowCount} records", rowCount);
     }
 
-
-    private async Task MergeNewData(IConnectionManager sourceDb,
+    private async Task MergeNewData(
+        IDataFlowExecutableSource<ExpandoObject> source,
         IConnectionManager destinationDb,
-        ILoaderSource loaderSource,
-        IMetaService service,
-        Loader loader,
         string destinationTable,
+        ILoader loader,
+        ILoaderSource loaderSource,
         IEntity entity,
-        Compiler sourceSqlCompiler,
-        Compiler destinationSqlCompiler)
+        IDataProvider sourceProvider,
+        IDataProvider targetProvider
+    )
     {
-        var newLastMergeDateTimeStamp = new Dictionary<string, (DateTime LastMergeDateTimeStamp, bool Updated)>();
+        var lastMergeDateTimeStampInfo = GetAllLastMergeDateTimeStamps(loader, targetProvider);
 
-        var targetColumns = entity.Attributes.Where(a => a.IsMappedAttribute()).Select(a => a.Name)
-                .Concat(entity.RelatedParents.Select(p => p + "Id"))
-                .Concat(loader.LoadStrategy!.Columns.Select(c => c))
-                .ToArray();
+        var targetColumns = entity.Attributes
+            .Where(a => a.IsMappedAttribute())
+            .Select(a => a.Name)
+            .Concat(entity.RelatedParents.Select(p => p + "Id"))
+            .Concat(loader.LoadStrategy!.Columns.Select(c => c))
+            .ToArray();
 
-        var query = new Query().FromRaw($"({loaderSource.Query}) AS tmp")
-            .Select(targetColumns);
+        sourceProvider.ApplyMergeInfo(loaderSource, lastMergeDateTimeStampInfo, loader.LoadStrategy!.Columns, targetColumns);
+        await ExecuteMergeNewData(source, destinationDb, destinationTable, targetColumns, loader, entity, lastMergeDateTimeStampInfo);
 
-        var lastMergeDateTimeStamp = DateTime.MinValue;
+        SetAllLastMergeDateTimeStamps(loader, targetProvider, lastMergeDateTimeStampInfo);
 
-        foreach (var dateColumn in loader.LoadStrategy.Columns)
-        {
-            lastMergeDateTimeStamp = GetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, destinationSqlCompiler, service.Database!.DatabaseProvider!);
+    }
 
-            if (!lastMergeDateTimeStamp.Equals(DateTime.MinValue))
-            {
-                var stamp = lastMergeDateTimeStamp;
-                query = query.Where(
-                    q => q.WhereNotNull(dateColumn).Where(dateColumn, ">", stamp)
-                );
-            }
-
-            newLastMergeDateTimeStamp[dateColumn] = new() { LastMergeDateTimeStamp = lastMergeDateTimeStamp, Updated = false };
-        }
-
-        var compiledQuery = sourceSqlCompiler.Compile(query);
-
-        var finalQuerySql = compiledQuery.Sql;
-
-        var finalQueryParams = compiledQuery.NamedBindings.Select(nb => new QueryParameter(nb.Key, nb.Value));
-
-        var source = new DbSource()
-        {
-            ConnectionManager = sourceDb,
-            Sql = finalQuerySql,
-            SqlParameter = finalQueryParams,
-        };
+    private async Task ExecuteMergeNewData(
+        IDataFlowExecutableSource<ExpandoObject> source,
+        IConnectionManager destinationDb,
+        string destinationTable,
+        string[] targetColumns,
+        ILoader loader,
+        IEntity entity,
+        LoaderMergeStates lastMergeDateTimeStampInfo
+        )
+    {
 
         var destination = new DbMerge(destinationDb, destinationTable)
         {
             CacheMode = ETLBox.DataFlow.Transformations.CacheMode.Partial,
-            MergeMode = MergeMode.InsertsAndUpdates,
-            BatchSize = 1,
+            MergeMode = MergeMode.InsertsAndUpdates
         };
 
         destination.MergeProperties.IdColumns =
@@ -207,106 +173,203 @@ public class EtlExecutor : IEtlExecutor
         destination.MergeProperties.CompareColumns =
             targetColumns
             .Skip(1)
-            .Take(targetColumns.Length - 1 - loader.LoadStrategy.Columns.Length)
+            .Take(targetColumns.Length - 1 - loader.LoadStrategy!.Columns.Length)
             .Select(colName => new CompareColumn() { ComparePropertyName = colName })
             .ToArray();
 
         source.LinkTo(destination);
 
-        var analytics = new CustomDestination();
+        var postProcessDestination = new CustomDestination();
 
-        int inserts = 0;
-        int updates = 0;
-        int nochanges = 0;
+        // Store analytics
+        
+        int inserts = 0, updates = 0, unchanged = 0;
 
-        analytics.WriteAction = (row, _) =>
+        // Get events to fire, if any
+
+        INoxEvent? entityCreatedMsg = null, entityUpdatedMsg = null;
+        if (loader.Messaging != null && loader.Messaging.Any())
         {
-            dynamic r = row;
+            entityCreatedMsg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Create);
+            entityUpdatedMsg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Update);
+        }
 
-            IDictionary<string, object?> d = new Dictionary<string, object?>(row);
+        postProcessDestination.WriteAction = (row, _) =>
+        {
+            var record = (IDictionary<string, object?>)row;
 
-            if (r.ChangeAction == ChangeAction.Insert)
+            if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Insert)
             {
                 inserts++;
-                var msg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Create);
-                
-                if (loader.Messaging != null && loader.Messaging.Any() && msg != null)
-                {
-                    var toSend = msg.MapInstance(row);
-                    _messenger?.SendMessage(loader, toSend);
-                }
-                
-                foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
-                {
-
-                    if (d[dateColumn] != null)
-                    {
-                        var fieldValue = (DateTime)d[dateColumn]!;
-                        if (fieldValue > newLastMergeDateTimeStamp[dateColumn].LastMergeDateTimeStamp)
-                        {
-                            var changeEntry = newLastMergeDateTimeStamp[dateColumn];
-                            changeEntry.LastMergeDateTimeStamp = fieldValue;
-                            changeEntry.Updated = true;
-                            newLastMergeDateTimeStamp[dateColumn] = changeEntry;
-                        }
-                    }
-                }
-
+                if(entityCreatedMsg is not null) SendChangeEvent(loader, row, entityCreatedMsg);
+                UpdateMergeStates(lastMergeDateTimeStampInfo, record);
             }
-            else if (r.ChangeAction == ChangeAction.Update)
+            else if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Update)
             {
                 updates++;
-                
-                var msg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Update);
-                
-                if (loader.Messaging != null && loader.Messaging.Any() && msg != null)
-                {
-                    var toSend = msg.MapInstance(row);
-                    _logger.LogInformation($"Publishing bus message: {toSend.GetType().Name}");
-                    _messenger?.SendMessage(loader, toSend);
-                }
-                
-                foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
-                {
-
-                    if (d[dateColumn] != null)
-                    {
-                        var fieldValue = (DateTime)d[dateColumn]!;
-                        if (fieldValue > newLastMergeDateTimeStamp[dateColumn].LastMergeDateTimeStamp)
-                        {
-                            var changeEntry = newLastMergeDateTimeStamp[dateColumn];
-                            changeEntry.LastMergeDateTimeStamp = fieldValue;
-                            changeEntry.Updated = true;
-                            newLastMergeDateTimeStamp[dateColumn] = changeEntry;
-                        }
-                    }
-                }
+                if (entityUpdatedMsg is not null) SendChangeEvent(loader, row, entityUpdatedMsg);
+                UpdateMergeStates(lastMergeDateTimeStampInfo, record);
             }
-            else if (r.ChangeAction == ChangeAction.Exists)
+            else if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Exists)
             {
-                nochanges++;
+                unchanged++;
             }
         };
 
-        destination.LinkTo(analytics);
+        destination.LinkTo(postProcessDestination);
 
         try
         {
-            await Network.ExecuteAsync(source);
+            await Network.ExecuteAsync((DataFlowExecutableSource<ExpandoObject>)source);
         }
         catch (Exception ex)
         {
-            _logger.LogCritical("Failed to run Merge for Entity {entity} at {lastMergeDateTimeStamp}", entity.Name, lastMergeDateTimeStamp);
+            _logger.LogCritical("Failed to run Merge for Entity {entity}", entity.Name);
             _logger.LogError("{message}", ex.Message);
             throw;
         }
 
+        LogMergeAnalytics(inserts, updates, unchanged, lastMergeDateTimeStampInfo);
+
+    }
+
+    private void SendChangeEvent(ILoader loader, ExpandoObject row, INoxEvent message)
+    {
+        var toSend = message.MapInstance(row);
+
+        _logger.LogInformation("Publishing bus message: {Name}", toSend.GetType().Name);
+
+        _messenger?.SendMessage(loader, toSend);
+    }
+
+    private static void UpdateMergeStates(LoaderMergeStates lastMergeDateTimeStampInfo, IDictionary<string, object?> record)
+    {
+        foreach (var dateColumn in lastMergeDateTimeStampInfo.Keys)
+        {
+            if (record[dateColumn] == null) continue;
+
+            var fieldValue = (DateTime)record[dateColumn]!;
+
+            if (fieldValue > lastMergeDateTimeStampInfo[dateColumn].LastDateLoadedUtc)
+            {
+                var changeEntry = lastMergeDateTimeStampInfo[dateColumn];
+                changeEntry.LastDateLoadedUtc = fieldValue;
+                changeEntry.Updated = true;
+                lastMergeDateTimeStampInfo[dateColumn] = changeEntry;
+            }
+        }
+    }
+
+    private static LoaderMergeStates GetAllLastMergeDateTimeStamps(ILoader loader, IDataProvider dataProvider)
+    {
+        var lastMergeDateTimeStampInfo = new LoaderMergeStates();
+
+        foreach (var dateColumn in loader.LoadStrategy!.Columns)
+        {
+            var lastMergeDateTimeStamp = GetLastMergeDateTimeStamp(loader.Name, dateColumn, dataProvider);
+
+            lastMergeDateTimeStampInfo[dateColumn] = new MergeState()
+            {
+                Loader = loader.Name,
+                Property = dateColumn,
+                LastDateLoadedUtc = lastMergeDateTimeStamp,
+            };
+        }
+
+        return lastMergeDateTimeStampInfo;
+    }
+
+    private void SetAllLastMergeDateTimeStamps(ILoader loader, IDataProvider dataProvider, LoaderMergeStates lastMergeDateTimeStampInfo)
+    {
+        foreach (var (dateColumn, mergeState) in lastMergeDateTimeStampInfo)
+        {
+            if (mergeState.Updated)
+            {
+                SetLastMergeDateTimeStamp(loader.Name, dateColumn, mergeState.LastDateLoadedUtc, dataProvider);
+            }
+        }
+    }
+
+
+    private static DateTime GetLastMergeDateTimeStamp(string loaderName, string dateColumn, 
+        IDataProvider destinationDbProvider)
+    {
+        var lastMergeDateTime = DateTime.MinValue;
+
+        var mergeStateTableName = destinationDbProvider.ToTableNameForSqlRaw(DatabaseObject.MergeStateTableName, DatabaseObject.MetadataSchemaName);
+
+        var findQuery = new SqlKata.Query(mergeStateTableName)
+                .Where("Property", dateColumn)
+                .Where("Loader", loaderName)
+                .Select("LastDateLoadedUtc");
+
+        var findSql = destinationDbProvider.SqlCompiler.Compile(findQuery).ToString();
+
+        object? resultDate = null;
+        SqlTask.ExecuteReader(destinationDbProvider.ConnectionManager, findSql, r => resultDate = r);
+        if (resultDate is not null)
+        {
+            return (DateTime)resultDate;
+        }
+
+        var insertQuery = new SqlKata.Query(mergeStateTableName).AsInsert(
+        new
+        {
+            Loader = loaderName,
+            Property = dateColumn,
+            LastDateLoadedUtc = lastMergeDateTime,
+            Updated = 1
+        });
+
+        var insertSql = destinationDbProvider.SqlCompiler.Compile(insertQuery).ToString();
+
+        SqlTask.ExecuteNonQuery(destinationDbProvider.ConnectionManager, insertSql);
+
+        return lastMergeDateTime;
+
+    }
+
+    private bool SetLastMergeDateTimeStamp(
+        string loaderName, string dateColumn, DateTime lastMergeDateTime,
+        IDataProvider destinationDbProvider)
+    {
+        var mergeStateTableName = destinationDbProvider.ToTableNameForSqlRaw(DatabaseObject.MergeStateTableName, DatabaseObject.MetadataSchemaName);
+
+        _logger.LogInformation("...setting last merge date for {loaderName}.{dateColumn} to {lastMergeDateTime}", loaderName, dateColumn, lastMergeDateTime);
+
+        var updateQuery = new SqlKata.Query(mergeStateTableName)
+          .Where("Property", dateColumn)
+          .Where("Loader", loaderName)
+          .AsUpdate(
+          new
+          {
+              LastDateLoadedUtc = lastMergeDateTime
+          });
+
+        var updateSql = destinationDbProvider.SqlCompiler.Compile(updateQuery).ToString();
+
+        var result = SqlTask.ExecuteNonQuery(destinationDbProvider.ConnectionManager, updateSql);
+
+        return result == 1;
+    }
+
+    private void LogMergeAnalytics(int inserts, int updates, int unchanged, LoaderMergeStates lastMergeDateTimeStampInfo)
+    {
+        var lastMergeDateTimeStamp = DateTime.MinValue;
+        
+        var info = lastMergeDateTimeStampInfo.Values.Select(v => v.LastDateLoadedUtc);
+
+        if (info.Any())
+        {
+            lastMergeDateTimeStamp = info.Max();
+        }
+
         if (inserts == 0 && updates == 0)
         {
-            if (nochanges > 0)
+            if (unchanged > 0)
             {
                 _logger.LogInformation(
-                    "{nochanges} records found but no change found to merge, last merge at: {lastMergeDateTimeStamp}", nochanges, lastMergeDateTimeStamp);
+                    "{nochanges} records found but no change found to merge, last merge at: {lastMergeDateTimeStamp}", unchanged, lastMergeDateTimeStamp);
             }
             else
             {
@@ -316,76 +379,20 @@ public class EtlExecutor : IEtlExecutor
             return;
         }
 
+        var changes = lastMergeDateTimeStampInfo.Values
+            .Where(v => v.Updated)
+            .Select(v => v.LastDateLoadedUtc);
+
+        if (changes.Any())
+        {
+            lastMergeDateTimeStamp = changes.Max();
+        }
+
         _logger.LogInformation("{inserts} records inserted, last merge at {lastMergeDateTimeStamp}", inserts, lastMergeDateTimeStamp);
+
         _logger.LogInformation("{updates} records updated, last merge at {lastMergeDateTimeStamp}", updates, lastMergeDateTimeStamp);
 
-        foreach (var (dateColumn, (timeStamp, updated)) in newLastMergeDateTimeStamp)
-        {
-            if (updated)
-            {
-                SetLastMergeDateTimeStamp(destinationDb, loader.Name, dateColumn, timeStamp, destinationSqlCompiler, service.Database!.DatabaseProvider!);
-            }
-        }
+        return;
     }
 
-    private static DateTime GetLastMergeDateTimeStamp(IConnectionManager destinationDb, string loaderName, string dateColumn, 
-        Compiler destinationSqlCompiler, IDatabaseProvider destinationDbProvider)
-    {
-        var lastMergeDateTime = DateTime.MinValue;
-
-        var mergeStateTableName = destinationDbProvider.ToTableNameForSqlRaw(DatabaseObject.MergeStateTableName, DatabaseObject.MetadataSchemaName);
-
-        var findQuery = new Query(mergeStateTableName)
-                .Where("Property", dateColumn)
-                .Where("Loader", loaderName)
-                .Select("LastDateLoadedUtc");
-
-        var findSql = destinationSqlCompiler.Compile(findQuery).ToString();
-
-        object? resultDate = null;
-        SqlTask.ExecuteReader(destinationDb, findSql, r => resultDate = r);
-        if (resultDate is not null)
-        {
-            return (DateTime)resultDate;
-        }
-
-        var insertQuery = new Query(mergeStateTableName).AsInsert(
-        new
-        {
-            Loader = loaderName,
-            Property = dateColumn,
-            LastDateLoadedUtc = lastMergeDateTime
-        });
-
-        var insertSql = destinationSqlCompiler.Compile(insertQuery).ToString();
-
-        SqlTask.ExecuteNonQuery(destinationDb, insertSql);
-
-        return lastMergeDateTime;
-
-    }
-
-    private bool SetLastMergeDateTimeStamp(IConnectionManager destinationDb, string loaderName,
-        string dateColumn, DateTime lastMergeDateTime, Compiler destinationSqlCompiler,
-        IDatabaseProvider destinationDbProvider)
-    {
-        var mergeStateTableName = destinationDbProvider.ToTableNameForSqlRaw(DatabaseObject.MergeStateTableName, DatabaseObject.MetadataSchemaName);
-
-        _logger.LogInformation("...setting last merge date for {loaderName}.{dateColumn} to {lastMergeDateTime}", loaderName, dateColumn, lastMergeDateTime);
-
-        var updateQuery = new Query(mergeStateTableName)
-          .Where("Property", dateColumn)
-          .Where("Loader", loaderName)
-          .AsUpdate(
-          new
-          {
-              LastDateLoadedUtc = lastMergeDateTime
-          });
-
-        var updateSql = destinationSqlCompiler.Compile(updateQuery).ToString();
-
-        var result = SqlTask.ExecuteNonQuery(destinationDb, updateSql);
-
-        return result == 1;
-    }
 }

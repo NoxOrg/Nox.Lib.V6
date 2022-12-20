@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using ETLBoxOffice.LicenseManager;
-using Microsoft.Azure.KeyVault;
+﻿using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
 using Nox.Core.Constants;
@@ -34,23 +32,23 @@ public class ConfigurationHelper
             "ConnectionString:AzureServiceBus",
             "ConnectionString:MasterDataSource",
             "XECurrency:ApiPassword",
-            "XECurrency:ApiUser",
-            "EtlBox:LicenseKey",
+            "XECurrency:ApiUser"
         };
-        
-        var secrets = GetSecrets(keyVaultUri, keys).GetAwaiter().GetResult();
-        
-        if (secrets == null)
+
+        try
         {
-            throw new ConfigurationException($"Error loading secrets from vault at '{keyVaultUri}'");
+            var secrets = GetSecrets(keyVaultUri, keys).GetAwaiter().GetResult();
+
+            //Api endpoint config
+            secrets!.Add(new KeyValuePair<string, string>("ServiceApiEndpointProvider", ""));
+
+            configBuilder.AddInMemoryCollection(secrets!);
+
         }
-        
-        //Api endpoint config
-        secrets.Add(new KeyValuePair<string, string>("ServiceApiEndpointProvider", ""));
-        
-        configBuilder.AddInMemoryCollection(secrets!);
-        
-        LicenseCheck.LicenseKey = secrets.First(s => s.Key.Equals("EtlBox:LicenseKey")).Value;
+        catch
+        {
+            // throw new ConfigurationException($"Error loading secrets from vault at '{keyVaultUri}'");
+        }
 
         return configBuilder.Build();
     }

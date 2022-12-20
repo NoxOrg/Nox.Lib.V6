@@ -5,7 +5,7 @@ namespace Nox.Core.Validation.Configuration;
 
 public class LoaderConfigValidator: AbstractValidator<LoaderConfiguration>
 {
-    public LoaderConfigValidator(List<EntityConfiguration>? entities, List<DatabaseConfiguration>? dataSources, List<MessagingProviderConfiguration>? msgProviders)
+    public LoaderConfigValidator(List<EntityConfiguration>? entities, List<DataSourceConfiguration>? dataSources, List<MessagingProviderConfiguration>? msgProviders)
     {
         RuleFor( loader => loader.Name)
             .NotEmpty()

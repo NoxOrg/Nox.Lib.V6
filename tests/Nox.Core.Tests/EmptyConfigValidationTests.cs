@@ -23,8 +23,8 @@ public class EmptyConfigValidationTests
     [Test]
     public void Must_validate_empty_database_config()
     {
-        var config = new DatabaseConfiguration();
-        var validator = new DatabaseConfigValidator();
+        var config = new DataSourceConfiguration();
+        var validator = new DataSourceConfigValidator();
         var result = validator.Validate(config);
         Assert.That(result.IsValid, Is.False);
         Assert.That(result.Errors.Count, Is.EqualTo(2));

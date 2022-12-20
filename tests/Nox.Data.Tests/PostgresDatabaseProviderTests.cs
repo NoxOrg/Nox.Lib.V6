@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Nox.Core.Constants;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Models;
@@ -35,8 +36,8 @@ public class PostgresDatabaseProviderTests : DataTestFixture
     [TestCase("unknown")]
     public void Can_Convert_Database_Column_Type(string typeName, int width = 0, int precision = 0)
     {
-        var factory = TestServiceProvider!.GetRequiredService<IDatabaseProviderFactory>();
-        var provider = factory.Create("postgres");
+        var factory = TestServiceProvider!.GetRequiredService<IDataProviderFactory>();
+        var provider = factory.Create(DataProvider.Postgres);
         var attr = new EntityAttribute
         {
             Name = "DbColumn",
@@ -105,8 +106,8 @@ public class PostgresDatabaseProviderTests : DataTestFixture
     [Test]
     public void Can_Convert_a_Table_Name()
     {
-        var factory = TestServiceProvider!.GetRequiredService<IDatabaseProviderFactory>();
-        var provider = factory.Create("postgres");
+        var factory = TestServiceProvider!.GetRequiredService<IDataProviderFactory>();
+        var provider = factory.Create(DataProvider.Postgres);
         var result = provider.ToTableNameForSql("MyTable", "MySchema");
         Assert.AreEqual("\"MySchema\".\"MyTable\"", result);
     }
@@ -114,8 +115,8 @@ public class PostgresDatabaseProviderTests : DataTestFixture
     [Test]
     public void Can_Convert_a_raw_Table_Name()
     {
-        var factory = TestServiceProvider!.GetRequiredService<IDatabaseProviderFactory>();
-        var provider = factory.Create("postgres");
+        var factory = TestServiceProvider!.GetRequiredService<IDataProviderFactory>();
+        var provider = factory.Create(DataProvider.Postgres);
         var result = provider.ToTableNameForSqlRaw("MyTable", "MySchema");
         Assert.AreEqual("MySchema.MyTable", result);
     }

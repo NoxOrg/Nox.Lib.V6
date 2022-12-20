@@ -16,7 +16,7 @@ public static class ConfigurationExtensions
         var mapperConfig = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<NoxConfiguration, MetaService>();
-            cfg.CreateMap<DatabaseConfiguration, ServiceDatabase>();
+            cfg.CreateMap<DataSourceConfiguration, ServiceDatabase>();
             cfg.CreateMap<ApiConfiguration, Api.Api>();
             cfg.CreateMap<ApiRouteConfiguration, Api.ApiRoute>();
             cfg.CreateMap<ApiRouteParameterConfiguration, Api.ApiRouteParameter>();

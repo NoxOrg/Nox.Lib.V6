@@ -51,9 +51,37 @@ public static class MessageExtensions
                 foreach (var prop in payload.GetType().GetProperties())
                 {
                     var sourceVal = sourceDict[prop.Name];
+
                     try
                     {
-                        prop.SetValue(payload, sourceVal);
+                        // when reading from json, numbers and booleans are long - will AutoMapper handle this better? A.S.
+                        if(sourceVal.GetType().Equals(prop.PropertyType))
+                        {
+                            prop.SetValue(payload, sourceVal);
+                        }
+                        else if (sourceVal is long) 
+                        {
+                            if (prop.PropertyType.Equals(typeof(Int32)))
+                            {
+                                prop.SetValue(payload, Convert.ToInt32(sourceVal));
+                            }
+                            else if (prop.PropertyType.Equals(typeof(bool)))
+                            {
+                                prop.SetValue(payload, Convert.ToBoolean(sourceVal));
+                            }
+                            else 
+                            {
+                                prop.SetValue(payload, Convert.ChangeType(sourceVal, prop.PropertyType));
+                            }
+                        }
+                        else if (sourceVal is int && prop.PropertyType.Equals(typeof(bool)))
+                        {
+                            prop.SetValue(payload, Convert.ToBoolean(sourceVal));
+                        }
+                        else
+                        {
+                            prop.SetValue(payload, Convert.ChangeType(sourceVal, prop.PropertyType));
+                        }
                     }
                     catch 
                     {
@@ -66,4 +94,5 @@ public static class MessageExtensions
         }
         return result;
     }
+
 }

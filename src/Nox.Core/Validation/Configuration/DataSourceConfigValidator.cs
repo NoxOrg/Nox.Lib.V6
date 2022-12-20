@@ -3,9 +3,9 @@ using Nox.Core.Configuration;
 
 namespace Nox.Core.Validation.Configuration;
 
-public class DatabaseConfigValidator: AbstractValidator<DatabaseConfiguration>
+public class DataSourceConfigValidator: AbstractValidator<DataSourceConfiguration>
 {
-    public DatabaseConfigValidator()
+    public DataSourceConfigValidator()
     {
         RuleFor( db => db.Name)
             .NotEmpty()

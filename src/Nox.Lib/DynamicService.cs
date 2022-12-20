@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Nox.Core.Components;
+using Nox.Core.Constants;
 using Nox.Core.Exceptions;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Api;
@@ -66,7 +67,7 @@ public class DynamicService : IDynamicService
         IConfiguration appConfig,
         INoxConfiguration noxConfig,
         IEtlExecutor etlExecutor,
-        IDatabaseProviderFactory factory,
+        IDataProviderFactory factory,
         INoxMessenger messenger)
     {
         _logger = logger;
@@ -102,7 +103,7 @@ public class DynamicService : IDynamicService
         AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(MetaBase)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
         AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(DynamicService)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
         AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(Loader)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
-        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(DatabaseBase)), typeof(DatabaseBase), DatabaseObject.MetadataSchemaName);
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(DataSourceBase)), typeof(DataSourceBase), DatabaseObject.MetadataSchemaName);
         AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(ServiceDatabase)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
         AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(Api.Api)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
         AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(MessagingProvider)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
@@ -154,7 +155,7 @@ public class DynamicService : IDynamicService
         {
             modelBuilder.Entity(metaType, b =>
             {
-                _metaService.Database!.DatabaseProvider!.ConfigureEntityTypeBuilder(b, metaType.Name, schema);
+                _metaService.Database!.DataProvider!.ConfigureEntityTypeBuilder(b, metaType.Name, schema);
 
                 var entityTypes = modelBuilder.Model.GetEntityTypes();
 
@@ -181,7 +182,7 @@ public class DynamicService : IDynamicService
                     }
                     else if (typeString == "object")
                     {
-                        var dbType = _metaService.Database.DatabaseProvider!.ToDatabaseColumnType(new EntityAttribute() { Type = "object" });
+                        var dbType = _metaService.Database.DataProvider!.ToDatabaseColumnType(new EntityAttribute() { Type = "object" });
 
                         b.Property(prop.Name).HasColumnType(dbType);
                     }
@@ -193,12 +194,14 @@ public class DynamicService : IDynamicService
     private class Configurator
     {
         private readonly DynamicService _dynamicService;
-        private IDatabaseProviderFactory? _factory;
+        private IDataProviderFactory? _factory;
         private ILogger? _logger;
         private IMetaService? _service;
         private IConfiguration? _appConfig;
         private INoxConfiguration? _noxConfig;
+#pragma warning disable IDE0052 // Remove unread private members
         private INoxMessenger? _messenger;
+#pragma warning restore IDE0052 // Remove unread private members
         
         public Configurator(DynamicService dynamicService)
         {
@@ -224,7 +227,7 @@ public class DynamicService : IDynamicService
             return this;
         }
         
-        public Configurator WithDatabaseProviderFactory(IDatabaseProviderFactory factory)
+        public Configurator WithDatabaseProviderFactory(IDataProviderFactory factory)
         {
             _factory = factory;
             return this;
@@ -244,18 +247,18 @@ public class DynamicService : IDynamicService
 
             _service.Validate();
             _service.Configure();
-            //if (_messenger != null) _messenger.Configure(_service.MessagingProviders);
+            // if (_messenger != null) _messenger.Configure(_service.MessagingProviders);
             
             serviceDatabases.ToList().ForEach(db =>
             {
-                db.DatabaseProvider = _factory!.Create(db.Provider);
-                db.DatabaseProvider.ConfigureServiceDatabase(db, _service.Name);
+                db.DataProvider = _factory!.Create(db.Provider);
+                db.DataProvider.Configure(db, _service.Name);
             });
 
             return _service;
         }
         
-        private void ResolveConfigurationVariables(IList<IServiceDatabase> serviceDatabases)
+        private void ResolveConfigurationVariables(IList<IServiceDataSource> serviceDatabases)
         {
             _logger!.LogInformation("Resolving all configuration variables...");
             // populate variables from application config
@@ -279,8 +282,6 @@ public class DynamicService : IDynamicService
                 }    
             }
             
-            variables.Add("EtlBox:LicenseKey", _appConfig?["EtlBox:LicenseKey"]);
-
             // try key vault where app configuration is missing 
             if (variables.Any(v => v.Value == null))
             {
@@ -345,9 +346,9 @@ public class DynamicService : IDynamicService
             }
         }
 
-        private IList<IServiceDatabase> GetServiceDatabasesFromNoxConfig()
+        private IList<IServiceDataSource> GetServiceDatabasesFromNoxConfig()
         {
-            var serviceDatabases = new List<IServiceDatabase>
+            var serviceDatabases = new List<IServiceDataSource>
             {
                 _service!.Database!
             };

@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using Nox.Core.Constants;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Database;
 
 namespace Nox.Core.Components;
 
-public class DatabaseBase : MetaBase, IServiceDatabase
+public class DataSourceBase : MetaBase, IServiceDataSource
 {
     public string Name { get; set; } = string.Empty;
     public string Provider { get; set; } = string.Empty;
@@ -17,7 +18,7 @@ public class DatabaseBase : MetaBase, IServiceDatabase
     public string? ConnectionVariable { get; set; }
         
     [NotMapped]
-    public IDatabaseProvider? DatabaseProvider { get; set; }
+    public IDataProvider? DataProvider { get; set; }
 
     public virtual bool ApplyDefaults()
     {
@@ -27,16 +28,19 @@ public class DatabaseBase : MetaBase, IServiceDatabase
 
         switch (Provider)
         {
-            case "sqlserver":
+            case Constants.DataProvider.SqlServer:
                 if (Port == 0) Port = 1433;
                 break;
 
-            case "postgres":
+            case Constants.DataProvider.Postgres:
                 if (Port == 0) Port = 5432;
                 break;
 
-            case "mysql":
+            case Constants.DataProvider.MySql:
                 if (Port == 0) Port = 3306;
+                break;
+
+            case Constants.DataProvider.Json:
                 break;
 
             default:

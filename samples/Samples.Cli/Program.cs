@@ -57,7 +57,7 @@ internal class Program
             .CreateDefaultBuilder(args)
             .ConfigureServices((_, services) =>
             {
-                services.AddNoxMessaging();
+                services.AddNoxListeners();
             })
             .UseSerilog();
 

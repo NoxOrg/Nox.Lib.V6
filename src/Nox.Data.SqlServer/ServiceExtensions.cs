@@ -8,7 +8,7 @@ public static class ServiceExtensions
 {
     public static IServiceCollection AddSqlServerDatabaseProvider(this IServiceCollection services)
     {
-        services.AddTransient<IDatabaseProvider, SqlServerDatabaseProvider>();
+        services.AddTransient<IDataProvider, SqlServerDatabaseProvider>();
         return services;
     }
 }

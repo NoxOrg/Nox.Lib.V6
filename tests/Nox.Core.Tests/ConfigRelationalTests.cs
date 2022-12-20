@@ -39,13 +39,13 @@ public class ConfigRelationalTests
             DefinitionFileName = "test.yaml",
             DataSource = "TestSource"
         };
-        var sourcesConfig = new List<DatabaseConfiguration>();
+        var sourcesConfig = new List<DataSourceConfiguration>();
         
         var validator = new LoaderSourceConfigValidator(sourcesConfig);
         var result = validator.Validate(sourceConfig);
         Assert.That(result.IsValid, Is.False);
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("The Loader data source TestSource in test.yaml does not exist in the service definition yaml")));
-        sourcesConfig.Add(new DatabaseConfiguration
+        sourcesConfig.Add(new DataSourceConfiguration
         {
             Name = "TestSource"
         });

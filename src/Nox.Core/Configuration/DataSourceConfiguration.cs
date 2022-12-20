@@ -2,7 +2,7 @@ using Nox.Core.Components;
 
 namespace Nox.Core.Configuration;
 
-public class DatabaseConfiguration: MetaBase
+public class DataSourceConfiguration: MetaBase
 {
     public string Name { get; set; } = string.Empty;
     public string Provider { get; set; } = string.Empty;
