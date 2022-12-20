@@ -39,29 +39,48 @@ public static class ServiceExtensions
         if (noxConfig.MessagingProviders != null && noxConfig.MessagingProviders.Any())
         {
             services.AddSingleton<INoxMessenger, NoxMessenger>();
+            var isRabbitAdded = false;
+            var isAzureAdded = false;
+            var isAmazonAdded = false;
+            var isMemoryAdded = false;
+            
             foreach (var msgProvider in noxConfig.MessagingProviders)
             {
                 switch (msgProvider.Provider!.ToLower())
                 {
                     case "rabbitmq":
-                        services.AddRabbitMqBus(msgProvider, isExternalListener); 
+                        if (!isRabbitAdded)
+                        {
+                            services.AddRabbitMqBus(msgProvider, isExternalListener);
+                            isRabbitAdded = true;    
+                        }
                         break;
                     case "azureservicebus":
-                        services.AddAzureBus(msgProvider, isExternalListener); 
+                        if (!isAzureAdded)
+                        {
+                            services.AddAzureBus(msgProvider, isExternalListener);
+                            isAzureAdded = true;
+                        }
                         break;
                     case "amazonsqs":
-                        services.AddAmazonBus(msgProvider, isExternalListener); 
+                        if (!isAmazonAdded)
+                        {
+                            services.AddAmazonBus(msgProvider, isExternalListener);
+                            isAmazonAdded = true;
+                        }
                         break;
-                    case "inmemory": 
-                        services.AddInMemoryBus();
-                        break;
-                    case "mediator":
-                        services.AddNoxMediator();
+                    case "inmemory":
+                        if (!isMemoryAdded)
+                        {
+                            services.AddInMemoryBus();
+                            isMemoryAdded = true;
+                        }
                         break;
                 }
             }
         }
 
+        if (!isExternalListener) services.AddNoxMediator();
         services.AddNoxEvents();
         return services;
     }

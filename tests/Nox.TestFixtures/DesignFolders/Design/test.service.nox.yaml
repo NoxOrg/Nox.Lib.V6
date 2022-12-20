@@ -42,4 +42,5 @@ DataSources:
     User: TestUser
     Password: TestPassword
   - Name: TestDataSource3
+    Provider: TestProvider
     ConnectionVariable: TestConnectionVariable
