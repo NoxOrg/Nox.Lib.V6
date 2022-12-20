@@ -236,7 +236,7 @@ $goo.Command.Add( 'main', { param( $featureName )
 
 ## extract a version object (file, xpath, value) table from all csproj files
 $goo.Command.Add( 'get-project-version-table', {
-    $files = (Get-ChildItem "*.csproj" -Recurse)
+    $files = (Get-ChildItem -Filter "*.csproj" -Recurse)
     $xml = New-Object XML
     $xpaths = @("//AssemblyVersion","//FileVersion","//PackageVersion","//PackageReference[@Include='Nox.Lib']/@Version")
     $versionInfoTable = @()
