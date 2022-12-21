@@ -12,18 +12,16 @@ namespace Nox.TestFixtures;
 [TestFixture]
 public class MessagingTestFixture: ConfigurationTestFixture
 {
-    protected IServiceProvider? TestServiceProvider;
-    
     [OneTimeSetUp]
     public void Setup()
     {
         TestServices.AddLogging();
-        TestServices
+        TestServices!
             .AddSingleton<IDynamicModel, DynamicModel>()
             .AddSingleton<IDynamicService, DynamicService>();
     }
 
-    public void BuildServiceProvider()
+    protected void BuildServiceProvider()
     {
         TestServiceProvider = TestServices!.BuildServiceProvider();
     }

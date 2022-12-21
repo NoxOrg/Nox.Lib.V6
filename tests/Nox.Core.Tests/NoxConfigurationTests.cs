@@ -84,7 +84,7 @@ public class ConfigurationTests: ConfigurationTestFixture
         Assert.That(testDataSource, Is.Not.Null);
         Assert.That(testDataSource!.Name, Is.EqualTo("TestDataSource1"));
         Assert.That(testDataSource.Password, Is.EqualTo("password"));
-        Assert.That(testDataSource.Provider, Is.EqualTo("TestProvider"));
+        Assert.That(testDataSource.Provider, Is.EqualTo("SqlServer"));
         Assert.That(testDataSource.Server, Is.EqualTo("localhost"));
         Assert.That(testDataSource.User, Is.EqualTo("user"));
         

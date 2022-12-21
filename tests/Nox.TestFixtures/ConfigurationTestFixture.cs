@@ -8,16 +8,18 @@ namespace Nox.TestFixtures;
 [TestFixture]
 public class ConfigurationTestFixture
 {
-    protected IServiceCollection TestServices = new ServiceCollection();
+    protected IServiceProvider? TestServiceProvider;
+    protected IServiceCollection? TestServices;
     
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
+        TestServices = new ServiceCollection();
         Environment.SetEnvironmentVariable("ENVIRONMENT", "");
         var config = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
             .Build();
         TestServices.AddSingleton<IConfiguration>(config);
+        TestServiceProvider = TestServices.BuildServiceProvider();
     }
-    
 }

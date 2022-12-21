@@ -15,7 +15,7 @@ public class MergeNewSeed
         _con = new SqlConnection(configuration["ConnectionString:Master"]);
     }
 
-    public async Task Execute(bool drop = true)
+    public async Task Insert(bool drop = true, int rowCount = 100)
     {
         await _con.OpenAsync();
         if (drop)
@@ -30,13 +30,18 @@ public class MergeNewSeed
             await RunScript("use TestSource");
         }
         
-        for (var day = 0; day < 5; day++)
+        for (var row = 0; row < rowCount; row++)
         {
-            for (var i = 0; i < 20; i++)
-            {
-                await SeedVehicle(DateTime.Now.AddDays(-1*day), DateTime.Now.AddDays(-1*day));
-            }
+            await SeedVehicle(DateTime.Now, DateTime.Now);
         }
+        await _con.CloseAsync();
+    }
+
+    public async Task Update(int rowCount)
+    {
+        await _con.OpenAsync();
+        await RunScript("use TestSource");
+        await RunScript($"UPDATE TOP ({rowCount}) dbo.SourceVehicle SET EditDate = '{DateTime.Now}'");
         await _con.CloseAsync();
     }
 

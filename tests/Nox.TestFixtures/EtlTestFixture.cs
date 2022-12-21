@@ -12,18 +12,16 @@ namespace Nox.TestFixtures;
 [TestFixture]
 public class EtlTestFixture: ConfigurationTestFixture
 {
-    protected IServiceProvider? TestServiceProvider;
-    
     [OneTimeSetUp]
     public void Setup()
     {
         TestServices.AddLogging();
-        TestServices
+        TestServices!
             .AddDataProviderFactory()
             .AddDbContext<IDynamicDbContext, DynamicDbContext>()
             .AddSingleton<IDynamicModel, DynamicModel>()
             .AddSingleton<IDynamicService, DynamicService>();
-        TestServices.AddSingleton<SqlHelper>();
+        TestServices!.AddSingleton<SqlHelper>();
         TestServiceProvider = TestServices.BuildServiceProvider();
     }
 }

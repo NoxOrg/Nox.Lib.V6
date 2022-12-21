@@ -15,7 +15,6 @@ public class DynamicDbContextTests: DataTestFixture
     [Test]
     public void Can_Get_a_Dynamic_Collection()
     {
-        BuildServiceProvider();
         var context = TestServiceProvider!.GetRequiredService<DynamicDbContext>();
         var dynamicQueryable = context.GetDynamicCollection("People");
         Assert.NotNull(dynamicQueryable);
@@ -28,8 +27,6 @@ public class DynamicDbContextTests: DataTestFixture
     [Test]
     public void Can_Get_Dynamic_Single_Result()
     {
-        AddSqlServerContainer();
-        BuildServiceProvider();
         var context = TestServiceProvider!.GetRequiredService<DynamicDbContext>();
         var result = context.GetDynamicSingleResult("People", 1);
         Assert.NotNull(result);
@@ -39,8 +36,6 @@ public class DynamicDbContextTests: DataTestFixture
     [Test]
     public async Task Can_Get_Dynamic_Navigation_and_property()
     {
-        AddSqlServerContainer();
-        BuildServiceProvider();
         TestServiceProvider!.GetRequiredService<IDynamicModel>();
         var testSeed = TestServiceProvider!.GetRequiredService<TestSqlSeed>();
         await testSeed.Execute();
