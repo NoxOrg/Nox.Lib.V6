@@ -10,25 +10,33 @@ using Newtonsoft.Json.Linq;
 using YamlDotNet.Serialization;
 
 namespace Nox.Generator;
+#pragma warning disable RS2008 // Disable analyzer release tracking
 
 [Generator]
 public class NoxDynamicGenerator : ISourceGenerator
 {
     private readonly DiagnosticDescriptor NI0000 = new DiagnosticDescriptor("NI0000", "Nox Generator Debug", "{0}", "Debug", DiagnosticSeverity.Info, true);
-    //Warnings
+
+    #region Warnings
+
     private readonly DiagnosticDescriptor NW0001 = new("NW0001", "No yaml definitions",
         "Nox.Generator will not contribute to your project as no yaml definitions were found", "Design",
         DiagnosticSeverity.Warning, true);
-    
+
+    #endregion Warnings
+
+    #region Errors
+
     private readonly DiagnosticDescriptor NW0002 = new("NW0002", "AppSettings",
         "DefinitionRootPath value not found in appsettings.json", "Design",
         DiagnosticSeverity.Warning, true);
-    //Errors
+
     private readonly DiagnosticDescriptor NE0001 = new("NE0001", "Duplicate Entity",
         "Duplicate entity detected in yaml configuration: {0}", "Design",
         DiagnosticSeverity.Error, true);
 
-    
+    #endregion Errors
+
     private List<string>? _entityNames;
     
     public void Initialize(GeneratorInitializationContext context)
@@ -202,3 +210,4 @@ public class NoxDynamicGenerator : ISourceGenerator
         context.AddSource(hintName, source);
     }
 }
+#pragma warning restore RS2008 // Enable analyzer release tracking
