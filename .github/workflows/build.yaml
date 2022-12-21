@@ -28,30 +28,22 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build --warnaserror --configuration Release --no-restore
-
-  test:
-    defaults:
-      run:
-        working-directory: tests
-        
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        dotnet-version: ['6.0.x']
-
-    steps:
-      - uses: actions/checkout@v3
       - name: Core Tests
+        working-directory: tests
         run: dotnet test Nox.Core.Tests --no-restore --verbosity normal
       - name: Data Tests
+        working-directory: tests
         run: dotnet test Nox.Data.Tests --no-restore --verbosity normal
       - name: Etl Tests
+        working-directory: tests
         run: dotnet test Nox.Etl.Tests --no-restore --verbosity normal
       - name: Generator Tests
+        working-directory: tests
         run: dotnet test Nox.Generator.Tests --no-restore --verbosity normal
       - name: Messaging Tests
+        working-directory: tests
         run: dotnet test Nox.Messaging.Tests --no-restore --verbosity normal
-    
+  
 
 # Removed comments once tests all run
 #      - name: Test

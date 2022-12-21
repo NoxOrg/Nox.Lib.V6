@@ -35,7 +35,6 @@ jobs:
         run: |
           New-Item -Path ./.sonar/scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
-          dotnet tool install --global dotnet-coverage
 
       - name: Build and analyze
         env:
@@ -45,5 +44,6 @@ jobs:
         run: |
           ./.sonar/scanner/dotnet-sonarscanner begin /k:"NoxOrg_Nox" /o:"noxorg" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
           dotnet build ./src --warnaserror --configuration Release --no-incremental
+          dotnet tool install --global dotnet-coverage
           dotnet-coverage collect 'dotnet test ./src' -f xml  -o 'coverage.xml'
           ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
