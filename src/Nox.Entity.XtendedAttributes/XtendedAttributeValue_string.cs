@@ -2,6 +2,6 @@
 
 public sealed class XtendedAttributeValue_string : XtendedAttributeValue
 {
-    public string? Value { get; set; }
+    public string Value { get; set; } = string.Empty;
 }
 

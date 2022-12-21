@@ -20,6 +20,7 @@ public sealed class MetaService : MetaBase, IMetaService
     public string Description { get; set; } = string.Empty;
     public string EndpointProvider { get; set; } = string.Empty;
     public string KeyVaultUri { get; set; } = KeyVault.DefaultKeyVaultUri;
+    public bool AutoMigrations { get; set; } = true;
 
     IServiceDataSource? IMetaService.Database
     {

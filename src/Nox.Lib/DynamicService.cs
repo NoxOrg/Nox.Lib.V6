@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using Hangfire;
@@ -33,6 +34,7 @@ public class DynamicService : IDynamicService
     public string Name => _metaService.Name;
     public IMetaService MetaService => _metaService;
     public string KeyVaultUri => _metaService.KeyVaultUri;
+    public bool AutoMigrations => _metaService.AutoMigrations;
     public IReadOnlyDictionary<string, IEntity>? Entities
     {
         get
@@ -135,12 +137,15 @@ public class DynamicService : IDynamicService
         }
     }
 
-    public void EnsureDatabaseCreated(DbContext dbContext)
+    public void EnsureDatabaseCreatedIfAutoMigrationsIsSet(DbContext dbContext)
     {
-        if (dbContext.Database.EnsureCreated())
+        if (_metaService.AutoMigrations)
         {
-            dbContext.Add((MetaService)_metaService);
-            dbContext.SaveChanges();    
+            if (dbContext.Database.EnsureCreated())
+            {
+                dbContext.Add((MetaService)_metaService);
+                dbContext.SaveChanges();
+            }
         }
     }
 
@@ -167,7 +172,7 @@ public class DynamicService : IDynamicService
 
                 foreach (var prop in properties)
                 {
-                    if (prop.GetCustomAttributes(typeof(NotMappedAttribute), false).Length > 0)
+                    if (prop.GetCustomAttributes<NotMappedAttribute>().Any())
                         continue;
 
                     var typeString = prop.PropertyType.Name.ToLower();
@@ -176,9 +181,21 @@ public class DynamicService : IDynamicService
                     {
                         b.Property(prop.Name).HasMaxLength(128);
                     }
+                    if (typeString == "string")
+                    {
+                        var attr = prop.GetCustomAttributes<MaxLengthAttribute>(false);
+                        if (attr.Any())
+                        {
+                            b.Property(prop.Name).HasMaxLength(attr.First().Length);
+                        }
+                        else
+                        {
+                            b.Property(prop.Name).HasMaxLength(128);
+                        }
+                    }
                     else if (typeString == "decimal")
                     {
-                        b.Property(prop.Name).HasPrecision(9, 6);
+                        b.Property(prop.Name).HasPrecision(38, 18);
                     }
                     else if (typeString == "object")
                     {

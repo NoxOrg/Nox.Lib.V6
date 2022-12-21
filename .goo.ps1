@@ -78,6 +78,9 @@ $goo.Command.Add( 'init', {
     $goo.Command.Run( 'clean' )
     $goo.Command.Run( 'build' )
     $goo.Command.Run( 'up' )
+    $goo.Command.Run( 'waitfordb' )
+    $goo.Command.Run( 'migr-add', "InitialCreate" )
+    $goo.Command.Run( 'migr-dbupdate' )
     $goo.Command.Run( 'run' )
 })
 
@@ -88,6 +91,7 @@ $goo.Command.Add( 'clean', {
     $goo.IO.EnsureRemoveFolder("./.docker-data")
     $goo.IO.EnsureRemoveFolder("./dist")
     $goo.IO.EnsureRemoveFolder("./src/dist")
+    $goo.IO.EnsureRemoveFolder("$script:ProjectFolder\Migrations")
     $goo.Command.RunExternal('dotnet','restore --verbosity:quiet --nologo',$script:SolutionFolder)
     $goo.Command.RunExternal('dotnet','clean --verbosity:quiet --nologo',$script:SolutionFolder)
     $goo.StopIfError("Failed to clean previous builds. (Release)")
@@ -101,6 +105,28 @@ $goo.Command.Add( 'build', {
     $goo.StopIfError("Failed to build solution. (Release)")
     $goo.Command.RunExternal('dotnet','publish --configuration Release --output ..\dist --no-build', $script:ProjectFolder )
     $goo.StopIfError("Failed to publish CLI project. (Release)")
+})
+
+# command: goo migr-add <name> | Add a migration to the project called "<name>"
+$goo.Command.Add( 'migr-add', { param([string]$name)
+    if([string]::IsNullOrWhiteSpace($name)) { $goo.Error("You need to specify a migration name.") }
+    $goo.Console.WriteInfo("Adding migration [$name]...")
+    $goo.Command.RunExternal('dotnet',"ef migrations add ""$name"" --context NoxDbContext", $script:ProjectFolder)
+    $goo.StopIfError("Failed to add migration.")
+})
+
+# command: goo migr-remove | Undo the last migration addition from the project
+$goo.Command.Add( 'migr-remove', { 
+    $goo.Console.WriteInfo("Removing last migration...")
+    $goo.Command.RunExternal('dotnet',"ef migrations remove --context NoxDbContext", $script:ProjectFolder)
+    $goo.StopIfError("Failed to remove migration.")
+})
+
+# command: goo migr-dbupdate | Update the database to the latest migration
+$goo.Command.Add( 'migr-dbupdate', { 
+    $goo.Console.WriteInfo("Migrating the the database...")
+    $goo.Command.RunExternal('dotnet',"ef database update --context NoxDbContext", $script:ProjectFolder)
+    $goo.StopIfError("Failed to migrate the databse.")
 })
 
 # command: goo up | Starts your local SQL Server in a Docker container
@@ -194,13 +220,6 @@ $goo.Command.Add( 'push', { param( $message )
     }
 })
 
-# command: goo pr | Performs and merges a pull request, checkout main and publish'
-$goo.Command.Add( 'pr', { 
-    gh pr create --fill
-    if($?) { gh pr merge --merge }
-    $goo.Command.Run( 'main' )
-})
-
 # command: goo main | Checks out the main branch and prunes features removed at origin
 $goo.Command.Add( 'main', { param( $featureName )
     $goo.Git.CheckoutMain()
@@ -209,10 +228,9 @@ $goo.Command.Add( 'main', { param( $featureName )
 ### some versioning helpers. TODO: move to goo project at some point
 
 ## extract a version object (file, xpath, value) table from all csproj files
-$goo.Command.Add( 'get-project-version-table', {
-    $files = (Get-ChildItem "*.csproj" -Recurse)
+$goo.Command.Add( 'get-project-version-table', { param($xpaths)
+    $files = (Get-ChildItem -Filter "*.csproj" -Recurse)
     $xml = New-Object XML
-    $xpaths = @("//AssemblyVersion","//FileVersion","//PackageVersion","//PackageReference[@Include='Nox.Lib']/@Version")
     $versionInfoTable = @()
     foreach($file in $files){
         $xml.Load($file)
@@ -277,7 +295,9 @@ $goo.Command.Add( 'set-project-version', { param( $versionInfoTable, $version )
 
 # command: goo bump-version [<version>]| Sets or increments the project version
 $goo.Command.Add( 'bump-version', { param($version)
-    $versionInfoTable = $goo.Command.Run('get-project-version-table')
+    $versionInfoTable = $goo.Command.Run('get-project-version-table', 
+        @("//AssemblyVersion","//FileVersion","//PackageVersion","//PackageReference[@Include='Nox.Lib']/@Version")
+    )
     $versionArray = $null;
     if($null -eq $version){
         $version = $goo.Command.Run('get-project-version-vote', $versionInfoTable)

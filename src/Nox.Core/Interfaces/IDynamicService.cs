@@ -9,6 +9,7 @@ namespace Nox.Core.Interfaces
     {
         string Name { get; }
         string KeyVaultUri { get; }
+        bool AutoMigrations { get; }
         IMetaService MetaService { get; }
         IReadOnlyDictionary<string, IApi>? Apis { get; }
         IReadOnlyDictionary<string, IEntity>? Entities { get; }
@@ -17,6 +18,6 @@ namespace Nox.Core.Interfaces
         Task<bool> ExecuteDataLoadersAsync();
         void AddMetadata(ModelBuilder modelBuilder);
         void SetupRecurringLoaderTasks();
-        void EnsureDatabaseCreated(DbContext dbContext);
+        void EnsureDatabaseCreatedIfAutoMigrationsIsSet(DbContext dbContext);
     }
 }

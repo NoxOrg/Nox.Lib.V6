@@ -2,6 +2,6 @@
 
 public sealed class XtendedAttributeValue_datetime : XtendedAttributeValue
 {
-    public DateTimeOffset? Value { get; set; }
+    public DateTimeOffset Value { get; set; }
 }
 

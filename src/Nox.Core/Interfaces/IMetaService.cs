@@ -11,6 +11,7 @@ public interface IMetaService
     string Name { get; set; }
     string Description { get; set; }
     string KeyVaultUri { get; set; }
+    bool AutoMigrations { get; set; }
     IServiceDataSource? Database { get; set; }
     ICollection<IMessagingProvider>? MessagingProviders { get; set; }
     ICollection<IServiceDataSource>? DataSources { get; set; }
