@@ -1,37 +1,15 @@
 using System;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Nox.Core.Configuration;
 using Nox.Core.Exceptions;
+using Nox.TestFixtures;
 using NUnit.Framework;
 
 namespace Nox.Core.Tests;
 
-public class ConfigurationTests
+public class ConfigurationTests: ConfigurationTestFixture
 {
-    [Test]
-    public void Must_Get_an_Exception_If_AppSettings_Are_Empty()
-    {
-        Environment.SetEnvironmentVariable("ENVIRONMENT", "Empty");
-        var ex = Assert.Throws<ConfigurationException>(() => ConfigurationHelper.GetNoxAppSettings());
-        Assert.That(ex!.Message, Is.EqualTo("Could not find 'Nox:DefinitionRootPath' in environment or appsettings"));
-    }
-    
-    [Test]
-    public void Must_Get_an_Exception_If_Design_Folder_does_not_contain_a_yaml_file()
-    {
-        Environment.SetEnvironmentVariable("ENVIRONMENT", "NoService");
-        var ex = Assert.Throws<ConfigurationException>(() => ConfigurationHelper.GetNoxAppSettings());
-        Assert.That(ex!.Message, Is.EqualTo("Could not find any yaml files in /home/jan/Projects/IWG/Nox/src/Nox.Core.Tests/bin/Debug/net6.0/DesignFolders/EmptyDesign"));
-    }
-    
-    [Test]
-    public void Must_Get_an_Exception_If_Design_Folder_does_not_contain_entity_folders()
-    {
-        Environment.SetEnvironmentVariable("ENVIRONMENT", "NoEntities");
-        var ex = Assert.Throws<ConfigurationException>(() => ConfigurationHelper.GetNoxAppSettings());
-        Assert.That(ex!.Message, Is.EqualTo("Could not find any entity folders in /home/jan/Projects/IWG/Nox/src/Nox.Core.Tests/bin/Debug/net6.0/DesignFolders/NoEntities"));
-    }
-
     [Test]
     public void Can_Load_Nox_Configuration_From_Yaml_Definitions()
     {
@@ -66,48 +44,57 @@ public class ConfigurationTests
         //Entities
         Assert.That(config.Entities, Is.Not.Null);
         Assert.That(config.Entities!.Count, Is.EqualTo(2));
-        Assert.That(config.Entities![0].Attributes.Count, Is.EqualTo(3));
-        Assert.That(config.Entities![0].DefinitionFileName, Is.Not.Empty);
-        Assert.That(config.Entities![0].Description, Is.EqualTo("Vehicles"));
-        Assert.That(config.Entities![0].Name, Is.EqualTo("Vehicle"));
-        Assert.That(config.Entities![0].PluralName, Is.EqualTo("Vehicles"));
-        Assert.That(config.Entities![0].RelatedParents!.Count, Is.EqualTo(1));
-        Assert.That(config.Entities![0].Schema, Is.EqualTo("dbo"));
-        Assert.That(config.Entities![0].Table, Is.EqualTo("Vehicle"));
+        //Person
+        var vehicle = config.Entities.FirstOrDefault(e => e.Name == "Vehicle");
+        Assert.That(vehicle, Is.Not.Null);
+        Assert.That(vehicle!.Attributes.Count, Is.EqualTo(3));
+        Assert.That(vehicle.DefinitionFileName, Is.Not.Empty);
+        Assert.That(vehicle.Description, Is.EqualTo("Vehicles"));
+        Assert.That(vehicle.Name, Is.EqualTo("Vehicle"));
+        Assert.That(vehicle.PluralName, Is.EqualTo("Vehicles"));
+        Assert.That(vehicle.RelatedParents!.Count, Is.EqualTo(1));
+        Assert.That(vehicle.Schema, Is.EqualTo("dbo"));
+        Assert.That(vehicle.Table, Is.EqualTo("Vehicle"));
 
         //Loaders        
         Assert.That(config.Loaders, Is.Not.Null);
         Assert.That(config.Loaders!.Count, Is.EqualTo(2));
-        Assert.That(config.Loaders![0].DefinitionFileName, Is.Not.Empty);
-        Assert.That(config.Loaders![0].Description, Is.EqualTo("Loads vehicle data"));
-        Assert.That(config.Loaders![0].LoadStrategy, Is.Not.Null);
-        Assert.That(config.Loaders![0].LoadStrategy!.Columns, Is.Not.Null);
-        Assert.That(config.Loaders![0].LoadStrategy!.Columns[0], Is.EqualTo("CreateDate"));
-        Assert.That(config.Loaders![0].Messaging, Is.Not.Empty);
-        Assert.That(config.Loaders![0].Messaging!.Count, Is.EqualTo(1));
-        Assert.That(config.Loaders![0].Name, Is.EqualTo("VehicleLoader"));
-        Assert.That(config.Loaders![0].Schedule, Is.Not.Null);
-        Assert.That(config.Loaders![0].Schedule!.Start, Is.EqualTo("Daily at 2am UTC"));
-        Assert.That(config.Loaders![0].Sources, Is.Not.Empty);
-        Assert.That(config.Loaders![0].Sources!.Count, Is.EqualTo(1));
-        Assert.That(config.Loaders![0].Sources![0].DataSource, Is.EqualTo("TestDataSource2"));
-        Assert.That(config.Loaders![0].Sources![0].MinimumExpectedRecords, Is.EqualTo(30));
-        Assert.That(config.Loaders![0].Sources![0].Query, Is.Not.Empty);
+        var vehicleLoader = config.Loaders.FirstOrDefault(l => l.Name == "VehicleLoader");
+        Assert.That(vehicleLoader, Is.Not.Null);
+        Assert.That(vehicleLoader!.DefinitionFileName, Is.Not.Empty);
+        Assert.That(vehicleLoader.Description, Is.EqualTo("Loads vehicle data"));
+        Assert.That(vehicleLoader.LoadStrategy, Is.Not.Null);
+        Assert.That(vehicleLoader.LoadStrategy!.Columns, Is.Not.Null);
+        Assert.That(vehicleLoader.LoadStrategy!.Columns[0], Is.EqualTo("CreateDate"));
+        Assert.That(vehicleLoader.Messaging, Is.Not.Empty);
+        Assert.That(vehicleLoader.Messaging!.Count, Is.EqualTo(1));
+        Assert.That(vehicleLoader.Name, Is.EqualTo("VehicleLoader"));
+        Assert.That(vehicleLoader.Schedule, Is.Not.Null);
+        Assert.That(vehicleLoader.Schedule!.Start, Is.EqualTo("Daily at 2am UTC"));
+        Assert.That(vehicleLoader.Sources, Is.Not.Empty);
+        Assert.That(vehicleLoader.Sources!.Count, Is.EqualTo(1));
+        Assert.That(vehicleLoader.Sources![0].DataSource, Is.EqualTo("TestDataSource2"));
+        Assert.That(vehicleLoader.Sources![0].MinimumExpectedRecords, Is.EqualTo(30));
+        Assert.That(vehicleLoader.Sources![0].Query, Is.Not.Empty);
         
         //DataSources
         Assert.That(config.DataSources, Is.Not.Null);
         Assert.That(config.DataSources!.Count, Is.EqualTo(3));
-        Assert.That(config.DataSources![0].Name, Is.EqualTo("TestDataSource1"));
-        Assert.That(config.DataSources![0].Password, Is.EqualTo("password"));
-        Assert.That(config.DataSources![0].Provider, Is.EqualTo("TestProvider"));
-        Assert.That(config.DataSources![0].Server, Is.EqualTo("localhost"));
-        Assert.That(config.DataSources![0].User, Is.EqualTo("user"));
+        var testDataSource = config.DataSources.FirstOrDefault(ds => ds.Name == "TestDataSource1");
+        Assert.That(testDataSource, Is.Not.Null);
+        Assert.That(testDataSource!.Name, Is.EqualTo("TestDataSource1"));
+        Assert.That(testDataSource.Password, Is.EqualTo("password"));
+        Assert.That(testDataSource.Provider, Is.EqualTo("SqlServer"));
+        Assert.That(testDataSource.Server, Is.EqualTo("localhost"));
+        Assert.That(testDataSource.User, Is.EqualTo("user"));
         
         //Messaging Providers
         Assert.That(config.MessagingProviders, Is.Not.Null);
         Assert.That(config.MessagingProviders!.Count, Is.EqualTo(2));
-        Assert.That(config.MessagingProviders![0].Name, Is.EqualTo("TestMessagingProvider1"));
-        Assert.That(config.MessagingProviders![0].Provider, Is.EqualTo("InMemory"));
+        var msgProvider = config.MessagingProviders.FirstOrDefault(mp => mp.Name == "TestMessagingProvider1");
+        Assert.That(msgProvider, Is.Not.Null);
+        Assert.That(msgProvider!.Name, Is.EqualTo("TestMessagingProvider1"));
+        Assert.That(msgProvider.Provider, Is.EqualTo("InMemory"));
     }
     
 }

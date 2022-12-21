@@ -22,10 +22,10 @@ Target:
   Entity: Person
   
 Messaging:
-  - Name: TestMessagingProvider1
+  - MessagingProvider: TestMessagingProvider1
 
 Sources:
-  - Name: TestDataSource1
+  - DataSource: TestDataSource1
     MinimumExpectedRecords: 30 
     Query: >-
       SELECT 

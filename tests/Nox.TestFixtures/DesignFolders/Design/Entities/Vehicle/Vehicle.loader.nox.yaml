@@ -22,10 +22,10 @@ Target:
   Entity: Vehicle
   
 Messaging:
-  - Name: TestMessagingProvider2
+  - MessagingProvider: TestMessagingProvider2
 
 Sources:
-  - Name: TestDataSource2
+  - DataSource: TestDataSource2
     MinimumExpectedRecords: 30 
     Query: >-
       SELECT 

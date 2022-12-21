@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  sqlserver:
+    container_name: sqlserver_container
+    image: "mcr.microsoft.com/azure-sql-edge:latest"
+    user: root
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "Developer*123"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    volumes:
+      - ./.docker-data/sqlserver:/var/opt/mssql/data

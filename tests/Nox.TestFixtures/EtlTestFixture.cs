@@ -10,26 +10,18 @@ using NUnit.Framework;
 namespace Nox.TestFixtures;
 
 [TestFixture]
-public class EtlTestFixture
+public class EtlTestFixture: ConfigurationTestFixture
 {
-    protected IServiceProvider? TestServiceProvider;
-    
     [OneTimeSetUp]
     public void Setup()
     {
-        Environment.SetEnvironmentVariable("ENVIRONMENT", "");
-        var services = new ServiceCollection();
-        var config = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .Build();
-        services.AddSingleton<IConfiguration>(config);
-        services.AddLogging();
-        services
+        TestServices.AddLogging();
+        TestServices!
             .AddDataProviderFactory()
             .AddDbContext<IDynamicDbContext, DynamicDbContext>()
             .AddSingleton<IDynamicModel, DynamicModel>()
             .AddSingleton<IDynamicService, DynamicService>();
-        services.AddSingleton<SqlHelper>();
-        TestServiceProvider = services.BuildServiceProvider();
+        TestServices!.AddSingleton<SqlHelper>();
+        TestServiceProvider = TestServices.BuildServiceProvider();
     }
 }

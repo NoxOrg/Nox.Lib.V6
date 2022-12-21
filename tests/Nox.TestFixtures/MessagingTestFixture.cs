@@ -10,28 +10,19 @@ using NUnit.Framework;
 namespace Nox.TestFixtures;
 
 [TestFixture]
-public class MessagingTestFixture
+public class MessagingTestFixture: ConfigurationTestFixture
 {
-    protected IServiceCollection? TestServiceCollection;
-    protected IServiceProvider? TestServiceProvider;
-    
     [OneTimeSetUp]
     public void Setup()
     {
-        Environment.SetEnvironmentVariable("ENVIRONMENT", "");
-        TestServiceCollection = new ServiceCollection();
-        var config = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .Build();
-        TestServiceCollection.AddSingleton<IConfiguration>(config);
-        TestServiceCollection.AddLogging();
-        TestServiceCollection
+        TestServices.AddLogging();
+        TestServices!
             .AddSingleton<IDynamicModel, DynamicModel>()
             .AddSingleton<IDynamicService, DynamicService>();
     }
 
-    public void BuildServiceProvider()
+    protected void BuildServiceProvider()
     {
-        TestServiceProvider = TestServiceCollection!.BuildServiceProvider();
+        TestServiceProvider = TestServices!.BuildServiceProvider();
     }
 }

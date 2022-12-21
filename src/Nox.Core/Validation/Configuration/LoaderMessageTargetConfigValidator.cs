@@ -11,8 +11,8 @@ public class LoaderMessageTargetConfigValidator: AbstractValidator<LoaderMessage
             .NotEmpty()
             .WithMessage(lmt => string.Format(ValidationResources.LoaderMessageTargetProviderEmpty, lmt.DefinitionFileName));
         
-        RuleFor(lmt => lmt!.MessagingProvider)
-            .Must(providerName => providers != null && providers.Exists(ec => ec.Name == providerName))
+        RuleFor(lmt => lmt!.MessagingProvider.ToLower())
+            .Must(providerName => (providers != null && providers.Exists(ec => ec.Name!.ToLower() == providerName)) || providerName == "inprocess")
             .WithMessage(lmt => string.Format(ValidationResources.LoaderMessageTargetMissing, lmt.MessagingProvider, lmt.DefinitionFileName));
     }
 }
