@@ -62,7 +62,9 @@ public class PostgresDatabaseProvider: DatabaseProviderBase
 
     public override DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
     {
-        return optionsBuilder.UseNpgsql(_connectionString);
+        return optionsBuilder.UseNpgsql(_connectionString, x =>
+            x.MigrationsHistoryTable("MigrationsHistory", "migrations")
+        );
     }
 
     public override string ToDatabaseColumnType(IEntityAttribute entityAttribute)

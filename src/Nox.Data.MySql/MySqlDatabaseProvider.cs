@@ -59,7 +59,9 @@ public class MySqlDatabaseProvider: DatabaseProviderBase
 
     public override DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
     {
-        return optionsBuilder.UseMySQL(_connectionString);
+        return optionsBuilder.UseMySQL(_connectionString, x =>
+            x.MigrationsHistoryTable("migrations_MigrationsHistory")
+        );
     }
 
     public override string ToDatabaseColumnType(IEntityAttribute entityAttribute)

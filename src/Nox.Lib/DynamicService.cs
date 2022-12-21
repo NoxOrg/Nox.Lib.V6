@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using Hangfire;
@@ -171,7 +172,7 @@ public class DynamicService : IDynamicService
 
                 foreach (var prop in properties)
                 {
-                    if (prop.GetCustomAttributes(typeof(NotMappedAttribute), false).Length > 0)
+                    if (prop.GetCustomAttributes<NotMappedAttribute>().Any())
                         continue;
 
                     var typeString = prop.PropertyType.Name.ToLower();
@@ -182,7 +183,15 @@ public class DynamicService : IDynamicService
                     }
                     if (typeString == "string")
                     {
-                        b.Property(prop.Name).HasMaxLength(2048);
+                        var attr = prop.GetCustomAttributes<MaxLengthAttribute>(false);
+                        if (attr.Any())
+                        {
+                            b.Property(prop.Name).HasMaxLength(attr.First().Length);
+                        }
+                        else
+                        {
+                            b.Property(prop.Name).HasMaxLength(128);
+                        }
                     }
                     else if (typeString == "decimal")
                     {

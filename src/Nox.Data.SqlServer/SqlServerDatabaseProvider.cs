@@ -58,7 +58,9 @@ public class SqlServerDatabaseProvider: DatabaseProviderBase
 
     public override DbContextOptionsBuilder ConfigureDbContext(DbContextOptionsBuilder optionsBuilder)
     {
-        return optionsBuilder.UseSqlServer(_connectionString);
+        return optionsBuilder.UseSqlServer(_connectionString, x =>
+            x.MigrationsHistoryTable("MigrationsHistory", "migrations")
+        );
     }
 
     public override string ToDatabaseColumnType(IEntityAttribute entityAttribute)
