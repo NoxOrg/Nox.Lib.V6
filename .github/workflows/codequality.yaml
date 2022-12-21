@@ -7,9 +7,6 @@ on:
     types: [opened, synchronize, reopened]
 jobs:
   build:
-    defaults:
-      run:
-        working-directory: src
     runs-on: ubuntu-latest
     steps:
       - name: Set up JDK 11
@@ -47,6 +44,6 @@ jobs:
         shell: pwsh
         run: |
           ./.sonar/scanner/dotnet-sonarscanner begin /k:"NoxOrg_Nox" /o:"noxorg" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
-          dotnet build --warnaserror --configuration Release --no-incremental
-          dotnet-coverage collect 'dotnet test' -f xml  -o 'coverage.xml'
+          dotnet build ./src --warnaserror --configuration Release --no-incremental
+          dotnet-coverage collect 'dotnet test ./src' -f xml  -o 'coverage.xml'
           ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
