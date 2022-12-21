@@ -228,10 +228,9 @@ $goo.Command.Add( 'main', { param( $featureName )
 ### some versioning helpers. TODO: move to goo project at some point
 
 ## extract a version object (file, xpath, value) table from all csproj files
-$goo.Command.Add( 'get-project-version-table', {
+$goo.Command.Add( 'get-project-version-table', { param($xpaths)
     $files = (Get-ChildItem -Filter "*.csproj" -Recurse)
     $xml = New-Object XML
-    $xpaths = @("//AssemblyVersion","//FileVersion","//PackageVersion","//PackageReference[@Include='Nox.Lib']/@Version")
     $versionInfoTable = @()
     foreach($file in $files){
         $xml.Load($file)
@@ -296,7 +295,9 @@ $goo.Command.Add( 'set-project-version', { param( $versionInfoTable, $version )
 
 # command: goo bump-version [<version>]| Sets or increments the project version
 $goo.Command.Add( 'bump-version', { param($version)
-    $versionInfoTable = $goo.Command.Run('get-project-version-table')
+    $versionInfoTable = $goo.Command.Run('get-project-version-table', 
+        @("//AssemblyVersion","//FileVersion","//PackageVersion","//PackageReference[@Include='Nox.Lib']/@Version")
+    )
     $versionArray = $null;
     if($null -eq $version){
         $version = $goo.Command.Run('get-project-version-vote', $versionInfoTable)
