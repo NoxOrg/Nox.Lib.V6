@@ -220,13 +220,6 @@ $goo.Command.Add( 'push', { param( $message )
     }
 })
 
-# command: goo pr | Performs and merges a pull request, checkout main and publish'
-$goo.Command.Add( 'pr', { 
-    gh pr create --fill
-    if($?) { gh pr merge --merge }
-    $goo.Command.Run( 'main' )
-})
-
 # command: goo main | Checks out the main branch and prunes features removed at origin
 $goo.Command.Add( 'main', { param( $featureName )
     $goo.Git.CheckoutMain()
