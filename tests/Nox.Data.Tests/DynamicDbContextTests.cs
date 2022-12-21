@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nox.Core.Configuration;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Database;
 using Nox.TestFixtures;

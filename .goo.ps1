@@ -347,6 +347,21 @@ $goo.Command.Add( 'waitfordb', {
     }
 })
 
+# command: goo test | Runs all tests in the solution
+$goo.Command.Add( 'test', {
+    $goo.Console.WriteLine( "Running core tests..." )
+    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal', "$script:TestsFolder\Nox.Core.Tests")
+    $goo.Console.WriteLine( "Running data tests..." )
+    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal', "$script:TestsFolder\Nox.Data.Tests")
+    $goo.Console.WriteLine( "Running etl tests..." )
+    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal', "$script:TestsFolder\Nox.Etl.Tests")
+    $goo.Console.WriteLine( "Running generator tests..." )
+    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal', "$script:TestsFolder\Nox.Generator.Tests")
+    $goo.Console.WriteLine( "Running messaging tests..." )
+    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal', "$script:TestsFolder\Nox.Messaging.Tests")
+})
+
+
 <# --- START GOO EXECUTION --- #>
 
 $goo.Start()

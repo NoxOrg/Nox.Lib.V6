@@ -100,7 +100,7 @@ public class EmptyConfigValidationTests
         var validator = new LoaderConfigValidator(null, null, null);
         var result = validator.Validate(config);
         Assert.That(result.IsValid, Is.False);
-        Assert.That(result.Errors.Count, Is.EqualTo(5));
+        Assert.That(result.Errors.Count, Is.EqualTo(6));
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("The loader name must be specified in")));
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("Loader Schedule must have a Start specified in")));
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("Loader load strategy must have a type specified in")));
@@ -138,7 +138,7 @@ public class EmptyConfigValidationTests
         var validator = new LoaderTargetConfigValidator(null);
         var result = validator.Validate(config);
         Assert.That(result.IsValid, Is.False);
-        Assert.That(result.Errors.Count, Is.EqualTo(1));
+        Assert.That(result.Errors.Count, Is.EqualTo(2));
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("The loader target entity must be specified in")));
     }
     
@@ -149,7 +149,7 @@ public class EmptyConfigValidationTests
         var validator = new LoaderMessageTargetConfigValidator(null);
         var result = validator.Validate(config);
         Assert.That(result.IsValid, Is.False);
-        Assert.That(result.Errors.Count, Is.EqualTo(1));
+        Assert.That(result.Errors.Count, Is.EqualTo(2));
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("The messaging provider must be specified in")));
     }
     
@@ -160,7 +160,7 @@ public class EmptyConfigValidationTests
         var validator = new LoaderSourceConfigValidator(null);
         var result = validator.Validate(config);
         Assert.That(result.IsValid, Is.False);
-        Assert.That(result.Errors.Count, Is.EqualTo(2));
+        Assert.That(result.Errors.Count, Is.EqualTo(3));
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("a Loader source is missing a DataSource value in")));
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("a Loader source is missing a Query statement in")));
     }

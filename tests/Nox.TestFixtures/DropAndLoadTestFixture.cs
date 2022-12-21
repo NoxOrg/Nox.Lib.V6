@@ -10,26 +10,26 @@ using NUnit.Framework;
 namespace Nox.TestFixtures;
 
 [TestFixture]
-public class DropAndLoadTestFixture
+public class DropAndLoadTestFixture: GlobalTestFixture
 {
     protected IServiceProvider? TestServiceProvider;
     
     [OneTimeSetUp]
     public async Task Setup()
     {
-        var services = new ServiceCollection();
         Environment.SetEnvironmentVariable("ENVIRONMENT", "DropAndLoad");
         var config = new ConfigurationBuilder()
             .AddJsonFile("appsettings.DropAndLoad.json")
             .Build();
+        var services = new ServiceCollection();
+        services.AddSingleton<SqlHelper>();
         services.AddSingleton<IConfiguration>(config);
         services.AddLogging();
         services.AddNox();
-        services.AddSingleton<SqlHelper>();
-        
         services.AddSingleton<DropAndLoadSeed>();
         TestServiceProvider = services.BuildServiceProvider();
-        TestServiceProvider!.GetRequiredService<IDynamicModel>();
+        var dynamicService = TestServiceProvider.GetRequiredService<IDynamicService>();
+        WaitForNoxDatabase(dynamicService, 30000);
         var sqlHelper = TestServiceProvider!.GetRequiredService<SqlHelper>();
         await sqlHelper.ExecuteAsync("DELETE FROM Vehicle");
         TestServiceProvider!.GetRequiredService<IDynamicModel>();

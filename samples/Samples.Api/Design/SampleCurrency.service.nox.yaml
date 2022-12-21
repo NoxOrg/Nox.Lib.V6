@@ -37,9 +37,6 @@ MessagingProviders:
     #ConnectionVariable: ConnectionString:AzureServiceBus
     Provider: RabbitMQ
     ConnectionString: rabbitmq://guest:guest@localhost/
-
-  - Name: InProcess
-    Provider: Mediator  
       
 DataSources:
 

@@ -41,6 +41,20 @@ public class NoxConfigurator
                 var config = _deserializer.Deserialize<NoxConfiguration>(ReadDefinitionFile(f));
                 config.DefinitionFileName = Path.GetFullPath(f);
                 config.Database!.DefinitionFileName = Path.GetFullPath(f);
+                if (config.MessagingProviders != null)
+                {
+                    foreach (var msgProviderConfig in config.MessagingProviders)
+                    {
+                        msgProviderConfig.DefinitionFileName = Path.GetFullPath(f);
+                    }    
+                }
+
+                if (config.DataSources == null) return config;
+                foreach (var dsConfig in config.DataSources)
+                {
+                    dsConfig.DefinitionFileName = Path.GetFullPath(f);
+                }
+
                 return config;
             })
             .FirstOrDefault();
@@ -68,7 +82,11 @@ public class NoxConfigurator
             {
                 var loader = _deserializer.Deserialize<LoaderConfiguration>(ReadDefinitionFile(f));
                 loader.DefinitionFileName = Path.GetFullPath(f);
-                loader.Sources!.ToList().ForEach(s => { s.DefinitionFileName = Path.GetFullPath(f); });
+                loader.Sources?.ToList().ForEach(s => { s.DefinitionFileName = Path.GetFullPath(f); });
+                if (loader.LoadStrategy != null) loader.LoadStrategy.DefinitionFileName = Path.GetFullPath(f);
+                loader.Messaging?.ToList().ForEach(m => { m.DefinitionFileName = Path.GetFullPath(f); });
+                if (loader.Schedule != null) loader.Schedule.DefinitionFileName = Path.GetFullPath(f);
+                if (loader.Target != null) loader.Target.DefinitionFileName = Path.GetFullPath(f);
                 return loader;
             });
         return loaders.ToList();

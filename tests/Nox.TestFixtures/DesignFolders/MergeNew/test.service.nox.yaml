@@ -21,8 +21,11 @@ Database:
   User: sa
   Password: Developer*123
 
-MessageBus:
-  Name: TestMessaging
-  #Provider: AzureServiceBus
-  #ConnectionVariable: ConnectionString:AzureServiceBus
-  Provider: InMemory
+MessagingProviders:
+  - Name: TestMessaging
+    Provider: InMemory
+    
+DataSources:
+  - Name: TestDataSource
+    Provider: SqlServer
+    ConnectionVariable: ConnectionString:MasterDataSource   
