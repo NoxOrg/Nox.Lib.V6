@@ -16,12 +16,11 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
+[![Build][build-shield]][build-url]
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
+[![Security][security-shield]][security-url]
 
 <!-- PROJECT LOGO -->
 <br />
@@ -468,6 +467,8 @@ Project Link: [https://github.com/noxorg/nox](https://github.com/noxorg/nox)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[build-shield]: https://img.shields.io/github/actions/workflow/status/noxorg/nox/build.yaml?branch=main&event=push&label=Build&style=for-the-badge
+[build-url]: https://github.com/NoxOrg/Nox/actions/workflows/build.yaml?query=branch%3Amain
 [contributors-shield]: https://img.shields.io/github/contributors/noxorg/Nox.svg?style=for-the-badge
 [contributors-url]: https://github.com/noxorg/Nox/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/noxorg/Nox.svg?style=for-the-badge
@@ -480,6 +481,8 @@ Project Link: [https://github.com/noxorg/nox](https://github.com/noxorg/nox)
 [license-url]: https://github.com/noxorg/Nox/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://ch.linkedin.com/in/sharpeandre
+[security-shield]: https://img.shields.io/sonar/vulnerabilities/NoxOrg_Nox/main?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge
+[security-url]: https://sonarcloud.io/project/security_hotspots?id=NoxOrg_Nox
 [product-screenshot]: images/goo-goo.gif
 [ETLBox]: https://img.shields.io/badge/ETLBox-000000?style=for-the-badge
 [ETLBox-url]: https://www.etlbox.net/
