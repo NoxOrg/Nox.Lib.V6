@@ -12,5 +12,12 @@ public class MessagingProviderBase : MetaBase, IMessagingProvider
     public string? ConnectionVariable { get; set; }
     public string? AccessKey { get; set; }
     public string? SecretKey { get; set; }
-}
 
+    public virtual bool ApplyDefaults()
+    {
+        var isValid = true;
+        Provider = Provider.Trim().ToLower();
+        return isValid;
+    }
+
+}

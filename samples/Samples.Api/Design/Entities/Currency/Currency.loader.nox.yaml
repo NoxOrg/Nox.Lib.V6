@@ -22,7 +22,7 @@ Target:
   
 Messaging:
   - MessagingProvider: AppServiceBus
-  - MessagingProvider: InProcess  
+  - MessagingProvider: Mediator  
 
 Sources:
   - DataSource: JsonSeedData

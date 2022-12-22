@@ -21,10 +21,12 @@ Target:
   Entity: Country
   
 Messaging:
-  - MessagingProvider: InProcess
+  - MessagingProvider: Mediator
   - MessagingProvider: AppServiceBus
   
 Sources:
   - DataSource: JsonSeedData
     MinimumExpectedRecords: 160
     Query: country-seeddata.json 
+
+

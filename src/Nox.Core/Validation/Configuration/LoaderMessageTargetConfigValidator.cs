@@ -12,7 +12,7 @@ public class LoaderMessageTargetConfigValidator: AbstractValidator<LoaderMessage
             .WithMessage(lmt => string.Format(ValidationResources.LoaderMessageTargetProviderEmpty, lmt.DefinitionFileName));
         
         RuleFor(lmt => lmt!.MessagingProvider.ToLower())
-            .Must(providerName => (providers != null && providers.Exists(ec => ec.Name!.ToLower() == providerName)) || providerName == "inprocess")
+            .Must(providerName => (providers != null && providers.Exists(ec => ec.Name!.ToLower() == providerName)) || providerName == "mediator")
             .WithMessage(lmt => string.Format(ValidationResources.LoaderMessageTargetMissing, lmt.MessagingProvider, lmt.DefinitionFileName));
     }
 }
