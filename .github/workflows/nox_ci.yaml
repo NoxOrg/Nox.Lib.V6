@@ -3,32 +3,35 @@ name: Build & Test
 on:
   pull_request:
     branches: [ main ]
+    paths:
+      - src/**
+      - tests/**
+      - .github/workflows/nox_ci.yaml
   push:
     branches: [ main ]
+    paths:
+      - src/**
+      - tests/**
+      - .github/workflows/nox_ci.yaml
 
 jobs:
   build:
-
-    defaults:
-      run:
-        working-directory: src
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
         dotnet-version: ['6.0.x']
 
     steps:
-
       - uses: actions/checkout@v3
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
-      - name: Install dependencies
-        run: dotnet restore
+      - name: Restore
+        run: dotnet restore ./src/Nox.sln
       - name: Build
-        run: dotnet build --warnaserror --configuration Release --no-restore
+        run: dotnet build ./src/Nox.sln --warnaserror --configuration Release --no-restore      
+      
       #### <-- add back when tests are working
       #- name: Core Tests
       #  working-directory: tests
