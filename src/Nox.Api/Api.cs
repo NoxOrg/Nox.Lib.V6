@@ -8,6 +8,7 @@ namespace Nox.Api;
 public sealed class Api : MetaBase, IApi
 {
     public string Name { get; set; } = string.Empty;
+    
     public string Description { get; set; } = string.Empty;
 
     ICollection<IApiRoute>? IApi.Routes
