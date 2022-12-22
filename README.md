@@ -467,8 +467,8 @@ Project Link: [https://github.com/noxorg/nox](https://github.com/noxorg/nox)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[build-shield]: https://img.shields.io/github/actions/workflow/status/noxorg/nox/build.yaml?branch=main&event=push&label=Build&style=for-the-badge
-[build-url]: https://github.com/NoxOrg/Nox/actions/workflows/build.yaml?query=branch%3Amain
+[build-shield]: https://img.shields.io/github/actions/workflow/status/noxorg/nox/nox_ci.yaml?branch=main&event=push&label=Build&style=for-the-badge
+[build-url]: https://github.com/NoxOrg/Nox/actions/workflows/nox_ci.yaml?query=branch%3Amain
 [contributors-shield]: https://img.shields.io/github/contributors/noxorg/Nox.svg?style=for-the-badge
 [contributors-url]: https://github.com/noxorg/Nox/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/noxorg/Nox.svg?style=for-the-badge
