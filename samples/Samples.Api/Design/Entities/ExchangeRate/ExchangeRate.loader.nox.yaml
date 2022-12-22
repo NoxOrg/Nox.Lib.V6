@@ -17,11 +17,11 @@ Target:
   Entity: ExchangeRate
   
 Sources:
-  - DataSource: JsonSeedData
-    Query: ExchangeRate-seeddata.json 
+  #- DataSource: JsonSeedData
+  #  Query: ExchangeRate-seeddata.json 
 
-  - DataSource: CsvSeedData
-    Query: ExchangeRate-seeddata.csv 
+  #- DataSource: CsvSeedData
+  #  Query: ExchangeRate-seeddata.csv 
 
-  - DataSource: ExcelSeedData
-    Query: ExchangeRate-seeddata.xlsx
+  #- DataSource: ExcelSeedData
+  #  Query: ExchangeRate-seeddata.xlsx

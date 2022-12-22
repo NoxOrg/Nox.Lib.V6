@@ -9,4 +9,6 @@ public interface IMessagingProvider: IMetaBase
     string? ConnectionVariable { get; set; }
     string? AccessKey { get; set; }
     string? SecretKey { get; set; }
+    bool ApplyDefaults();
+
 }
