@@ -1,0 +1,55 @@
+name: Build & Test
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - src/**
+      - tests/**
+      - .github/workflows/nox_ci.yaml
+  push:
+    branches: [ main ]
+    paths:
+      - src/**
+      - tests/**
+      - .github/workflows/nox_ci.yaml
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: ['6.0.x']
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Restore
+        run: dotnet restore ./src/Nox.sln
+      - name: Build
+        run: dotnet build ./src/Nox.sln --warnaserror --configuration Release --no-restore      
+      
+      #### <-- add back when tests are working
+      #- name: Core Tests
+      #  working-directory: tests
+      #  run: dotnet test Nox.Core.Tests --no-restore --verbosity normal
+      #- name: Data Tests
+      #  working-directory: tests
+      #  run: dotnet test Nox.Data.Tests --no-restore --verbosity normal
+      #- name: Etl Tests
+      #  working-directory: tests
+      #  run: dotnet test Nox.Etl.Tests --no-restore --verbosity normal
+      #- name: Generator Tests
+      #  working-directory: tests
+      #  run: dotnet test Nox.Generator.Tests --no-restore --verbosity normal
+      #- name: Messaging Tests
+      #  working-directory: tests
+      #  run: dotnet test Nox.Messaging.Tests --no-restore --verbosity normal
+  
+
+# Removed comments once tests all run
+#      - name: Test
+#        run: dotnet test --no-restore --verbosity normal
