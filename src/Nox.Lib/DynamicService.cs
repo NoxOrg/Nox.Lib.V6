@@ -191,7 +191,7 @@ public class DynamicService : IDynamicService
                         }
                         else
                         {
-                            b.Property(prop.Name).HasMaxLength(255);
+                            b.Property(prop.Name).HasMaxLength(128);
                         }
                     }
                     else if (typeString == "decimal")
