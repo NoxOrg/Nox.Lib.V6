@@ -1,4 +1,4 @@
-name: jan-test
+name: local-test
 
 on:
   pull_request:
