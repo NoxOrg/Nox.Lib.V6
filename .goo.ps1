@@ -228,7 +228,8 @@ $goo.Command.Add( 'main', { param( $featureName )
 ### some versioning helpers. TODO: move to goo project at some point
 
 ## extract a version object (file, xpath, value) table from all csproj files
-$goo.Command.Add( 'get-project-version-table', { param($xpaths)
+$goo.Command.Add( 'get-project-version-table', {
+    $xpaths = $args
     $files = (Get-ChildItem -Filter "*.csproj" -Recurse)
     $xml = New-Object XML
     $versionInfoTable = @()
