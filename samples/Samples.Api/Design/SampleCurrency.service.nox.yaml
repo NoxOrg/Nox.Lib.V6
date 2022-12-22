@@ -44,4 +44,12 @@ DataSources:
     Provider: Json
     Options: Source=File;Path=../../docs/sample-data/;
 
+  #- Name: CsvSeedData
+  #  Provider: Csv
+  #  Options: Source=File;Path=../../docs/sample-data/;
+
+  #- Name: ExcelSeedData
+  #  Provider: Excel
+  #  Options: Source=File;Path=../../docs/sample-data/;
+
   
