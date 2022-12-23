@@ -25,7 +25,6 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build --warnaserror --configuration Release --no-restore
-      #### <-- add back when tests are working
       - name: Core Tests
         working-directory: tests
         run: dotnet test Nox.Core.Tests --no-restore --verbosity normal

@@ -1,0 +1,27 @@
+﻿#
+# ExchangeRate.loader.nox.yaml
+#
+
+Name: ExchangeRateLoader
+
+Description: Loads exchange rate data 
+
+Schedule:
+  Start: Every day at 1am
+
+LoadStrategy: 
+  Type: MergeNew
+  Columns: [CreateDate]
+
+Target:
+  Entity: ExchangeRate
+  
+Sources:
+  #- DataSource: JsonSeedData
+  #  Query: ExchangeRate-seeddata.json 
+
+  #- DataSource: CsvSeedData
+  #  Query: ExchangeRate-seeddata.csv 
+
+  #- DataSource: ExcelSeedData
+  #  Query: ExchangeRate-seeddata.xlsx

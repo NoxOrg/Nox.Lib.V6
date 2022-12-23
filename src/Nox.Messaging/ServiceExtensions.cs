@@ -43,6 +43,11 @@ public static class ServiceExtensions
             var isAzureAdded = false;
             var isAmazonAdded = false;
             var isMemoryAdded = false;
+
+            if (noxConfig.MessagingProviders.All(mp => !mp.Provider!.ToLower().Equals("mediator")))
+            {
+                noxConfig.MessagingProviders.Add(new MessagingProviderConfiguration() { Provider = "Mediator", Name = "Mediator" });
+            }
             
             foreach (var msgProvider in noxConfig.MessagingProviders)
             {
@@ -76,12 +81,16 @@ public static class ServiceExtensions
                             isMemoryAdded = true;
                         }
                         break;
+
+                    case "mediator":
+                        if (!isExternalListener) services.AddNoxMediator();
+                        break;
                 }
             }
         }
 
-        if (!isExternalListener) services.AddNoxMediator();
         services.AddNoxEvents();
+
         return services;
     }
 
