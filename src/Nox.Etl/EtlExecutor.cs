@@ -12,9 +12,9 @@ using Nox.Core.Interfaces.Etl;
 using Nox.Core.Interfaces.Messaging;
 using Nox.Core.Models;
 using Nox.Messaging;
-using Nox.Messaging.Enumerations;
-using Nox.Messaging.Events;
 using System.Dynamic;
+using Nox.Core.Enumerations;
+using Nox.Core.Interfaces.Messaging.Events;
 
 
 namespace Nox.Etl;

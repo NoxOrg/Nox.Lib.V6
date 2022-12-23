@@ -1,4 +1,4 @@
-namespace Nox.Messaging.Enumerations;
+namespace Nox.Core.Enumerations;
 
 public enum NoxEventTypeEnum
 {

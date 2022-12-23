@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Nox.Messaging.Enumerations;
-using Nox.Messaging.Events;
+using Nox.Core.Enumerations;
+using Nox.Core.Interfaces.Messaging.Events;
 using Nox.TestFixtures;
 using NUnit.Framework;
 

@@ -1,9 +1,9 @@
 using System.Collections.Immutable;
 using System.Dynamic;
+using Nox.Core.Enumerations;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Entity;
-using Nox.Messaging.Enumerations;
-using Nox.Messaging.Events;
+using Nox.Core.Interfaces.Messaging.Events;
 
 namespace Nox.Messaging;
 

@@ -108,7 +108,7 @@ public class DynamicModel : IDynamicModel
 
                     else if (attr.IsDateTimeType())
                     {
-                        // don't set Maxwidth, throw's error on db create
+                        // don't set MaxWidth, throw's error on db create
                     }
 
                     else if (attr.MaxWidth > 0 && attr.Precision > 0)
