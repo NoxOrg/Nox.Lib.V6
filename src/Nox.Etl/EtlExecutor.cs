@@ -248,14 +248,15 @@ public class EtlExecutor : IEtlExecutor
         {
             if (record[dateColumn] == null) continue;
 
-            var fieldValue = DateTime.Parse(record[dateColumn]!.ToString()!);
-
-            if (fieldValue > lastMergeDateTimeStampInfo[dateColumn].LastDateLoadedUtc)
+            if (DateTime.TryParse(record[dateColumn]!.ToString(), out var fieldValue))
             {
-                var changeEntry = lastMergeDateTimeStampInfo[dateColumn];
-                changeEntry.LastDateLoadedUtc = fieldValue;
-                changeEntry.Updated = true;
-                lastMergeDateTimeStampInfo[dateColumn] = changeEntry;
+                if (fieldValue > lastMergeDateTimeStampInfo[dateColumn].LastDateLoadedUtc)
+                {
+                    var changeEntry = lastMergeDateTimeStampInfo[dateColumn];
+                    changeEntry.LastDateLoadedUtc = fieldValue;
+                    changeEntry.Updated = true;
+                    lastMergeDateTimeStampInfo[dateColumn] = changeEntry;
+                }
             }
         }
     }
@@ -309,7 +310,10 @@ public class EtlExecutor : IEtlExecutor
         SqlTask.ExecuteReader(destinationDbProvider.ConnectionManager, findSql, r => resultDate = r);
         if (resultDate is not null)
         {
-            return DateTime.Parse(resultDate!.ToString()!);
+            if (DateTime.TryParse(resultDate!.ToString(), out var result))
+            {
+                return result;
+            }
         }
 
         var insertQuery = new SqlKata.Query(mergeStateTableName).AsInsert(
