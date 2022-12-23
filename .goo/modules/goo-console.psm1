@@ -37,7 +37,12 @@ class GooConsole {
     }
 
     [void] Write( [Object]$object, [string]$fgColor, [string]$bgColor ) {
-        Write-Host -ForegroundColor $fgColor -Object $object -NoNewline
+        if($bgColor -eq "Black"){
+            Write-Host -ForegroundColor $fgColor -Object $object -NoNewline
+        }
+        else {
+            Write-Host -ForegroundColor $fgColor -BackgroundColor $bgColor -Object $object -NoNewline
+        }
     }
 
     [void] WriteHighlight( [Object]$object ) {
@@ -57,7 +62,12 @@ class GooConsole {
     }
 
     [void] WriteLine( [Object]$object, [string]$fgColor, [string]$bgColor ) {
-        Write-Host -ForegroundColor $fgColor -BackgroundColor $bgColor -Object $object
+        if($bgColor -eq "Black"){
+            Write-Host -ForegroundColor $fgColor -Object $object 
+        }
+        else {
+            Write-Host -ForegroundColor $fgColor -BackgroundColor $bgColor -Object $object 
+        }
     }
 
     [void] WriteLineHighlight( [Object]$object ) {
