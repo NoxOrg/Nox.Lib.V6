@@ -87,7 +87,7 @@ $goo.Command.Add( 'init', {
 # command: goo clean | Removes data and build output
 $goo.Command.Add( 'clean', {
     $goo.Console.WriteInfo( "Cleaning data and distribution folders..." )
-    $goo.Command.Run('dockerDownIfUp')
+    $goo.Docker.DownAndClean($script:RootFolder)
     $goo.IO.EnsureRemoveFolder("./.docker-data")
     $goo.IO.EnsureRemoveFolder("./dist")
     $goo.IO.EnsureRemoveFolder("./src/dist")

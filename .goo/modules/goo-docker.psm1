@@ -37,6 +37,12 @@ class GooDocker {
         }   
     }
 
+    [void] DownAndClean( [string]$folder ) {
+        if ($null -ne (docker-compose --project-directory $folder ps -q)) {
+            $this.Goo.Command.RunExternal( 'docker-compose', "down --remove-orphans --volumes", $folder ) 
+        }   
+    }
+
     [void] StopAllRunningContainers()
     {
         $containers = $(docker ps -q)

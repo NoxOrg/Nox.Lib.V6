@@ -1,5 +1,10 @@
 version: '3.7'
 
+volumes:
+  sqlserver: 
+  postgres: 
+  mysql: 
+  
 services:
   sqlserver:
     container_name: sqlserver_container
@@ -12,7 +17,7 @@ services:
       ACCEPT_EULA: "Y"
       MSSQL_PID: "Developer"
     volumes:
-      - ./.docker-data/sqlserver:/var/opt/mssql/data
+      - sqlserver:/var/opt/mssql/data
       
   postgres:
     container_name: postgres_container
@@ -26,7 +31,7 @@ services:
     ports:
       - "54320:5432"
     volumes:
-      - ./.docker-data/postgres:/var/lib/postgresql/data
+      - postgres:/var/lib/postgresql/data
 
   mysql:
     container_name: mysql_container
@@ -42,7 +47,7 @@ services:
     expose:
       - '3306'
     volumes:
-      - ./.docker-data/mysql:/var/lib/mysql
+      - mysql:/var/lib/mysql
 
   rabbitmq:
       container_name: rabbitmq_container
@@ -69,3 +74,4 @@ services:
   #    - elasticsearch
   #  ports:
   #    - "5601:5601"
+
