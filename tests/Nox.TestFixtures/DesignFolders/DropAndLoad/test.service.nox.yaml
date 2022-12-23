@@ -2,24 +2,14 @@
 # Service definition
 #
 
-Name: Test
+Name: DropAndLoadTest
 
-Description: Test Microservice
+Description: Drop And Load Test Microservice
 
 Database:
   Name: Test
-  
-  Provider: SqlServer
-  Options: Trusted_Connection=no;connection timeout=120;TrustServerCertificate=true
-  
-  #Provider: Postgres
-  #Port: 54320
-
-  #Provider: MySql
-
-  Server: localhost
-  User: sa
-  Password: Developer*123
+  Provider: SqLite
+  ConnectionString: Data Source=./DropAndLoad.db;
 
 MessagingProviders:
   - Name: TestMessaging
@@ -27,5 +17,5 @@ MessagingProviders:
     
 DataSources:
   - Name: TestDataSource
-    Provider: SqlServer
-    ConnectionVariable: ConnectionString:MasterDataSource
+    Provider: SqLite
+    ConnectionString: Data Source=./DropAndLoadMaster.db;

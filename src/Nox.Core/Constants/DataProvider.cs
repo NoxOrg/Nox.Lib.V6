@@ -10,5 +10,6 @@ public static class DataProvider
     public const string MySql = @"mysql";
 
     public const string Json = @"json";
+    public const string SqLite = @"sqlite";
 }
 

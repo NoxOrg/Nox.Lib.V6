@@ -180,6 +180,7 @@ public class DynamicService : IDynamicService
                     if (prop.Name == "Name" && typeString == "string")
                     {
                         b.Property(prop.Name).HasMaxLength(128);
+                        continue;
                     }
                     if (typeString == "string")
                     {

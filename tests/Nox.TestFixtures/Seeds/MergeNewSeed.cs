@@ -2,17 +2,18 @@ using System;
 using System.Threading.Tasks;
 using Bogus;
 using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 
-namespace Nox.TestFixtures;
+namespace Nox.TestFixtures.Seeds;
 
 public class MergeNewSeed
 {
-    private readonly SqlConnection _con;
+    private readonly SqliteConnection _con;
 
     public MergeNewSeed(IConfiguration configuration)
     {
-        _con = new SqlConnection(configuration["ConnectionString:Master"]);
+        _con = new SqliteConnection(configuration["ConnectionString:MasterDataSource"]);
     }
 
     public async Task Insert(bool drop = true, int rowCount = 100)
@@ -20,14 +21,7 @@ public class MergeNewSeed
         await _con.OpenAsync();
         if (drop)
         {
-            await RunScript("DROP DATABASE IF EXISTS TestSource;");
-            await RunScript("CREATE DATABASE TestSource;");
-            await RunScript("use TestSource");
-            await RunScript("CREATE TABLE SourceVehicle (Id int NOT NULL PRIMARY KEY IDENTITY(1,1), VehicleBrand varchar(40) NOT NULL, VehicleColor varchar(10) NOT NULL, CreateDate datetime2, EditDate datetime2);");    
-        }
-        else
-        {
-            await RunScript("use TestSource");
+            await RunScript("CREATE TABLE SourceVehicle (Id integer NOT NULL PRIMARY KEY AUTOINCREMENT, VehicleBrand text NOT NULL, VehicleColor text NOT NULL, CreateDate text, EditDate text);");    
         }
         
         for (var row = 0; row < rowCount; row++)
@@ -40,8 +34,7 @@ public class MergeNewSeed
     public async Task Update(int rowCount)
     {
         await _con.OpenAsync();
-        await RunScript("use TestSource");
-        await RunScript($"UPDATE TOP ({rowCount}) dbo.SourceVehicle SET EditDate = '{DateTime.Now}'");
+        await RunScript($"UPDATE SourceVehicle SET EditDate = '{DateTime.Now}' WHERE Id < 11");
         await _con.CloseAsync();
     }
 
@@ -54,7 +47,7 @@ public class MergeNewSeed
 
     private async Task RunScript(string script)
     {
-        var cmd = new SqlCommand(script);
+        var cmd = new SqliteCommand(script);
         cmd.Connection = _con;
         await cmd.ExecuteNonQueryAsync();
     }

@@ -1,0 +1,23 @@
+#
+# Service definition
+#
+
+Name: Data Test
+
+Description: Data Test Microservice
+  
+Database:
+  Name: Test
+  Provider: SqLite
+  ConnectionString: Data Source=./DataTest.db
+
+MessagingProviders:
+  - Name: TestMessagingProvider1
+    Provider: InMemory
+  - Name: TestMessagingProvider2
+    Provider: InMemory
+    
+DataSources:
+  - Name: TestDataSource1
+    Provider: SqLite
+    ConnectionString: Data Source=./DataMaster.db

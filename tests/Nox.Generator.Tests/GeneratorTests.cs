@@ -18,7 +18,7 @@ public class GeneratorTests: GeneratorTestFixture
         var compilation = GenerateTestExeCompilation();
         Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
         var updatedComp = RunGenerators(compilation, out var generatorDiags, new NoxDynamicGenerator());
-        Assert.That(updatedComp.SyntaxTrees.Count(), Is.EqualTo(5));
+        Assert.That(updatedComp.SyntaxTrees.Count(), Is.EqualTo(6));
     }
 
     [Test]
@@ -30,7 +30,7 @@ public class GeneratorTests: GeneratorTestFixture
         var compilation = GenerateTestExeCompilation();
         Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
         var updatedComp = RunGenerators(compilation, out var generatorDiags, new NoxDynamicGenerator());
-        Assert.That(updatedComp.SyntaxTrees.Count(), Is.EqualTo(1));
+        Assert.That(updatedComp.SyntaxTrees.Count(), Is.EqualTo(2));
         File.Move($"{appSetFile}.tmp", appSetFile);
     }
     
@@ -43,7 +43,7 @@ public class GeneratorTests: GeneratorTestFixture
         var compilation = GenerateTestExeCompilation();
         Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
         var updatedComp = RunGenerators(compilation, out var generatorDiags, new NoxDynamicGenerator());
-        Assert.That(updatedComp.SyntaxTrees.Count(), Is.EqualTo(1));
+        Assert.That(updatedComp.SyntaxTrees.Count(), Is.EqualTo(2));
         File.Move($"{appSetFile}.tmp", appSetFile);
     }
     
@@ -58,7 +58,7 @@ public class GeneratorTests: GeneratorTestFixture
         var compilation = GenerateTestExeCompilation();
         Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
         var updatedComp = RunGenerators(compilation, out var generatorDiags, new NoxDynamicGenerator());
-        Assert.That(updatedComp.SyntaxTrees.Count(), Is.EqualTo(5));
+        Assert.That(updatedComp.SyntaxTrees.Count(), Is.EqualTo(6));
         File.Move($"{appSetFile}.tmp", appSetFile, true);
     }
 

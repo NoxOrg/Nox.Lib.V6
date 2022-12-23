@@ -2,30 +2,20 @@
 # Service definition
 #
 
-Name: Test
+Name: MergeNewTest
 
-Description: Test Microservice
+Description: Merge New Test Microservice
 
 Database:
   Name: Test
-  
-  Provider: SqlServer
-  Options: Trusted_Connection=no;connection timeout=120;TrustServerCertificate=true
-  
-  #Provider: Postgres
-  #Port: 54320
-
-  #Provider: MySql
-
-  Server: localhost
-  User: sa
-  Password: Developer*123
+  Provider: SqLite
+  ConnectionString: Data Source=./MergeNew.db;
 
 MessagingProviders:
   - Name: TestMessaging
     Provider: InMemory
-    
+
 DataSources:
   - Name: TestDataSource
-    Provider: SqlServer
-    ConnectionVariable: ConnectionString:MasterDataSource   
+    Provider: SqLite
+    ConnectionString: Data Source=./MergeNewMaster.db;

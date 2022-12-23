@@ -1,22 +1,24 @@
+using System.Data;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 
 namespace Nox.TestFixtures;
 
 public class SqlHelper
 {
-    private readonly SqlConnection _connection;
+    private readonly SqliteConnection _connection;
 
     public SqlHelper(IConfiguration config)
     {
-        _connection = new SqlConnection(config["ConnectionString:Test"]);
+        _connection = new SqliteConnection(config["ConnectionString:Test"]);
     }
     
     public async Task ExecuteAsync(string sql)
     {
         await _connection.OpenAsync();
-        var cmd = new SqlCommand
+        var cmd = new SqliteCommand()
         {
             Connection = _connection,
             CommandText = sql,
@@ -31,7 +33,7 @@ public class SqlHelper
         try
         {
             await _connection.OpenAsync();
-            var cmd = new SqlCommand
+            var cmd = new SqliteCommand
             {
                 Connection = _connection,
                 CommandText = sql,
@@ -41,6 +43,28 @@ public class SqlHelper
             {
                 result = reader.GetInt32(0);
             }
+        }
+        finally
+        {
+            await _connection.CloseAsync();
+        }
+
+        return result;
+    }
+
+    public async Task<DataTable> ExecuteTable(string sql)
+    {
+        var result = new DataTable();
+        try
+        {
+            await _connection.OpenAsync();
+            var cmd = new SqliteCommand
+            {
+                Connection = _connection,
+                CommandText = sql,
+            };
+            var reader = await cmd.ExecuteReaderAsync();
+            result.Load(reader);
         }
         finally
         {

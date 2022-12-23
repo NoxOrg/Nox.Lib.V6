@@ -1,4 +1,4 @@
-#
+﻿#
 # Vehicle entity definition
 #
 
@@ -6,11 +6,14 @@ Name: Vehicle
 Description: Vehicles
 PluralName: Vehicles
 Table: Vehicle
+Schema: dbo
+
+RelatedParents: [Person]
 
 Attributes:
 
   - Name: Id
-    Description: The vehicle's unique identifier
+    Description: The vehicle's unique identifier 
     IsPrimaryKey: true
     Type: int
     CanFilter: true

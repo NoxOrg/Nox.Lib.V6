@@ -107,7 +107,7 @@ public class EtlExecutor : IEtlExecutor
             ConnectionManager = destinationDb,
             TableName = destinationTable,
         };
-
+        
         source.LinkTo(destination);
 
         SqlTask.ExecuteNonQuery(destinationDb, $"DELETE FROM {destinationTable};");
@@ -248,14 +248,15 @@ public class EtlExecutor : IEtlExecutor
         {
             if (record[dateColumn] == null) continue;
 
-            var fieldValue = (DateTime)record[dateColumn]!;
-
-            if (fieldValue > lastMergeDateTimeStampInfo[dateColumn].LastDateLoadedUtc)
+            if (DateTime.TryParse(record[dateColumn]!.ToString(), out var fieldValue))
             {
-                var changeEntry = lastMergeDateTimeStampInfo[dateColumn];
-                changeEntry.LastDateLoadedUtc = fieldValue;
-                changeEntry.Updated = true;
-                lastMergeDateTimeStampInfo[dateColumn] = changeEntry;
+                if (fieldValue > lastMergeDateTimeStampInfo[dateColumn].LastDateLoadedUtc)
+                {
+                    var changeEntry = lastMergeDateTimeStampInfo[dateColumn];
+                    changeEntry.LastDateLoadedUtc = fieldValue;
+                    changeEntry.Updated = true;
+                    lastMergeDateTimeStampInfo[dateColumn] = changeEntry;
+                }
             }
         }
     }
@@ -309,7 +310,10 @@ public class EtlExecutor : IEtlExecutor
         SqlTask.ExecuteReader(destinationDbProvider.ConnectionManager, findSql, r => resultDate = r);
         if (resultDate is not null)
         {
-            return (DateTime)resultDate;
+            if (DateTime.TryParse(resultDate!.ToString(), out var result))
+            {
+                return result;
+            }
         }
 
         var insertQuery = new SqlKata.Query(mergeStateTableName).AsInsert(

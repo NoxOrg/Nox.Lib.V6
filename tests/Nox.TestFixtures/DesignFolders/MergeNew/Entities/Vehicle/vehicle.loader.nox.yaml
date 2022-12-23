@@ -35,4 +35,4 @@ Sources:
           ,0 AS [PersonId]
           ,[CreateDate]
           ,[EditDate]
-      FROM dbo.SourceVehicle WITH (NOLOCK)
+      FROM SourceVehicle

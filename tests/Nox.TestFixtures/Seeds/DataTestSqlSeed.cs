@@ -1,24 +1,25 @@
 using System.Threading.Tasks;
 using Bogus;
 using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 
-namespace Nox.TestFixtures;
+namespace Nox.TestFixtures.Seeds;
 
-public class TestSqlSeed
+public class DataTestSqlSeed
 {
-    private readonly SqlConnection _con;
+    private readonly SqliteConnection _con;
 
-    public TestSqlSeed(IConfiguration configuration)
+    public DataTestSqlSeed(IConfiguration configuration)
     {
-        _con = new SqlConnection(configuration["ConnectionString:Test"]);
+        _con = new SqliteConnection(configuration["ConnectionString:Test"]);
     }
 
     public async Task Execute()
     {
         await _con.OpenAsync();
-        await RunScript("DELETE Vehicle;");
-        await RunScript("DELETE Person;");
+        await RunScript("DELETE FROM Vehicle;");
+        await RunScript("DELETE FROM Person;");
         await SeedPerson(1);
         await _con.CloseAsync();
     }
@@ -41,7 +42,7 @@ public class TestSqlSeed
 
     private async Task RunScript(string script)
     {
-        var cmd = new SqlCommand(script);
+        var cmd = new SqliteCommand(script);
         cmd.Connection = _con;
         await cmd.ExecuteNonQueryAsync();
     }

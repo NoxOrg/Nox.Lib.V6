@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Nox.Core.Constants;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Database;
@@ -14,6 +15,7 @@ public class DataSourceBase : MetaBase, IServiceDataSource
     public int Port { get; set; } = 0;
     public string Password { get; set; } = "password";
     public string Options { get; set; } = "";
+    [MaxLength(512)]
     public string? ConnectionString { get; set; }
     public string? ConnectionVariable { get; set; }
         
@@ -42,7 +44,8 @@ public class DataSourceBase : MetaBase, IServiceDataSource
 
             case Constants.DataProvider.Json:
                 break;
-
+            case Constants.DataProvider.SqLite:
+                break;
             default:
                 isValid = false;
                 break;

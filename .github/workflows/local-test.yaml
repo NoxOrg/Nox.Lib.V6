@@ -31,13 +31,15 @@ jobs:
       - name: Data Tests
         working-directory: tests
         run: dotnet test Nox.Data.Tests --no-restore --verbosity normal
-      - name: Etl Tests
+      - name: Drop And Load Tests
         working-directory: tests
-        run: dotnet test Nox.Etl.Tests --no-restore --verbosity normal
+        run: dotnet test Nox.Etl.DropAndLoad.Tests --no-restore --verbosity normal
+      - name: Merge New Tests
+        working-directory: tests
+        run: dotnet test Nox.Etl.MergeNew.Tests --no-restore --verbosity normal
       - name: Generator Tests
         working-directory: tests
         run: dotnet test Nox.Generator.Tests --no-restore --verbosity normal
       - name: Messaging Tests
         working-directory: tests
         run: dotnet test Nox.Messaging.Tests --no-restore --verbosity normal
- 

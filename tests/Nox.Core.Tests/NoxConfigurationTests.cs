@@ -36,11 +36,7 @@ public class ConfigurationTests: ConfigurationTestFixture
         //Database
         Assert.That(config.Database, Is.Not.Null);
         Assert.That(config.Database!.Name, Is.EqualTo("Test"));
-        Assert.That(config.Database.Options, Is.EqualTo("Trusted_Connection=no;connection timeout=120;TrustServerCertificate=true"));
-        Assert.That(config.Database.Password, Is.EqualTo("Developer*123"));
-        Assert.That(config.Database.Server, Is.EqualTo("localhost"));
-        Assert.That(config.Database.Provider, Is.EqualTo("SqlServer"));
-        Assert.That(config.Database.User, Is.EqualTo("sa"));
+        Assert.That(config.Database!.ConnectionString, Is.EqualTo("Data Source=Test;Mode=Memory;Cache=Shared"));
         //Entities
         Assert.That(config.Entities, Is.Not.Null);
         Assert.That(config.Entities!.Count, Is.EqualTo(2));
@@ -84,9 +80,8 @@ public class ConfigurationTests: ConfigurationTestFixture
         Assert.That(testDataSource, Is.Not.Null);
         Assert.That(testDataSource!.Name, Is.EqualTo("TestDataSource1"));
         Assert.That(testDataSource.Password, Is.EqualTo("password"));
-        Assert.That(testDataSource.Provider, Is.EqualTo("SqlServer"));
-        Assert.That(testDataSource.Server, Is.EqualTo("localhost"));
-        Assert.That(testDataSource.User, Is.EqualTo("user"));
+        Assert.That(testDataSource.Provider, Is.EqualTo("SqLite"));
+        Assert.That(testDataSource.ConnectionString, Is.EqualTo("Data Source=Test;Mode=Memory;Cache=Shared"));
         
         //Messaging Providers
         Assert.That(config.MessagingProviders, Is.Not.Null);

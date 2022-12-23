@@ -1,5 +1,3 @@
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Etl;
@@ -7,7 +5,7 @@ using Nox.TestFixtures;
 using Nox.TestFixtures.Seeds;
 using NUnit.Framework;
 
-namespace Nox.Etl.Tests;
+namespace Nox.Etl.MergeNew.Tests;
 
 public class MergeNewTests : MergeNewTestFixture
 {
