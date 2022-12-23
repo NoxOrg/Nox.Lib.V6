@@ -9,14 +9,14 @@ namespace Nox.Messaging;
 
 public static class MessageExtensions
 {
-    public static INoxEvent? FindEventImplementation(this IEnumerable<INoxEvent> messages, IEntity entity, NoxEventTypeEnum eventType)
+    public static INoxEvent? FindEventImplementation(this IEnumerable<INoxEvent> messages, string entityName, NoxEventTypeEnum eventType)
     {
         foreach (var msg in messages.ToImmutableList())
         {
             var type = msg.GetType();
             var baseType = type.BaseType;
             if (baseType == null) return null;
-            if (baseType.GenericTypeArguments.Any(gta => gta.Name == entity.Name))
+            if (baseType.GenericTypeArguments.Any(gta => gta.Name == entityName))
             {
 
                 switch (eventType)
@@ -35,12 +35,16 @@ public static class MessageExtensions
         }
         return null;
     }
-    
-    
 
-    public static object MapInstance(this INoxEvent template, ExpandoObject source)
+    public static object MapInstance(this INoxEvent template, Object source, NoxEventSourceEnum eventSource)
     {
         var result = Activator.CreateInstance(template.GetType())!;
+        var props = template.GetType().GetProperties();
+        var eventSourceProp = props.FirstOrDefault(p => p.Name.ToLower() == "eventsource");
+        if (eventSourceProp != null)
+        {
+            eventSourceProp.SetValue(result, eventSource);
+        }
         var payloadProp = template.GetType().GetProperties().FirstOrDefault(p => p.Name.ToLower() == "payload");
         if (payloadProp != null)
         {
@@ -50,7 +54,7 @@ public static class MessageExtensions
             {
                 foreach (var prop in payload.GetType().GetProperties())
                 {
-                    var sourceVal = sourceDict[prop.Name];
+                    var sourceVal = sourceDict?[prop.Name];
                     if (sourceVal == null) continue;
 
                     try
@@ -95,5 +99,4 @@ public static class MessageExtensions
         }
         return result;
     }
-
 }

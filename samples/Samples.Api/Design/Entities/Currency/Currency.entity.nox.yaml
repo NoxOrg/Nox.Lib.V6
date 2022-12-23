@@ -8,6 +8,10 @@ PluralName: Currencies
 Table: Currency
 Schema: dbo
 
+Messaging:
+  - MessagingProvider: Mediator
+  - MessagingProvider: AppServiceBus
+
 Attributes:
 
   - Name: Id

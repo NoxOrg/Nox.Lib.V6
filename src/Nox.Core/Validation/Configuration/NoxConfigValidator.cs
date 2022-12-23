@@ -26,7 +26,7 @@ public class NoxConfigValidator: AbstractValidator<NoxConfiguration>
             .WithMessage(config => string.Format(ValidationResources.ConfigEntitiesEmpty, config.Name, config.DefinitionFileName));
 
         RuleForEach(config => config.Entities)
-            .SetValidator(new EntityConfigValidator());
+            .SetValidator(config => new EntityConfigValidator(config.MessagingProviders));
         
         RuleForEach(config => config.Loaders)
             .SetValidator(config => new LoaderConfigValidator(config.Entities, config.DataSources, config.MessagingProviders));

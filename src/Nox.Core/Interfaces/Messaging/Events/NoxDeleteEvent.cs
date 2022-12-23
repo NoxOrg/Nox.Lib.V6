@@ -6,5 +6,6 @@ namespace Nox.Core.Interfaces.Messaging.Events;
 public class NoxDeleteEvent<T>: INoxEvent where T: IDynamicEntity
 {
     private NoxEventTypeEnum EventType => NoxEventTypeEnum.Delete;
+    public NoxEventSourceEnum EventSource { get; set; }
     public T? Payload { get; set; }
 }

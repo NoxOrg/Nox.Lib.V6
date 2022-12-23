@@ -3,13 +3,18 @@ using System.Reflection.Emit;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using Nox.Core.Enumerations;
 using Nox.Core.Extensions;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Etl;
+using Nox.Core.Interfaces.Messaging;
+using Nox.Core.Interfaces.Messaging.Events;
+using Nox.Messaging;
 
 namespace Nox.Data;
 
@@ -19,11 +24,21 @@ public class DynamicModel : IDynamicModel
     private readonly IDynamicService _dynamicService;
     private readonly IDataProvider _databaseProvider;
     private readonly Dictionary<string, DynamicDbEntity> _dynamicDbEntities = new();
+    private IEnumerable<INoxEvent>? _messages = null;
+    private readonly INoxMessenger? _messenger = null;
 
-    public DynamicModel(ILogger<DynamicModel> logger, IDynamicService dynamicService, IEtlExecutor etlExecutor)
+    public DynamicModel(
+        ILogger<DynamicModel> logger, 
+        IDynamicService dynamicService,
+        IEnumerable<INoxEvent>? messages = null,
+        INoxMessenger? messenger = null)
     {
         _dynamicService = dynamicService;
 
+        _messages = messages;
+
+        _messenger = messenger;
+        
         _databaseProvider = dynamicService.MetaService.Database!.DataProvider!;
 
         var builder = new ODataConventionModelBuilder();
@@ -196,9 +211,17 @@ public class DynamicModel : IDynamicModel
     public object PostDynamicObject(DbContext context, string dbSetName, string json)
     {
         var parameters = new object[] { json };
-
         var ret = _dynamicDbEntities[dbSetName].DbContextPostMethod.Invoke(context, parameters);
-
+        
+        if (_messenger != null && _messages != null && ret != null)
+        {
+            var msg = _messages.FindEventImplementation(_dynamicDbEntities[dbSetName].Name, NoxEventTypeEnum.Create);
+            if (msg != null)
+            {
+                SendChangeEvent(_dynamicDbEntities[dbSetName].Entity, ret, msg, NoxEventSourceEnum.NoxEventSourceDomain);
+            }
+        }
+        
         return ret!;
     }
 
@@ -249,5 +272,11 @@ public class DynamicModel : IDynamicModel
 
         return dynamicTypes;
 
+    }
+    
+    private void SendChangeEvent(IEntity entity, Object obj, INoxEvent message, NoxEventSourceEnum eventSource)
+    {
+        var toSend = message.MapInstance(obj, eventSource);
+        _messenger?.SendMessage(entity, toSend);
     }
 }

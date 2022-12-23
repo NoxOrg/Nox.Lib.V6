@@ -24,12 +24,13 @@ public static class ConfigurationExtensions
             cfg.CreateMap<MessagingProviderConfiguration, MessagingProvider>();
             cfg.CreateMap<EntityConfiguration, Core.Models.Entity>();
             cfg.CreateMap<EntityAttributeConfiguration, EntityAttribute>();
+            cfg.CreateMap<MessageTargetConfiguration, EntityMessageTarget>();
             cfg.CreateMap<LoaderConfiguration, Loader>();
             cfg.CreateMap<LoaderScheduleConfiguration, LoaderSchedule>();
             cfg.CreateMap<LoaderScheduleRetryPolicyConfiguration, LoaderScheduleRetryPolicy>();
             cfg.CreateMap<LoaderLoadStrategyConfiguration, LoaderLoadStrategy>();
             cfg.CreateMap<LoaderTargetConfiguration, LoaderTarget>();
-            cfg.CreateMap<LoaderMessageTargetConfiguration, LoaderMessageTarget>();
+            cfg.CreateMap<MessageTargetConfiguration, LoaderMessageTarget>();
             cfg.CreateMap<LoaderSourceConfiguration, LoaderSource>();
 
         });

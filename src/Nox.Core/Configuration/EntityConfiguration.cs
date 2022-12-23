@@ -12,4 +12,5 @@ public class EntityConfiguration: MetaBase
     public string Schema { get; set; } = string.Empty;
     public int SortOrder { get; set; } = 0;
     public string Table { get; set; } = string.Empty;
+    public List<MessageTargetConfiguration>? Messaging { get; set; } = new();
 }

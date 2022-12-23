@@ -1,5 +1,6 @@
 using MassTransit;
 using Nox;
+using Nox.Core.Enumerations;
 
 namespace Samples.Api.Consumers;
 
@@ -14,7 +15,7 @@ public class CountryUpdatedEventConsumer: IConsumer<CountryUpdatedDomainEvent>
     
     public Task Consume(ConsumeContext<CountryUpdatedDomainEvent> context)
     {
-        _logger.LogInformation("Received CountryUpdatedDomainEvent: {Text}", context.Message.Payload);
+        _logger.LogInformation($"Received CountryUpdatedDomainEvent from {context.Message.EventSource.ToFriendlyName()}: {context.Message.Payload}");
         return Task.CompletedTask;
     }
 }

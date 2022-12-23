@@ -5,7 +5,7 @@ namespace Nox.Core.Validation.Configuration;
 
 public class EntityConfigValidator: AbstractValidator<EntityConfiguration>
 {
-    public EntityConfigValidator()
+    public EntityConfigValidator(List<MessagingProviderConfiguration>? msgProviders)
     {
         RuleFor(entity => entity.Name)
             .NotEmpty()
@@ -17,5 +17,8 @@ public class EntityConfigValidator: AbstractValidator<EntityConfiguration>
 
         RuleForEach(entity => entity.Attributes)
             .SetValidator(new EntityAttributeConfigValidator());
+        
+        RuleForEach(entity => entity.Messaging)
+            .SetValidator(new MessageTargetConfigValidator(msgProviders));
     }
 }

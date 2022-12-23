@@ -1,33 +1,30 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
+using Nox.Core.Enumerations;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Messaging;
 using Nox.Core.Interfaces.Messaging.Events;
+using Nox.Messaging;
 
 namespace Nox.Data;
 
 public class DynamicDbContext : DbContext, IDynamicDbContext
 {
     private readonly IDynamicModel _dynamicDbModel;
-    private readonly IEnumerable<INoxEvent> _messages;
-    private readonly INoxMessenger? _messenger;
 
     public DynamicDbContext(
         DbContextOptions<DynamicDbContext> options,
-        IDynamicModel dynamicDbModel
-    )
+        IDynamicModel dynamicDbModel)
         : base(options)
     {
         _dynamicDbModel = dynamicDbModel;
-
         ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
 
     public DynamicDbContext(IDynamicModel dynamicDbModel)
     {
         _dynamicDbModel = dynamicDbModel;
-
         ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
 

@@ -30,12 +30,12 @@ public class LoaderConfigValidator: AbstractValidator<LoaderConfiguration>
             .SetValidator(_ => new LoaderTargetConfigValidator(entities));
         
         RuleForEach(loader => loader.Messaging)
-            .SetValidator(new LoaderMessageTargetConfigValidator(msgProviders));
+            .SetValidator(new MessageTargetConfigValidator(msgProviders));
         
         RuleForEach(loader => loader.Sources)
             .SetValidator(new LoaderSourceConfigValidator(dataSources));
         
         RuleForEach(loader => loader.Messaging)
-            .SetValidator(new LoaderMessageTargetConfigValidator(msgProviders));
+            .SetValidator(new MessageTargetConfigValidator(msgProviders));
     }
 }

@@ -145,8 +145,8 @@ public class EmptyConfigValidationTests
     [Test]
     public void Must_validate_empty_loader_message_target_config()
     {
-        var config = new LoaderMessageTargetConfiguration();
-        var validator = new LoaderMessageTargetConfigValidator(null);
+        var config = new MessageTargetConfiguration();
+        var validator = new MessageTargetConfigValidator(null);
         var result = validator.Validate(config);
         Assert.That(result.IsValid, Is.False);
         Assert.That(result.Errors.Count, Is.EqualTo(2));

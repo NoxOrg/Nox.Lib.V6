@@ -3,9 +3,9 @@ using Nox.Core.Configuration;
 
 namespace Nox.Core.Validation.Configuration;
 
-public class LoaderMessageTargetConfigValidator: AbstractValidator<LoaderMessageTargetConfiguration>
+public class MessageTargetConfigValidator: AbstractValidator<MessageTargetConfiguration>
 {
-    public LoaderMessageTargetConfigValidator(List<MessagingProviderConfiguration>? providers)
+    public MessageTargetConfigValidator(List<MessagingProviderConfiguration>? providers)
     {
         RuleFor(lmt => lmt.MessagingProvider)
             .NotEmpty()

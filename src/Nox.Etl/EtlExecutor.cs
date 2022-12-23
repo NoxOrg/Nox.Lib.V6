@@ -2,7 +2,6 @@ using ETLBox.Connection;
 using ETLBox.ControlFlow.Tasks;
 using ETLBox.DataFlow;
 using ETLBox.DataFlow.Connectors;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Nox.Core.Constants;
 using Nox.Core.Interfaces;
@@ -121,10 +120,10 @@ public class EtlExecutor : IEtlExecutor
         int inserts = 0;
 
         // Get events to fire, if any
-        INoxEvent? entityCreatedMsg = null, entityUpdatedMsg = null;
+        INoxEvent? entityCreatedMsg = null;
         if (loader.Messaging != null && loader.Messaging.Any())
         {
-            entityCreatedMsg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Create);
+            entityCreatedMsg = _messages.FindEventImplementation(entity.Name, NoxEventTypeEnum.Create);
         }
         
         postProcessDestination.WriteAction = (row, _) =>
@@ -134,7 +133,7 @@ public class EtlExecutor : IEtlExecutor
             if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Insert)
             {
                 inserts++;
-                if(entityCreatedMsg is not null) SendChangeEvent(loader, row, entityCreatedMsg);
+                if(entityCreatedMsg is not null) SendChangeEvent(loader, row, entityCreatedMsg, NoxEventSourceEnum.NoxEventSourceEtlLoad);
             }
         };
         
@@ -223,8 +222,8 @@ public class EtlExecutor : IEtlExecutor
         INoxEvent? entityCreatedMsg = null, entityUpdatedMsg = null;
         if (loader.Messaging != null && loader.Messaging.Any())
         {
-            entityCreatedMsg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Create);
-            entityUpdatedMsg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Update);
+            entityCreatedMsg = _messages.FindEventImplementation(entity.Name, NoxEventTypeEnum.Create);
+            entityUpdatedMsg = _messages.FindEventImplementation(entity.Name, NoxEventTypeEnum.Update);
         }
 
         postProcessDestination.WriteAction = (row, _) =>
@@ -234,13 +233,13 @@ public class EtlExecutor : IEtlExecutor
             if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Insert)
             {
                 inserts++;
-                if(entityCreatedMsg is not null) SendChangeEvent(loader, row, entityCreatedMsg);
+                if(entityCreatedMsg is not null) SendChangeEvent(loader, row, entityCreatedMsg, NoxEventSourceEnum.NoxEventSourceEtlMerge);
                 UpdateMergeStates(lastMergeDateTimeStampInfo, record);
             }
             else if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Update)
             {
                 updates++;
-                if (entityUpdatedMsg is not null) SendChangeEvent(loader, row, entityUpdatedMsg);
+                if (entityUpdatedMsg is not null) SendChangeEvent(loader, row, entityUpdatedMsg, NoxEventSourceEnum.NoxEventSourceEtlMerge);
                 UpdateMergeStates(lastMergeDateTimeStampInfo, record);
             }
             else if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Exists)
@@ -266,9 +265,9 @@ public class EtlExecutor : IEtlExecutor
 
     }
 
-    private void SendChangeEvent(ILoader loader, ExpandoObject row, INoxEvent message)
+    private void SendChangeEvent(ILoader loader, ExpandoObject row, INoxEvent message, NoxEventSourceEnum eventSource)
     {
-        var toSend = message.MapInstance(row);
+        var toSend = message.MapInstance(row, eventSource);
 
         _logger.LogInformation("Publishing bus message: {Name}", toSend.GetType().Name);
 

@@ -5,6 +5,7 @@ namespace Nox.Core.Interfaces.Entity;
 public interface IEntity : IMetaBase
 {
     ICollection<EntityAttribute> Attributes { get; set; }
+    ICollection<IEntityMessageTarget>? Messaging { get; set; }
     string Description { get; set; }
     string Name { get; set; }
     string PluralName { get; set; }

@@ -25,6 +25,7 @@
     <ProjectReference Include="..\Nox.Data.Postgres\Nox.Data.Postgres.csproj" />
     <ProjectReference Include="..\Nox.Data.SqlServer\Nox.Data.SqlServer.csproj" />
     <ProjectReference Include="..\Nox.Entity.XtendedAttributes\Nox.Entity.XtendedAttributes.csproj" />
+    <ProjectReference Include="..\Nox.Messaging\Nox.Messaging.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.12" />

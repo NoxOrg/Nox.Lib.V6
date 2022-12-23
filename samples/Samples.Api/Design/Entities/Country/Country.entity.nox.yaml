@@ -10,6 +10,10 @@ Schema: dbo
 
 RelatedParents: [Currency]
 
+Messaging:
+  - MessagingProvider: Mediator
+  - MessagingProvider: AppServiceBus
+    
 Attributes:
 
   - Name: Id

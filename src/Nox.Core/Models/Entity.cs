@@ -22,6 +22,14 @@ public sealed class Entity : MetaBase, IEntity
     public string RelatedChildrenJson { get => string.Join('|',RelatedChildren.ToArray()); set => RelatedChildren = value.Split('|').ToList(); }
     public int SortOrder { get; set; }
     public ICollection<EntityAttribute> Attributes { get; set; } = new Collection<EntityAttribute>();
+    
+    ICollection<IEntityMessageTarget>? IEntity.Messaging
+    {
+        get => Messaging?.ToList<IEntityMessageTarget>();
+        set => Messaging = value as ICollection<EntityMessageTarget>;
+    }
+
+    public ICollection<EntityMessageTarget>? Messaging { get; set; }
 
     public bool ApplyDefaults()
     {

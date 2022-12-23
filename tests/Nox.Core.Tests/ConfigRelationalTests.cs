@@ -57,14 +57,14 @@ public class ConfigRelationalTests
     [Test]
     public void If_MessageTarget_is_used_in_loader_it_must_exist_in_MessagingProviders()
     {
-        var targetConfig = new LoaderMessageTargetConfiguration()
+        var targetConfig = new MessageTargetConfiguration()
         {
             DefinitionFileName = "test.yaml",
             MessagingProvider = "TestProvider"
         };
         var providersConfig = new List<MessagingProviderConfiguration>();
         
-        var validator = new LoaderMessageTargetConfigValidator(providersConfig);
+        var validator = new MessageTargetConfigValidator(providersConfig);
         var result = validator.Validate(targetConfig);
         Assert.That(result.IsValid, Is.False);
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("The Loader messaging target TestProvider in test.yaml does not exist in the service definition yaml")));
