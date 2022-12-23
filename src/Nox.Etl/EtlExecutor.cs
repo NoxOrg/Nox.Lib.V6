@@ -79,8 +79,8 @@ public class EtlExecutor : IEtlExecutor
             switch (loadStrategy)
             {
                 case "dropandload":
-                    _logger.LogInformation("Dropping and loading data for entity {entity}...", entity.Name);
-                    await DropAndLoadData(source, destinationDb, destinationTable);
+                    _logger.LogInformation("Reload data for entity {entity}...", entity.Name);
+                    await DropAndLoadData(source, destinationDb, destinationTable, loader, entity);
                     break;
 
                 case "mergenew":
@@ -100,7 +100,9 @@ public class EtlExecutor : IEtlExecutor
     private async Task DropAndLoadData(
         IDataFlowExecutableSource<ExpandoObject> source,
         IConnectionManager destinationDb,
-        string destinationTable)
+        string destinationTable,
+        ILoader loader,
+        IEntity entity)
     {
         var destination = new DbDestination()
         {
@@ -111,12 +113,43 @@ public class EtlExecutor : IEtlExecutor
         source.LinkTo(destination);
 
         SqlTask.ExecuteNonQuery(destinationDb, $"DELETE FROM {destinationTable};");
+        
+        var postProcessDestination = new CustomDestination();
 
-        await Network.ExecuteAsync((DataFlowExecutableSource<ExpandoObject>)source);
+        // Store analytics
 
-        int rowCount = RowCountTask.Count(destinationDb, destinationTable);
+        int inserts = 0;
 
-        _logger.LogInformation("...copied {rowCount} records", rowCount);
+        // Get events to fire, if any
+        INoxEvent? entityCreatedMsg = null, entityUpdatedMsg = null;
+        if (loader.Messaging != null && loader.Messaging.Any())
+        {
+            entityCreatedMsg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Create);
+        }
+        
+        postProcessDestination.WriteAction = (row, _) =>
+        {
+            var record = (IDictionary<string, object?>)row;
+
+            if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Insert)
+            {
+                inserts++;
+                if(entityCreatedMsg is not null) SendChangeEvent(loader, row, entityCreatedMsg);
+            }
+        };
+        
+        try
+        {
+            await Network.ExecuteAsync((DataFlowExecutableSource<ExpandoObject>)source);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("Failed to run Drop & Load for Entity {entity}", entity.Name);
+            _logger.LogError("{message}", ex.Message);
+            throw;
+        }
+
+        LogReloadAnalytics(inserts);
     }
 
     private async Task MergeNewData(
@@ -357,6 +390,16 @@ public class EtlExecutor : IEtlExecutor
         return result == 1;
     }
 
+    private void LogReloadAnalytics(int inserts)
+    {
+        if (inserts == 0)
+        {
+            _logger.LogInformation("...no records found to load");
+            return;
+        }
+        _logger.LogInformation($"{inserts} records inserted, last merge at {DateTime.Now}");
+    }
+    
     private void LogMergeAnalytics(int inserts, int updates, int unchanged, LoaderMergeStates lastMergeDateTimeStampInfo)
     {
         var lastMergeDateTimeStamp = DateTime.MinValue;
