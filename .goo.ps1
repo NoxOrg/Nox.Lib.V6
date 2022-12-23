@@ -79,9 +79,9 @@ $goo.Command.Add( 'init', {
     $goo.Command.Run( 'build' )
     $goo.Command.Run( 'up' )
     $goo.Command.Run( 'waitfordb' )
-    $goo.Command.Run( 'migr-add', "InitialCreate" )
-    $goo.Command.Run( 'migr-dbupdate' )
-    $goo.Command.Run( 'run' )
+    $goo.Command.Run( 'migr-add', @("InitialCreate", "--configuration Release --no-build") )
+    $goo.Command.Run( 'migr-dbupdate', "--configuration Release" )
+    $goo.Command.Run( 'run', "--configuration Release --no-build" )
 })
 
 # command: goo clean | Removes data and build output
@@ -92,8 +92,8 @@ $goo.Command.Add( 'clean', {
     $goo.IO.EnsureRemoveFolder("./dist")
     $goo.IO.EnsureRemoveFolder("./src/dist")
     $goo.IO.EnsureRemoveFolder("$script:ProjectFolder\Migrations")
-    $goo.Command.RunExternal('dotnet','restore --verbosity:quiet --nologo',$script:SolutionFolder)
-    $goo.Command.RunExternal('dotnet','clean --verbosity:quiet --nologo',$script:SolutionFolder)
+    $goo.Command.RunExternal('dotnet','restore --verbosity:quiet --nologo',$script:ProjectFolder)
+    $goo.Command.RunExternal('dotnet','clean --verbosity:quiet --nologo',$script:ProjectFolder)
     $goo.StopIfError("Failed to clean previous builds. (Release)")
 })
 
@@ -101,31 +101,31 @@ $goo.Command.Add( 'clean', {
 # command: goo build | Builds the solution and command line app. 
 $goo.Command.Add( 'build', {
     $goo.Console.WriteInfo("Building solution...")
-    $goo.Command.RunExternal('dotnet','build /clp:ErrorsOnly --warnaserror --configuration Release', $script:SolutionFolder)
+    $goo.Command.RunExternal('dotnet','build /clp:ErrorsOnly --warnaserror --configuration Release', $script:ProjectFolder)
     $goo.StopIfError("Failed to build solution. (Release)")
-    $goo.Command.RunExternal('dotnet','publish --configuration Release --output ..\dist --no-build', $script:ProjectFolder )
+    $goo.Command.RunExternal('dotnet','publish --configuration Release --output ..\dist --no-build', $script:ProjectFolder)
     $goo.StopIfError("Failed to publish CLI project. (Release)")
 })
 
 # command: goo migr-add <name> | Add a migration to the project called "<name>"
-$goo.Command.Add( 'migr-add', { param([string]$name)
+$goo.Command.Add( 'migr-add', { param([string]$name, [string]$options)
     if([string]::IsNullOrWhiteSpace($name)) { $goo.Error("You need to specify a migration name.") }
     $goo.Console.WriteInfo("Adding migration [$name]...")
-    $goo.Command.RunExternal('dotnet',"ef migrations add ""$name"" --context NoxDbContext", $script:ProjectFolder)
+    $goo.Command.RunExternal('dotnet',"ef migrations add ""$name"" --context NoxDbContext $options", $script:ProjectFolder)
     $goo.StopIfError("Failed to add migration.")
 })
 
 # command: goo migr-remove | Undo the last migration addition from the project
-$goo.Command.Add( 'migr-remove', { 
+$goo.Command.Add( 'migr-remove', { param([string]$options)
     $goo.Console.WriteInfo("Removing last migration...")
-    $goo.Command.RunExternal('dotnet',"ef migrations remove --context NoxDbContext", $script:ProjectFolder)
+    $goo.Command.RunExternal('dotnet',"ef migrations remove --context NoxDbContext $options", $script:ProjectFolder)
     $goo.StopIfError("Failed to remove migration.")
 })
 
 # command: goo migr-dbupdate | Update the database to the latest migration
-$goo.Command.Add( 'migr-dbupdate', { 
+$goo.Command.Add( 'migr-dbupdate', { param([string]$options)
     $goo.Console.WriteInfo("Migrating the the database...")
-    $goo.Command.RunExternal('dotnet',"ef database update --context NoxDbContext", $script:ProjectFolder)
+    $goo.Command.RunExternal('dotnet',"ef database update --context NoxDbContext $options", $script:ProjectFolder)
     $goo.StopIfError("Failed to migrate the databse.")
 })
 
@@ -185,9 +185,9 @@ $goo.Command.Add( 'dev', {
 })
 
 # command: goo run | Run the console application
-$goo.Command.Add( 'run', {
+$goo.Command.Add( 'run', { param([string]$options)
     $goo.Command.Run( 'waitfordb' )
-    $goo.Command.RunExternal('dotnet','run',$script:ProjectFolder)
+    $goo.Command.RunExternal('dotnet',"run $options",$script:ProjectFolder)
 })
 
 # command: goo listen | View events being emmited from event source
