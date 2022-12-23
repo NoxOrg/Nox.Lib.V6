@@ -61,9 +61,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nox.Data.Json", "Nox.Data.J
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nox.Data.SQLite", "Nox.Data.SQLite\Nox.Data.SQLite.csproj", "{DA1F9968-094A-4EC6-ABCA-6E75F77948CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nox.Etl.DropAndLoad.Tests", "Nox.Etl.DropAndLoad.Tests\Nox.Etl.DropAndLoad.Tests.csproj", "{9F9CE6EE-A47D-4079-9412-09ACAF9ADC7B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nox.Etl.DropAndLoad.Tests", "..\tests\Nox.Etl.DropAndLoad.Tests\Nox.Etl.DropAndLoad.Tests.csproj", "{9F9CE6EE-A47D-4079-9412-09ACAF9ADC7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nox.Etl.MergeNew.Tests", "Nox.Etl.MergeNew.Tests\Nox.Etl.MergeNew.Tests.csproj", "{4AD6A270-516E-4ABE-B2A5-77F46FD62950}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nox.Etl.MergeNew.Tests", "..\tests\Nox.Etl.MergeNew.Tests\Nox.Etl.MergeNew.Tests.csproj", "{4AD6A270-516E-4ABE-B2A5-77F46FD62950}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
