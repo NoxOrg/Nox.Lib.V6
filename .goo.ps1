@@ -186,6 +186,7 @@ $goo.Command.Add( 'dev', {
 
 # command: goo run | Run the console application
 $goo.Command.Add( 'run', { param([string]$options)
+    $goo.Console.WriteInfo("Starting the application...")
     $goo.Command.Run( 'waitfordb' )
     $goo.Command.RunExternal('dotnet',"run $options",$script:ProjectFolder)
 })
@@ -310,8 +311,9 @@ $goo.Command.Add( 'bump-version', { param($version)
     $goo.Command.Run('set-project-version', @($versionInfoTable, $versionArray))
 })
 
-# command: goo publish | Build and publish Nox nuget packages
 $goo.Command.Add( 'publish', { 
+
+    $goo.Error("This command is depricated and now handled by Github Actions.")
 
     $goo.Console.WriteInfo("Updating version for ($script:SourceFolder\Nox.Lib) and dependancies...")
     $goo.Command.Run( 'bump-version' )
@@ -341,7 +343,7 @@ $goo.Command.Add( 'waitfordb', {
         "Connection Timeout=120;" +
         "Application Name=$script:SolutionName;" 
     )
-    $goo.Console.WriteInfo("Master Connection String: $masterConnectionString")
+    $goo.Console.WriteInfo("Connection String: $masterConnectionString")
     while (-not $goo.Sql.TestConnection( $masterConnectionString )){
         $goo.Console.WriteInfo('Waiting for docker SQL database to be ready to accept connections...')
         $goo.Sleep(10)
