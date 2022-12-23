@@ -5,21 +5,11 @@
 Name: Test
 
 Description: Test Microservice
-
+  
 Database:
   Name: Test
-  
-  Provider: SqlServer
-  Options: Trusted_Connection=no;connection timeout=120;TrustServerCertificate=true
-  
-  #Provider: Postgres
-  #Port: 54320
-
-  #Provider: MySql
-
-  Server: localhost
-  User: sa
-  Password: Developer*123
+  Provider: SqLite
+  ConnectionString: Data Source=Test;Mode=Memory;Cache=Shared
 
 MessagingProviders:
   - Name: TestMessagingProvider1
@@ -29,14 +19,14 @@ MessagingProviders:
     
 DataSources:
   - Name: TestDataSource1
-    Provider: SqlServer
-    ConnectionString: data source=localhost;user id=sa; password=Developer*123; database=Test;
+    Provider: SqLite
+    ConnectionString: Data Source=Test;Mode=Memory;Cache=Shared
   - Name: TestDataSource2
-    Provider: SqlServer
+    Provider: SqLite
     Server: localhost
     Port: 1433
     User: sa
     Password: Developer*123
   - Name: TestDataSource3
-    Provider: SqlServer
+    Provider: SqLite
     ConnectionVariable: TestConnectionVariable

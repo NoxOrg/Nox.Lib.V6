@@ -32,4 +32,4 @@ Sources:
            [Id]
           ,[VehicleBrand] AS [Brand]
           ,[VehicleColor] AS [Color]
-      FROM dbo.SourceVehicle WITH (NOLOCK)
+      FROM SourceVehicle

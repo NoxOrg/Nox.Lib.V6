@@ -1,25 +1,23 @@
 using System.Threading.Tasks;
 using Bogus;
 using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 
-namespace Nox.TestFixtures;
+namespace Nox.TestFixtures.Seeds;
 
 public class TestSourceSqlSeed
 {
-    private readonly SqlConnection _con;
+    private readonly SqliteConnection _con;
 
     public TestSourceSqlSeed(IConfiguration configuration)
     {
-        _con = new SqlConnection(configuration["ConnectionString:Master"]);
+        _con = new SqliteConnection(configuration["ConnectionString:Master"]);
     }
 
     public async Task Execute()
     {
         await _con.OpenAsync();
-        await RunScript("DROP DATABASE IF EXISTS TestSource;");
-        await RunScript("CREATE DATABASE TestSource;");
-        await RunScript("use TestSource");
         await RunScript("CREATE TABLE SourcePerson (Id int NOT NULL PRIMARY KEY, PersonName varchar(100) NOT NULL, PersonAge int NOT NULL);");
         await RunScript("CREATE TABLE SourceVehicle (Id int NOT NULL PRIMARY KEY IDENTITY(1,1), PersonId int NOT NULL, VehicleBrand varchar(40) NOT NULL, VehicleColor varchar(10) NOT NULL);");
         for (var i = 0; i < 100; i++)
@@ -48,7 +46,7 @@ public class TestSourceSqlSeed
 
     private async Task RunScript(string script)
     {
-        var cmd = new SqlCommand(script);
+        var cmd = new SqliteCommand(script);
         cmd.Connection = _con;
         await cmd.ExecuteNonQueryAsync();
     }

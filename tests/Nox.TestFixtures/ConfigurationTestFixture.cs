@@ -15,11 +15,7 @@ public class ConfigurationTestFixture
     public void OneTimeSetup()
     {
         TestServices = new ServiceCollection();
-        Environment.SetEnvironmentVariable("ENVIRONMENT", "");
-        var config = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .Build();
-        TestServices.AddSingleton<IConfiguration>(config);
+        Environment.SetEnvironmentVariable("ENVIRONMENT", "Config");
         TestServiceProvider = TestServices.BuildServiceProvider();
     }
 }

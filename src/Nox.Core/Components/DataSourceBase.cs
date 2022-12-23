@@ -44,7 +44,8 @@ public class DataSourceBase : MetaBase, IServiceDataSource
 
             case Constants.DataProvider.Json:
                 break;
-
+            case Constants.DataProvider.SqLite:
+                break;
             default:
                 isValid = false;
                 break;

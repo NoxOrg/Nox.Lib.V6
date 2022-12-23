@@ -20,7 +20,7 @@ public class DropAndLoadTests: DropAndLoadTestFixture
         var result = await loaderExecutor.ExecuteLoaderAsync(service.MetaService, loader, entity);
         Assert.That(result, Is.True);
         var sqlHelper = TestServiceProvider!.GetRequiredService<SqlHelper>();
-        var count = await sqlHelper.ExecuteInt("SELECT COUNT(*) FROM dbo.Vehicle");
+        var count = await sqlHelper.ExecuteInt("SELECT COUNT(*) FROM Vehicle");
         Assert.That(count, Is.EqualTo(1000));
     }
 }
