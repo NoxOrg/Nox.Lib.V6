@@ -31,25 +31,21 @@ jobs:
         run: dotnet restore ./src/Nox.sln
       - name: Build
         run: dotnet build ./src/Nox.sln --warnaserror --configuration Release --no-restore      
-      
-      #### <-- add back when tests are working
-      #- name: Core Tests
-      #  working-directory: tests
-      #  run: dotnet test Nox.Core.Tests --no-restore --verbosity normal
-      #- name: Data Tests
-      #  working-directory: tests
-      #  run: dotnet test Nox.Data.Tests --no-restore --verbosity normal
-      #- name: Etl Tests
-      #  working-directory: tests
-      #  run: dotnet test Nox.Etl.Tests --no-restore --verbosity normal
-      #- name: Generator Tests
-      #  working-directory: tests
-      #  run: dotnet test Nox.Generator.Tests --no-restore --verbosity normal
-      #- name: Messaging Tests
-      #  working-directory: tests
-      #  run: dotnet test Nox.Messaging.Tests --no-restore --verbosity normal
-  
-
-# Removed comments once tests all run
-#      - name: Test
-#        run: dotnet test --no-restore --verbosity normal
+      - name: Core Tests
+        working-directory: tests
+        run: dotnet test Nox.Core.Tests --no-restore --verbosity normal
+      - name: Data Tests
+        working-directory: tests
+        run: dotnet test Nox.Data.Tests --no-restore --verbosity normal
+      - name: Drop And Load Tests
+        working-directory: tests
+        run: dotnet test Nox.Etl.DropAndLoad.Tests --no-restore --verbosity normal
+      - name: Merge New Tests
+        working-directory: tests
+        run: dotnet test Nox.Etl.MergeNew.Tests --no-restore --verbosity normal
+      - name: Generator Tests
+        working-directory: tests
+        run: dotnet test Nox.Generator.Tests --no-restore --verbosity normal
+      - name: Messaging Tests
+        working-directory: tests
+        run: dotnet test Nox.Messaging.Tests --no-restore --verbosity normal
