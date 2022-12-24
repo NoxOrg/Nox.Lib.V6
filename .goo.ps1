@@ -353,17 +353,17 @@ $goo.Command.Add( 'waitfordb', {
 # command: goo test | Runs all tests in the solution
 $goo.Command.Add( 'test', {
     $goo.Console.WriteLine( "Running core tests..." )
-    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal', "$script:TestsFolder\Nox.Core.Tests")
+    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal --configuration Release', "$script:TestsFolder\Nox.Core.Tests")
     $goo.Console.WriteLine( "Running data tests..." )
-    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal', "$script:TestsFolder\Nox.Data.Tests")
+    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal --configuration Release', "$script:TestsFolder\Nox.Data.Tests")
     $goo.Console.WriteLine( "Running drop and load tests..." )
-    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal', "$script:TestsFolder\Nox.Etl.DropAndLoad.Tests")
+    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal --configuration Release', "$script:TestsFolder\Nox.Etl.DropAndLoad.Tests")
     $goo.Console.WriteLine( "Running merge new tests..." )
-    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal', "$script:TestsFolder\Nox.Etl.MergeNew.Tests")
+    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal --configuration Release', "$script:TestsFolder\Nox.Etl.MergeNew.Tests")
     $goo.Console.WriteLine( "Running generator tests..." )
-    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal', "$script:TestsFolder\Nox.Generator.Tests")
+    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal --configuration Release', "$script:TestsFolder\Nox.Generator.Tests")
     $goo.Console.WriteLine( "Running messaging tests..." )
-    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal', "$script:TestsFolder\Nox.Messaging.Tests")
+    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal --configuration Release', "$script:TestsFolder\Nox.Messaging.Tests")
 })
 
 
