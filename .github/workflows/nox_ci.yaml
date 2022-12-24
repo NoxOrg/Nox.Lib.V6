@@ -32,20 +32,14 @@ jobs:
       - name: Build
         run: dotnet build ./src/Nox.sln --warnaserror --configuration Release --no-restore      
       - name: Core Tests
-        working-directory: tests
-        run: dotnet test Nox.Core.Tests --no-restore --verbosity minimal
+        run: dotnet test ./tests/Nox.Core.Tests --no-restore --verbosity minimal
       - name: Data Tests
-        working-directory: tests
-        run: dotnet test Nox.Data.Tests --no-restore --verbosity minimal
+        run: dotnet test ./tests/Nox.Data.Tests --no-restore --verbosity minimal
       - name: Drop And Load Tests
-        working-directory: tests
-        run: dotnet test Nox.Etl.DropAndLoad.Tests --no-restore --verbosity minimal
+        run: dotnet test ./tests/Nox.Etl.DropAndLoad.Tests --no-restore --verbosity minimal
       - name: Merge New Tests
-        working-directory: tests
-        run: dotnet test Nox.Etl.MergeNew.Tests --no-restore --verbosity minimal
+        run: dotnet test ./tests/Nox.Etl.MergeNew.Tests --no-restore --verbosity minimal
       - name: Generator Tests
-        working-directory: tests
-        run: dotnet test Nox.Generator.Tests --no-restore --verbosity minimal
+        run: dotnet test ./tests/Nox.Generator.Tests --no-restore --verbosity minimal
       - name: Messaging Tests
-        working-directory: tests
-        run: dotnet test Nox.Messaging.Tests --no-restore --verbosity minimal
+        run: dotnet test ./tests/Nox.Messaging.Tests --no-restore --verbosity minimal
