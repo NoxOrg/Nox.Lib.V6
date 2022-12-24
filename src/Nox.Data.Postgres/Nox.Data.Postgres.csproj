@@ -26,10 +26,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="ETLBox">
-      <HintPath>..\Nox.Tle\Nox.ETLBox.dll</HintPath>
+      <HintPath>..\Nox.Tle\ETLBox.dll</HintPath>
     </Reference>
-    <Reference Include="Nox.ETLBox.MySql">
-      <HintPath>..\Nox.Tle\Nox.ETLBox.Postgres.dll</HintPath>
+    <Reference Include="ETLBox.MySql">
+      <HintPath>..\Nox.Tle\ETLBox.Postgres.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

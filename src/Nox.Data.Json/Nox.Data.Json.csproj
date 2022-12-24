@@ -22,10 +22,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="ETLBox">
-      <HintPath>..\Nox.Tle\Nox.ETLBox.dll</HintPath>
+      <HintPath>..\Nox.Tle\ETLBox.dll</HintPath>
     </Reference>
-    <Reference Include="Nox.ETLBox.Json">
-      <HintPath>..\Nox.Tle\Nox.ETLBox.Json.dll</HintPath>
+    <Reference Include="ETLBox.Json">
+      <HintPath>..\Nox.Tle\ETLBox.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
