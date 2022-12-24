@@ -26,11 +26,11 @@
     <PackageReference Include="MySql.EntityFrameworkCore" Version="6.0.7" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="ETLBox">
-      <HintPath>..\Nox.Tle\ETLBox.dll</HintPath>
+    <Reference Include="Nox.ETLBox">
+      <HintPath>..\Nox.Tle\Nox.ETLBox.dll</HintPath>
     </Reference>
-    <Reference Include="ETLBox.MySql">
-      <HintPath>..\Nox.Tle\ETLBox.MySql.dll</HintPath>
+    <Reference Include="Nox.ETLBox.MySql">
+      <HintPath>..\Nox.Tle\Nox.ETLBox.MySql.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

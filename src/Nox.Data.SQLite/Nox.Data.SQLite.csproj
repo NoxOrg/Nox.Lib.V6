@@ -26,11 +26,11 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.12" />
     </ItemGroup>
   <ItemGroup>
-    <Reference Include="ETLBox">
-      <HintPath>..\Nox.Tle\ETLBox.dll</HintPath>
+    <Reference Include="Nox.ETLBox">
+      <HintPath>..\Nox.Tle\Nox.ETLBox.dll</HintPath>
     </Reference>
-    <Reference Include="ETLBox.SQLite">
-      <HintPath>..\Nox.Tle\ETLBox.SQLite.dll</HintPath>
+    <Reference Include="Nox.ETLBox.SQLite">
+      <HintPath>..\Nox.Tle\Nox.ETLBox.SQLite.dll</HintPath>
     </Reference>
   </ItemGroup>
   

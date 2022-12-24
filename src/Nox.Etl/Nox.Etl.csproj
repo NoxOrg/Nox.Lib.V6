@@ -26,8 +26,8 @@
     <PackageReference Include="SqlKata" Version="2.4.0" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="ETLBox">
-      <HintPath>..\Nox.Tle\ETLBox.dll</HintPath>
+    <Reference Include="Nox.ETLBox">
+      <HintPath>..\Nox.Tle\Nox.ETLBox.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
