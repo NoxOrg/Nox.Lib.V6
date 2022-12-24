@@ -25,7 +25,7 @@
 
     <ItemGroup>
       <Reference Include="Nox.ETLBox">
-        <HintPath>..\..\Nox.Tle\Nox.ETLBox.dll</HintPath>
+        <HintPath>..\..\src\Nox.Tle\Nox.ETLBox.dll</HintPath>
       </Reference>
     </ItemGroup>
 
