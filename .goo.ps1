@@ -92,8 +92,8 @@ $goo.Command.Add( 'clean', {
     $goo.IO.EnsureRemoveFolder("./dist")
     $goo.IO.EnsureRemoveFolder("./src/dist")
     $goo.IO.EnsureRemoveFolder("$script:ProjectFolder\Migrations")
-    $goo.Command.RunExternal('dotnet','restore --verbosity:quiet --nologo',$script:ProjectFolder)
-    $goo.Command.RunExternal('dotnet','clean --verbosity:quiet --nologo',$script:ProjectFolder)
+    $goo.Command.RunExternal('dotnet','clean --verbosity:quiet --nologo',$script:SolutionFolder)
+    $goo.Command.RunExternal('dotnet','restore --verbosity:quiet --nologo',$script:SolutionFolder)
     $goo.StopIfError("Failed to clean previous builds. (Release)")
 })
 
@@ -353,17 +353,17 @@ $goo.Command.Add( 'waitfordb', {
 # command: goo test | Runs all tests in the solution
 $goo.Command.Add( 'test', {
     $goo.Console.WriteLine( "Running core tests..." )
-    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal --configuration Release', "$script:TestsFolder\Nox.Core.Tests")
+    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Core.Tests --no-restore --verbosity minimal --configuration Release')
     $goo.Console.WriteLine( "Running data tests..." )
-    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal --configuration Release', "$script:TestsFolder\Nox.Data.Tests")
+    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Data.Tests --no-restore --verbosity minimal --configuration Release')
     $goo.Console.WriteLine( "Running drop and load tests..." )
-    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal --configuration Release', "$script:TestsFolder\Nox.Etl.DropAndLoad.Tests")
+    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Etl.DropAndLoad.Tests --no-restore --verbosity minimal --configuration Release')
     $goo.Console.WriteLine( "Running merge new tests..." )
-    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal --configuration Release', "$script:TestsFolder\Nox.Etl.MergeNew.Tests")
+    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Etl.MergeNew.Tests --no-restore --verbosity minimal --configuration Release')
     $goo.Console.WriteLine( "Running generator tests..." )
-    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal --configuration Release', "$script:TestsFolder\Nox.Generator.Tests")
+    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Generator.Tests --no-restore --verbosity minimal --configuration Release')
     $goo.Console.WriteLine( "Running messaging tests..." )
-    $goo.Command.RunExternal('dotnet','test --no-restore --verbosity minimal --configuration Release', "$script:TestsFolder\Nox.Messaging.Tests")
+    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Messaging.Tests --no-restore --verbosity minimal --configuration Release')
 })
 
 
