@@ -48,7 +48,7 @@
     <Folder Include="Exceptions" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Nox.ETLBox">
+    <Reference Include="ETLBox">
       <HintPath>..\Nox.Tle\Nox.ETLBox.dll</HintPath>
     </Reference>
   </ItemGroup>

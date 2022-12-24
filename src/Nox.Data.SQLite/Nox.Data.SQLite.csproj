@@ -25,13 +25,13 @@
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.12" />
     </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Nox.ETLBox">
-      <HintPath>..\Nox.Tle\Nox.ETLBox.dll</HintPath>
-    </Reference>
-    <Reference Include="Nox.ETLBox.SQLite">
-      <HintPath>..\Nox.Tle\Nox.ETLBox.SQLite.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+    <ItemGroup>
+      <Reference Include="ETLBox">
+        <HintPath>..\Nox.Tle\Nox.ETLBox.dll</HintPath>
+      </Reference>
+      <Reference Include="Nox.ETLBox.SQLite">
+        <HintPath>..\Nox.Tle\Nox.ETLBox.SQLite.dll</HintPath>
+      </Reference>
+    </ItemGroup>
   
 </Project>

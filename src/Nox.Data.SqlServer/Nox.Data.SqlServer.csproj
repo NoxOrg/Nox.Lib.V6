@@ -25,7 +25,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.11" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Nox.ETLBox">
+    <Reference Include="ETLBox">
       <HintPath>..\Nox.Tle\Nox.ETLBox.dll</HintPath>
     </Reference>
     <Reference Include="Nox.ETLBox.SqlServer">

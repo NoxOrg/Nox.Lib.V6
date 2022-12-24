@@ -21,7 +21,7 @@
     <ProjectReference Include="..\Nox.Core\Nox.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Nox.ETLBox">
+    <Reference Include="ETLBox">
       <HintPath>..\Nox.Tle\Nox.ETLBox.dll</HintPath>
     </Reference>
     <Reference Include="Nox.ETLBox.Json">
