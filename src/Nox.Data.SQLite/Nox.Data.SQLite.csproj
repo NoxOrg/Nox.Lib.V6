@@ -27,10 +27,10 @@
     </ItemGroup>
   <ItemGroup>
     <Reference Include="ETLBox">
-      <HintPath>..\Nox.Tle\EtlBox.dll</HintPath>
+      <HintPath>..\Nox.Tle\ETLBox.dll</HintPath>
     </Reference>
     <Reference Include="ETLBox.SQLite">
-      <HintPath>..\Nox.Tle\EtlBox.SQLite.dll</HintPath>
+      <HintPath>..\Nox.Tle\ETLBox.SQLite.dll</HintPath>
     </Reference>
   </ItemGroup>
   

@@ -26,10 +26,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="ETLBox">
-      <HintPath>..\Nox.Tle\EtlBox.dll</HintPath>
+      <HintPath>..\Nox.Tle\ETLBox.dll</HintPath>
     </Reference>
     <Reference Include="ETLBox.SqlServer">
-      <HintPath>..\Nox.Tle\EtlBox.SqlServer.dll</HintPath>
+      <HintPath>..\Nox.Tle\ETLBox.SqlServer.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
