@@ -81,9 +81,6 @@
     <ProjectReference Include="..\Nox.Messaging\Nox.Messaging.csproj" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="ETLBox">
-      <HintPath>..\Nox.Tle\EtlBox.dll</HintPath>
-    </Reference>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.13.1.0" />
     <PackageReference Include="TSQL.Parser" Version="1.5.3" />
   </ItemGroup>

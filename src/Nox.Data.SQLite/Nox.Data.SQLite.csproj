@@ -21,8 +21,17 @@
         <ProjectReference Include="..\Nox.Core\Nox.Core.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="ETLBox.SQLite" Version="2.6.6" />
+        <PackageReference Include="System.Data.SQLite.Core" Version="1.0.116" />
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.12" />
     </ItemGroup>
+    <ItemGroup>
+      <Reference Include="ETLBox">
+        <HintPath>..\Nox.Tle\ETLBox.dll</HintPath>
+      </Reference>
+      <Reference Include="ETLBox.SQLite">
+        <HintPath>..\Nox.Tle\ETLBox.SQLite.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+  
 </Project>
