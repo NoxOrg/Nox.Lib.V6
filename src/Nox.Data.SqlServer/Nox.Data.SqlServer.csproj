@@ -21,8 +21,15 @@
     <ProjectReference Include="..\Nox.Core\Nox.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ETLBox.SqlServer" Version="2.6.6" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.7.32" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.11" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="ETLBox">
+      <HintPath>..\Nox.Tle\EtlBox.dll</HintPath>
+    </Reference>
+    <Reference Include="ETLBox.SqlServer">
+      <HintPath>..\Nox.Tle\EtlBox.SqlServer.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
