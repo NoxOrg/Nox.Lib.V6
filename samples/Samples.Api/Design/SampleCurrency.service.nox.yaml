@@ -52,4 +52,21 @@ DataSources:
   #  Provider: Excel
   #  Options: Source=File;Path=../../docs/sample-data/;
 
-  
+VersionControl:
+  Provider: AzureDevOps
+  Server: https://dev.azure.com/iwgplc
+  Project: Nox.SampleCurrency
+  Repository: SampleCurrency.Api.V1
+
+Team:
+  Developers:
+    - Name: Dionisis Stoubos
+      UserName: dionisis.stoubos@iwgplc.com
+      IsAdmin: true
+    - Name: Andre Sharpe
+      UserName: andre.sharpe@iwgplc.com
+      MobilePhoneNumber: +41234567890
+      IsAdmin: true
+    - Name: Jan Schutte
+      UserName: jan.schutte@iwgplc.com
+      IsAdmin: true
