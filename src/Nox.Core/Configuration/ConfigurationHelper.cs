@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
+using Nox.Core.Constants;
 using Nox.Core.Exceptions;
 
 namespace Nox.Core.Configuration;
@@ -27,8 +28,7 @@ public class ConfigurationHelper
 
         if (string.IsNullOrEmpty(keyVaultUri))
         {
-            // Removed implicit keyvault: keyVaultUri = KeyVault.DefaultKeyVaultUri;
-            return configBuilder.Build();
+            keyVaultUri = KeyVault.DefaultKeyVaultUri;
         }
 
         // Add key vault (if specified) to the config
