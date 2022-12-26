@@ -8,6 +8,8 @@ public interface INoxConfiguration
     string Description { get; set; }
     string KeyVaultUri { get; set; }
     string EndpointProvider { get; set; }
+    public VersionControlConfiguration? VersionControl { get; set; }
+    public TeamConfiguration? Team { get; set; }
     DataSourceConfiguration? Database { get; set; }
     List<MessagingProviderConfiguration>? MessagingProviders { get; set; }
     List<ApiConfiguration>? Apis { get; set; }
