@@ -23,4 +23,10 @@
       <ProjectReference Include="..\Nox.TestFixtures\Nox.TestFixtures.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="ETLBox">
+        <HintPath>..\..\src\Nox.Tle\ETLBox.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

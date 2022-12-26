@@ -14,6 +14,8 @@ public class NoxConfiguration: MetaBase, INoxConfiguration
     public bool AutoMigrations { get; set; } = true;
     public DataSourceConfiguration? Database { get; set; }
     public List<MessagingProviderConfiguration>? MessagingProviders { get; set; }
+    public VersionControlConfiguration? VersionControl { get; set; }
+    public TeamConfiguration? Team { get; set; }
     public List<ApiConfiguration>? Apis { get; set; }
     public List<EntityConfiguration>? Entities { get; set; }
     public List<LoaderConfiguration>? Loaders { get; set; }

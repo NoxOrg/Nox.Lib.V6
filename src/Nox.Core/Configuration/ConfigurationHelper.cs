@@ -1,14 +1,12 @@
 ﻿using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
-using Nox.Core.Constants;
 using Nox.Core.Exceptions;
 
 namespace Nox.Core.Configuration;
 
 public class ConfigurationHelper
 {
-
     public static IConfiguration? GetNoxAppSettings()
     {
         return GetNoxAppSettings(Array.Empty<string>());
@@ -25,14 +23,21 @@ public class ConfigurationHelper
         }
 
         config = configBuilder.Build();
-        var keyVaultUri = config["KeyVaultUri"];
-        if (string.IsNullOrEmpty(keyVaultUri)) keyVaultUri = KeyVault.DefaultKeyVaultUri;
+        var keyVaultUri = config["Nox:KeyVaultUri"];
+
+        if (string.IsNullOrEmpty(keyVaultUri))
+        {
+            // Removed implicit keyvault: keyVaultUri = KeyVault.DefaultKeyVaultUri;
+            return configBuilder.Build();
+        }
+
+        // Add key vault (if specified) to the config
 
         var keys = new[] {
-            "ConnectionString:AzureServiceBus",
-            "ConnectionString:MasterDataSource",
-            "XECurrency:ApiPassword",
-            "XECurrency:ApiUser"
+            "AZURE-TENANT-ID",
+            "AZURE-CLIENT-ID",
+            "AZURE-CLIENT-SECRET",
+            "AZURE-DEVOPS-PAT"
         };
 
         try
@@ -77,17 +82,15 @@ public class ConfigurationHelper
         return secrets;
     }
 
-    // public static IConfiguration GetApplicationConfiguration(string[] args)
-    // {
-    //     return GetApplicationConfigurationBuilder(args).Build();
-    // }
-
     private static IConfigurationBuilder GetApplicationConfigurationBuilder(string[] args)
     {
         var env = GetEnvironment();
+        
         var pathToContentRoot = Directory.GetCurrentDirectory();
+
         //AppSettings
         var json = Path.Combine(pathToContentRoot, "appsettings.json");
+
         //AppSettings.Env
         var envJson = "";
         if (!string.IsNullOrEmpty(env))
@@ -100,7 +103,9 @@ public class ConfigurationHelper
             .AddJsonFile(json, true, true)
             .AddEnvironmentVariables()
             .AddCommandLine(args);
+
         if (File.Exists(json)) builder.AddJsonFile(json);
+
         if (!string.IsNullOrEmpty(envJson) && File.Exists(envJson)) builder.AddJsonFile(envJson);
 
         if (IsDevelopment())
