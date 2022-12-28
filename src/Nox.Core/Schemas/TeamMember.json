@@ -1,0 +1,27 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "NOX TeamMember",
+    "description": "Defines NOX project team member",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["userName"],
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "The team meaber's name"
+        },
+        "userName": {
+            "type": "string",
+            "description": "The team member's user name on with version control provider"
+        },
+        "mobilePhoneNumber": {
+            "type": "number",
+            "description": "The mobile phone number of the user"
+        },
+        "isAdmin": {
+            "type": "boolean",
+            "description": "Whether the team member is a project administrator"
+        }
+    }
+}
+
