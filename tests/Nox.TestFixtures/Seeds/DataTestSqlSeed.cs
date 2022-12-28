@@ -22,6 +22,7 @@ public class DataTestSqlSeed
         await RunScript("DELETE FROM Person;");
         await SeedPerson(1);
         await _con.CloseAsync();
+        _con.Dispose();
     }
 
     private async Task SeedPerson(int id)
