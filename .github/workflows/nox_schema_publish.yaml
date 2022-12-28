@@ -21,4 +21,5 @@ jobs:
           username: ${{ secrets.ftp_user }}
           password: ${{ secrets.ftp_password }}
           protocol: ftps
+          local-dir: ./src/Nox.Core/Schemas/
           dangerous-clean-slate: true
