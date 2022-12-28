@@ -1,128 +1,130 @@
 ﻿#
 # Country.entity.nox.yaml
 #
+# yaml-language-server: $schema=https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/Entity.json
+#
 
-Name: Country
-Description: Countries and related data
-PluralName: Countries
-Table: Country
-Schema: dbo
+name: Country
+description: Countries and related data
+pluralName: Countries
+table: Country
+schema: dbo
 
-RelatedParents: [Currency]
+relatedParents: [Currency]
 
-Messaging:
-  - MessagingProvider: Mediator
-  - MessagingProvider: AppServiceBus
+messaging:
+  - messagingProvider: Mediator
+  - messagingProvider: AppServiceBus
     
-Attributes:
+attributes:
 
-  - Name: Id
-    Description: The country's unique identifier 
-    IsPrimaryKey: true
-    Type: int
-    CanFilter: true
-    CanSort: true
+  - name: Id
+    description: The country's unique identifier 
+    isPrimaryKey: true
+    type: int
+    canFilter: true
+    canSort: true
 
-  - Name: Name
-    Description: The country's common name 
-    IsRequired: true
-    Type: string
-    MaxWidth: 64
-    CanFilter: true
-    CanSort: true
+  - name: Name
+    description: The country's common name 
+    isRequired: true
+    type: string
+    maxWidth: 64
+    canFilter: true
+    canSort: true
 
-  - Name: FormalName
-    Description: The country's official name
-    Type: string
-    MaxWidth: 64
-    CanFilter: true
-    CanSort: true
+  - name: FormalName
+    description: The country's official name
+    type: string
+    maxWidth: 64
+    canFilter: true
+    canSort: true
 
-  - Name: ISO_Alpha3
-    Description: The country's official ISO 4217 alpha-3 code
-    IsRequired: true
-    IsUnicode: false
-    Type: char
-    MinWidth: 3
-    MaxWidth: 3
+  - name: ISO_Alpha3
+    description: The country's official ISO 4217 alpha-3 code
+    isRequired: true
+    isUnicode: false
+    type: char
+    minWidth: 3
+    maxWidth: 3
 
-  - Name: ISO_Alpha2
-    Description: The country's official ISO 4217 alpha-2 code
-    IsRequired: true
-    IsUnicode: false
-    Type: char
-    MinWidth: 2
-    MaxWidth: 2
+  - name: ISO_Alpha2
+    description: The country's official ISO 4217 alpha-2 code
+    isRequired: true
+    isUnicode: false
+    type: char
+    minWidth: 2
+    maxWidth: 2
 
-  - Name: ISO_Numeric
-    Description: The country's official ISO 4217 alpha-3 code
-    IsRequired: true
-    IsUnicode: false
-    Type: char
-    MinWidth: 3
-    MaxWidth: 3
+  - name: ISO_Numeric
+    description: The country's official ISO 4217 alpha-3 code
+    isRequired: true
+    isUnicode: false
+    type: char
+    minWidth: 3
+    maxWidth: 3
 
-  - Name: DialingCodes
-    Description: The country's phone dialing codes (comma-delimited)
-    IsUnicode: false
-    Type: string
-    MaxWidth: 32
+  - name: DialingCodes
+    description: The country's phone dialing codes (comma-delimited)
+    isUnicode: false
+    type: string
+    maxWidth: 32
 
-  - Name: Capital
-    Description: The capital city of the country
-    Type: string
-    MaxWidth: 64
+  - name: Capital
+    description: The capital city of the country
+    type: string
+    maxWidth: 64
 
-  - Name: Demonym
-    Description: Noun denoting the natives of the country
-    Type: string
-    MaxWidth: 64
+  - name: Demonym
+    description: Noun denoting the natives of the country
+    type: string
+    maxWidth: 64
 
-  - Name: AreaInSquareKilometres
-    Description: Country area in square kilometers 
-    Type: int
+  - name: AreaInSquareKilometres
+    description: Country area in square kilometers 
+    type: int
 
-  - Name: GeoLattitude
-    Description: The the north–south position of the workplace's point on the surface of the Earth
-    Type: decimal
-    MaxWidth: 18
-    Precision: 15
-    IsRequired: true
+  - name: GeoLattitude
+    description: The the north–south position of the workplace's point on the surface of the Earth
+    type: decimal
+    maxWidth: 18
+    precision: 15
+    isRequired: true
 
-  - Name: GeoLongitude
-    Description: The the east-west position of the workplace's point on the surface of the Earth
-    Type: decimal
-    MaxWidth: 18
-    Precision: 15
-    IsRequired: true
+  - name: GeoLongitude
+    description: The the east-west position of the workplace's point on the surface of the Earth
+    type: decimal
+    maxWidth: 18
+    precision: 15
+    isRequired: true
 
-  - Name: GeoRegion
-    Description: The region the country is in
-    Type: string
-    IsUnicode: false
-    MaxWidth: 8
-    IsRequired: true
+  - name: GeoRegion
+    description: The region the country is in
+    type: string
+    isUnicode: false
+    maxWidth: 8
+    isRequired: true
 
-  - Name: GeoSubRegion
-    Description: The sub-region the country is in
-    Type: string
-    IsUnicode: false
-    MaxWidth: 32
-    IsRequired: false
+  - name: GeoSubRegion
+    description: The sub-region the country is in
+    type: string
+    isUnicode: false
+    maxWidth: 32
+    isRequired: false
 
-  - Name: GeoWorldRegion
-    Description: The world region the country is in
-    Type: string
-    IsUnicode: false
-    MaxWidth: 4
-    IsRequired: true
+  - name: GeoWorldRegion
+    description: The world region the country is in
+    type: string
+    isUnicode: false
+    maxWidth: 4
+    isRequired: true
 
-  - Name: Population
-    Description: The estimated population of the country
-    Type: int
+  - name: Population
+    description: The estimated population of the country
+    type: int
 
-  - Name: TopLevelDomains
-    Description: The top level internet domains regitered to the country (comma-delimited)
-    Type: string
-    IsUnicode: true
-    MaxWidth: 32
+  - name: TopLevelDomains
+    description: The top level internet domains regitered to the country (comma-delimited)
+    type: string
+    isUnicode: true
+    maxWidth: 32

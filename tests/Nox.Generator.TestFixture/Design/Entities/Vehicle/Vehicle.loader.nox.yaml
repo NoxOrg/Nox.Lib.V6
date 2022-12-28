@@ -1,31 +1,32 @@
 ﻿#
-# Vehcile data loader definition
+# Vehicle.loader.nox.yaml
+#
+# yaml-language-server: $schema=https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/Loader.json
 #
 
-Name: VehicleLoader
+name: VehicleLoader
 
-Description: Loads vehicle data 
+description: Loads vehicle data 
 
-Schedule:
-  Start: Daily at 2am UTC
-  Retry:
-    Limit: 10
-    DelaySeconds: 60
-    DoubleDelayLimit: 5
+schedule:
+  start: Daily at 2am UTC
+  retry:
+    limit: 10
+    delaySeconds: 60
+    doubleDelayLimit: 5
 
-LoadStrategy: 
-  Type: DropAndLoad
-  Columns: [CreateDate,EditDate]
+loadStrategy: 
+  type: DropAndLoad
+  columns: [CreateDate,EditDate]
 
+target:
+  entity: Vehicle
 
-Target:
-  Entity: Vehicle
-
-Sources:
-  - ConnectionVariable: ConnectionString:MasterDataSource
-    Provider: SqlServer
-    MinimumExpectedRecords: 30 
-    Query: >-
+sources:
+  - connectionVariable: ConnectionString:MasterDataSource
+    provider: SqlServer
+    minimumExpectedRecords: 30 
+    query: >-
       SELECT 
            [Id]
           ,[PersonId] AS [PersonId]

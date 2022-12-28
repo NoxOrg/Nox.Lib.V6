@@ -1,72 +1,77 @@
 #
-# Service definition
+# SampleCurrency.service.nox.yaml
+#
+# yaml-language-server: $schema=https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/NoxConfiguration.json
 #
 
-Name: SampleCurrency
+name: SampleCurrency
 
-Description: Sample Currency Microservice
+description: A sample currency conversion microservice
 
-AutoMigrations: false
+autoMigrations: false
 
-Database:
-  Name: SampleCurrencyDb
-  Server: localhost
+database:
+  name: SampleCurrencyDb
+  server: localhost
 
   ### Sql Server
-  Provider: SqlServer
-  Options: Trusted_Connection=no;connection timeout=120;
-  User: sa  
-  Password: Developer*123
+  provider: sqlServer
+  options: Trusted_Connection=no;connection timeout=120;
+  user: sa  
+  password: Developer*123
 
   ### Postgres
-  #Provider: Postgres
-  #Port: 54320
-  #User: sa  
-  #Password: Developer*123
+  #provider: postgres
+  #port: 54320
+  #user: sa  
+  #password: Developer*123
 
   ### MySql  
-  #Provider: MySql
-  #Port: 3306
-  #User: root
-  #Password: Developer*123
+  #provider: mySql
+  #port: 3306
+  #user: root
+  #password: Developer*123
   
-MessagingProviders:
+messagingProviders:
 
-  - Name: AppServiceBus
-    #Provider: AzureServiceBus
-    #ConnectionVariable: ConnectionString:AzureServiceBus
-    Provider: RabbitMQ
-    ConnectionString: rabbitmq://guest:guest@localhost/
-      
-DataSources:
+  - name: AppServiceBus
 
-  - Name: JsonSeedData
-    Provider: Json
-    Options: Source=File;Path=../../docs/sample-data/;
+    ## RabbitMQ
+    provider: rabbitMQ
+    connectionString: rabbitmq://guest:guest@localhost/
 
-  #- Name: CsvSeedData
-  #  Provider: Csv
-  #  Options: Source=File;Path=../../docs/sample-data/;
+    ### Azure Service Bus
+    #provider: azureServiceBus
+    #connectionString: ${ConnectionString:AzureServiceBus}
+  
+dataSources:
 
-  #- Name: ExcelSeedData
-  #  Provider: Excel
-  #  Options: Source=File;Path=../../docs/sample-data/;
+  - name: JsonSeedData
+    provider: json
+    options: Source=File;Path=../../docs/sample-data/;
 
-VersionControl:
-  Provider: AzureDevOps
-  Server: https://dev.azure.com/iwgplc
-  Project: Nox.SampleCurrency
-  Repository: SampleCurrency.Api.V1
+  #- name: CsvSeedData
+  #  provider: csv
+  #  options: Source=File;Path=../../docs/sample-data/;
 
-Team:
-  Developers:
-    - Name: Dionisis Stoubos
-      UserName: dionisis.stoubos@iwgplc.com
-      IsAdmin: true
-    - Name: Andre Sharpe
-      UserName: andre.sharpe@iwgplc.com
-      MobilePhoneNumber: +41234567890
-      IsAdmin: true
-    - Name: Jan Schutte
-      UserName: jan.schutte@iwgplc.com
-      IsAdmin: true
+  #- name: ExcelSeedData
+  #  provider: excel
+  #  options: Source=File;Path=../../docs/sample-data/;
+
+versionControl:
+  provider: azureDevOps
+  server: https://dev.azure.com/iwgplc
+  project: Nox.SampleCurrency
+  repository: SampleCurrency.Api.V1
+
+team:
+  developers:
+    - name: Andre Sharpe
+      userName: andre.sharpe@iwgplc.com
+      mobilePhoneNumber: +41789461056
+      isAdmin: true
+    - name: Jan Schutte
+      userName: jan.schutte@iwgplc.com
+      isAdmin: true
+    - name: Dionisis Stoubos
+      userName: dionisis.stoubos@iwgplc.com
