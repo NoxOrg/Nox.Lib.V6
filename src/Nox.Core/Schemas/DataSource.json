@@ -36,6 +36,10 @@
             "type": "string",
             "description": "The name name or network location of the database server"
         },
+        "port": {
+            "type": "integer",
+            "description": "The port that the server is listening for connections on"
+        },
         "user": {
             "type": "string",
             "description": "The user name to connect to the database"
