@@ -5,6 +5,8 @@
 name: Data Test
 
 description: Data Test Microservice
+
+autoMigrations: true
   
 database:
   name: Test
