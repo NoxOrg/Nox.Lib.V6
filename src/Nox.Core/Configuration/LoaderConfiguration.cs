@@ -9,6 +9,6 @@ public class LoaderConfiguration: MetaBase
     public LoaderScheduleConfiguration? Schedule { get; set; } = new();
     public LoaderLoadStrategyConfiguration? LoadStrategy { get; set; } = new();
     public LoaderTargetConfiguration? Target { get; set; } = new();
-    public List<LoaderMessageTargetConfiguration>? Messaging { get; set; } = new();
+    public List<MessageTargetConfiguration>? Messaging { get; set; } = new();
     public List<LoaderSourceConfiguration>? Sources { get; set; } = new();
 }

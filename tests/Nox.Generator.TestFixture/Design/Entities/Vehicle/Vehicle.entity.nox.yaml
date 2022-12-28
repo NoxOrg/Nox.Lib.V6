@@ -1,36 +1,38 @@
 ﻿#
-# Vehicle entity definition
+# Vehicle.entity.nox.yaml
+#
+# yaml-language-server: $schema=https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/Entity.json
 #
 
-Name: Vehicle
-Description: Vehicles
-PluralName: Vehicles
-Table: Vehicle
-Schema: dbo
+name: Vehicle
+description: Vehicles
+pluralName: Vehicles
+table: Vehicle
+schema: dbo
 
-RelatedParents: [Person]
+relatedParents: [Person]
 
-Attributes:
+attributes:
 
-  - Name: Id
-    Description: The vehicle's unique identifier 
-    IsPrimaryKey: true
-    Type: int
-    CanFilter: true
-    CanSort: true
+  - name: Id
+    description: The vehicle's unique identifier 
+    isPrimaryKey: true
+    type: int
+    canFilter: true
+    canSort: true
 
-  - Name: Brand
-    Description: The brand of the vehicle
-    IsRequired: true
-    Type: string
-    MaxWidth: 128
-    CanFilter: true
-    CanSort: true
+  - name: Brand
+    description: The brand of the vehicle
+    isRequired: true
+    type: string
+    maxWidth: 128
+    canFilter: true
+    canSort: true
 
-  - Name: Color
-    Description: The color of the person
-    IsRequired: true
-    Type: string
-    MaxWidth: 30
-    CanFilter: true
-    CanSort: true
+  - name: Color
+    description: The color of the person
+    isRequired: true
+    type: string
+    maxWidth: 30
+    canFilter: true
+    canSort: true

@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Nox.Messaging.Enumerations;
-using Nox.Messaging.Events;
+using Nox.Core.Enumerations;
+using Nox.Core.Interfaces.Messaging.Events;
 using Nox.TestFixtures;
 using NUnit.Framework;
 
@@ -23,7 +23,7 @@ public class MessageExtensionTests: MessagingTestFixture
         BuildServiceProvider();
         
         var messages = TestServiceProvider!.GetRequiredService<IEnumerable<INoxEvent>>();
-        var msg = messages.FindEventImplementation(personEntity, NoxEventTypeEnum.Create);
+        var msg = messages.FindEventImplementation("Person", NoxEventType.Created);
         Assert.That(msg, Is.Not.Null);
     }
 
@@ -38,7 +38,7 @@ public class MessageExtensionTests: MessagingTestFixture
             Name = "Something"
         };
         var messages = TestServiceProvider!.GetRequiredService<IEnumerable<INoxEvent>>();
-        var msg = messages.FindEventImplementation(personEntity, NoxEventTypeEnum.Delete);
+        var msg = messages.FindEventImplementation("Person", NoxEventType.Deleted);
         Assert.That(msg, Is.Null);
     }
     
@@ -57,9 +57,9 @@ public class MessageExtensionTests: MessagingTestFixture
             Name = "Person"
         };
         var messages = TestServiceProvider!.GetRequiredService<IEnumerable<INoxEvent>>();
-        var msg = messages.FindEventImplementation(personEntity, NoxEventTypeEnum.Create);
+        var msg = messages.FindEventImplementation("Person", NoxEventType.Created);
         Assert.That(msg, Is.Not.Null);
-        var instance = msg!.MapInstance(exObject);
+        var instance = msg!.MapInstance(exObject, NoxEventSource.NoxDbContext);
         Assert.That(instance, Is.Not.Null);
         var createEvent = instance as PersonCreatedDomainEvent;
         Assert.That(createEvent!.Payload, Is.Not.Null);

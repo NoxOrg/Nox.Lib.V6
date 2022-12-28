@@ -2,32 +2,30 @@
 # Person data loader definition
 #
 
-Name: PersonLoader
+name: PersonLoader
 
-Description: Loads person data 
+description: Loads person data 
 
-Schedule:
-  Start: Daily at 2am UTC
-  Retry:
-    Limit: 10
-    DelaySeconds: 60
-    DoubleDelayLimit: 5
+schedule:
+  start: Daily at 2am UTC
+  retry:
+    limit: 10
+    delaySeconds: 60
+    doubleDelayLimit: 5
+loadStrategy: 
+  type: DropAndLoad
+  columns: [CreateDate,EditDate]
 
-LoadStrategy: 
-  Type: DropAndLoad
-  Columns: [CreateDate,EditDate]
-
-
-Target:
-  Entity: Person
+target:
+  entity: Person
   
-Messaging:
-  - MessagingProvider: TestMessagingProvider1
+messaging:
+  - messagingProvider: TestMessagingProvider1
 
-Sources:
-  - DataSource: TestDataSource1
-    MinimumExpectedRecords: 30 
-    Query: >-
+sources:
+  - dataSource: TestDataSource1
+    minimumExpectedRecords: 30 
+    query: >-
       SELECT 
            [Id]
           ,[PersonName] AS [Name]

@@ -2,6 +2,7 @@ using System.Text.Json;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Nox;
+using Nox.Core.Enumerations;
 
 namespace Samples.Cli.Consumers;
 
@@ -16,7 +17,7 @@ public class CurrencyCreatedEventConsumer : IConsumer<CurrencyCreatedDomainEvent
 
     public Task Consume(ConsumeContext<CurrencyCreatedDomainEvent> context)
     {
-        _logger.LogInformation("Currency Created: {Text}", JsonSerializer.Serialize(context.Message.Payload));
+        _logger.LogInformation("Currency Created by {source}: {@payload}", context.Message.EventSource, context.Message.Payload);
         return Task.CompletedTask;
     }
 }

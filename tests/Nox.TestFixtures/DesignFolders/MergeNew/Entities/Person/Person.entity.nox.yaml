@@ -2,32 +2,31 @@
 # Person entity definition
 #
 
-Name: Person
-Description: Persons
-PluralName: Persons
-Table: Person
-Schema: dbo
+name: Person
+description: Persons
+pluralName: Persons
+table: Person
+schema: dbo
 
-Attributes:
+attributes:
+  - name: Id
+    description: The person's unique identifier
+    isPrimaryKey: true
+    type: int
+    canFilter: true
+    canSort: true
 
-  - Name: Id
-    Description: The person's unique identifier 
-    IsPrimaryKey: true
-    Type: int
-    CanFilter: true
-    CanSort: true
+  - name: Name
+    description: The name of the person
+    isRequired: true
+    type: string
+    maxWidth: 128
+    canFilter: true
+    canSort: true
 
-  - Name: Name
-    Description: The name of the person
-    IsRequired: true
-    Type: string
-    MaxWidth: 128
-    CanFilter: true
-    CanSort: true
-
-  - Name: Age
-    Description: The age of the person
-    IsRequired: true
-    Type: int
-    CanFilter: true
-    CanSort: true
+  - name: Age
+    description: The age of the person
+    isRequired: true
+    type: int
+    canFilter: true
+    canSort: true

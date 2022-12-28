@@ -2,20 +2,22 @@
 # Service definition
 #
 
-Name: DropAndLoadTest
+name: DropAndLoadTest
 
-Description: Drop And Load Test Microservice
+description: Drop And Load Test Microservice
 
-Database:
-  Name: Test
-  Provider: SqLite
-  ConnectionString: Data Source=./DropAndLoad.db;
+autoMigrations: true
 
-MessagingProviders:
-  - Name: TestMessaging
-    Provider: InMemory
+database:
+  name: Test
+  provider: SqLite
+  connectionString: Data Source=./DropAndLoad.db;
+
+messagingProviders:
+  - name: TestMessaging
+    provider: InMemory
     
-DataSources:
-  - Name: TestDataSource
-    Provider: SqLite
-    ConnectionString: Data Source=./DropAndLoadMaster.db;
+dataSources:
+  - name: TestDataSource
+    provider: SqLite
+    connectionString: Data Source=./DropAndLoadMaster.db;

@@ -2,7 +2,6 @@ using ETLBox.Connection;
 using ETLBox.ControlFlow.Tasks;
 using ETLBox.DataFlow;
 using ETLBox.DataFlow.Connectors;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Nox.Core.Constants;
 using Nox.Core.Interfaces;
@@ -12,9 +11,9 @@ using Nox.Core.Interfaces.Etl;
 using Nox.Core.Interfaces.Messaging;
 using Nox.Core.Models;
 using Nox.Messaging;
-using Nox.Messaging.Enumerations;
-using Nox.Messaging.Events;
 using System.Dynamic;
+using Nox.Core.Enumerations;
+using Nox.Core.Interfaces.Messaging.Events;
 
 
 namespace Nox.Etl;
@@ -79,8 +78,8 @@ public class EtlExecutor : IEtlExecutor
             switch (loadStrategy)
             {
                 case "dropandload":
-                    _logger.LogInformation("Dropping and loading data for entity {entity}...", entity.Name);
-                    await DropAndLoadData(source, destinationDb, destinationTable);
+                    _logger.LogInformation("Reload data for entity {entity}...", entity.Name);
+                    await DropAndLoadData(source, destinationDb, destinationTable, loader, entity);
                     break;
 
                 case "mergenew":
@@ -100,7 +99,9 @@ public class EtlExecutor : IEtlExecutor
     private async Task DropAndLoadData(
         IDataFlowExecutableSource<ExpandoObject> source,
         IConnectionManager destinationDb,
-        string destinationTable)
+        string destinationTable,
+        ILoader loader,
+        IEntity entity)
     {
         var destination = new DbDestination()
         {
@@ -111,12 +112,43 @@ public class EtlExecutor : IEtlExecutor
         source.LinkTo(destination);
 
         SqlTask.ExecuteNonQuery(destinationDb, $"DELETE FROM {destinationTable};");
+        
+        var postProcessDestination = new CustomDestination();
 
-        await Network.ExecuteAsync((DataFlowExecutableSource<ExpandoObject>)source);
+        // Store analytics
 
-        int rowCount = RowCountTask.Count(destinationDb, destinationTable);
+        int inserts = 0;
 
-        _logger.LogInformation("...copied {rowCount} records", rowCount);
+        // Get events to fire, if any
+        INoxEvent? entityCreatedMsg = null;
+        if (loader.Messaging != null && loader.Messaging.Any())
+        {
+            entityCreatedMsg = _messages.FindEventImplementation(entity.Name, NoxEventType.Created);
+        }
+        
+        postProcessDestination.WriteAction = (row, _) =>
+        {
+            var record = (IDictionary<string, object?>)row;
+
+            if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Insert)
+            {
+                inserts++;
+                if(entityCreatedMsg is not null) SendChangeEvent(loader, row, entityCreatedMsg, NoxEventSource.EtlLoad);
+            }
+        };
+        
+        try
+        {
+            await Network.ExecuteAsync((DataFlowExecutableSource<ExpandoObject>)source);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("Failed to run Drop & Load for Entity {entity}", entity.Name);
+            _logger.LogError("{message}", ex.Message);
+            throw;
+        }
+
+        LogReloadAnalytics(inserts);
     }
 
     private async Task MergeNewData(
@@ -190,8 +222,8 @@ public class EtlExecutor : IEtlExecutor
         INoxEvent? entityCreatedMsg = null, entityUpdatedMsg = null;
         if (loader.Messaging != null && loader.Messaging.Any())
         {
-            entityCreatedMsg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Create);
-            entityUpdatedMsg = _messages.FindEventImplementation(entity, NoxEventTypeEnum.Update);
+            entityCreatedMsg = _messages.FindEventImplementation(entity.Name, NoxEventType.Created);
+            entityUpdatedMsg = _messages.FindEventImplementation(entity.Name, NoxEventType.Updated);
         }
 
         postProcessDestination.WriteAction = (row, _) =>
@@ -201,13 +233,13 @@ public class EtlExecutor : IEtlExecutor
             if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Insert)
             {
                 inserts++;
-                if(entityCreatedMsg is not null) SendChangeEvent(loader, row, entityCreatedMsg);
+                if(entityCreatedMsg is not null) SendChangeEvent(loader, row, entityCreatedMsg, NoxEventSource.EtlMerge);
                 UpdateMergeStates(lastMergeDateTimeStampInfo, record);
             }
             else if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Update)
             {
                 updates++;
-                if (entityUpdatedMsg is not null) SendChangeEvent(loader, row, entityUpdatedMsg);
+                if (entityUpdatedMsg is not null) SendChangeEvent(loader, row, entityUpdatedMsg, NoxEventSource.EtlMerge);
                 UpdateMergeStates(lastMergeDateTimeStampInfo, record);
             }
             else if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Exists)
@@ -233,9 +265,9 @@ public class EtlExecutor : IEtlExecutor
 
     }
 
-    private void SendChangeEvent(ILoader loader, ExpandoObject row, INoxEvent message)
+    private void SendChangeEvent(ILoader loader, ExpandoObject row, INoxEvent message, NoxEventSource eventSource)
     {
-        var toSend = message.MapInstance(row);
+        var toSend = message.MapInstance(row, eventSource);
 
         _logger.LogInformation("Publishing bus message: {Name}", toSend.GetType().Name);
 
@@ -357,6 +389,16 @@ public class EtlExecutor : IEtlExecutor
         return result == 1;
     }
 
+    private void LogReloadAnalytics(int inserts)
+    {
+        if (inserts == 0)
+        {
+            _logger.LogInformation("...no records found to load");
+            return;
+        }
+        _logger.LogInformation($"{inserts} records inserted, last merge at {DateTime.Now}");
+    }
+    
     private void LogMergeAnalytics(int inserts, int updates, int unchanged, LoaderMergeStates lastMergeDateTimeStampInfo)
     {
         var lastMergeDateTimeStamp = DateTime.MinValue;

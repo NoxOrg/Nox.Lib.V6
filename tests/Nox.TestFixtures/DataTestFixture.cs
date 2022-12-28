@@ -2,8 +2,6 @@ using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Nox.Core.Interfaces;
-using Nox.Core.Interfaces.Database;
 using Nox.TestFixtures.Seeds;
 using NUnit.Framework;
 
@@ -28,11 +26,5 @@ public class DataTestFixture
         services.AddNox();
         services.AddSingleton<DataTestSqlSeed>();
         TestServiceProvider = services.BuildServiceProvider();
-    }
-
-    [SetUp]
-    public void TestSetup()
-    {
-        if (File.Exists("./DataTest.db")) File.Delete("./DataTest.db");
     }
 }

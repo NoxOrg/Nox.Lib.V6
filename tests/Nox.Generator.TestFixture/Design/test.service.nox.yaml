@@ -1,28 +1,21 @@
 #
-# Service definition
+# test.service.nox.yaml
+#
+# yaml-language-server: $schema=https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/NoxConfiguration.json
 #
 
-Name: Test
+name: Test
 
-Description: Test Microservice
+description: Test Microservice
 
-Database:
-  Name: Test
-  
-  Provider: SqlServer
-  Options: Trusted_Connection=no;connection timeout=120;TrustServerCertificate=true
-  
-  #Provider: Postgres
-  #Port: 54320
+database:
+  name: Test
+  provider: sqlServer
+  options: Trusted_Connection=no;connection timeout=120;TrustServerCertificate=true
+  server: localhost
+  user: sa
+  password: Developer*123
 
-  #Provider: MySql
-
-  Server: localhost
-  User: sa
-  Password: Developer*123
-
-MessageBus:
-  Name: TestMessaging
-  #Provider: AzureServiceBus
-  #ConnectionVariable: ConnectionString:AzureServiceBus
-  Provider: InMemory
+messagingProviders:
+  - name: TestMessaging
+    provider: inMemory

@@ -1,46 +1,50 @@
 using System.Collections.Immutable;
 using System.Dynamic;
+using Nox.Core.Enumerations;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Entity;
-using Nox.Messaging.Enumerations;
-using Nox.Messaging.Events;
+using Nox.Core.Interfaces.Messaging.Events;
 
 namespace Nox.Messaging;
 
 public static class MessageExtensions
 {
-    public static INoxEvent? FindEventImplementation(this IEnumerable<INoxEvent> messages, IEntity entity, NoxEventTypeEnum eventType)
+    public static INoxEvent? FindEventImplementation(this IEnumerable<INoxEvent> messages, string entityName, NoxEventType eventType)
     {
         foreach (var msg in messages.ToImmutableList())
         {
             var type = msg.GetType();
             var baseType = type.BaseType;
             if (baseType == null) return null;
-            if (baseType.GenericTypeArguments.Any(gta => gta.Name == entity.Name))
+            if (baseType.GenericTypeArguments.Any(gta => gta.Name == entityName))
             {
 
                 switch (eventType)
                 {
-                    case NoxEventTypeEnum.Create:
-                        if (baseType.Name == "NoxCreateEvent`1") return msg;
+                    case NoxEventType.Created:
+                        if (baseType.Name.StartsWith(nameof(NoxCreatedEvent<IDynamicEntity>))) return msg;
                         break;
-                    case NoxEventTypeEnum.Delete:
-                        if (baseType.Name == "NoxDeleteEvent`1") return msg;
+                    case NoxEventType.Deleted:
+                        if (baseType.Name.StartsWith(nameof(NoxDeletedEvent<IDynamicEntity>))) return msg;
                         break;
-                    case NoxEventTypeEnum.Update:
-                        if (baseType.Name == "NoxUpdateEvent`1") return msg;
+                    case NoxEventType.Updated:
+                        if (baseType.Name.StartsWith(nameof(NoxUpdatedEvent<IDynamicEntity>))) return msg;
                         break;
                 }
             }
         }
         return null;
     }
-    
-    
 
-    public static object MapInstance(this INoxEvent template, ExpandoObject source)
+    public static object MapInstance(this INoxEvent template, Object source, NoxEventSource eventSource)
     {
         var result = Activator.CreateInstance(template.GetType())!;
+        var props = template.GetType().GetProperties();
+        var eventSourceProp = props.FirstOrDefault(p => p.Name.ToLower() == "eventsource");
+        if (eventSourceProp != null)
+        {
+            eventSourceProp.SetValue(result, eventSource);
+        }
         var payloadProp = template.GetType().GetProperties().FirstOrDefault(p => p.Name.ToLower() == "payload");
         if (payloadProp != null)
         {
@@ -50,7 +54,7 @@ public static class MessageExtensions
             {
                 foreach (var prop in payload.GetType().GetProperties())
                 {
-                    var sourceVal = sourceDict[prop.Name];
+                    var sourceVal = sourceDict?[prop.Name];
                     if (sourceVal == null) continue;
 
                     try
@@ -95,5 +99,4 @@ public static class MessageExtensions
         }
         return result;
     }
-
 }

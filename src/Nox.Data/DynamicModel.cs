@@ -3,13 +3,18 @@ using System.Reflection.Emit;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using Nox.Core.Enumerations;
 using Nox.Core.Extensions;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Etl;
+using Nox.Core.Interfaces.Messaging;
+using Nox.Core.Interfaces.Messaging.Events;
+using Nox.Messaging;
 
 namespace Nox.Data;
 
@@ -18,9 +23,13 @@ public class DynamicModel : IDynamicModel
     private readonly IEdmModel _edmModel;
     private readonly IDynamicService _dynamicService;
     private readonly IDataProvider _databaseProvider;
-    private readonly Dictionary<string, DynamicDbEntity> _dynamicDbEntities = new();
+    private readonly Dictionary<string, IDynamicDbEntity> _dynamicDbEntities = new();
 
-    public DynamicModel(ILogger<DynamicModel> logger, IDynamicService dynamicService, IEtlExecutor etlExecutor)
+    public DynamicModel(
+        ILogger<DynamicModel> logger, 
+        IDynamicService dynamicService,
+        IEnumerable<INoxEvent>? messages = null,
+        INoxMessenger? messenger = null)
     {
         _dynamicService = dynamicService;
 
@@ -30,20 +39,15 @@ public class DynamicModel : IDynamicModel
 
         var methods = typeof(IDynamicDbContext).GetMethods();
 
-        var dbContextGetCollectionMethod =
-            methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedCollection));
+        var dbContextGetCollectionMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedCollection));
 
-        var dbContextGetSingleResultMethod =
-            methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedSingleResult));
+        var dbContextGetSingleResultMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedSingleResult));
 
-        var dbContextGetObjectPropertyMethod =
-            methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedObjectProperty));
+        var dbContextGetObjectPropertyMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedObjectProperty));
 
-        var dbContextGetNavigationMethod =
-            methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedNavigation));
+        var dbContextGetNavigationMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedNavigation));
 
-        var dbContextPostMethod =
-            methods.First(m => m.Name == nameof(IDynamicDbContext.PostDynamicTypedObject));
+        var dbContextPostMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.PostDynamicTypedObject));
 
         foreach (var (entityName, (entity, typeBuilder)) in GetTablesAndTypeBuilders())
         {
@@ -83,6 +87,8 @@ public class DynamicModel : IDynamicModel
 
     public IDataProvider GetDatabaseProvider() => _databaseProvider;
 
+    public Dictionary<string, IDynamicDbEntity> DynamicDbEntities => _dynamicDbEntities;
+
     public IDynamicService GetDynamicService() => _dynamicService;
 
     public ModelBuilder ConfigureDbContextModel(ModelBuilder modelBuilder)
@@ -108,7 +114,7 @@ public class DynamicModel : IDynamicModel
 
                     else if (attr.IsDateTimeType())
                     {
-                        // don't set Maxwidth, throw's error on db create
+                        // don't set MaxWidth, throw's error on db create
                     }
 
                     else if (attr.MaxWidth > 0 && attr.Precision > 0)
@@ -196,11 +202,10 @@ public class DynamicModel : IDynamicModel
     public object PostDynamicObject(DbContext context, string dbSetName, string json)
     {
         var parameters = new object[] { json };
-
         var ret = _dynamicDbEntities[dbSetName].DbContextPostMethod.Invoke(context, parameters);
-
         return ret!;
     }
+   
 
     private Dictionary<string, (IEntity Entity, TypeBuilder TypeBuilder)> GetTablesAndTypeBuilders()
     {

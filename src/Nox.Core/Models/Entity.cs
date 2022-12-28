@@ -4,6 +4,7 @@ using Humanizer;
 using Nox.Core.Components;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Entity;
+using Nox.Core.Interfaces.Messaging;
 
 namespace Nox.Core.Models;
 
@@ -22,6 +23,14 @@ public sealed class Entity : MetaBase, IEntity
     public string RelatedChildrenJson { get => string.Join('|',RelatedChildren.ToArray()); set => RelatedChildren = value.Split('|').ToList(); }
     public int SortOrder { get; set; }
     public ICollection<EntityAttribute> Attributes { get; set; } = new Collection<EntityAttribute>();
+    
+    ICollection<IMessageTarget>? IEntity.Messaging
+    {
+        get => Messaging?.ToList<IMessageTarget>();
+        set => Messaging = value as ICollection<MessageTarget>;
+    }
+
+    public ICollection<MessageTarget>? Messaging { get; set; }
 
     public bool ApplyDefaults()
     {
