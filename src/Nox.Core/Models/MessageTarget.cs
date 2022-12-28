@@ -1,9 +1,9 @@
 using Nox.Core.Components;
-using Nox.Core.Interfaces.Entity;
+using Nox.Core.Interfaces.Messaging;
 
 namespace Nox.Core.Models;
 
-public sealed class EntityMessageTarget: MetaBase, IEntityMessageTarget
+public sealed class MessageTarget: MetaBase, IMessageTarget
 {
     public string MessagingProvider { get; set; } = string.Empty;
 }

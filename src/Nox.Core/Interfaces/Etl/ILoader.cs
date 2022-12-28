@@ -1,3 +1,5 @@
+using Nox.Core.Interfaces.Messaging;
+
 namespace Nox.Core.Interfaces.Etl;
 
 public interface ILoader: IMetaBase
@@ -7,7 +9,7 @@ public interface ILoader: IMetaBase
     ILoaderSchedule? Schedule { get; set; }
     ILoaderLoadStrategy? LoadStrategy { get; set; }
     ILoaderTarget? Target { get; set; }
-    ICollection<ILoaderMessageTarget>? Messaging { get; set; }
+    ICollection<IMessageTarget>? Messaging { get; set; }
     ICollection<ILoaderSource>? Sources { get; set; }
 
     bool ApplyDefaults();

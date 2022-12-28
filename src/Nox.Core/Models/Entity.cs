@@ -4,6 +4,7 @@ using Humanizer;
 using Nox.Core.Components;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Entity;
+using Nox.Core.Interfaces.Messaging;
 
 namespace Nox.Core.Models;
 
@@ -23,13 +24,13 @@ public sealed class Entity : MetaBase, IEntity
     public int SortOrder { get; set; }
     public ICollection<EntityAttribute> Attributes { get; set; } = new Collection<EntityAttribute>();
     
-    ICollection<IEntityMessageTarget>? IEntity.Messaging
+    ICollection<IMessageTarget>? IEntity.Messaging
     {
-        get => Messaging?.ToList<IEntityMessageTarget>();
-        set => Messaging = value as ICollection<EntityMessageTarget>;
+        get => Messaging?.ToList<IMessageTarget>();
+        set => Messaging = value as ICollection<MessageTarget>;
     }
 
-    public ICollection<EntityMessageTarget>? Messaging { get; set; }
+    public ICollection<MessageTarget>? Messaging { get; set; }
 
     public bool ApplyDefaults()
     {

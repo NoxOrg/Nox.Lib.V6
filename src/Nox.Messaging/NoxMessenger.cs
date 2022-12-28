@@ -38,39 +38,7 @@ public class NoxMessenger: INoxMessenger
     {
         if (loader.Messaging != null)
         {
-            foreach (var target in loader.Messaging!)
-            {
-                try
-                {
-                    if (_config.MessagingProviders == null) throw new ConfigurationException("Cannot add messaging if messaging providers not present in configuration!");
-                    var providerInstance = _config.MessagingProviders.First(p => 
-                        p.Name.Equals(target.MessagingProvider, StringComparison.OrdinalIgnoreCase)
-                    );
-                    switch (providerInstance.Provider!.ToLower())
-                    {
-                        case "rabbitmq":
-                            await _rabbitBus!.Publish(message);
-                            _logger.LogInformation($"{message.GetType().Name} sent to RabbitMq bus.");
-                            break;
-                        case "azureservicebus":
-                            await _azureBus!.Publish(message);
-                            _logger.LogInformation($"{message.GetType().Name} sent to Azure bus.");
-                            break;
-                        case "amazonsqs":
-                            await _amazonBus!.Publish(message);
-                            _logger.LogInformation($"{message.GetType().Name} sent to Amazon bus.");
-                            break;
-                        case "mediator":
-                            await _mediator!.Publish(message);
-                            _logger.LogInformation($"{message.GetType().Name} sent to Mediator.");
-                            break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex.ToString());
-                }
-            }
+            await SendMessage(loader.Messaging!, message);
         }
     }
 
@@ -78,38 +46,43 @@ public class NoxMessenger: INoxMessenger
     {
         if (entity.Messaging != null)
         {
-            foreach (var target in entity.Messaging!)
+            await SendMessage(entity.Messaging, message);
+        }
+    }
+
+    private async Task SendMessage(IEnumerable<IMessageTarget> messageTargets, object message)
+    {
+        foreach (var target in messageTargets)
+        {
+            try
             {
-                try
+                if (_config.MessagingProviders == null) throw new ConfigurationException("Cannot add messaging if messaging providers not present in configuration!");
+                var providerInstance = _config.MessagingProviders.First(p => 
+                    p.Name.Equals(target.MessagingProvider, StringComparison.OrdinalIgnoreCase)
+                );
+                switch (providerInstance.Provider!.ToLower())
                 {
-                    if (_config.MessagingProviders == null) throw new ConfigurationException("Cannot add messaging if messaging providers not present in configuration!");
-                    var providerInstance = _config.MessagingProviders.First(p => 
-                        p.Name.Equals(target.MessagingProvider, StringComparison.OrdinalIgnoreCase)
-                    );
-                    switch (providerInstance.Provider!.ToLower())
-                    {
-                        case "rabbitmq":
-                            await _rabbitBus!.Publish(message);
-                            _logger.LogInformation($"{message.GetType().Name} sent to RabbitMq bus.");
-                            break;
-                        case "azureservicebus":
-                            await _azureBus!.Publish(message);
-                            _logger.LogInformation($"{message.GetType().Name} sent to Azure bus.");
-                            break;
-                        case "amazonsqs":
-                            await _amazonBus!.Publish(message);
-                            _logger.LogInformation($"{message.GetType().Name} sent to Amazon bus.");
-                            break;
-                        case "mediator":
-                            await _mediator!.Publish(message);
-                            _logger.LogInformation($"{message.GetType().Name} sent to Mediator.");
-                            break;
-                    }
+                    case "rabbitmq":
+                        await _rabbitBus!.Publish(message);
+                        _logger.LogInformation($"{message.GetType().Name} sent to RabbitMq bus.");
+                        break;
+                    case "azureservicebus":
+                        await _azureBus!.Publish(message);
+                        _logger.LogInformation($"{message.GetType().Name} sent to Azure bus.");
+                        break;
+                    case "amazonsqs":
+                        await _amazonBus!.Publish(message);
+                        _logger.LogInformation($"{message.GetType().Name} sent to Amazon bus.");
+                        break;
+                    case "mediator":
+                        await _mediator!.Publish(message);
+                        _logger.LogInformation($"{message.GetType().Name} sent to Mediator.");
+                        break;
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex.ToString());
-                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
             }
         }
     }
