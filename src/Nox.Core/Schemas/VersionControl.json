@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "NOX VersionCountrol",
+    "description": "Defines NOX version control",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "The name of the version control system"
+        },
+        "provider": {
+            "type": "string",
+            "description": "The version control provider",
+            "oneOf": [
+                {
+                    "const": "azureDevOps",
+                    "description": "Use Postgres database driver"
+                }
+            ]
+        },
+        "server": {
+            "type": "string",
+            "description": "The name name or network location of the database server",
+            "format": "uri"
+        },
+        "project": {
+            "type": "string",
+            "description": "The name of the project on the version control server"
+        },
+        "repository": {
+            "type": "string",
+            "description": "The name of the repoitory in the version control project"
+        }
+    }
+}
+

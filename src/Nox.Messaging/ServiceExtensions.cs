@@ -178,6 +178,8 @@ public static class ServiceExtensions
                 mt.AddActivities(entryAssembly);
             }
 
+            // TODO: there should be no secrets in the yaml. We should maybe look at supporting special ${ENV_VARIABLE_NAME} expressions for 
+            // connection strings and other environment variable/secret injection. Have opened an Issue to resolve.
             mt.UseAmazonSqs(config.ConnectionString!, config.AccessKey!, config.SecretKey!);
         });
     }

@@ -1,0 +1,51 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "NOX Service",
+    "description": "Defines NOX microservice properties for rapid application development",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["name"],
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "The name of the NOX service"
+        },  
+        "description": {
+            "type": "string",
+            "description": "A string describing the microservice"
+        },  
+        "autoMigrations": {
+            "type": "boolean",
+            "description": "Whether the service database is automatically created if it doesn't exist"
+        },  
+        "database": {
+            "type": "object",
+            "title": "Database",
+            "description": "The database provider for storing microservice data",
+            "$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/DataSource.json"
+        },
+        "messagingProviders": {
+            "type": "array",
+            "description": "A list of message providers used in the service",
+            "items": {"$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/MessagingProvider.json"  }
+        },
+        "dataSources": {
+            "type": "array",
+            "description": "A list of message providers used in the service",
+            "items": {"$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/DataSource.json"  }
+        },
+        "versionControl": {
+            "type": "object",
+            "$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/VersionControl.json"
+        },
+        "team": {
+            "properties": {
+                "developers": {
+                    "type": "array",
+                    "description": "The NOX service development team",
+                    "items": {"$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/TeamMember.json"  }
+                }
+            }  
+        }
+    }
+}
