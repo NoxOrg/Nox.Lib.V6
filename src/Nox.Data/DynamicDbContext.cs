@@ -90,7 +90,7 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
             
         }
 
-        return result;
+        return result!;
     }
 
     // Strongly typed methods for model callback
