@@ -6,11 +6,11 @@ public static class NoxEventSourceEnumHelper
     {
         switch (source)
         {
-            case NoxEventSourceEnum.NoxEventSourceDomain:
-                return "Domain";
-            case NoxEventSourceEnum.NoxEventSourceEtlLoad:
+            case NoxEventSourceEnum.NoxEventSource_DbContext:
+                return "Nox Context";
+            case NoxEventSourceEnum.NoxEventSource_EtlLoad:
                 return "Etl Load";
-            case NoxEventSourceEnum.NoxEventSourceEtlMerge:
+            case NoxEventSourceEnum.NoxEventSource_EtlMerge:
                 return "Etl Merge";
         }
 

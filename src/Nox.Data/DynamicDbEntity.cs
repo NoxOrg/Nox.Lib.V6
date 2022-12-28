@@ -1,11 +1,12 @@
 using System.Reflection;
 using System.Reflection.Emit;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
 
 namespace Nox.Data;
 
-public class DynamicDbEntity
+public class DynamicDbEntity: IDynamicDbEntity
 {
     public string Name { get; init; } = null!;
     public string PluralName { get; init; } = null!;

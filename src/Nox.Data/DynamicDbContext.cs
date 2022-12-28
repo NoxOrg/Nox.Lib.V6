@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
 using Nox.Core.Enumerations;
 using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Messaging;
 using Nox.Core.Interfaces.Messaging.Events;
 using Nox.Messaging;
@@ -12,13 +13,19 @@ namespace Nox.Data;
 public class DynamicDbContext : DbContext, IDynamicDbContext
 {
     private readonly IDynamicModel _dynamicDbModel;
+    private IEnumerable<INoxEvent>? _messages = null;
+    private readonly INoxMessenger? _messenger = null;
 
     public DynamicDbContext(
         DbContextOptions<DynamicDbContext> options,
-        IDynamicModel dynamicDbModel)
+        IDynamicModel dynamicDbModel,
+        IEnumerable<INoxEvent>? messages = null,
+        INoxMessenger? messenger = null)
         : base(options)
     {
         _dynamicDbModel = dynamicDbModel;
+        _messenger = messenger;
+        _messages = messages;
         ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
 
@@ -67,7 +74,23 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
 
     public object PostDynamicObject(string dbSetName, string json)
     {
-        return _dynamicDbModel.PostDynamicObject(this, dbSetName, json);
+        var result = _dynamicDbModel.PostDynamicObject(this, dbSetName, json);
+         
+        if (_messenger != null && _messages != null && result != null)
+        {
+            var dynamicEntity = ((DynamicModel)_dynamicDbModel).DynamicDbEntities.FirstOrDefault(e => e.Value.Entity.PluralName == dbSetName).Value;
+            if (dynamicEntity != null)
+            {
+                var msg = _messages.FindEventImplementation(dynamicEntity.Entity.Name, NoxEventTypeEnum.Create);
+                if (msg != null)
+                {
+                    SendChangeEvent(dynamicEntity.Entity, result, msg, NoxEventSourceEnum.NoxEventSource_DbContext);
+                }
+            }
+            
+        }
+
+        return result;
     }
 
     // Strongly typed methods for model callback
@@ -121,9 +144,28 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
         repo.Add(tObj!);
 
         this.SaveChanges();
-        //Todo fire Create event
+        if (_messenger != null && _messages != null && tObj != null)
+        {
+            var dynamicEntity = ((DynamicModel)_dynamicDbModel).DynamicDbEntities.FirstOrDefault(e => e.Value.Entity.PluralName == tObj.GetType().Name).Value;
+            if (dynamicEntity != null)
+            {
+                var msg = _messages.FindEventImplementation(dynamicEntity.Entity.Name, NoxEventTypeEnum.Create);
+                if (msg != null)
+                {
+                    SendChangeEvent(dynamicEntity.Entity, tObj, msg, NoxEventSourceEnum.NoxEventSource_DbContext);
+                }
+            }
+            
+        }
+
 
         return tObj!;
 
+    }
+    
+    private void SendChangeEvent(IEntity entity, Object obj, INoxEvent message, NoxEventSourceEnum eventSource)
+    {
+        var toSend = message.MapInstance(obj, eventSource);
+        _messenger?.SendMessage(entity, toSend);
     }
 }

@@ -23,9 +23,7 @@ public class DynamicModel : IDynamicModel
     private readonly IEdmModel _edmModel;
     private readonly IDynamicService _dynamicService;
     private readonly IDataProvider _databaseProvider;
-    private readonly Dictionary<string, DynamicDbEntity> _dynamicDbEntities = new();
-    private IEnumerable<INoxEvent>? _messages = null;
-    private readonly INoxMessenger? _messenger = null;
+    private readonly Dictionary<string, IDynamicDbEntity> _dynamicDbEntities = new();
 
     public DynamicModel(
         ILogger<DynamicModel> logger, 
@@ -35,30 +33,21 @@ public class DynamicModel : IDynamicModel
     {
         _dynamicService = dynamicService;
 
-        _messages = messages;
-
-        _messenger = messenger;
-        
         _databaseProvider = dynamicService.MetaService.Database!.DataProvider!;
 
         var builder = new ODataConventionModelBuilder();
 
         var methods = typeof(IDynamicDbContext).GetMethods();
 
-        var dbContextGetCollectionMethod =
-            methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedCollection));
+        var dbContextGetCollectionMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedCollection));
 
-        var dbContextGetSingleResultMethod =
-            methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedSingleResult));
+        var dbContextGetSingleResultMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedSingleResult));
 
-        var dbContextGetObjectPropertyMethod =
-            methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedObjectProperty));
+        var dbContextGetObjectPropertyMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedObjectProperty));
 
-        var dbContextGetNavigationMethod =
-            methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedNavigation));
+        var dbContextGetNavigationMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedNavigation));
 
-        var dbContextPostMethod =
-            methods.First(m => m.Name == nameof(IDynamicDbContext.PostDynamicTypedObject));
+        var dbContextPostMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.PostDynamicTypedObject));
 
         foreach (var (entityName, (entity, typeBuilder)) in GetTablesAndTypeBuilders())
         {
@@ -97,6 +86,8 @@ public class DynamicModel : IDynamicModel
     }
 
     public IDataProvider GetDatabaseProvider() => _databaseProvider;
+
+    public Dictionary<string, IDynamicDbEntity> DynamicDbEntities => _dynamicDbEntities;
 
     public IDynamicService GetDynamicService() => _dynamicService;
 
@@ -212,18 +203,9 @@ public class DynamicModel : IDynamicModel
     {
         var parameters = new object[] { json };
         var ret = _dynamicDbEntities[dbSetName].DbContextPostMethod.Invoke(context, parameters);
-        
-        if (_messenger != null && _messages != null && ret != null)
-        {
-            var msg = _messages.FindEventImplementation(_dynamicDbEntities[dbSetName].Name, NoxEventTypeEnum.Create);
-            if (msg != null)
-            {
-                SendChangeEvent(_dynamicDbEntities[dbSetName].Entity, ret, msg, NoxEventSourceEnum.NoxEventSourceDomain);
-            }
-        }
-        
         return ret!;
     }
+   
 
     private Dictionary<string, (IEntity Entity, TypeBuilder TypeBuilder)> GetTablesAndTypeBuilders()
     {
@@ -272,11 +254,5 @@ public class DynamicModel : IDynamicModel
 
         return dynamicTypes;
 
-    }
-    
-    private void SendChangeEvent(IEntity entity, Object obj, INoxEvent message, NoxEventSourceEnum eventSource)
-    {
-        var toSend = message.MapInstance(obj, eventSource);
-        _messenger?.SendMessage(entity, toSend);
     }
 }

@@ -59,7 +59,7 @@ public class MessageExtensionTests: MessagingTestFixture
         var messages = TestServiceProvider!.GetRequiredService<IEnumerable<INoxEvent>>();
         var msg = messages.FindEventImplementation("Person", NoxEventTypeEnum.Create);
         Assert.That(msg, Is.Not.Null);
-        var instance = msg!.MapInstance(exObject, NoxEventSourceEnum.NoxEventSourceDomain);
+        var instance = msg!.MapInstance(exObject, NoxEventSourceEnum.NoxEventSource_DbContext);
         Assert.That(instance, Is.Not.Null);
         var createEvent = instance as PersonCreatedDomainEvent;
         Assert.That(createEvent!.Payload, Is.Not.Null);
