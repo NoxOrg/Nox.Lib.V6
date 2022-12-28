@@ -11,7 +11,7 @@ public class NoxConfiguration: MetaBase, INoxConfiguration
     public string Description { get; set; } = string.Empty;
     public string KeyVaultUri { get; set; } = KeyVault.DefaultKeyVaultUri;
     public string EndpointProvider { get; set; } = string.Empty;
-    public bool AutoMigrations { get; set; } = true;
+    public bool AutoMigrations { get; set; } = false;
     public DataSourceConfiguration? Database { get; set; }
     public List<MessagingProviderConfiguration>? MessagingProviders { get; set; }
     public VersionControlConfiguration? VersionControl { get; set; }
