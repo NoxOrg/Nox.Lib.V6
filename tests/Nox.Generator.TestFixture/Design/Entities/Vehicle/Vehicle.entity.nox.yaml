@@ -1,7 +1,7 @@
 ﻿#
 # Vehicle.entity.nox.yaml
 #
-# yaml-language-server: $schema=https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/Entity.json
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
 #
 
 name: Vehicle

@@ -1,7 +1,7 @@
 ﻿#
 # Person.loader.nox.yaml
 #
-# yaml-language-server: $schema=https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/Loader.json
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Loader.json
 #
 
 name: PersonLoader
