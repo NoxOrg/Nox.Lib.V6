@@ -34,7 +34,7 @@ $script:ProjectFolder           = "$script:SamplesFolder\Samples.Api"
 $script:ProjectFile             = "$script:SamplesFolder\Samples.Api.csproj"
 $script:CliFolder               = "$script:SamplesFolder\Samples.Cli"
 
-$script:DefaultEnvironment      = 'Samples'
+$script:DefaultEnvironment      = 'Development'
 
 $script:DockerContainerName     = 'nox'
 
@@ -352,18 +352,31 @@ $goo.Command.Add( 'waitfordb', {
 
 # command: goo test | Runs all tests in the solution
 $goo.Command.Add( 'test', {
+    
     $goo.Console.WriteLine( "Running core tests..." )
-    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Core.Tests --no-restore --verbosity minimal --configuration Release')
+    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Core.Tests --no-restore --verbosity quiet --configuration Release')
+    $goo.StopIfError("Failed core tests.")
+
     $goo.Console.WriteLine( "Running data tests..." )
-    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Data.Tests --no-restore --verbosity minimal --configuration Release')
+    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Data.Tests --no-restore --verbosity quiet --configuration Release')
+    $goo.StopIfError("Failed data tests.")
+
     $goo.Console.WriteLine( "Running drop and load tests..." )
-    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Etl.DropAndLoad.Tests --no-restore --verbosity minimal --configuration Release')
+    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Etl.DropAndLoad.Tests --no-restore --verbosity quiet --configuration Release')
+    $goo.StopIfError("Failed drop and load tests.")
+
     $goo.Console.WriteLine( "Running merge new tests..." )
-    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Etl.MergeNew.Tests --no-restore --verbosity minimal --configuration Release')
+    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Etl.MergeNew.Tests --no-restore --verbosity quiet --configuration Release')
+    $goo.StopIfError("Failed merge new tests.")
+
     $goo.Console.WriteLine( "Running generator tests..." )
-    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Generator.Tests --no-restore --verbosity minimal --configuration Release')
+    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Generator.Tests --no-restore --verbosity quiet --configuration Release')
+    $goo.StopIfError("Failed generator tests.")
+
     $goo.Console.WriteLine( "Running messaging tests..." )
-    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Messaging.Tests --no-restore --verbosity minimal --configuration Release')
+    $goo.Command.RunExternal('dotnet','test ./tests/Nox.Messaging.Tests --no-restore --verbosity quiet --configuration Release')
+    $goo.StopIfError("Failed messaging tests.")
+
 })
 
 

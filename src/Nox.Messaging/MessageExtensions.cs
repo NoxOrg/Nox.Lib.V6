@@ -9,7 +9,7 @@ namespace Nox.Messaging;
 
 public static class MessageExtensions
 {
-    public static INoxEvent? FindEventImplementation(this IEnumerable<INoxEvent> messages, string entityName, NoxEventTypeEnum eventType)
+    public static INoxEvent? FindEventImplementation(this IEnumerable<INoxEvent> messages, string entityName, NoxEventType eventType)
     {
         foreach (var msg in messages.ToImmutableList())
         {
@@ -21,14 +21,14 @@ public static class MessageExtensions
 
                 switch (eventType)
                 {
-                    case NoxEventTypeEnum.Create:
-                        if (baseType.Name == "NoxCreateEvent`1") return msg;
+                    case NoxEventType.Created:
+                        if (baseType.Name.StartsWith(nameof(NoxCreatedEvent<IDynamicEntity>))) return msg;
                         break;
-                    case NoxEventTypeEnum.Delete:
-                        if (baseType.Name == "NoxDeleteEvent`1") return msg;
+                    case NoxEventType.Deleted:
+                        if (baseType.Name.StartsWith(nameof(NoxDeletedEvent<IDynamicEntity>))) return msg;
                         break;
-                    case NoxEventTypeEnum.Update:
-                        if (baseType.Name == "NoxUpdateEvent`1") return msg;
+                    case NoxEventType.Updated:
+                        if (baseType.Name.StartsWith(nameof(NoxUpdatedEvent<IDynamicEntity>))) return msg;
                         break;
                 }
             }
@@ -36,7 +36,7 @@ public static class MessageExtensions
         return null;
     }
 
-    public static object MapInstance(this INoxEvent template, Object source, NoxEventSourceEnum eventSource)
+    public static object MapInstance(this INoxEvent template, Object source, NoxEventSource eventSource)
     {
         var result = Activator.CreateInstance(template.GetType())!;
         var props = template.GetType().GetProperties();

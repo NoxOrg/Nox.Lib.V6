@@ -81,11 +81,12 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
             var dynamicEntity = ((DynamicModel)_dynamicDbModel).DynamicDbEntities.FirstOrDefault(e => e.Value.Entity.PluralName == dbSetName).Value;
             if (dynamicEntity != null)
             {
-                var msg = _messages.FindEventImplementation(dynamicEntity.Entity.Name, NoxEventTypeEnum.Create);
+                var msg = _messages.FindEventImplementation(dynamicEntity.Entity.Name, NoxEventType.Created);
                 if (msg != null)
                 {
-                    SendChangeEvent(dynamicEntity.Entity, result, msg, NoxEventSourceEnum.NoxEventSource_DbContext);
+                    SendChangeEvent(dynamicEntity.Entity, result, msg, NoxEventSource.NoxDbContext);
                 }
+
             }
             
         }
@@ -149,10 +150,10 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
             var dynamicEntity = ((DynamicModel)_dynamicDbModel).DynamicDbEntities.FirstOrDefault(e => e.Value.Entity.PluralName == tObj.GetType().Name).Value;
             if (dynamicEntity != null)
             {
-                var msg = _messages.FindEventImplementation(dynamicEntity.Entity.Name, NoxEventTypeEnum.Create);
+                var msg = _messages.FindEventImplementation(dynamicEntity.Entity.Name, NoxEventType.Created);
                 if (msg != null)
                 {
-                    SendChangeEvent(dynamicEntity.Entity, tObj, msg, NoxEventSourceEnum.NoxEventSource_DbContext);
+                    SendChangeEvent(dynamicEntity.Entity, tObj, msg, NoxEventSource.NoxDbContext);
                 }
             }
             
@@ -163,7 +164,7 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
 
     }
     
-    private void SendChangeEvent(IEntity entity, Object obj, INoxEvent message, NoxEventSourceEnum eventSource)
+    private void SendChangeEvent(IEntity entity, Object obj, INoxEvent message, NoxEventSource eventSource)
     {
         var toSend = message.MapInstance(obj, eventSource);
         _messenger?.SendMessage(entity, toSend);

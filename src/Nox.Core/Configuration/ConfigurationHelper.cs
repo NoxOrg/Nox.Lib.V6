@@ -90,27 +90,23 @@ public class ConfigurationHelper
         var json = Path.Combine(pathToContentRoot, "appsettings.json");
 
         //AppSettings.Env
-        var envJson = "";
-        if (!string.IsNullOrEmpty(env))
-        {
-            envJson = Path.Combine(pathToContentRoot, $"appsettings.{env}.json");
-        }
-        
+        var envJson = string.IsNullOrEmpty(env) ? "" : Path.Combine(pathToContentRoot, $"appsettings.{env}.json");
+
         var builder = new ConfigurationBuilder()
             .SetBasePath(pathToContentRoot)
-            .AddJsonFile(json, true, true)
-            .AddEnvironmentVariables()
-            .AddCommandLine(args);
-
-        if (File.Exists(json)) builder.AddJsonFile(json);
-
+            .AddJsonFile(json, true, true);
+        
         if (!string.IsNullOrEmpty(envJson) && File.Exists(envJson)) builder.AddJsonFile(envJson);
-
+        
         if (IsDevelopment())
         {
             builder.AddUserSecrets<ConfigurationHelper>();
         }
 
+        builder.AddEnvironmentVariables();
+        
+        builder.AddCommandLine(args);
+        
         return builder;
 
     }

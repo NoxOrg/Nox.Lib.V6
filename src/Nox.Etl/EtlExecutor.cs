@@ -123,7 +123,7 @@ public class EtlExecutor : IEtlExecutor
         INoxEvent? entityCreatedMsg = null;
         if (loader.Messaging != null && loader.Messaging.Any())
         {
-            entityCreatedMsg = _messages.FindEventImplementation(entity.Name, NoxEventTypeEnum.Create);
+            entityCreatedMsg = _messages.FindEventImplementation(entity.Name, NoxEventType.Created);
         }
         
         postProcessDestination.WriteAction = (row, _) =>
@@ -133,7 +133,7 @@ public class EtlExecutor : IEtlExecutor
             if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Insert)
             {
                 inserts++;
-                if(entityCreatedMsg is not null) SendChangeEvent(loader, row, entityCreatedMsg, NoxEventSourceEnum.NoxEventSource_EtlLoad);
+                if(entityCreatedMsg is not null) SendChangeEvent(loader, row, entityCreatedMsg, NoxEventSource.EtlLoad);
             }
         };
         
@@ -222,8 +222,8 @@ public class EtlExecutor : IEtlExecutor
         INoxEvent? entityCreatedMsg = null, entityUpdatedMsg = null;
         if (loader.Messaging != null && loader.Messaging.Any())
         {
-            entityCreatedMsg = _messages.FindEventImplementation(entity.Name, NoxEventTypeEnum.Create);
-            entityUpdatedMsg = _messages.FindEventImplementation(entity.Name, NoxEventTypeEnum.Update);
+            entityCreatedMsg = _messages.FindEventImplementation(entity.Name, NoxEventType.Created);
+            entityUpdatedMsg = _messages.FindEventImplementation(entity.Name, NoxEventType.Updated);
         }
 
         postProcessDestination.WriteAction = (row, _) =>
@@ -233,13 +233,13 @@ public class EtlExecutor : IEtlExecutor
             if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Insert)
             {
                 inserts++;
-                if(entityCreatedMsg is not null) SendChangeEvent(loader, row, entityCreatedMsg, NoxEventSourceEnum.NoxEventSource_EtlMerge);
+                if(entityCreatedMsg is not null) SendChangeEvent(loader, row, entityCreatedMsg, NoxEventSource.EtlMerge);
                 UpdateMergeStates(lastMergeDateTimeStampInfo, record);
             }
             else if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Update)
             {
                 updates++;
-                if (entityUpdatedMsg is not null) SendChangeEvent(loader, row, entityUpdatedMsg, NoxEventSourceEnum.NoxEventSource_EtlMerge);
+                if (entityUpdatedMsg is not null) SendChangeEvent(loader, row, entityUpdatedMsg, NoxEventSource.EtlMerge);
                 UpdateMergeStates(lastMergeDateTimeStampInfo, record);
             }
             else if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Exists)
@@ -265,7 +265,7 @@ public class EtlExecutor : IEtlExecutor
 
     }
 
-    private void SendChangeEvent(ILoader loader, ExpandoObject row, INoxEvent message, NoxEventSourceEnum eventSource)
+    private void SendChangeEvent(ILoader loader, ExpandoObject row, INoxEvent message, NoxEventSource eventSource)
     {
         var toSend = message.MapInstance(row, eventSource);
 

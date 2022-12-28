@@ -17,7 +17,7 @@ public class CurrencyUpdatedEventConsumer : IConsumer<CurrencyUpdatedDomainEvent
 
     public Task Consume(ConsumeContext<CurrencyUpdatedDomainEvent> context)
     {
-        _logger.LogInformation($"Currency Updated by {context.Message.EventSource.ToFriendlyName()}: {JsonSerializer.Serialize(context.Message.Payload)}");
+        _logger.LogInformation("Currency Updated by {source}: {@payload}", context.Message.EventSource, context.Message.Payload);
         return Task.CompletedTask;
     }
 }

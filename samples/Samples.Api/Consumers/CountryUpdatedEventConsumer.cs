@@ -15,7 +15,7 @@ public class CountryUpdatedEventConsumer: IConsumer<CountryUpdatedDomainEvent>
     
     public Task Consume(ConsumeContext<CountryUpdatedDomainEvent> context)
     {
-        _logger.LogInformation($"Received CountryUpdatedDomainEvent from {context.Message.EventSource.ToFriendlyName()}: {context.Message.Payload}");
+        _logger.LogInformation("Received CountryUpdatedDomainEvent from {message}: {@payload}", context.Message, context.Message.Payload);
         return Task.CompletedTask;
     }
 }

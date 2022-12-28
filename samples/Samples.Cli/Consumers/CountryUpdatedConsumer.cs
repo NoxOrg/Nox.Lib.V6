@@ -17,7 +17,7 @@ public class CountryUpdatedEventConsumer : IConsumer<CountryUpdatedDomainEvent>
 
     public Task Consume(ConsumeContext<CountryUpdatedDomainEvent> context)
     {
-        _logger.LogInformation($"Country Updated by {context.Message.EventSource.ToFriendlyName()}: {JsonSerializer.Serialize(context.Message.Payload)}");
+        _logger.LogInformation("Country Updated by {source}: {@payload}", context.Message.EventSource, context.Message.Payload);
         return Task.CompletedTask;
     }
 }

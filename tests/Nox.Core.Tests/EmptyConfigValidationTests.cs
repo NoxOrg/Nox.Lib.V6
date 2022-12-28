@@ -14,10 +14,11 @@ public class EmptyConfigValidationTests
         var validator = new NoxConfigValidator();
         var result = validator.Validate(config);
         Assert.That(result.IsValid, Is.False);
-        Assert.That(result.Errors.Count, Is.EqualTo(3));
+        Assert.That(result.Errors.Count, Is.EqualTo(2));
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("a Name must be specified in ")));
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("a Database definition must be specified in ")));
-        Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("The service definition '' must have at least one entity in ")));
+        // Removed : Andre Sharpe - Services don't need to define entities
+        // Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("The service definition '' must have at least one entity in ")));
     }
 
     [Test]

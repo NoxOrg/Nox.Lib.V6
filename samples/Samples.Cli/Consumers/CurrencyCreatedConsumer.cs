@@ -17,7 +17,7 @@ public class CurrencyCreatedEventConsumer : IConsumer<CurrencyCreatedDomainEvent
 
     public Task Consume(ConsumeContext<CurrencyCreatedDomainEvent> context)
     {
-        _logger.LogInformation($"Currency Created by {context.Message.EventSource.ToFriendlyName()}: {JsonSerializer.Serialize(context.Message.Payload)}");
+        _logger.LogInformation("Currency Created by {source}: {@payload}", context.Message.EventSource, context.Message.Payload);
         return Task.CompletedTask;
     }
 }

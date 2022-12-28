@@ -21,9 +21,12 @@ public class NoxConfigValidator: AbstractValidator<NoxConfiguration>
         RuleForEach(config => config.Apis)
             .SetValidator(new ApiConfigValidator());
 
+        /* We should be able to define services without Entities: Andre - test this..
+         
         RuleFor(config => config.Entities)
             .NotEmpty()
             .WithMessage(config => string.Format(ValidationResources.ConfigEntitiesEmpty, config.Name, config.DefinitionFileName));
+        */
 
         RuleForEach(config => config.Entities)
             .SetValidator(config => new EntityConfigValidator(config.MessagingProviders));

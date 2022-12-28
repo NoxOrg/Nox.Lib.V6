@@ -15,7 +15,7 @@ public class CurrencyCreatedEventConsumer: IConsumer<CurrencyCreatedDomainEvent>
     
     public Task Consume(ConsumeContext<CurrencyCreatedDomainEvent> context)
     {
-        _logger.LogInformation($"Received CurrencyCreatedDomainEvent from {context.Message.EventSource.ToFriendlyName()}: {context.Message.Payload}");
+        _logger.LogInformation("Received CurrencyCreatedDomainEvent from {message}: {@payload}", context.Message, context.Message.Payload);
         return Task.CompletedTask;
     }
 }

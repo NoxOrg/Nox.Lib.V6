@@ -1,8 +1,8 @@
 namespace Nox.Generator;
 
-public enum GeneratorEventTypeEnum
+public enum GeneratorEventType
 {
-    Created = 0,
+    Created,
     Updated,
     Deleted
 }
