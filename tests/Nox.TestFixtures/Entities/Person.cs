@@ -1,5 +1,3 @@
-using Nox.Core.Interfaces;
-using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
 
 namespace Nox.TestFixtures.Entities;

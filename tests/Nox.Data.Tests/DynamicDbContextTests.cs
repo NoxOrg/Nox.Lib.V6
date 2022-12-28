@@ -1,3 +1,4 @@
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
@@ -23,7 +24,7 @@ public class DynamicDbContextTests: DataTestFixture
         Assert.AreEqual("Person, DynamicPoco, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null", dynamicQueryable.ElementType.AssemblyQualifiedName);
         dynamicQueryable = context.GetDynamicCollection("Vehicles");
         Assert.IsNotNull(dynamicQueryable);
-        Assert.AreEqual("Vehicle, DynamicPoco, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null", dynamicQueryable.ElementType.AssemblyQualifiedName);                    
+        Assert.AreEqual("Vehicle, DynamicPoco, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null", dynamicQueryable.ElementType.AssemblyQualifiedName);  
     }
 
     [Test]
