@@ -2,32 +2,32 @@
 # Vehicle data loader definition
 #
 
-Name: VehicleLoader
+name: VehicleLoader
 
-Description: Loads vehicle data
+description: Loads vehicle data
 
-Schedule:
-  Start: Daily at 2am UTC
-  Retry:
-    Limit: 10
-    DelaySeconds: 60
-    DoubleDelayLimit: 5
+schedule:
+  start: Daily at 2am UTC
+  retry:
+    limit: 10
+    delaySeconds: 60
+    doubleDelayLimit: 5
 
-LoadStrategy:
-  Type: MergeNew
-  Columns: [CreateDate,EditDate]
+loadStrategy:
+  type: MergeNew
+  columns: [CreateDate,EditDate]
 
 
-Target:
-  Entity: Vehicle
+target:
+  entity: Vehicle
   
-Messaging:
-  - MessagingProvider: TestMessaging  
+messaging:
+  - messagingProvider: TestMessaging  
 
-Sources:
-  - DataSource: TestDataSource
-    MinimumExpectedRecords: 30
-    Query: >-
+sources:
+  - dataSource: TestDataSource
+    minimumExpectedRecords: 30
+    query: >-
       SELECT 
            [Id]
           ,[VehicleBrand] AS [Brand]

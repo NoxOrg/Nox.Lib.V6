@@ -33,7 +33,8 @@ public class DropAndLoadTestFixture
         services.AddSingleton<DropAndLoadSeed>();
         TestServiceProvider = services.BuildServiceProvider();
         TestServiceProvider.GetRequiredService<IDynamicService>();
-        TestServiceProvider!.GetRequiredService<IDynamicModel>();
+        var model = TestServiceProvider!.GetRequiredService<IDynamicModel>();
+        var dbContext = TestServiceProvider!.GetRequiredService<IDynamicDbContext>();
         var sqlHelper = TestServiceProvider!.GetRequiredService<SqlHelper>();
         await sqlHelper.ExecuteAsync("DELETE FROM Vehicle");
         var seed = TestServiceProvider.GetRequiredService<DropAndLoadSeed>();

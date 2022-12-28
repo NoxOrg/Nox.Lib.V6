@@ -2,27 +2,27 @@
 # Service definition
 #
 
-Name: Test
+name: Test
 
-Description: Test Microservice
+description: Test Microservice
 
-Database:
-  Name: Test
+database:
+  name: Test
   
-  Provider: SqlServer
-  Options: Trusted_Connection=no;connection timeout=120;TrustServerCertificate=true
+  provider: SqlServer
+  options: Trusted_Connection=no;connection timeout=120;TrustServerCertificate=true
   
   #Provider: Postgres
   #Port: 54320
 
   #Provider: MySql
 
-  Server: localhost
-  User: sa
-  Password: Developer*123
+  server: localhost
+  user: sa
+  password: Developer*123
 
-MessageBus:
-  Name: TestMessaging
+messageBus:
+  name: TestMessaging
   #Provider: AzureServiceBus
   #ConnectionVariable: ConnectionString:AzureServiceBus
-  Provider: InMemory
+  provider: InMemory

@@ -2,31 +2,31 @@
 # Service definition
 #
 
-Name: Test
+name: Test
 
-Description: Test Microservice
+description: Test Microservice
   
-Database:
-  Name: Test
-  Provider: SqLite
-  ConnectionString: Data Source=Test;Mode=Memory;Cache=Shared
+database:
+  name: Test
+  provider: SqLite
+  connectionString: Data Source=Test;Mode=Memory;Cache=Shared
 
-MessagingProviders:
-  - Name: TestMessagingProvider1
-    Provider: InMemory
-  - Name: TestMessagingProvider2
-    Provider: InMemory
+messagingProviders:
+  - name: TestMessagingProvider1
+    provider: InMemory
+  - name: TestMessagingProvider2
+    provider: InMemory
     
-DataSources:
-  - Name: TestDataSource1
-    Provider: SqLite
-    ConnectionString: Data Source=Test;Mode=Memory;Cache=Shared
-  - Name: TestDataSource2
-    Provider: SqLite
-    Server: localhost
-    Port: 1433
-    User: sa
-    Password: Developer*123
-  - Name: TestDataSource3
-    Provider: SqLite
-    ConnectionVariable: TestConnectionVariable
+dataSources:
+  - name: TestDataSource1
+    provider: SqLite
+    connectionString: Data Source=Test;Mode=Memory;Cache=Shared
+  - name: TestDataSource2
+    provider: SqLite
+    server: localhost
+    port: 1433
+    user: sa
+    password: Developer*123
+  - name: TestDataSource3
+    provider: SqLite
+    connectionVariable: TestConnectionVariable

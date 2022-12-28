@@ -2,20 +2,22 @@
 # Service definition
 #
 
-Name: MergeNewTest
+name: MergeNewTest
 
-Description: Merge New Test Microservice
+description: Merge New Test Microservice
 
-Database:
-  Name: Test
-  Provider: SqLite
-  ConnectionString: Data Source=./MergeNew.db;
+autoMigrations: true
 
-MessagingProviders:
-  - Name: TestMessaging
-    Provider: InMemory
+database:
+  name: Test
+  provider: SqLite
+  connectionString: Data Source=./MergeNew.db;
 
-DataSources:
-  - Name: TestDataSource
-    Provider: SqLite
-    ConnectionString: Data Source=./MergeNewMaster.db;
+messagingProviders:
+  - name: TestMessaging
+    provider: InMemory
+
+dataSources:
+  - name: TestDataSource
+    provider: SqLite
+    connectionString: Data Source=./MergeNewMaster.db;
