@@ -3,6 +3,7 @@ using Nox.Core.Constants;
 using Nox.Core.Exceptions;
 using Serilog;
 using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace Nox.Core.Configuration;
 
@@ -16,6 +17,7 @@ public class NoxConfigurator
     {
         _designRoot = designRoot;
         _deserializer = new DeserializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .Build();
     }
 

@@ -1,0 +1,55 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "MessagingProvider",
+    "description": "The database provider for storing microservice data",
+    "type": "object",
+    "required": ["name","provider"],
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "The name of the message bus"
+        },
+        "provider": {
+            "type": "string",
+            "description": "The provider to use for messaging",
+            "oneOf": [
+                {
+                    "const": "rabbitMQ",
+                    "description": "Use RabbitMQ message broker for messaging"
+                },
+                {
+                    "const": "azureServiceBus",
+                    "description": "Use Azure ServiceBus for messaging"
+                },
+                {
+                    "const": "amazonSQS",
+                    "description": "Use Amazon Simple Queue Service (SQS) for messaging"
+                },
+                {
+                    "const": "inMemory",
+                    "description": "Use an in-memory queue for messaging (in test only)"
+                },
+                {
+                    "const": "mediator",
+                    "description": "Use MassTransit in-process mediator. Added implicitly anyway."
+                }
+            ]
+        },
+        "connectionString": {
+            "type": "string",
+            "description": "The connection string to the messaging provider"
+        },
+        "connectionStringVariable": {
+            "type": "string",
+            "description": "The secret or environment variable containing the connection string to the messaging provider"
+        },
+        "accessKey": {
+            "type": "string",
+            "description": "The AmazonSQS access key"
+        },
+        "secretKey": {
+            "type": "string",
+            "description": "The AmazonSQS secret key"
+        }
+    }
+}

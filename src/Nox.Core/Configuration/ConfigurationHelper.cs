@@ -31,13 +31,11 @@ public class ConfigurationHelper
             keyVaultUri = KeyVault.DefaultKeyVaultUri;
         }
 
-        // Add key vault (if specified) to the config
-
         var keys = new[] {
-            "AZURE-TENANT-ID",
-            "AZURE-CLIENT-ID",
-            "AZURE-CLIENT-SECRET",
-            "AZURE-DEVOPS-PAT"
+            "AZURE_TENANT_ID",
+            "AZURE_CLIENT_ID",
+            "AZURE_CLIENT_SECRET",
+            "AZURE_DEVOPS_PAT"
         };
 
         try
@@ -70,7 +68,7 @@ public class ConfigurationHelper
         {
             foreach (var key in keys)
             {
-                var secret = await keyVault.GetSecretAsync(keyVaultUri, key.Replace(":", "--"));
+                var secret = await keyVault.GetSecretAsync(keyVaultUri, key.Replace(":", "--").Replace("_","-"));
                 secrets.Add(new KeyValuePair<string, string>(key, secret.Value ?? ""));
             }
         }
