@@ -1,0 +1,140 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "NOX Service",
+    "description": "Defines Nox microservice properties for rapid application development",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["name"],
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "The name of the Nox service"
+        },  
+        "description": {
+            "type": "string",
+            "description": "A string describing the microservice"
+        },  
+        "autoMigrations": {
+            "type": "boolean",
+            "description": "Whether the service database is automatically created if it doesn't exist"
+        },  
+        "database": {
+            "type": "object",
+            "title": "DataSource",
+            "description": "The database provider for storing microservice data",
+            "required": ["name"],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the data source"
+                },
+                "provider": {
+                    "type": "string",
+                    "description": "The database provider for data storage",
+                    "items": {
+                        "type": "string",
+                        "oneOf": [
+                            {
+                                "const": "postgres",
+                                "description": "Use Postgres database driver"
+                            },
+                            {
+                                "const": "sqlserver",
+                                "description": "Use Microsoft SqlServer database driver"
+                            },
+                            {
+                                "const": "mysql",
+                                "description": "Use MySql database driver"
+                            }
+                        ]
+                    }
+                },
+                "server": {
+                    "type": "string",
+                    "description": "The name name or network location of the database server"
+                },
+                "user": {
+                    "type": "string",
+                    "description": "The user name to connect to the database"
+                },
+                "password": {
+                    "type": "string",
+                    "description": "The password to connect to the database"
+                },
+                "options": {
+                    "type": "string",
+                    "description": "Additional options to append to the database connection string"
+                },
+                "connectionString": {
+                    "type": "string",
+                    "description": "The connection string to connect to the database"
+                },
+                "connectionStringVariable": {
+                    "type": "string",
+                    "description": "The secret or environment variable containing the connection string to connect to the database"
+                }
+            }
+        },
+        "messagingProviders": {
+            "type": "array",
+            "description": "A list of message providers used in the service",
+            "items": {
+                "type": "object",
+                "title": "MessagingProvider",
+                "description": "The database provider for storing microservice data",
+                "required": ["name"],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the message bus"
+                    },
+                    "provider": {
+                        "type": "string",
+                        "description": "The provider to use for messaging",
+                        "items": {
+                            "type": "string",
+                            "oneOf": [
+                                {
+                                    "const": "rabbitmq",
+                                    "description": "Use RabbitMQ message broker for messaging"
+                                },
+                                {
+                                    "const": "azureservicebus",
+                                    "description": "Use Azure ServiceBus for messaging"
+                                },
+                                {
+                                    "const": "amazonsqs",
+                                    "description": "Use Amazon Simple Queue Service (SQS) for messaging"
+                                },
+                                {
+                                    "const": "inmemory",
+                                    "description": "Use an in-memory queue for messaging (in test only)"
+                                },
+                                {
+                                    "const": "mediator",
+                                    "description": "Use MassTransit in-process mediator. Added implicitly anyway."
+                                }
+                            ]
+                        }
+                    },
+                    "connectionString": {
+                        "type": "string",
+                        "description": "The connection string to the messaging provider"
+                    },
+                    "connectionStringVariable": {
+                        "type": "string",
+                        "description": "The secret or environment variable containing the connection string to the messaging provider"
+                    },
+                    "accessKey": {
+                        "type": "string",
+                        "description": "The AmazonSQS access key"
+                    },
+                    "secretKey": {
+                        "type": "string",
+                        "description": "The AmazonSQS secret key"
+                    }
+                }
+            }
+        }
+    }
+}
