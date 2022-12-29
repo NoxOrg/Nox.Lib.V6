@@ -43,12 +43,12 @@
     "parameters": {
       "type": "array",
       "description": "The list of parameters used by this route",
-      "items": {"$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/ApiRouteParameter.json"  }
+      "items": {"$ref": "https://noxorg.dev/schemas/ApiRouteParameter.json"  }
     },
     "responses": {
       "type": "array",
       "description": "The list of responses used by this route",
-      "items": {"$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/ApiRouteResponse.json"  }
+      "items": {"$ref": "https://noxorg.dev/schemas/ApiRouteResponse.json"  }
     },
     "targetUrl": {
       "type": "string",

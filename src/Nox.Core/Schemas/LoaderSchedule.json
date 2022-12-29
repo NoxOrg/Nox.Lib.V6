@@ -14,7 +14,7 @@
       "type": "object",
       "title": "Retry",
       "description": "The retry policy for this loader",
-      "$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/LoaderScheduleRetryPolicy.json"
+      "$ref": "https://noxorg.dev/schemas/LoaderScheduleRetryPolicy.json"
     }
   }
 }
