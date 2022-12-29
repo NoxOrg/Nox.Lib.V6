@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NOX Loader Load Strategy",
+  "description": "Defines NOX Loader Load Strategy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "description": "The type of load strategy this loader will perform",
+      "oneOf": [
+        {
+          "const": "DropAndLoad",
+          "description": "Drop existing data and load all available data from source"
+        },
+        {
+          "const": "MergeNew",
+          "description": "Insert missing data and update existing data based on defined merge fields"
+        }
+      ]
+    },
+    "columns": {
+      "type": "array",
+      "description": "The list of columns which will determine how data is merged",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
+

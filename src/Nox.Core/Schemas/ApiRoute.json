@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NOX Api Route",
+  "description": "Defines NOX API route",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name","httpVerb", "targetUrl"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the API route"
+    },
+    "description": {
+      "type": "string",
+      "description": "The description of the API route"
+    },
+    "httpVerb": {
+      "type": "string",
+      "description": "The HTTP verb to use for this route",
+      "oneOf": [
+        {
+          "const": "GET",
+          "description": "use http GET"
+        },
+        {
+          "const": "POST",
+          "description": "Use http POST"
+        },
+        {
+          "const": "PUT",
+          "description": "Use http PUT"
+        },
+        {
+          "const": "PATCH",
+          "description": "Use http PATCH"
+        },
+        {
+          "const": "DELETE",
+          "description": "Use http DELETE"
+        }
+      ]
+    },
+    "parameters": {
+      "type": "array",
+      "description": "The list of parameters used by this route",
+      "items": {"$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/ApiRouteParameter.json"  }
+    },
+    "responses": {
+      "type": "array",
+      "description": "The list of responses used by this route",
+      "items": {"$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/ApiRouteResponse.json"  }
+    },
+    "targetUrl": {
+      "type": "string",
+      "description": "The url that this route will use"
+    }
+  }
+}
+
