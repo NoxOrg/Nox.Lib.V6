@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NOX Loader Schedule",
+  "description": "Defines NOX Loader Schedule",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["start"],
+  "properties": {
+    "start": {
+      "type": "string",
+      "description": "English expression defining when the loader should execute, see https://github.com/NoxOrg/Nox.Cron"
+    },
+    "retry": {
+      "type": "object",
+      "title": "Retry",
+      "description": "The retry policy for this loader",
+      "$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/LoaderScheduleRetryPolicy.json"
+    }
+  }
+}
+

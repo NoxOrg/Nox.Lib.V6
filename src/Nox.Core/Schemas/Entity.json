@@ -37,6 +37,11 @@
             "type": "array",
             "description": "A list of attributres of the entity",
             "items": {"$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/EntityAttribute.json"  }
+        },
+        "messaging": {
+            "type": "array",
+            "description": "A list of messaging providers to which this entity will submit events",
+            "items": {"$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/MessageTarget.json"  }
         }
     }
 }
