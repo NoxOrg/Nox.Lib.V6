@@ -5,7 +5,7 @@ namespace Nox.Data.Csv;
 
 public static class ServiceExtensions
 {
-    public static IServiceCollection AddJsonDataProvider(this IServiceCollection services)
+    public static IServiceCollection AddCsvDataProvider(this IServiceCollection services)
     {
         services.AddTransient<IDataProvider, CsvDataProvider>();
         return services;

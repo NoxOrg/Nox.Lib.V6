@@ -236,5 +236,11 @@ namespace Nox.Core {
                 return ResourceManager.GetString("LoaderMessageTargetMissing", resourceCulture);
             }
         }
+        
+        internal static string DbProviderInvalid {
+            get {
+                return ResourceManager.GetString("DbProviderInvalid", resourceCulture);
+            }
+        }
     }
 }
