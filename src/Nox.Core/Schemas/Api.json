@@ -17,7 +17,7 @@
     "routes": {
       "type": "array",
       "description": "The list of routes to use for this API",
-      "items": {"$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/ApiRoute.json"  }
+      "items": {"$ref": "https://noxorg.dev/schemas/ApiRoute.json"  }
     }
   }
 }
