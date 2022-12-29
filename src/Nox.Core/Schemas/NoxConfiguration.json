@@ -22,28 +22,28 @@
             "type": "object",
             "title": "Database",
             "description": "The database provider for storing microservice data",
-            "$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/DataSource.json"
+            "$ref": "https://noxorg.dev/schemas/DataSource.json"
         },
         "messagingProviders": {
             "type": "array",
             "description": "A list of message providers used in the service",
-            "items": {"$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/MessagingProvider.json"  }
+            "items": {"$ref": "https://noxorg.dev/schemas/MessagingProvider.json"  }
         },
         "dataSources": {
             "type": "array",
             "description": "A list of message providers used in the service",
-            "items": {"$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/DataSource.json"  }
+            "items": {"$ref": "https://noxorg.dev/schemas/DataSource.json"  }
         },
         "versionControl": {
             "type": "object",
-            "$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/VersionControl.json"
+            "$ref": "https://noxorg.dev/schemas/VersionControl.json"
         },
         "team": {
             "properties": {
                 "developers": {
                     "type": "array",
                     "description": "The NOX service development team",
-                    "items": {"$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/TeamMember.json"  }
+                    "items": {"$ref": "https://noxorg.dev/schemas/TeamMember.json"  }
                 }
             }  
         }

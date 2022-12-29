@@ -18,29 +18,29 @@
       "type": "object",
       "title": "Schedule",
       "description": "The schedule for this loader",
-      "$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/LoaderSchedule.json"
+      "$ref": "https://noxorg.dev/schemas/LoaderSchedule.json"
     },
     "loadStrategy": {
       "type": "object",
       "title": "Load Strategy",
       "description": "The load strategy for this loader",
-      "$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/LoaderLoadStrategy.json"
+      "$ref": "https://noxorg.dev/schemas/LoaderLoadStrategy.json"
     },
     "target": {
       "type": "object",
       "title": "Loader Target",
       "description": "The target for this loader",
-      "$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/LoaderTarget.json"
+      "$ref": "https://noxorg.dev/schemas/LoaderTarget.json"
     },
     "messaging": {
       "type": "array",
       "description": "A list of messaging providers to which this loader will submit events",
-      "items": {"$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/MessageTarget.json"  }
+      "items": {"$ref": "https://noxorg.dev/schemas/MessageTarget.json"  }
     },
     "sources": {
       "type": "array",
       "description": "a List of Data Sources from which this loader will source data",
-      "items": {"$ref": "https://raw.githubusercontent.com/NoxOrg/Nox/main/src/Nox.Core/Schemas/LoaderSource.json"  }
+      "items": {"$ref": "https://noxorg.dev/schemas/LoaderSource.json"  }
     }
   }
 }
