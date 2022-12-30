@@ -42,7 +42,7 @@ public class NoxConfigurator
             {
                 var config = _deserializer.Deserialize<NoxConfiguration>(ReadDefinitionFile(f));
                 config.DefinitionFileName = Path.GetFullPath(f);
-                config.Database!.DefinitionFileName = Path.GetFullPath(f);
+                if (config.Database != null) config.Database.DefinitionFileName = Path.GetFullPath(f);
                 if (config.MessagingProviders != null)
                 {
                     foreach (var msgProviderConfig in config.MessagingProviders)

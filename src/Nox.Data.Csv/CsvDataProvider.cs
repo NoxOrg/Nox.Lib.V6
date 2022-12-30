@@ -74,9 +74,7 @@ public class CsvDataProvider : IDataProvider
 
     public void Configure(IServiceDataSource serviceDb, string applicationName)
     {
-
         _options = serviceDb.Options;
-
         SetConnectionString(_options);
     }
 

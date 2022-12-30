@@ -5,11 +5,6 @@
 name: Test
 
 description: Test Microservice
-  
-database:
-  name: Test
-  provider: SqLite
-  connectionString: Data Source=Test;Mode=Memory;Cache=Shared
 
 messagingProviders:
   - name: TestMessagingProvider1
