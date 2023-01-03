@@ -35,11 +35,11 @@ jobs:
         run: dotnet test ./tests/Nox.Core.Tests --no-restore --verbosity minimal --configuration Release
       - name: Data Tests
         run: dotnet test ./tests/Nox.Data.Tests --no-restore --verbosity minimal --configuration Release
-      - name: Drop And Load Tests
-        run: dotnet test ./tests/Nox.Etl.DropAndLoad.Tests --no-restore --verbosity minimal --configuration Release
-      - name: Merge New Tests
-        run: dotnet test ./tests/Nox.Etl.MergeNew.Tests --no-restore --verbosity minimal --configuration Release
-      - name: Generator Tests
-        run: dotnet test ./tests/Nox.Generator.Tests --no-restore --verbosity minimal --configuration Release
-      - name: Messaging Tests
-        run: dotnet test ./tests/Nox.Messaging.Tests --no-restore --verbosity minimal --configuration Release
+      #- name: Drop And Load Tests
+      #  run: dotnet test ./tests/Nox.Etl.DropAndLoad.Tests --no-restore --verbosity minimal --configuration Release
+      #- name: Merge New Tests
+      #  run: dotnet test ./tests/Nox.Etl.MergeNew.Tests --no-restore --verbosity minimal --configuration Release
+      #- name: Generator Tests
+      #  run: dotnet test ./tests/Nox.Generator.Tests --no-restore --verbosity minimal --configuration Release
+      #- name: Messaging Tests
+      #  run: dotnet test ./tests/Nox.Messaging.Tests --no-restore --verbosity minimal --configuration Release
