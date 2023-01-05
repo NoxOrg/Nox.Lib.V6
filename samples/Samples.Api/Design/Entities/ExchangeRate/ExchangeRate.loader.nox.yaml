@@ -23,7 +23,7 @@ sources:
   #  query: ExchangeRate-seeddata.json 
 
   - dataSource: CsvSeedData
-    query: exchangeRate-seedData.csv 
+    query: exchange-rate-seeddata.csv 
 
   #- dataSource: ExcelSeedData
   #  query: ExchangeRate-seeddata.xlsx

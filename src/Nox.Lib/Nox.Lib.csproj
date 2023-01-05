@@ -118,6 +118,10 @@
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
+    <Content Include="$(OutputPath)\Nox.Data.SQLite.dll">
+      <Pack>true</Pack>
+      <PackagePath>lib\$(TargetFramework)</PackagePath>
+    </Content>
     <Content Include="$(OutputPath)\Nox.Data.Postgres.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
