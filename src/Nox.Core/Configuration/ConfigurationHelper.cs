@@ -22,62 +22,7 @@ public class ConfigurationHelper
         {
             config["Nox:DefinitionRootPath"] = "./";
         }
-
-        config = configBuilder.Build();
-        var keyVaultUri = config["Nox:KeyVaultUri"];
-
-        if (string.IsNullOrEmpty(keyVaultUri))
-        {
-            keyVaultUri = KeyVault.DefaultKeyVaultUri;
-        }
-
-        var keys = new[] {
-            "AZURE_TENANT_ID",
-            "AZURE_CLIENT_ID",
-            "AZURE_CLIENT_SECRET",
-            "AZURE_DEVOPS_PAT"
-        };
-
-        try
-        {
-            var secrets = GetSecrets(keyVaultUri, keys).GetAwaiter().GetResult();
-
-            //Api endpoint config
-            secrets!.Add(new KeyValuePair<string, string>("ServiceApiEndpointProvider", ""));
-
-            configBuilder.AddInMemoryCollection(secrets!);
-
-        }
-        catch
-        {
-            // throw new ConfigurationException($"Error loading secrets from vault at '{keyVaultUri}'");
-        }
-
         return configBuilder.Build();
-    }
-
-    private static async Task<IList<KeyValuePair<string,string>>?> GetSecrets(string keyVaultUri, string[] keys)
-    {
-        var secrets = new List<KeyValuePair<string,string>>();
-
-        var azureServiceTokenProvider = new AzureServiceTokenProvider();
-
-        var keyVault = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
-
-        try
-        {
-            foreach (var key in keys)
-            {
-                var secret = await keyVault.GetSecretAsync(keyVaultUri, key.Replace(":", "--").Replace("_","-"));
-                secrets.Add(new KeyValuePair<string, string>(key, secret.Value ?? ""));
-            }
-        }
-        catch (Exception ex) 
-        {
-            throw new ConfigurationException($"Error loading secrets from vault at '{keyVaultUri}'. ({ex.Message})");
-        }
-
-        return secrets;
     }
 
     private static IConfigurationBuilder GetApplicationConfigurationBuilder(string[] args)
@@ -131,5 +76,44 @@ public class ConfigurationHelper
         env ??= Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
         return env;
     }
+
+    public static async Task<IList<KeyValuePair<string, string>>?> GetNoxSecrets(IConfiguration config, string[] keys)
+    {
+        var keyVaultUri = config["Nox:KeyVaultUri"];
+
+        if (string.IsNullOrEmpty(keyVaultUri))
+        {
+            keyVaultUri = KeyVault.DefaultKeyVaultUri;
+        }
+
+        return await GetSecretsFromVault(keyVaultUri, keys);
+    }
+
+
+    private static async Task<IList<KeyValuePair<string, string>>?> GetSecretsFromVault(string keyVaultUri, string[] keys)
+    {
+        var secrets = new List<KeyValuePair<string, string>>();
+
+        var azureServiceTokenProvider = new AzureServiceTokenProvider();
+
+        var keyVault = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+
+        try
+        {
+            foreach (var key in keys)
+            {
+                var secret = await keyVault.GetSecretAsync(keyVaultUri, key.Replace(":", "--").Replace("_", "-"));
+                secrets.Add(new KeyValuePair<string, string>(key, secret.Value ?? ""));
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new ConfigurationException($"Error loading secrets from vault at '{keyVaultUri}'. ({ex.Message})");
+        }
+
+        return secrets;
+    }
+
+
 
 }

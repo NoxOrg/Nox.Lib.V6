@@ -107,7 +107,7 @@ public class NoxConfigurator
             .ToList();
     }
     
-    private string ReadDefinitionFile(string fileName)
+    private static string ReadDefinitionFile(string fileName)
     {
         Log.Information("Reading definition from {fileName}", fileName.Replace('\\', '/'));
         return File.ReadAllText(fileName);

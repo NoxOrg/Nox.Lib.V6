@@ -15,9 +15,17 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
+
       - name: Build
         run: dotnet build ./src/Nox.Lib --warnaserror --configuration Release
-      - name: Pack
+
+      - name: Pack Nox.Lib
         run: dotnet pack --no-build ./src/Nox.Lib --configuration Release -o ./artifacts
-      - name: Publish
+      - name: Publish Nox.Lib
         run: dotnet nuget push ./artifacts/Nox.Lib.*.nupkg --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+
+      - name: Pack Nox.Core
+        run: dotnet pack --no-build ./src/Nox.Core --configuration Release -o ./artifacts
+      - name: Publish Nox.Core
+        run: dotnet nuget push ./artifacts/Nox.Core.*.nupkg --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+

@@ -10,5 +10,7 @@ public static class FileExtension
     public const string LoaderDefinition = @"*.loader.nox.yaml";
 
     public const string ApiDefinition = @"*.api.nox.yaml";
+
+    public const string WorflowDefinition = @"*.workflow.nox.yaml";
 }
 
