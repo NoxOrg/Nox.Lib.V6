@@ -1,4 +1,6 @@
 using System.Dynamic;
+using System.Globalization;
+using CsvHelper.Configuration;
 using ETLBox.Connection;
 using ETLBox.DataFlow;
 using ETLBox.DataFlow.Connectors;
@@ -100,7 +102,10 @@ public class CsvDataProvider : IDataProvider
 
     public IDataFlowExecutableSource<ExpandoObject> DataFlowSource(ILoaderSource loaderSource)
     {
-        _dataFlowExecutableSource = new CsvSource<ExpandoObject>();
+        _dataFlowExecutableSource = new CsvSource<ExpandoObject>
+        {
+            Configuration = new CsvConfiguration(CultureInfo.InvariantCulture)
+        };
 
         switch (_resourceType)
         {

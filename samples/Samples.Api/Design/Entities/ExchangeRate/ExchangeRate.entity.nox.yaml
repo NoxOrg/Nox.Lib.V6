@@ -15,7 +15,7 @@ relatedParents: [Currency]
 attributes:
 
   - name: Id
-    description: The unique identifier of an exhange rate
+    description: The unique identifier of an exchange rate
     isPrimaryKey: true
     type: int
     canFilter: true
