@@ -50,9 +50,9 @@ dataSources:
     provider: json
     options: Source=File;Path=../../docs/sample-data/;
 
-  #- name: CsvSeedData
-  #  provider: csv
-  #  options: Source=File;Path=../../docs/sample-data/;
+  - name: CsvSeedData
+    provider: csv
+    options: Source=File;Path=../../docs/sample-data/;
 
   #- name: ExcelSeedData
   #  provider: excel

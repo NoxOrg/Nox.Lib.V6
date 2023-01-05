@@ -28,4 +28,7 @@
             <HintPath>..\Nox.Tle\ETLBox.Csv.dll</HintPath>
         </Reference>
     </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="CsvHelper" Version="28.0.0" />
+    </ItemGroup>
 </Project>
