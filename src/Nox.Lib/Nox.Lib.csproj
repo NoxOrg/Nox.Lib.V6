@@ -178,7 +178,7 @@
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
-    <Content Include="$(OutputPath)\ETLBoxSQLite.dll">
+    <Content Include="$(OutputPath)\ETLBox.SQLite.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
