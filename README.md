@@ -91,7 +91,7 @@
 ***
 Nox is a .NET microservice framework that allows developers to rapidly build, maintain and deploy enterprise-grade, production-ready microservices. 
 
-It removes all the ceremony, repition and technical details associated with building and maintaining applications without constraining developer creativity or control in any way.
+It removes all the ceremony, repetition and technical details associated with building and maintaining applications without constraining developer creativity or control in any way.
 
 <div align="center">
     <img src="docs/images/nox_overview.png" alt="Overview" width="100%">
@@ -104,12 +104,12 @@ Nox lets you focus on your business problem and domain, and provides you with th
 
 - Declaration of your core application and domain (models, data, entities, attributes and bounded contexts) in a declaritive and easily maintainable way (YAML, using YamlDotNet)
 - Automatic (and selective) Create, Read, Update and Delete (CRUD) API for entities and/or aggregate roots (supports REST with OData, with GraphQL and gRPC in the making)
-- The choice of persisting your data in any database with current support for Sql Server, Postgress or MySql (using Entity Framework)
+- The choice of persisting your data in any database with current support for Sql Server, PostgreSQL or MySql (using Entity Framework)
 - Automated Database Migrations (coming soon)
 - Validation of entities and attributes (using FluentValidation)
 - Logging, Observability and Monitoring (using SeriLog)
 - Events and Messaging (In process/Mediator, Azure Servicebus, Amazon SQS, RabbitMQ) using MassTransit
-- Extract-transform and load definitions from any database, file or API with bulk load and merge support
+- Extract, transform and load (ETL) definitions from any database, file or API with bulk-load and merge support
 - A task scheduler for running recurring tasks at periodic intervals (using Hangfire)
 - Automated DevOps including testing and deployment
 
@@ -197,21 +197,23 @@ Create a new file to define your service called `SampleCurrency.service.nox.yaml
 #
 # SampleCurrency.service.nox.yaml
 #
+# yaml-language-server: $schema=https://noxorg.dev/schemas/NoxConfiguration.json
+#
 
-Name: SampleCurrencyService
+name: SampleCurrencyService
 
-Description: Sample Currency Microservice
+description: Sample Currency Microservice
 
-Database:
-  Name: SampleCurrencyDb
-  Provider: SqlServer
-  Server: localhost
-  User: sa
-  Password: Developer*123
+database:
+  name: SampleCurrencyDb
+  provider: sqlServer
+  server: localhost
+  user: sa  
+  password: Developer*123
 
-MessagingProviders:
-  - Name: InProcess
-    Provider: Mediator      
+messagingProviders:
+  - name: InProcess
+    provider: mediator
 ```
 Create an entity definition in `Currency.entity.nox.yaml`
 
@@ -220,34 +222,34 @@ Create an entity definition in `Currency.entity.nox.yaml`
 # Currency.entity.nox.yaml
 #
 
-Name: Currency
-Description: Currency definition and related data
+name: Currency
+description: Currency definition and related data
 
-Attributes:
+attributes:
 
-  - Name: Id
-    Description: The currency's unique identifier 
-    IsPrimaryKey: true
-    Type: int
+  - name: Id
+    description: The currency's unique identifier 
+    isPrimaryKey: true
+    type: int
 
-  - Name: Name
-    Description: The currency's name 
-    IsRequired: true
-    Type: string
-    MaxWidth: 128
+  - name: Name
+    description: The currency's name 
+    isRequired: true
+    type: string
+    maxWidth: 128
 
-  - Name: ISO_Alpha3
-    Description: The currency's official ISO 4217 alpha-3 code
-    IsRequired: true
-    IsUnicode: false
-    Type: char
-    MinWidth: 3
-    MaxWidth: 3
+  - name: ISO_Alpha3
+    description: The currency's official ISO 4217 alpha-3 code
+    isRequired: true
+    isUnicode: false
+    type: char
+    minWidth: 3
+    maxWidth: 3
 
-  - Name: Symbol
-    Description: The currency's well known symbol
-    Type: string
-    MaxWidth: 5
+  - name: Symbol
+    description: The currency's well known symbol
+    type: string
+    maxWidth: 5
 ```
 ### Setup SqlServer with Docker
 ---
@@ -459,7 +461,7 @@ Project Link: [https://github.com/noxorg/nox](https://github.com/noxorg/nox)
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* Nox was inspired and draws heavily from [Paul DeVito](https://github.com/pdevito3)'s very impressive [Wrapt](https://wrapt.dev/) project. Nox is essentially (a less feature-rich) Wrapt without the code generation and aims to keep developer code 100% separate from the framework, and imposes no constraints on application architechture.
+* Nox was inspired and draws heavily from [Paul DeVito](https://github.com/pdevito3)'s very impressive [Wrapt](https://wrapt.dev/) project. Nox is essentially (a less feature-rich) Wrapt without the code generation and aims to keep developer code 100% separate from the framework, and imposes no constraints on application architecture.
 * Nox would not have been possible without the many open-source projects that it draws from. The goal is to build on top of an already rich ecosystem of great libraries and tools like Microsoft's .NetCore, YamlDotNet, NewtonSoft.Json, Hangfire, Serilog, SqlKata, ETLBox, Entity Framework, MassTransit and others.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
