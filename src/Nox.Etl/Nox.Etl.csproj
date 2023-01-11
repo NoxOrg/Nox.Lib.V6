@@ -29,5 +29,20 @@
     <Reference Include="ETLBox">
       <HintPath>..\Nox.Tle\ETLBox.dll</HintPath>
     </Reference>
+    <Reference Include="ETLBox.Json">
+      <HintPath>..\Nox.Tle\ETLBox.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="ETLBox.MySql">
+      <HintPath>..\Nox.Tle\ETLBox.MySql.dll</HintPath>
+    </Reference>
+    <Reference Include="ETLBox.Postgres">
+      <HintPath>..\Nox.Tle\ETLBox.Postgres.dll</HintPath>
+    </Reference>
+    <Reference Include="ETLBox.SQLite">
+      <HintPath>..\Nox.Tle\ETLBox.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="ETLBox.SqlServer">
+      <HintPath>..\Nox.Tle\ETLBox.SqlServer.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
