@@ -35,7 +35,7 @@
     Build and deploy enterprise-grade microservices in under an hour
     <br />
     <br />
-    <a href="https://github.com/noxorg/nox"><strong>View the documentation »</strong></a>
+    <a href="https://noxorg.dev"><strong>View the documentation »</strong></a>
     <br />
     <br />
     <a href="https://github.com/noxorg/nox">View Demo</a>
