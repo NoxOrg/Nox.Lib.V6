@@ -22,8 +22,11 @@ sources:
   #- dataSource: JsonSeedData
   #  query: ExchangeRate-seeddata.json 
 
-  - dataSource: CsvSeedData
-    query: exchange-rate-seeddata.csv 
+#  - dataSource: CsvSeedData
+#    query: exchange-rate-seeddata.csv 
 
-  - dataSource: ExcelSeedData
-    query: exchange-rate-seeddata.xlsx
+#  - dataSource: ExcelSeedData
+#    query: exchange-rate-seeddata.xlsx
+    
+  - dataSource: ParquetSeedData
+    query: exchange-rate-seeddata.parquet
