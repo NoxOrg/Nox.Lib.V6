@@ -32,60 +32,66 @@ public static class ServiceExtensions
             services.AddNoxConfiguration((appSettings != null ? appSettings["Nox:DefinitionRootPath"] : "")!);
         }
 
-        if (services == null) throw new ArgumentNullException(nameof (services));
+        if (services == null) throw new ArgumentNullException(nameof(services));
         var svcProvider = services.BuildServiceProvider();
         var noxConfig = svcProvider.GetRequiredService<INoxConfiguration>();
-        
-        if (noxConfig.MessagingProviders != null && noxConfig.MessagingProviders.Any())
+
+        services.AddSingleton<INoxMessenger, NoxMessenger>();
+
+        //Create the messaging providers if not defined in yaml
+        noxConfig.MessagingProviders ??= new List<MessagingProviderConfiguration>();
+
+        //Ensure Mediator is added
+        if (noxConfig.MessagingProviders.All(mp => !mp.Provider!.ToLower().Equals("mediator")))
         {
-            services.AddSingleton<INoxMessenger, NoxMessenger>();
-            var isRabbitAdded = false;
-            var isAzureAdded = false;
-            var isAmazonAdded = false;
-            var isMemoryAdded = false;
+            noxConfig.MessagingProviders.Add(new MessagingProviderConfiguration() { Provider = "Mediator", Name = "Mediator" });
+        }
 
-            if (noxConfig.MessagingProviders.All(mp => !mp.Provider!.ToLower().Equals("mediator")))
-            {
-                noxConfig.MessagingProviders.Add(new MessagingProviderConfiguration() { Provider = "Mediator", Name = "Mediator" });
-            }
-            
-            foreach (var msgProvider in noxConfig.MessagingProviders)
-            {
-                switch (msgProvider.Provider!.ToLower())
-                {
-                    case "rabbitmq":
-                        if (!isRabbitAdded)
-                        {
-                            services.AddRabbitMqBus(msgProvider, isExternalListener);
-                            isRabbitAdded = true;    
-                        }
-                        break;
-                    case "azureservicebus":
-                        if (!isAzureAdded)
-                        {
-                            services.AddAzureBus(msgProvider, isExternalListener);
-                            isAzureAdded = true;
-                        }
-                        break;
-                    case "amazonsqs":
-                        if (!isAmazonAdded)
-                        {
-                            services.AddAmazonBus(msgProvider, isExternalListener);
-                            isAmazonAdded = true;
-                        }
-                        break;
-                    case "inmemory":
-                        if (!isMemoryAdded)
-                        {
-                            services.AddInMemoryBus();
-                            isMemoryAdded = true;
-                        }
-                        break;
+        var isRabbitAdded = false;
+        var isAzureAdded = false;
+        var isAmazonAdded = false;
+        var isMemoryAdded = false;
 
-                    case "mediator":
-                        if (!isExternalListener) services.AddNoxMediator();
-                        break;
-                }
+        foreach (var msgProvider in noxConfig.MessagingProviders)
+        {
+            switch (msgProvider.Provider!.ToLower())
+            {
+                case "rabbitmq":
+                    if (!isRabbitAdded)
+                    {
+                        services.AddRabbitMqBus(msgProvider, isExternalListener);
+                        isRabbitAdded = true;
+                    }
+
+                    break;
+                case "azureservicebus":
+                    if (!isAzureAdded)
+                    {
+                        services.AddAzureBus(msgProvider, isExternalListener);
+                        isAzureAdded = true;
+                    }
+
+                    break;
+                case "amazonsqs":
+                    if (!isAmazonAdded)
+                    {
+                        services.AddAmazonBus(msgProvider, isExternalListener);
+                        isAmazonAdded = true;
+                    }
+
+                    break;
+                case "inmemory":
+                    if (!isMemoryAdded)
+                    {
+                        services.AddInMemoryBus();
+                        isMemoryAdded = true;
+                    }
+
+                    break;
+
+                case "mediator":
+                    if (!isExternalListener) services.AddNoxMediator();
+                    break;
             }
         }
 
