@@ -28,4 +28,7 @@
             <HintPath>..\Nox.Tle\ETLBox.Excel.dll</HintPath>
         </Reference>
     </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="ExcelDataReader" Version="3.6.0" />
+    </ItemGroup>
 </Project>

@@ -44,5 +44,17 @@
     <Reference Include="ETLBox.SqlServer">
       <HintPath>..\Nox.Tle\ETLBox.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="ETLBox.Csv">
+      <HintPath>..\Nox.Tle\ETLBox.Csv.dll</HintPath>
+    </Reference>
+    <Reference Include="ETLBox.Excel">
+      <HintPath>..\Nox.Tle\ETLBox.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="ETLBox.Parquet">
+      <HintPath>..\Nox.Tle\ETLBox.Parquet.dll</HintPath>
+    </Reference>
+    <Reference Include="ETLBox.Xml">
+      <HintPath>..\Nox.Tle\ETLBox.Xml.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

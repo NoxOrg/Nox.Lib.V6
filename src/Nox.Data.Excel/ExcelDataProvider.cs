@@ -103,7 +103,7 @@ public class ExcelDataProvider : IDataProvider
     public IDataFlowExecutableSource<ExpandoObject> DataFlowSource(ILoaderSource loaderSource)
     {
         _dataFlowExecutableSource = new ExcelSource<ExpandoObject>();
-
+        
         switch (_resourceType)
         {
             case ResourceType.File:

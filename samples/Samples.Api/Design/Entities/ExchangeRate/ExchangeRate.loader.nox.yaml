@@ -25,5 +25,5 @@ sources:
   - dataSource: CsvSeedData
     query: exchange-rate-seeddata.csv 
 
-  #- dataSource: ExcelSeedData
-  #  query: ExchangeRate-seeddata.xlsx
+  - dataSource: ExcelSeedData
+    query: exchange-rate-seeddata.xlsx
