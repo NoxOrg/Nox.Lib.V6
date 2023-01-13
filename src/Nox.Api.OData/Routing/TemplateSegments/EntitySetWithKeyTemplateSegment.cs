@@ -37,7 +37,9 @@ namespace Nox.Api.OData.Routing.TemplateSegments
 
             string? keyValue = keyObj as string;
 
-            var edmEntitySet = context.Model.EntityContainer.FindEntitySet(entitySetName);
+            // if you want to support case-insensitive
+            var edmEntitySet = context.Model.EntityContainer.EntitySets()
+                .FirstOrDefault(e => string.Equals(entitySetName, e.Name, StringComparison.OrdinalIgnoreCase));
 
             if (edmEntitySet != null)
             {
