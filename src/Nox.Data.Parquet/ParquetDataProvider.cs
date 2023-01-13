@@ -103,6 +103,7 @@ public class ParquetDataProvider : IDataProvider
     public IDataFlowExecutableSource<ExpandoObject> DataFlowSource(ILoaderSource loaderSource)
     {
         _dataFlowExecutableSource = new ParquetSource<ExpandoObject>();
+        
 
         switch (_resourceType)
         {
