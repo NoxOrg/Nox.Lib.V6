@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Nox.Core.Configuration;
 using Nox.Core.Exceptions;
+using Nox.Core.Validation.Configuration;
 using Nox.TestFixtures;
 using NUnit.Framework;
 
@@ -36,7 +37,7 @@ public class ConfigurationTests: ConfigurationTestFixture
         //Database
         Assert.That(config.Database, Is.Not.Null);
         Assert.That(config.Database!.Name, Is.EqualTo("Test"));
-        Assert.That(config.Database!.ConnectionString, Is.EqualTo("Data Source=Test;Mode=Memory;Cache=Shared"));
+        Assert.That(config.Database!.ConnectionString, Is.EqualTo("Data Source=./DataTest.db"));
         //Entities
         Assert.That(config.Entities, Is.Not.Null);
         Assert.That(config.Entities!.Count, Is.EqualTo(2));

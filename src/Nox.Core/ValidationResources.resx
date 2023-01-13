@@ -64,7 +64,7 @@
         <value>The loader name must be specified in {0}</value>
     </data>
     <data name="LoadStrategyTypeInvalid" xml:space="preserve">
-        <value>Please only use: {0} for Load strategy Type in {1}</value>
+        <value>Load strategy Type must be one of {0} in {1}</value>
     </data>
     <data name="MessagingProviderNameEmpty" xml:space="preserve">
         <value>The messaging provider name must be specified in {0}</value>
@@ -113,5 +113,8 @@
     </data>
     <data name="LoaderMessageTargetMissing" xml:space="preserve">
         <value>The Loader messaging target {0} in {1} does not exist in the service definition yaml</value>
+    </data>
+    <data name="DbProviderInvalid" xml:space="preserve">
+        <value>Data source provider must be one of {0} in {1}</value>
     </data>
 </root>

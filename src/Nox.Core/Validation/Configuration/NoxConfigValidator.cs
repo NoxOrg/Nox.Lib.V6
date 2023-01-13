@@ -15,6 +15,9 @@ public class NoxConfigValidator: AbstractValidator<NoxConfiguration>
             .NotEmpty()
             .WithMessage(config => string.Format(ValidationResources.ConfigDbEmpty, config.DefinitionFileName));
 
+        RuleFor(config => config.Database!)
+            .SetValidator(config => new DataSourceConfigValidator(true));
+
         RuleForEach(config => config.MessagingProviders)
             .SetValidator(new MessagingProviderConfigValidator());
         
@@ -35,6 +38,6 @@ public class NoxConfigValidator: AbstractValidator<NoxConfiguration>
             .SetValidator(config => new LoaderConfigValidator(config.Entities, config.DataSources, config.MessagingProviders));
         
         RuleForEach(config => config.DataSources)
-            .SetValidator(config => new DataSourceConfigValidator());
+            .SetValidator(config => new DataSourceConfigValidator(false));
     }
 }

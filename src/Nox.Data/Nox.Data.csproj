@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>6.0.32.0</AssemblyVersion>
-    <FileVersion>6.0.32.0</FileVersion>
+    <AssemblyVersion>6.0.33.0</AssemblyVersion>
+    <FileVersion>6.0.33.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
@@ -19,11 +19,15 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Nox.Core\Nox.Core.csproj" />
+    <ProjectReference Include="..\Nox.Data.Csv\Nox.Data.Csv.csproj" />
+    <ProjectReference Include="..\Nox.Data.Excel\Nox.Data.Excel.csproj" />
+    <ProjectReference Include="..\Nox.Data.Parquet\Nox.Data.Parquet.csproj" />
     <ProjectReference Include="..\Nox.Data.SQLite\Nox.Data.SQLite.csproj" />
     <ProjectReference Include="..\Nox.Data.Json\Nox.Data.Json.csproj" />
     <ProjectReference Include="..\Nox.Data.MySql\Nox.Data.MySql.csproj" />
     <ProjectReference Include="..\Nox.Data.Postgres\Nox.Data.Postgres.csproj" />
     <ProjectReference Include="..\Nox.Data.SqlServer\Nox.Data.SqlServer.csproj" />
+    <ProjectReference Include="..\Nox.Data.Xml\Nox.Data.Xml.csproj" />
     <ProjectReference Include="..\Nox.Entity.XtendedAttributes\Nox.Entity.XtendedAttributes.csproj" />
     <ProjectReference Include="..\Nox.Messaging\Nox.Messaging.csproj" />
   </ItemGroup>

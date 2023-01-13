@@ -15,7 +15,7 @@ relatedParents: [Currency]
 attributes:
 
   - name: Id
-    description: The unique identifier of an exhange rate
+    description: The unique identifier of an exchange rate
     isPrimaryKey: true
     type: int
     canFilter: true
@@ -28,5 +28,5 @@ attributes:
   - name: Rate
     description: The exchange rate relative to Swiss Franc (CHF)
     type: decimal
-    maxWidth: 12
+    maxWidth: 14
     precision: 8

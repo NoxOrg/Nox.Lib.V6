@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>6.0.32.0</AssemblyVersion>
-    <FileVersion>6.0.32.0</FileVersion>
+    <AssemblyVersion>6.0.33.0</AssemblyVersion>
+    <FileVersion>6.0.33.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
@@ -43,6 +43,18 @@
     </Reference>
     <Reference Include="ETLBox.SqlServer">
       <HintPath>..\Nox.Tle\ETLBox.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="ETLBox.Csv">
+      <HintPath>..\Nox.Tle\ETLBox.Csv.dll</HintPath>
+    </Reference>
+    <Reference Include="ETLBox.Excel">
+      <HintPath>..\Nox.Tle\ETLBox.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="ETLBox.Parquet">
+      <HintPath>..\Nox.Tle\ETLBox.Parquet.dll</HintPath>
+    </Reference>
+    <Reference Include="ETLBox.Xml">
+      <HintPath>..\Nox.Tle\ETLBox.Xml.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
