@@ -19,17 +19,15 @@ target:
   entity: ExchangeRate
   
 sources:
-  #- dataSource: JsonSeedData
-  #  query: ExchangeRate-seeddata.json 
 
-#  - dataSource: CsvSeedData
-#    query: exchange-rate-seeddata.csv 
+  - dataSource: CsvSeedData
+    query: exchange-rate-seeddata.csv 
 
-#  - dataSource: ExcelSeedData
-#    query: exchange-rate-seeddata.xlsx
+  - dataSource: ExcelSeedData
+    query: exchange-rate-seeddata.xlsx
     
-#  - dataSource: ParquetSeedData
-#    query: exchange-rate-seeddata.parquet
+  - dataSource: ParquetSeedData
+    query: exchange-rate-seeddata.parquet
 
   - dataSource: XmlSeedData
-    query: exchange-rate-seeddata.xml
+    query: exchange-rate-seeddata.xml;ElementName=fxRate

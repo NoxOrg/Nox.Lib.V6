@@ -50,17 +50,17 @@ dataSources:
     provider: json
     options: Source=File;Path=../../docs/sample-data/;
 
-#  - name: CsvSeedData
-#    provider: csv
-#    options: Source=File;Path=../../docs/sample-data/;
+  - name: CsvSeedData
+    provider: csv
+    options: Source=File;Path=../../docs/sample-data/;
 
-#  - name: ExcelSeedData
-#    provider: excel
-#    options: Source=File;Path=../../docs/sample-data/;
+  - name: ExcelSeedData
+    provider: excel
+    options: Source=File;Path=../../docs/sample-data/;
     
-#  - name: ParquetSeedData
-#    provider: parquet
-#    options: Source=File;Path=../../docs/sample-data/;    
+  - name: ParquetSeedData
+    provider: parquet
+    options: Source=File;Path=../../docs/sample-data/;    
 
   - name: XmlSeedData
     provider: xml

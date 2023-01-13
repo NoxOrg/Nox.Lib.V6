@@ -104,17 +104,32 @@ public class XmlDataProvider : IDataProvider
     {
         _dataFlowExecutableSource = new XmlSource<ExpandoObject>();
 
+        var parameters = loaderSource.Query.Split(';');
+        var query = parameters[0];
+        if (parameters.Length > 1)
+        {
+            var options = parameters
+                .Skip(1)
+                .Select(e => e.Split('=', 2))
+                .ToDictionary(e => e[0], e => e[1], StringComparer.OrdinalIgnoreCase);
+            if (options.ContainsKey("ElementName"))
+            {
+                _dataFlowExecutableSource.ElementName = options["ElementName"];
+            }
+        }
+        
+
         switch (_resourceType)
         {
             case ResourceType.File:
-                var filePath = Path.Combine(_folderPath, loaderSource.Query);
+                var filePath = Path.Combine(_folderPath, query);
                 _dataFlowExecutableSource.ResourceType = ResourceType.File;
                 _dataFlowExecutableSource.Uri = filePath;
                 break;
 
             case ResourceType.Http:
                 var baseUri = new Uri(_folderPath);
-                var uri = new Uri(baseUri, loaderSource.Query);
+                var uri = new Uri(baseUri, query);
                 _dataFlowExecutableSource.ResourceType = ResourceType.Http;
                 _dataFlowExecutableSource.Uri = uri.ToString();
                 break;
