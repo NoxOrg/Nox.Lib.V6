@@ -24,7 +24,7 @@
     <Reference Include="ETLBox">
       <HintPath>..\Nox.Tle\ETLBox.dll</HintPath>
     </Reference>
-    <Reference Include="ETLBox.Json">
+    <Reference Include="ETLBox.Parquet">
       <HintPath>..\Nox.Tle\ETLBox.Parquet.dll</HintPath>
     </Reference>
   </ItemGroup>
