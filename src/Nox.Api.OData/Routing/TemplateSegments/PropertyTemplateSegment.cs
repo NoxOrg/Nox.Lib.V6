@@ -42,8 +42,7 @@ namespace Nox.Api.OData.Routing.TemplateSegments
 
             string? propertyName = propertyObj as string;
 
-            var edmEntitySet = context.Model.EntityContainer.EntitySets()
-                .FirstOrDefault(e => string.Equals(entitySetName, e.Name));
+            var edmEntitySet = context.Model.EntityContainer.FindEntitySet(entitySetName);
             
             if (edmEntitySet != null)
             {
