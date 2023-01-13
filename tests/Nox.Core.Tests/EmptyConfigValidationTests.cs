@@ -28,9 +28,11 @@ public class EmptyConfigValidationTests
         var validator = new DataSourceConfigValidator(true);
         var result = validator.Validate(config);
         Assert.That(result.IsValid, Is.False);
-        Assert.That(result.Errors.Count, Is.EqualTo(2));
+        Assert.That(result.Errors.Count, Is.EqualTo(3));
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("The database/datasource name must be specified in")));
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("The database/datasource '' provider must be specified in")));
+        Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("Data source provider must be one of SqlServer/Postgres/MySql/Sqlite in")));
+        
     }
     
     [Test]
@@ -105,7 +107,7 @@ public class EmptyConfigValidationTests
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("The loader name must be specified in")));
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("Loader Schedule must have a Start specified in")));
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("Loader load strategy must have a type specified in")));
-        Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("Please only use: DropAndLoad/MergeNew for Load strategy Type in")));
+        Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("Load strategy Type must be one of DropAndLoad/MergeNew in")));
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("The loader target entity must be specified in")));
     }
     
@@ -129,7 +131,7 @@ public class EmptyConfigValidationTests
         Assert.That(result.IsValid, Is.False);
         Assert.That(result.Errors.Count, Is.EqualTo(2));
         Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("Loader load strategy must have a type specified in")));
-        Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("Please only use: DropAndLoad/MergeNew for Load strategy Type in")));
+        Assert.That(result.Errors.Any(e => e.ErrorMessage.StartsWith("Load strategy Type must be one of DropAndLoad/MergeNew in")));
     }
     
     [Test]
