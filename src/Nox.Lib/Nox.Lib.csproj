@@ -136,6 +136,22 @@
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
+    <Content Include="$(OutputPath)\Nox.Data.Csv.dll">
+      <Pack>true</Pack>
+      <PackagePath>lib\$(TargetFramework)</PackagePath>
+    </Content>
+    <Content Include="$(OutputPath)\Nox.Data.Excel.dll">
+      <Pack>true</Pack>
+      <PackagePath>lib\$(TargetFramework)</PackagePath>
+    </Content>
+    <Content Include="$(OutputPath)\Nox.Data.Parquet.dll">
+      <Pack>true</Pack>
+      <PackagePath>lib\$(TargetFramework)</PackagePath>
+    </Content>
+    <Content Include="$(OutputPath)\Nox.Data.Xml.dll">
+      <Pack>true</Pack>
+      <PackagePath>lib\$(TargetFramework)</PackagePath>
+    </Content>
     <Content Include="$(OutputPath)\Nox.Entity.XtendedAttributes.dll">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
