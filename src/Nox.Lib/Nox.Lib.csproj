@@ -22,9 +22,9 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Copyright>Copyright (c) Andre Sharpe 2022</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>6.0.32.0</AssemblyVersion>
-    <FileVersion>6.0.32.0</FileVersion>
-    <PackageVersion>6.0.32</PackageVersion>
+    <AssemblyVersion>6.0.33.0</AssemblyVersion>
+    <FileVersion>6.0.33.0</FileVersion>
+    <PackageVersion>6.0.33</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/NoxOrg/Nox</PackageProjectUrl>
     <RepositoryUrl>https://github.com/NoxOrg/Nox.git</RepositoryUrl>
