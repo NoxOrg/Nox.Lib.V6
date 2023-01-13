@@ -28,9 +28,7 @@ namespace Nox.Api.OData.Routing.TemplateSegments
 
             var entitySetName = classname?.ToString();
 
-            // if you want to support case-insensitive
-            var edmEntitySet = context.Model.EntityContainer.EntitySets()
-                .FirstOrDefault(e => string.Equals(entitySetName, e.Name, StringComparison.OrdinalIgnoreCase));
+            var edmEntitySet = context.Model.EntityContainer.FindEntitySet(entitySetName);
 
             //var edmEntitySet = context.Model.EntityContainer.FindEntitySet(entitySetName);
             if (edmEntitySet != null)
