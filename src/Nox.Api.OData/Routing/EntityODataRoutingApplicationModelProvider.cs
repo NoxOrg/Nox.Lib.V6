@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
+using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -74,8 +75,7 @@ namespace Nox.Api.OData.Routing
                         new EntitySetTemplateSegment(),
                         new EntitySetWithKeyTemplateSegment(),
                         new NavigationTemplateSegment());
-
-                    actionModel.AddSelector("get", prefix, model, path);
+                    actionModel.AddSelector("get", prefix, model, path, new ODataRouteOptions());
                 }
                 else if (actionModel.ActionName == "GetProperty")
                 {
@@ -104,6 +104,20 @@ namespace Nox.Api.OData.Routing
                     var path = new ODataPathTemplate(new EntitySetTemplateSegment());
 
                     actionModel.AddSelector("post", prefix, model, path);
+
+                }
+                else if (actionModel.ActionName == "Put")
+                {
+                    var path = new ODataPathTemplate(new EntitySetTemplateSegment());
+
+                    actionModel.AddSelector("put", prefix, model, path);
+
+                }
+                else if (actionModel.ActionName == "Delete")
+                {
+                    var path = new ODataPathTemplate(new EntitySetTemplateSegment(), new EntitySetWithKeyTemplateSegment());
+
+                    actionModel.AddSelector("delete", prefix, model, path);
 
                 }
             }

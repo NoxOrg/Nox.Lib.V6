@@ -18,4 +18,7 @@ public class DynamicDbEntity: IDynamicDbEntity
     public MethodInfo DbContextGetObjectPropertyMethod { get; init; } = null!;
     public MethodInfo DbContextGetNavigationMethod { get; init; } = null!;
     public MethodInfo DbContextPostMethod { get; init; } = null!;
+    public MethodInfo DbContextPutMethod { get; init; } = null!;
+    public MethodInfo DbContextPatchMethod { get; init; } = null!;
+    public MethodInfo DbContextDeleteMethod { get; init; } = null!;
 }

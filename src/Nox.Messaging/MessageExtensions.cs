@@ -49,10 +49,10 @@ public static class MessageExtensions
     
     public static object MapInstance(this INoxEvent template, string json, NoxEventSource eventSource)
     {
-        var sourceDict = JsonConvert.DeserializeObject<IDictionary<string, Object?>>(json);
+        var sourceDict = JsonConvert.DeserializeObject<IDictionary<string, object?>>(json);
         return template
             .ToInstance(eventSource)
-            .ResolvePayload(template, sourceDict);
+            .ResolvePayload(template, sourceDict!);
     }
 
     private static object ToInstance(this INoxEvent template, NoxEventSource eventSource)

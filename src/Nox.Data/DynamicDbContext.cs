@@ -120,7 +120,7 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
         return result.Single();
     }
 
-    public object PostDynamicTypedObject<T>(string json) where T : class
+    public object PostDynamicTypedObject<T>( string json) where T : class
     {
         var repo = Set<T>();
 
@@ -140,6 +140,72 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
             }, TaskContinuationOptions.OnlyOnFaulted);
         
         return tObj!;
+    }
+
+    public object PutDynamicObject(string dbSetName, string json)
+    {
+        return _dynamicDbModel.PutDynamicObject(this, dbSetName, json);
+    }
+
+    public object PutDynamicTypedObject<T>(string json) where T : class
+    {
+        var tObj = JsonSerializer.Deserialize<T>(json);
+        
+        var repo = Set<T>();
+
+        repo.Update(tObj!);
+
+        SaveChanges();
+
+        SendChangeEvent(tObj!.GetType().Name, NoxEventType.Updated, json)
+            .ContinueWith(t =>
+            {
+                if (t.Exception != null)
+                {
+                    throw t.Exception;
+                }
+            }, TaskContinuationOptions.OnlyOnFaulted);
+        
+        return tObj!;
+    }
+
+    public object PatchDynamicObject(string dbSetName, object id, string json)
+    {
+        return _dynamicDbModel.PatchDynamicObject(this, dbSetName, id, json);
+    }
+
+    public object PatchDynamicTypedObject<T>(object id, string json) where T : class
+    {
+        throw new NotImplementedException();
+    }
+
+    public void DeleteDynamicObject(string dbSetName, object id)
+    {
+        _dynamicDbModel.DeleteDynamicObject(this, dbSetName, id);
+    }
+
+    public void DeleteDynamicTypedObject<T>(object id) where T : class
+    {
+        var collection = GetDynamicTypedCollection<T>();
+
+        var whereLambda = id.GetByIdExpression<T>();
+
+        var item = collection.Where(whereLambda).Single();
+        var repo = Set<T>();
+
+        repo.Remove(item);
+
+        SaveChanges();
+
+        SendChangeEvent(item.GetType().Name, NoxEventType.Deleted, JsonSerializer.Serialize(item))
+            .ContinueWith(t =>
+            {
+                if (t.Exception != null)
+                {
+                    throw t.Exception;
+                }
+            }, TaskContinuationOptions.OnlyOnFaulted);
+
     }
 
     private async Task SendChangeEvent(string entityName, NoxEventType eventType, string json)

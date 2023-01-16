@@ -48,6 +48,12 @@ public class DynamicModel : IDynamicModel
         var dbContextGetNavigationMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedNavigation));
 
         var dbContextPostMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.PostDynamicTypedObject));
+        
+        var dbContextPutMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.PutDynamicTypedObject));
+        
+        var dbContextPatchMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.PatchDynamicTypedObject));
+        
+        var dbContextDeleteMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.DeleteDynamicTypedObject));
 
         foreach (var (entityName, (entity, typeBuilder)) in GetTablesAndTypeBuilders())
         {
@@ -70,7 +76,10 @@ public class DynamicModel : IDynamicModel
                 DbContextGetSingleResultMethod = dbContextGetSingleResultMethod.MakeGenericMethod(t!),
                 DbContextGetObjectPropertyMethod = dbContextGetObjectPropertyMethod.MakeGenericMethod(t!),
                 DbContextGetNavigationMethod = dbContextGetNavigationMethod.MakeGenericMethod(t!),
-                DbContextPostMethod = dbContextPostMethod.MakeGenericMethod(t!)
+                DbContextPostMethod = dbContextPostMethod.MakeGenericMethod(t!),
+                DbContextPutMethod = dbContextPutMethod.MakeGenericMethod(t!),
+                DbContextPatchMethod = dbContextPatchMethod.MakeGenericMethod(t!),
+                DbContextDeleteMethod = dbContextDeleteMethod.MakeGenericMethod(t!)
             };
         }
 
@@ -205,7 +214,28 @@ public class DynamicModel : IDynamicModel
         var ret = _dynamicDbEntities[dbSetName].DbContextPostMethod.Invoke(context, parameters);
         return ret!;
     }
-   
+
+    public object PutDynamicObject(DbContext context, string dbSetName, string json)
+    {
+        var parameters = new object[] { json };
+        var ret = _dynamicDbEntities[dbSetName].DbContextPutMethod.Invoke(context, parameters);
+        return ret!;
+    }
+
+    public object PatchDynamicObject(DbContext context, string dbSetName, object id, string json)
+    {
+        var parameters = new object[] { id, json };
+        var ret = _dynamicDbEntities[dbSetName].DbContextPatchMethod.Invoke(context, parameters);
+        return ret!;
+    }
+
+    public void DeleteDynamicObject(DbContext context, string dbSetName, object id)
+    {
+        var parameters = new object[] { id };
+
+        _dynamicDbEntities[dbSetName].DbContextDeleteMethod.Invoke(context, parameters);
+    }
+
 
     private Dictionary<string, (IEntity Entity, TypeBuilder TypeBuilder)> GetTablesAndTypeBuilders()
     {
