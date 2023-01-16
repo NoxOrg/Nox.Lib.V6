@@ -34,23 +34,7 @@ public class NoxMessenger: INoxMessenger
         _mediator = mediator;
     }
 
-    public async Task SendMessage(ILoader loader, object message)
-    {
-        if (loader.Messaging != null)
-        {
-            await SendMessage(loader.Messaging!, message);
-        }
-    }
-
-    public async Task SendMessage(IEntity entity, object message)
-    {
-        if (entity.Messaging != null)
-        {
-            await SendMessage(entity.Messaging, message);
-        }
-    }
-
-    private async Task SendMessage(IEnumerable<IMessageTarget> messageTargets, object message)
+    public async Task SendMessage(IEnumerable<IMessageTarget> messageTargets, object message)
     {
         foreach (var target in messageTargets)
         {

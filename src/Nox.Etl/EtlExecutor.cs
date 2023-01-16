@@ -270,8 +270,10 @@ public class EtlExecutor : IEtlExecutor
         var toSend = message.MapInstance(row, eventSource);
 
         _logger.LogInformation("Publishing bus message: {Name}", toSend.GetType().Name);
-
-        _messenger?.SendMessage(loader, toSend);
+        if (loader.Messaging != null)
+        {
+            _messenger?.SendMessage(loader.Messaging, toSend);    
+        }
     }
 
     private static void UpdateMergeStates(LoaderMergeStates lastMergeDateTimeStampInfo, IDictionary<string, object?> record)

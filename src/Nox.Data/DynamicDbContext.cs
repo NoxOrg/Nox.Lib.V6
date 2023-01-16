@@ -144,10 +144,11 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
 
         repo.Add(tObj!);
 
-        this.SaveChanges();
+        SaveChanges();
+        
         if (_messenger != null && _messages != null && tObj != null)
         {
-            var dynamicEntity = ((DynamicModel)_dynamicDbModel).DynamicDbEntities.FirstOrDefault(e => e.Value.Entity.PluralName == tObj.GetType().Name).Value;
+            var dynamicEntity = ((DynamicModel)_dynamicDbModel).DynamicDbEntities.FirstOrDefault(e => e.Value.Entity.Name == tObj.GetType().Name).Value;
             if (dynamicEntity != null)
             {
                 var msg = _messages.FindEventImplementation(dynamicEntity.Entity.Name, NoxEventType.Created);
@@ -159,7 +160,6 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
             
         }
 
-
         return tObj!;
 
     }
@@ -167,6 +167,9 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
     private void SendChangeEvent(IEntity entity, Object obj, INoxEvent message, NoxEventSource eventSource)
     {
         var toSend = message.MapInstance(obj, eventSource);
-        _messenger?.SendMessage(entity, toSend);
+        if (entity.Messaging != null)
+        {
+            _messenger?.SendMessage(entity.Messaging, toSend);    
+        }
     }
 }
