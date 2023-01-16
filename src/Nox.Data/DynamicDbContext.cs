@@ -1,3 +1,4 @@
+using System.Dynamic;
 using System.Text.Json;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
@@ -74,24 +75,7 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
 
     public object PostDynamicObject(string dbSetName, string json)
     {
-        var result = _dynamicDbModel.PostDynamicObject(this, dbSetName, json);
-         
-        if (_messenger != null && _messages != null && result != null)
-        {
-            var dynamicEntity = ((DynamicModel)_dynamicDbModel).DynamicDbEntities.FirstOrDefault(e => e.Value.Entity.PluralName == dbSetName).Value;
-            if (dynamicEntity != null)
-            {
-                var msg = _messages.FindEventImplementation(dynamicEntity.Entity.Name, NoxEventType.Created);
-                if (msg != null)
-                {
-                    SendChangeEvent(dynamicEntity.Entity, result, msg, NoxEventSource.NoxDbContext);
-                }
-
-            }
-            
-        }
-
-        return result!;
+        return _dynamicDbModel.PostDynamicObject(this, dbSetName, json);
     }
 
     // Strongly typed methods for model callback
@@ -145,31 +129,36 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
         repo.Add(tObj!);
 
         SaveChanges();
-        
-        if (_messenger != null && _messages != null && tObj != null)
-        {
-            var dynamicEntity = ((DynamicModel)_dynamicDbModel).DynamicDbEntities.FirstOrDefault(e => e.Value.Entity.Name == tObj.GetType().Name).Value;
-            if (dynamicEntity != null)
+
+        SendChangeEvent(tObj!.GetType().Name, NoxEventType.Created, json)
+            .ContinueWith(t =>
             {
-                var msg = _messages.FindEventImplementation(dynamicEntity.Entity.Name, NoxEventType.Created);
+                if (t.Exception != null)
+                {
+                    throw t.Exception;
+                }
+            }, TaskContinuationOptions.OnlyOnFaulted);
+        
+        return tObj!;
+    }
+
+    private async Task SendChangeEvent(string entityName, NoxEventType eventType, string json)
+    {
+        if (_messenger != null && _messages != null && !string.IsNullOrEmpty(json))
+        {
+            var dynamicEntity = ((DynamicModel)_dynamicDbModel).DynamicDbEntities.FirstOrDefault(e => e.Value.Entity.Name == entityName);
+            if (dynamicEntity.Value != null)
+            {
+                var msg = _messages.FindEventImplementation(entityName, eventType);
                 if (msg != null)
                 {
-                    SendChangeEvent(dynamicEntity.Entity, tObj, msg, NoxEventSource.NoxDbContext);
+                    var toSend = msg.MapInstance(json, NoxEventSource.NoxDbContext);
+                    if (dynamicEntity.Value.Entity.Messaging != null)
+                    {
+                        await _messenger!.SendMessage(dynamicEntity.Value.Entity.Messaging, toSend);    
+                    }
                 }
             }
-            
-        }
-
-        return tObj!;
-
-    }
-    
-    private void SendChangeEvent(IEntity entity, Object obj, INoxEvent message, NoxEventSource eventSource)
-    {
-        var toSend = message.MapInstance(obj, eventSource);
-        if (entity.Messaging != null)
-        {
-            _messenger?.SendMessage(entity.Messaging, toSend);    
         }
     }
 }

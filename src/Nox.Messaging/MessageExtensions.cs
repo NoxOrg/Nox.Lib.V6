@@ -1,5 +1,8 @@
 using System.Collections.Immutable;
 using System.Dynamic;
+using Amazon.SimpleNotificationService.Model;
+using AutoMapper;
+using Newtonsoft.Json;
 using Nox.Core.Enumerations;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Entity;
@@ -36,7 +39,23 @@ public static class MessageExtensions
         return null;
     }
 
-    public static object MapInstance(this INoxEvent template, Object source, NoxEventSource eventSource)
+    public static object MapInstance(this INoxEvent template, ExpandoObject source, NoxEventSource eventSource)
+    {
+        var sourceDict = source as IDictionary<string, object?>;
+        return template
+            .ToInstance(eventSource)
+            .ResolvePayload(template, sourceDict);
+    }
+    
+    public static object MapInstance(this INoxEvent template, string json, NoxEventSource eventSource)
+    {
+        var sourceDict = JsonConvert.DeserializeObject<IDictionary<string, Object?>>(json);
+        return template
+            .ToInstance(eventSource)
+            .ResolvePayload(template, sourceDict);
+    }
+
+    private static object ToInstance(this INoxEvent template, NoxEventSource eventSource)
     {
         var result = Activator.CreateInstance(template.GetType())!;
         var props = template.GetType().GetProperties();
@@ -45,16 +64,22 @@ public static class MessageExtensions
         {
             eventSourceProp.SetValue(result, eventSource);
         }
+
+        return result;
+    }
+
+    private static object ResolvePayload(this object eventInstance, INoxEvent template, IDictionary<string, object?> source)
+    {
         var payloadProp = template.GetType().GetProperties().FirstOrDefault(p => p.Name.ToLower() == "payload");
         if (payloadProp != null)
         {
             var payload = Activator.CreateInstance(payloadProp.PropertyType);
-            var sourceDict = source as IDictionary<string, object?>;
+            
             if (payload != null)
             {
                 foreach (var prop in payload.GetType().GetProperties())
                 {
-                    var sourceVal = sourceDict?[prop.Name];
+                    var sourceVal = source?[prop.Name];
                     if (sourceVal == null) continue;
 
                     try
@@ -95,8 +120,10 @@ public static class MessageExtensions
                     }
                 }    
             }
-            payloadProp.SetValue(result, payload);
+            payloadProp.SetValue(eventInstance, payload);
         }
-        return result;
+
+        return eventInstance;
     }
+    
 }
