@@ -1,21 +1,22 @@
-using System.Dynamic;
 using System.Text.Json;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Nox.Core.Enumerations;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Messaging;
 using Nox.Core.Interfaces.Messaging.Events;
 using Nox.Messaging;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Nox.Data;
 
 public class DynamicDbContext : DbContext, IDynamicDbContext
 {
     private readonly IDynamicModel _dynamicDbModel;
-    private IEnumerable<INoxEvent>? _messages = null;
-    private readonly INoxMessenger? _messenger = null;
+    private readonly IEnumerable<INoxEvent>? _messages;
+    private readonly INoxMessenger? _messenger;
 
     public DynamicDbContext(
         DbContextOptions<DynamicDbContext> options,
@@ -139,7 +140,7 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
                 }
             }, TaskContinuationOptions.OnlyOnFaulted);
         
-        return tObj!;
+        return tObj;
     }
 
     public object PutDynamicObject(string dbSetName, string json)
@@ -166,7 +167,7 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
                 }
             }, TaskContinuationOptions.OnlyOnFaulted);
         
-        return tObj!;
+        return tObj;
     }
 
     public object PatchDynamicObject(string dbSetName, object id, string json)
@@ -176,7 +177,30 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
 
     public object PatchDynamicTypedObject<T>(object id, string json) where T : class
     {
-        throw new NotImplementedException();
+        var collection = GetDynamicTypedCollection<T>();
+
+        var whereLambda = id.GetByIdExpression<T>();
+
+        var item = collection.Where(whereLambda).Single();
+
+        PatchItem<T>(item, json);
+        
+        var repo = Set<T>();
+
+        repo.Update(item);
+
+        SaveChanges();
+
+        SendChangeEvent(item.GetType().Name, NoxEventType.Updated, JsonSerializer.Serialize(item))
+            .ContinueWith(t =>
+            {
+                if (t.Exception != null)
+                {
+                    throw t.Exception;
+                }
+            }, TaskContinuationOptions.OnlyOnFaulted);
+        
+        return item;
     }
 
     public void DeleteDynamicObject(string dbSetName, object id)
@@ -213,7 +237,6 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
         if (_messenger != null && _messages != null && !string.IsNullOrEmpty(json))
         {
             var dynamicEntity = ((DynamicModel)_dynamicDbModel).DynamicDbEntities.FirstOrDefault(e => e.Value.Entity.Name == entityName);
-            if (dynamicEntity.Value != null)
             {
                 var msg = _messages.FindEventImplementation(entityName, eventType);
                 if (msg != null)
@@ -227,4 +250,19 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
             }
         }
     }
+
+    private void PatchItem<TEntity>(TEntity item, string json) where TEntity: class
+    {
+        var itemProps = item.GetType().GetProperties();
+        var jsonValues = JsonSerializer.Deserialize<IDictionary<string, JsonElement>>(json);
+        
+        foreach (var jsonValue in jsonValues)
+        {
+            var itemProp = itemProps.FirstOrDefault(ip => ip.Name.Equals(jsonValue.Key, StringComparison.OrdinalIgnoreCase));
+            if (itemProp != null)
+            {
+                itemProp.SetValue(item, jsonValue.Value.Deserialize(itemProp.PropertyType));
+            }
+        }                
+    } 
 }

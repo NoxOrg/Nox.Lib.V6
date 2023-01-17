@@ -113,6 +113,13 @@ namespace Nox.Api.OData.Routing
                     actionModel.AddSelector("put", prefix, model, path);
 
                 }
+                else if (actionModel.ActionName == "Patch")
+                {
+                    var path = new ODataPathTemplate(new EntitySetTemplateSegment(), new EntitySetWithKeyTemplateSegment());
+
+                    actionModel.AddSelector("patch", prefix, model, path);
+
+                }
                 else if (actionModel.ActionName == "Delete")
                 {
                     var path = new ODataPathTemplate(new EntitySetTemplateSegment(), new EntitySetWithKeyTemplateSegment());
