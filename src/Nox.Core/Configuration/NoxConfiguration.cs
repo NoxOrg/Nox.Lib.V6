@@ -1,6 +1,5 @@
 ﻿using Nox.Core.Components;
 using Nox.Core.Constants;
-using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Configuration;
 
 namespace Nox.Core.Configuration;
@@ -21,4 +20,3 @@ public class NoxConfiguration: MetaBase, INoxConfiguration
     public List<LoaderConfiguration>? Loaders { get; set; }
     public List<DataSourceConfiguration>? DataSources { get; set; }
 }
-

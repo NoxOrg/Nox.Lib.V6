@@ -1,14 +1,15 @@
-﻿using Nox.Core.Components;
-using Nox.Core.Interfaces;
+﻿using System.ComponentModel.DataAnnotations;
+using Nox.Core.Components;
 using Nox.Core.Interfaces.Etl;
 
 namespace Nox.Etl;
 
-public sealed class LoaderSource: MetaBase, ILoaderSource
+public sealed class LoaderSource : MetaBase, ILoaderSource
 {
     public string DataSource { get; set; } = string.Empty;
+
+    [MaxLength(50000)]
     public string Query { get; set; } = string.Empty;
+
     public int MinimumExpectedRecords { get; set; } = 0;
 }
-
-

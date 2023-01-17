@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Nox.Core.Constants;
-using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Database;
 
 namespace Nox.Core.Components;
@@ -15,8 +13,10 @@ public class DataSourceBase : MetaBase, IServiceDataSource
     public int Port { get; set; } = 0;
     public string Password { get; set; } = "password";
     public string Options { get; set; } = "";
+
     [MaxLength(512)]
     public string? ConnectionString { get; set; }
+    
     public string? ConnectionVariable { get; set; }
         
     [NotMapped]
@@ -54,4 +54,3 @@ public class DataSourceBase : MetaBase, IServiceDataSource
         return isValid;
     }
 }
-
