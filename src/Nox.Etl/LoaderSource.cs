@@ -8,7 +8,7 @@ public sealed class LoaderSource : MetaBase, ILoaderSource
 {
     public string DataSource { get; set; } = string.Empty;
 
-    [MaxLength(50000)]
+    [MaxLength(65536)]
     public string Query { get; set; } = string.Empty;
 
     public int MinimumExpectedRecords { get; set; } = 0;
