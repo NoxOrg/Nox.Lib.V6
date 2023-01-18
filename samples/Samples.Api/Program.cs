@@ -6,7 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(cfg =>
+{
+    //Add this to ensure swagger document is correctly annotated
+    cfg.EnableAnnotations();
+});
 
 // Add Nox to the service collection
 builder.Services.AddNox();

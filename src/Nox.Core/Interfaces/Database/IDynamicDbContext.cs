@@ -13,4 +13,10 @@ public interface IDynamicDbContext
     object GetDynamicTypedSingleResult<T>(object id) where T : class;
     object PostDynamicObject(string dbSetName, string json);
     object PostDynamicTypedObject<T>(string json) where T : class;
+    object PutDynamicObject(string dbSetName, string json);
+    object PutDynamicTypedObject<T>(string json) where T : class;
+    object PatchDynamicObject(string dbSetName, object id, string json);
+    object PatchDynamicTypedObject<T>(object id, string json) where T : class;
+    void DeleteDynamicObject(string dbSetName, object id);
+    void DeleteDynamicTypedObject<T>(object id) where T : class;
 }

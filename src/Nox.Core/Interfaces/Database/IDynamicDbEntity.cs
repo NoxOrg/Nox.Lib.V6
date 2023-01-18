@@ -16,4 +16,7 @@ public interface IDynamicDbEntity
     MethodInfo DbContextGetObjectPropertyMethod { get; }
     MethodInfo DbContextGetNavigationMethod { get; }
     MethodInfo DbContextPostMethod { get; }
+    MethodInfo DbContextPutMethod { get; }
+    MethodInfo DbContextPatchMethod { get; }
+    MethodInfo DbContextDeleteMethod { get; }
 }

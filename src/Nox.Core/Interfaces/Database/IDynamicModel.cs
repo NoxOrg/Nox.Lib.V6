@@ -12,5 +12,8 @@ public interface IDynamicModel
     object GetDynamicObjectProperty(DbContext context, string dbSetName, object id, string propName);
     object GetDynamicSingleResult(DbContext context, string dbSetName, object id);
     IEdmModel GetEdmModel();
-    object PostDynamicObject(DbContext context, string dbSetName, string obj);
+    object PostDynamicObject(DbContext context, string dbSetName, string json);
+    object PutDynamicObject(DbContext context, string dbSetName, string json);
+    object PatchDynamicObject(DbContext context, string dbSetName, object id, string json);
+    void DeleteDynamicObject(DbContext context, string dbSetName, object id);
 }
