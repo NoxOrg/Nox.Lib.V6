@@ -255,14 +255,17 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
     {
         var itemProps = item.GetType().GetProperties();
         var jsonValues = JsonSerializer.Deserialize<IDictionary<string, JsonElement>>(json);
-        
-        foreach (var jsonValue in jsonValues)
+
+        if (jsonValues != null)
         {
-            var itemProp = itemProps.FirstOrDefault(ip => ip.Name.Equals(jsonValue.Key, StringComparison.OrdinalIgnoreCase));
-            if (itemProp != null)
+            foreach (var jsonValue in jsonValues)
             {
-                itemProp.SetValue(item, jsonValue.Value.Deserialize(itemProp.PropertyType));
-            }
-        }                
+                var itemProp = itemProps.FirstOrDefault(ip => ip.Name.Equals(jsonValue.Key, StringComparison.OrdinalIgnoreCase));
+                if (itemProp != null)
+                {
+                    itemProp.SetValue(item, jsonValue.Value.Deserialize(itemProp.PropertyType));
+                }
+            }    
+        }
     } 
 }
