@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Nox.Core.Components;
-using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Etl;
 
 namespace Nox.Etl
@@ -8,9 +8,11 @@ namespace Nox.Etl
     public sealed class LoaderLoadStrategy : MetaBase, ILoaderLoadStrategy
     {
         public string Type { get; set; } = string.Empty;
+        
         [NotMapped]
         public string[] Columns { get; set; } = Array.Empty<string>();
-        public string ColumnsJson { get => string.Join('|', Columns.ToArray()); set => Columns = value.Split('|'); }
 
+        [MaxLength(512)]
+        public string ColumnsJson { get => string.Join('|', Columns.ToArray()); set => Columns = value.Split('|'); }
     }
 }
