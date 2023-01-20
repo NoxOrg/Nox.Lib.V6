@@ -34,6 +34,7 @@
         <PackageReference Include="Microsoft.OData.Edm" Version="7.12.2" />
         <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.9" />
         <PackageReference Include="Nox.Cron" Version="1.0.10" />
+        <PackageReference Include="Serilog" Version="2.12.0" />
         <PackageReference Include="SqlKata" Version="2.4.0" />
         <PackageReference Include="YamlDotNet" Version="12.0.2" />
     </ItemGroup>
