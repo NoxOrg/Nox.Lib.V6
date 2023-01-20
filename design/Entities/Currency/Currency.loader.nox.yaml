@@ -13,16 +13,17 @@ Schedule:
     DelaySeconds: 60
     DoubleDelayLimit: 5
 
-LoadStrategy: 
-  Type: MergeNew
-  Columns: [CreateDate,EditDate]
+
 
 Target:
   Entity: Currency
-  
-Messaging:
-  - Name: Bunny
-  - Name: InProcess  
+  LoadStrategy: 
+    Type: MergeNew
+    Columns: [CreateDate,EditDate]  
+
+  Messaging:
+    - Name: Bunny
+    - Name: InProcess  
 
 Sources:
   - Name: BusinessSystem
