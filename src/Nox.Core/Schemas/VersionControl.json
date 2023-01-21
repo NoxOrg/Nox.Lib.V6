@@ -15,13 +15,13 @@
             "oneOf": [
                 {
                     "const": "azureDevOps",
-                    "description": "Use Postgres database driver"
+                    "description": "Use Azure Devops provider"
                 }
             ]
         },
         "server": {
             "type": "string",
-            "description": "The name name or network location of the database server",
+            "description": "The root URL of the version control server",
             "format": "uri"
         },
         "project": {
