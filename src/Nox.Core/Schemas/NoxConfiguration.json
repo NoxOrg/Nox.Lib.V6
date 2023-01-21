@@ -8,11 +8,11 @@
     "properties": {
         "name": {
             "type": "string",
-            "description": "The name of the NOX service"
+            "description": "The name of the NOX app/service"
         },  
         "description": {
             "type": "string",
-            "description": "A string describing the microservice"
+            "description": "A short description of the app/service"
         },  
         "autoMigrations": {
             "type": "boolean",
@@ -21,7 +21,7 @@
         "database": {
             "type": "object",
             "title": "Database",
-            "description": "The database provider for storing microservice data",
+            "description": "The database provider for storing app/service data",
             "$ref": "https://noxorg.dev/schemas/DataSource.json"
         },
         "messagingProviders": {
@@ -42,7 +42,7 @@
             "properties": {
                 "developers": {
                     "type": "array",
-                    "description": "The NOX service development team",
+                    "description": "The development team for this app/service",
                     "items": {"$ref": "https://noxorg.dev/schemas/TeamMember.json"  }
                 }
             }  
