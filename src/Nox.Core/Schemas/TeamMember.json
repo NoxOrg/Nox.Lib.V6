@@ -8,19 +8,19 @@
     "properties": {
         "name": {
             "type": "string",
-            "description": "The team meaber's name"
+            "description": "The team member's full name"
         },
         "userName": {
             "type": "string",
-            "description": "The team member's user name on with version control provider"
+            "description": "The team member's user name/email with version control provider"
         },
         "mobilePhoneNumber": {
             "type": "number",
-            "description": "The mobile phone number of the user"
+            "description": "The mobile phone number of the team member"
         },
         "isAdmin": {
             "type": "boolean",
-            "description": "Whether the team member is a project administrator"
+            "description": "Is the team member is a project administrator"
         }
     }
 }
