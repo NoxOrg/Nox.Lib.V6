@@ -5,10 +5,6 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-        "name": {
-            "type": "string",
-            "description": "The name of the version control system"
-        },
         "provider": {
             "type": "string",
             "description": "The version control provider",
