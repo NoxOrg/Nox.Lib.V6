@@ -26,12 +26,13 @@
 <br />
 <div align="center">
   <a href="https://github.com/noxorg/nox">
-    <img src="docs/images/nox_logo_with_text.png" alt="Logo" width="150">
+    <img src="docs/images/Nox_Logo_text-grey_transparent-bg.png" alt="Logo" width="150">
   </a>
 <!--
 <h3 align="center">Nox</h3>
 -->
   <p align="center">
+    <br />
     Build and deploy enterprise-grade microservices in under an hour
     <br />
     <br />
