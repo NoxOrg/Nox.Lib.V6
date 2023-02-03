@@ -18,7 +18,7 @@ public class ConfigurationTests: ConfigurationTestFixture
         var configurator = new NoxConfigurator(appSettings!["Nox:DefinitionRootPath"]!);
         var config = configurator.LoadConfiguration();
         Assert.That(config, Is.Not.Null);
-        Assert.That(config.Name, Is.EqualTo("Test"));
+        Assert.That(config!.Name, Is.EqualTo("Test"));
         Assert.That(config.Description, Is.EqualTo("Test Microservice"));
         Assert.That(config.DefinitionFileName, Is.Not.Empty);
         Assert.That(config.EndpointProvider, Is.EqualTo(""));

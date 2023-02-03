@@ -14,25 +14,28 @@ namespace Nox;
 
 public static class ServiceExtensions
 {
-    private static readonly IConfiguration? _configuration = ConfigurationHelper.GetNoxAppSettings();
+    private static readonly IConfiguration? Configuration = ConfigurationHelper.GetNoxAppSettings();
 
     public static IServiceCollection AddNox(
         this IServiceCollection services)
     {
-        if (_configuration == null)
+        var designRoot = "./";
+        if (Configuration?["Nox:DefinitionRootPath"] != null)
         {
-            throw new ConfigurationException("Could not load Nox configuration.");
+            designRoot = Configuration["Nox:DefinitionRootPath"];
         }
 
-        services
-            .AddNoxConfiguration(_configuration["Nox:DefinitionRootPath"]!)
-            .AddNoxMessaging(false)
-            .AddDataProviderFactory()
-            .AddDynamicApi(_configuration)
-            .AddData()
-            .AddEtl()
-            .AddMicroservice()
-            .AddJobScheduler();
+        if (services.AddNoxConfiguration(designRoot!))
+        {
+            services
+                .AddNoxMessaging(false)
+                .AddDataProviderFactory()
+                .AddDynamicApi(Configuration!)
+                .AddData()
+                .AddEtl()
+                .AddMicroservice()
+                .AddJobScheduler();    
+        }
             
         return services;
     }
