@@ -21,17 +21,14 @@ public class NoxConfigurator
             .Build();
     }
 
-    public NoxConfiguration LoadConfiguration()
+    public NoxConfiguration? LoadConfiguration()
     {
         _config = ReadServiceDefinition();
-        if (_config != null)
-        {
-            _config.Entities = ReadEntityDefinitionsFromFolder();
-            _config.Loaders = ReadLoaderDefinitionsFromFolder();
-            _config.Apis = ReadApiDefinitionsFromFolder();
-            return _config;
-        }
-        throw new ConfigurationException("Unable to configure Nox. No yaml configuration files found. Please add yaml configuration files to your project root or a folder defined in your appsettings file.");
+        if (_config == null) return _config;
+        _config.Entities = ReadEntityDefinitionsFromFolder();
+        _config.Loaders = ReadLoaderDefinitionsFromFolder();
+        _config.Apis = ReadApiDefinitionsFromFolder();
+        return _config;
     }
 
     private NoxConfiguration? ReadServiceDefinition()
