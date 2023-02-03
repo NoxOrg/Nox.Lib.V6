@@ -1,3 +1,5 @@
+using System;
+
 namespace Samples.Api
 {
     public class WeatherForecast
