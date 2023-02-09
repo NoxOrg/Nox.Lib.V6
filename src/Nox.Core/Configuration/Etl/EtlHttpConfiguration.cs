@@ -8,5 +8,5 @@ public class EtlHttpConfiguration: MetaBase
     public string Format { get; set; } = string.Empty;
     public string Verb { get; set; } = string.Empty;
     public string Url { get; set; } = string.Empty;
-    public EtlHttpAuthConfiguration? Auth { get; set; }
+    public EtlHttpAuthConfiguration? Auth { get; set; } = new();
 }

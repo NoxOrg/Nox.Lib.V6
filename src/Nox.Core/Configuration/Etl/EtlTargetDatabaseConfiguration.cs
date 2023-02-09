@@ -3,7 +3,7 @@ using Nox.Core.Interfaces.Configuration;
 
 namespace Nox.Core.Configuration;
 
-public class EtlTargetDatabaseConfiguration: MetaBase, IEtlTargetConfiguration
+public class EtlTargetDatabaseConfiguration: MetaBase
 {
     public string Name { get; set; } = string.Empty;
     public string ConnectionString { get; set; } = string.Empty;
