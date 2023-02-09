@@ -61,6 +61,7 @@
     <PackageReference Include="YamlDotNet" Version="12.1.0" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Configuration\Dto" />
     <Folder Include="Exceptions" />
   </ItemGroup>
   <ItemGroup>
