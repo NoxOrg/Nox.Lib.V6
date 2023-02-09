@@ -34,7 +34,7 @@ public static class ServiceExtensions
 
         if (services == null) throw new ArgumentNullException(nameof(services));
         var svcProvider = services.BuildServiceProvider();
-        var noxConfig = svcProvider.GetRequiredService<INoxConfiguration>();
+        var noxConfig = svcProvider.GetRequiredService<IProjectConfiguration>();
 
         services.AddSingleton<INoxMessenger, NoxMessenger>();
 

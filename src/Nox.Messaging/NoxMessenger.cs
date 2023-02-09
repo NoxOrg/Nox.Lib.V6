@@ -12,7 +12,7 @@ namespace Nox.Messaging;
 public class NoxMessenger: INoxMessenger
 {
     private readonly ILogger _logger;
-    private INoxConfiguration _config;
+    private IProjectConfiguration _config;
     private readonly IRabbitMqBus? _rabbitBus = null;
     private readonly IAzureBus? _azureBus = null;
     private readonly IAmazonBus? _amazonBus = null;
@@ -20,7 +20,7 @@ public class NoxMessenger: INoxMessenger
     
     public NoxMessenger(
         ILogger<NoxMessenger> logger,
-        INoxConfiguration config,
+        IProjectConfiguration config,
         IRabbitMqBus? rabbitBus = null,
         IAzureBus? azureBus = null,
         IAmazonBus? amazonBus = null,

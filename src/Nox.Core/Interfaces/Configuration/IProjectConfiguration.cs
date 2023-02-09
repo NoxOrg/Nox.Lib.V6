@@ -2,7 +2,7 @@ using Nox.Core.Configuration;
 
 namespace Nox.Core.Interfaces.Configuration;
 
-public interface INoxConfiguration
+public interface IProjectConfiguration
 {
     string Name { get; set; }
     string Description { get; set; }

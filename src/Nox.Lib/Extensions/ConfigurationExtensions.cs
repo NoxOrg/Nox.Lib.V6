@@ -11,11 +11,11 @@ namespace Nox;
 
 public static class ConfigurationExtensions
 {
-    public static MetaService ToMetaService(this INoxConfiguration source)
+    public static MetaService ToMetaService(this IProjectConfiguration source)
     {
         var mapperConfig = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<NoxConfiguration, MetaService>();
+            cfg.CreateMap<ProjectConfiguration, MetaService>();
             cfg.CreateMap<DataSourceConfiguration, ServiceDatabase>();
             cfg.CreateMap<ApiConfiguration, Api.Api>();
             cfg.CreateMap<ApiRouteConfiguration, Api.ApiRoute>();

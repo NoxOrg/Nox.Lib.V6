@@ -4,7 +4,7 @@ using Nox.Core.Interfaces.Configuration;
 
 namespace Nox.Core.Configuration;
 
-public class NoxConfiguration: MetaBase, INoxConfiguration
+public class ProjectConfiguration: MetaBase, IProjectConfiguration
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
