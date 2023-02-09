@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Nox.Core.Configuration;
 using Nox.Core.Exceptions;
+using Nox.Core.Helpers;
 using Nox.Core.Validation.Configuration;
 using Nox.TestFixtures;
 using NUnit.Framework;

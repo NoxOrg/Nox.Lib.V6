@@ -61,7 +61,6 @@
     <PackageReference Include="YamlDotNet" Version="12.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Configuration\Api" />
     <Folder Include="Exceptions" />
   </ItemGroup>
   <ItemGroup>

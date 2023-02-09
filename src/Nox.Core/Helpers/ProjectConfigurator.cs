@@ -1,11 +1,10 @@
-using Microsoft.Extensions.Logging;
+using Nox.Core.Configuration;
 using Nox.Core.Constants;
-using Nox.Core.Exceptions;
 using Serilog;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace Nox.Core.Configuration;
+namespace Nox.Core.Helpers;
 
 public class ProjectConfigurator
 {

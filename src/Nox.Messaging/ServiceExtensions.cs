@@ -2,6 +2,8 @@ using System.Reflection;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Nox.Core.Configuration;
+using Nox.Core.Extensions;
+using Nox.Core.Helpers;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Configuration;
 using Nox.Core.Interfaces.Messaging;

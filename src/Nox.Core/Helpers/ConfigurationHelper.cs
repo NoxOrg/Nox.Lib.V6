@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Nox.Core.Constants;
 using Nox.Core.Exceptions;
 
-namespace Nox.Core.Configuration;
+namespace Nox.Core.Helpers;
 
 public class ConfigurationHelper
 {
