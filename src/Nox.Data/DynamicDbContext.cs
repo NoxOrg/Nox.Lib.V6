@@ -1,13 +1,11 @@
-using System.Text.Json;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using Nox.Core.Enumerations;
 using Nox.Core.Interfaces.Database;
-using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Messaging;
 using Nox.Core.Interfaces.Messaging.Events;
 using Nox.Messaging;
+using System.Text.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Nox.Data;
