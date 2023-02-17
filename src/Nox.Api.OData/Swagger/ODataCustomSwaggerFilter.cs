@@ -22,7 +22,10 @@ namespace Nox.Api.OData.Swagger
             if (_noxConfiguration?.Entities == null ||
                 !_noxConfiguration.Entities.Any())
             {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.BackgroundColor = ConsoleColor.Red;
                 Console.WriteLine("Warning! Nox configuration or entities were not found in ODataCustomSwaggerFilter. Using default API definitions.");
+                Console.ResetColor();
                 return;
             }
 
