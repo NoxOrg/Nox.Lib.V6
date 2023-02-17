@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using Nox.Api.OData.Constants;
 
 namespace Nox.Api.OData.Routing.TemplateSegments
 {
@@ -16,12 +17,12 @@ namespace Nox.Api.OData.Routing.TemplateSegments
     {
         public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
         {
-            yield return "/{navigation}";
+            yield return $"/{RoutingConstants.NavigationParameterPathName}";
         }
 
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            if (!context.RouteValues.TryGetValue("navigation", out object? navigationNameObj))
+            if (!context.RouteValues.TryGetValue(RoutingConstants.NavigationParameterName, out object? navigationNameObj))
             {
                 return false;
             }
@@ -32,7 +33,7 @@ namespace Nox.Api.OData.Routing.TemplateSegments
 
             var navigationProperty = entityType
                 .NavigationProperties()
-                .FirstOrDefault(n => n.Name.Equals(navigationName,StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault(n => n.Name.Equals(navigationName, StringComparison.OrdinalIgnoreCase));
 
             if (navigationProperty != null)
             {

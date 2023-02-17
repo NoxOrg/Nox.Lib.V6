@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using Nox.Api.OData.Constants;
 
 namespace Nox.Api.OData.Routing.TemplateSegments
 {
@@ -16,22 +17,22 @@ namespace Nox.Api.OData.Routing.TemplateSegments
     {
         public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
         {
-            yield return "/{property}";
+            yield return $"/{RoutingConstants.PropertyParameterPathName}";
         }
 
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            if (!context.RouteValues.TryGetValue("entityset", out object? entitysetNameObj))
+            if (!context.RouteValues.TryGetValue(RoutingConstants.EntitySetParameterName, out object? entitysetNameObj))
             {
                 return false;
             }
 
-            if (!context.RouteValues.TryGetValue("key", out object? keyObj))
+            if (!context.RouteValues.TryGetValue(RoutingConstants.KeyParameterName, out object? keyObj))
             {
                 return false;
             }
 
-            if (!context.RouteValues.TryGetValue("property", out object? propertyObj))
+            if (!context.RouteValues.TryGetValue(RoutingConstants.PropertyParameterName, out object? propertyObj))
             {
                 return false;
             }
@@ -43,7 +44,7 @@ namespace Nox.Api.OData.Routing.TemplateSegments
             string? propertyName = propertyObj as string;
 
             var edmEntitySet = context.Model.EntityContainer.FindEntitySet(entitySetName);
-            
+
             if (edmEntitySet != null)
             {
                 KeySegment? keySegment = context.Segments.Last() as KeySegment;

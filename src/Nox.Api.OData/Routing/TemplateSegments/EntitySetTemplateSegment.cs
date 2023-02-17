@@ -7,8 +7,8 @@
 
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
-using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using Nox.Api.OData.Constants;
 
 namespace Nox.Api.OData.Routing.TemplateSegments
 {
@@ -16,12 +16,12 @@ namespace Nox.Api.OData.Routing.TemplateSegments
     {
         public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
         {
-            yield return "/{entityset}";
+            yield return $"/{RoutingConstants.EntitySetParameterPathName}";
         }
 
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            if (!context.RouteValues.TryGetValue("entityset", out object? classname))
+            if (!context.RouteValues.TryGetValue(RoutingConstants.EntitySetParameterName, out object? classname))
             {
                 return false;
             }
