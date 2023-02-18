@@ -5,10 +5,10 @@ namespace Nox.Etl;
 
 public class EtlMessageQueue: MetaBase, IEtlMessageQueue
 {
-    public string Name { get; set; }
-    public string Provider { get; set; }
-    public string ConnectionString { get; set; }
-    public string Queue { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Provider { get; set; } = string.Empty;
+    public string ConnectionString { get; set; } = string.Empty;
+    public string Queue { get; set; } = string.Empty;
     
     IEtlRetryPolicy? IEtlMessageQueue.Retry
     {

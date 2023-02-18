@@ -5,10 +5,10 @@ namespace Nox.Etl;
 
 public class EtlHttp: MetaBase, IEtlHttp
 {
-    public string Name { get; set; }
-    public string Format { get; set; }
-    public string Verb { get; set; }
-    public string Url { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Format { get; set; } = string.Empty;
+    public string Verb { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
     
     IEtlHttpAuth? IEtlHttp.Auth
     {

@@ -5,8 +5,8 @@ namespace Nox.Etl;
 
 public class EtlSchedule: IEtlSchedule
 {
-    public string Start { get; set; }
-    public string CronExpression { get; set; }
+    public string Start { get; set; } = string.Empty;
+    public string CronExpression { get; set; } = string.Empty;
     
     IEtlRetryPolicy? IEtlSchedule.Retry
     {

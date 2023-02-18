@@ -35,5 +35,5 @@ public class EtlSources: IEtlSources
         set => Http = value as ICollection<EtlHttp>;
     }
     
-    public ICollection<EtlHttp> Http { get; set; }
+    public ICollection<EtlHttp>? Http { get; set; }
 }

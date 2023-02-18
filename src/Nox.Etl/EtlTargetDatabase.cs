@@ -5,8 +5,8 @@ namespace Nox.Etl;
 
 public class EtlTargetDatabase: MetaBase, IEtlTargetDatabase
 {
-    public string Name { get; set; }
-    public string ConnectionString { get; set; }
-    public string Provider { get; set; }
-    public string StoredProc { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string ConnectionString { get; set; } = string.Empty;
+    public string Provider { get; set; } = string.Empty;
+    public string StoredProc { get; set; } = string.Empty;
 }

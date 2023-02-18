@@ -6,10 +6,10 @@ namespace Nox.Etl;
 
 public class EtlSourceDatabase: MetaBase, IEtlSourceDatabase
 {
-    public string Name { get; set; }
-    public string ConnectionString { get; set; }
-    public string Provider { get; set; }
-    public string Query { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string ConnectionString { get; set; } = string.Empty;
+    public string Provider { get; set; } = string.Empty;
+    public string Query { get; set; } = string.Empty;
     public int MinimumExpectedRecords { get; set; }
     
     IEtlSchedule? IEtlSourceDatabase.Schedule
