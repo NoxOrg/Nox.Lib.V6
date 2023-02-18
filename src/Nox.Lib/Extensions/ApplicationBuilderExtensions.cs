@@ -11,7 +11,7 @@ public static class ApplicationBuilderExtensions
     public static IApplicationBuilder UseNox(
         this IApplicationBuilder builder)
     {
-        if (builder.ApplicationServices.GetService<INoxConfiguration>() == null) return builder;
+        if (builder.ApplicationServices.GetService<IProjectConfiguration>() == null) return builder;
         builder.UseMiddleware<DynamicApiMiddleware>().UseRouting();
 
         builder.UseHangfireDashboard("/jobs");

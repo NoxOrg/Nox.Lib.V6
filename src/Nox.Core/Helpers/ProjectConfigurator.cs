@@ -1,19 +1,19 @@
-using Microsoft.Extensions.Logging;
+using Nox.Core.Configuration;
 using Nox.Core.Constants;
-using Nox.Core.Exceptions;
+using Nox.Core.Interfaces.Configuration;
 using Serilog;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace Nox.Core.Configuration;
+namespace Nox.Core.Helpers;
 
-public class NoxConfigurator
+public class ProjectConfigurator
 {
     private readonly string _designRoot;
     private readonly IDeserializer _deserializer;
-    private NoxConfiguration? _config;
+    private ProjectConfiguration? _config;
     
-    public NoxConfigurator(string designRoot)
+    public ProjectConfigurator(string designRoot)
     {
         _designRoot = designRoot;
         _deserializer = new DeserializerBuilder()
@@ -21,7 +21,7 @@ public class NoxConfigurator
             .Build();
     }
 
-    public NoxConfiguration? LoadConfiguration()
+    public ProjectConfiguration? LoadConfiguration()
     {
         _config = ReadServiceDefinition();
         if (_config == null) return _config;
@@ -31,13 +31,13 @@ public class NoxConfigurator
         return _config;
     }
 
-    private NoxConfiguration? ReadServiceDefinition()
+    private ProjectConfiguration? ReadServiceDefinition()
     {
         return Directory
             .EnumerateFiles(_designRoot, FileExtension.ServiceDefinition, SearchOption.AllDirectories)
             .Select(f =>
             {
-                var config = _deserializer.Deserialize<NoxConfiguration>(ReadDefinitionFile(f));
+                var config = _deserializer.Deserialize<ProjectConfiguration>(ReadDefinitionFile(f));
                 config.DefinitionFileName = Path.GetFullPath(f);
                 if (config.Database != null) config.Database.DefinitionFileName = Path.GetFullPath(f);
                 if (config.MessagingProviders != null)

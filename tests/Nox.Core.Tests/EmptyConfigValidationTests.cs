@@ -10,7 +10,7 @@ public class EmptyConfigValidationTests
     [Test]
     public void Must_validate_empty_config()
     {
-        var config = new NoxConfiguration();
+        var config = new ProjectConfiguration();
         var validator = new NoxConfigValidator();
         var result = validator.Validate(config);
         Assert.That(result.IsValid, Is.False);

@@ -4,11 +4,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Nox.Api;
 using Nox.Lib;
 using Nox.Core.Configuration;
+using Nox.Core.Extensions;
+using Nox.Core.Helpers;
 using Nox.Core.Interfaces;
 using Nox.Data;
 using Nox.Etl;
 using Nox.Jobs;
 using Nox.Messaging;
+using Nox.Utilities.Secrets;
 
 namespace Nox;
 
@@ -28,6 +31,7 @@ public static class ServiceExtensions
         if (services.AddNoxConfiguration(designRoot!))
         {
             services
+                .AddPersistedSecretStore()
                 .AddNoxMessaging(false)
                 .AddDataProviderFactory()
                 .AddDynamicApi(Configuration!)

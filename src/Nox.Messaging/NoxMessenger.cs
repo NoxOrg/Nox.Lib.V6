@@ -12,7 +12,7 @@ namespace Nox.Messaging;
 public class NoxMessenger: INoxMessenger
 {
     private readonly ILogger _logger;
-    private INoxConfiguration _config;
+    private IProjectConfiguration _config;
     private readonly IRabbitMqBus? _rabbitBus = null;
     private readonly IAzureBus? _azureBus = null;
     private readonly IAmazonBus? _amazonBus = null;
@@ -20,7 +20,7 @@ public class NoxMessenger: INoxMessenger
     
     public NoxMessenger(
         ILogger<NoxMessenger> logger,
-        INoxConfiguration config,
+        IProjectConfiguration config,
         IRabbitMqBus? rabbitBus = null,
         IAzureBus? azureBus = null,
         IAmazonBus? amazonBus = null,
@@ -42,7 +42,7 @@ public class NoxMessenger: INoxMessenger
             {
                 if (_config.MessagingProviders == null) throw new ConfigurationException("Cannot add messaging if messaging providers not present in configuration!");
                 var providerInstance = _config.MessagingProviders.First(p => 
-                    p.Name.Equals(target.MessagingProvider, StringComparison.OrdinalIgnoreCase)
+                    p.Name != null && p.Name.Equals(target.MessagingProvider, StringComparison.OrdinalIgnoreCase)
                 );
                 switch (providerInstance.Provider!.ToLower())
                 {
