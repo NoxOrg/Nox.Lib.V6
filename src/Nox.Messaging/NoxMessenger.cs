@@ -41,6 +41,7 @@ public class NoxMessenger: INoxMessenger
                 var providerInstance = _config.MessagingProviders.First(p => 
                     p?.Name != null && p!.Name!.Equals(target.MessagingProvider, StringComparison.OrdinalIgnoreCase)
                 );
+
                 switch (providerInstance.Provider!.ToLower())
                 {
                     case "rabbitmq":
