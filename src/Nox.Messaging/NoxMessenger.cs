@@ -1,10 +1,7 @@
 using MassTransit;
 using MassTransit.Mediator;
 using Microsoft.Extensions.Logging;
-using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Configuration;
-using Nox.Core.Interfaces.Entity;
-using Nox.Core.Interfaces.Etl;
 using Nox.Core.Interfaces.Messaging;
 
 namespace Nox.Messaging;
@@ -42,7 +39,7 @@ public class NoxMessenger: INoxMessenger
             {
                 if (_config.MessagingProviders == null) throw new ConfigurationException("Cannot add messaging if messaging providers not present in configuration!");
                 var providerInstance = _config.MessagingProviders.First(p => 
-                    p.Name != null && p.Name.Equals(target.MessagingProvider, StringComparison.OrdinalIgnoreCase)
+                    p?.Name != null && p!.Name!.Equals(target.MessagingProvider, StringComparison.OrdinalIgnoreCase)
                 );
                 switch (providerInstance.Provider!.ToLower())
                 {

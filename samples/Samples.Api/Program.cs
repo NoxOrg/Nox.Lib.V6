@@ -32,7 +32,7 @@ builder.Services.AddNox();
 
 var app = builder.Build();
 
-ODataCustomSwaggerFilter.SetNoxConfiguration(app.Services.GetService<INoxConfiguration>());
+ODataCustomSwaggerFilter.SetProjectConfiguration(app.Services.GetService<IProjectConfiguration>());
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

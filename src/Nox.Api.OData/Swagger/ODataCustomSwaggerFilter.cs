@@ -8,7 +8,7 @@ namespace Nox.Api.OData.Swagger
 {
     public class ODataCustomSwaggerFilter : IDocumentFilter
     {
-        private static INoxConfiguration? _noxConfiguration;
+        private static IProjectConfiguration? _projectConfiguration;
 
         private static IReadOnlySet<string> _parametersToRemoveFromSwagger = new HashSet<string>
         {
@@ -19,8 +19,8 @@ namespace Nox.Api.OData.Swagger
 
         public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {
-            if (_noxConfiguration?.Entities == null ||
-                !_noxConfiguration.Entities.Any())
+            if (_projectConfiguration?.Entities == null ||
+                !_projectConfiguration.Entities.Any())
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.BackgroundColor = ConsoleColor.Red;
@@ -29,7 +29,7 @@ namespace Nox.Api.OData.Swagger
                 return;
             }
 
-            var entities = _noxConfiguration!.Entities!
+            var entities = _projectConfiguration!.Entities!
                 .Where(x => !string.IsNullOrWhiteSpace(x.PluralName));
 
             var odataPathItems = swaggerDoc.Paths
@@ -83,9 +83,9 @@ namespace Nox.Api.OData.Swagger
             }
         }
 
-        public static void SetNoxConfiguration(INoxConfiguration? noxConfiguration)
+        public static void SetProjectConfiguration(IProjectConfiguration? projectConfiguration)
         {
-            _noxConfiguration = noxConfiguration;
+            _projectConfiguration = projectConfiguration;
         }
 
         private static void AddOldOperationParametersThatAreNotReplacedToNewOperation(
