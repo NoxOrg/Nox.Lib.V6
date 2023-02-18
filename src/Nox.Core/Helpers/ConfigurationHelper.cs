@@ -1,8 +1,4 @@
-﻿using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Extensions.Configuration;
-using Nox.Core.Constants;
-using Nox.Core.Exceptions;
+﻿using Microsoft.Extensions.Configuration;
 using Nox.Core.Interfaces.Configuration;
 using Nox.Utilities.Secrets;
 
