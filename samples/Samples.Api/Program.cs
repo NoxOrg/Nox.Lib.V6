@@ -33,6 +33,7 @@ builder.Services.AddNox();
 var app = builder.Build();
 
 ODataCustomSwaggerFilter.SetProjectConfiguration(app.Services.GetService<IProjectConfiguration>());
+ODataCustomSwaggerFilter.SetLogger(app.Services.GetService<ILogger<ODataCustomSwaggerFilter>>());
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

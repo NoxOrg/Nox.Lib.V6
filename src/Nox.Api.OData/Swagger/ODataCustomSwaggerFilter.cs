@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using Nox.Api.OData.Constants;
 using Nox.Core.Configuration;
 using Nox.Core.Interfaces.Configuration;
@@ -6,9 +7,14 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Nox.Api.OData.Swagger
 {
+    /// <summary>
+    /// This filter is intended to format default OData generated API
+    /// to more usable form specyfing particular entities available
+    /// </summary>
     public class ODataCustomSwaggerFilter : IDocumentFilter
     {
         private static IProjectConfiguration? _projectConfiguration;
+        private static ILogger? _logger;
 
         private static IReadOnlySet<string> _parametersToRemoveFromSwagger = new HashSet<string>
         {
@@ -17,15 +23,29 @@ namespace Nox.Api.OData.Swagger
             RoutingConstants.NavigationParameterName
         };
 
+        /// <summary>
+        /// Interface method that applies filter change to swagger definition
+        /// </summary>
+        /// <param name="swaggerDoc">Swagger definition</param>
+        /// <param name="context">Filterting context</param>
         public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {
             if (_projectConfiguration?.Entities == null ||
                 !_projectConfiguration.Entities.Any())
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("Warning! Nox configuration or entities were not found in ODataCustomSwaggerFilter. Using default API definitions.");
-                Console.ResetColor();
+                if (_logger != null)
+                {
+                    _logger!.LogWarning("Warning! Nox configuration or entities were not found in ODataCustomSwaggerFilter. Using default API definitions.");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.BackgroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Warning! Logger was not set to ODataCustomSwaggerFilter. Falling back to console output.");
+                    Console.WriteLine("Warning! Nox configuration or entities were not found in ODataCustomSwaggerFilter. Using default API definitions.");
+                    Console.ResetColor();
+                }
+
                 return;
             }
 
@@ -83,9 +103,25 @@ namespace Nox.Api.OData.Swagger
             }
         }
 
+        /// <summary>
+        /// Dependency injection is not available for filters, so this needs to be set manually.
+        /// A non-empty list of entities to be used in generation is expected
+        /// No change will be applied if empty
+        /// </summary>
+        /// <param name="projectConfiguration">Project configuration containing entities list</param>
         public static void SetProjectConfiguration(IProjectConfiguration? projectConfiguration)
         {
             _projectConfiguration = projectConfiguration;
+        }
+
+        /// <summary>
+        /// Dependency injection is not available for filters, so this needs to be set manually.
+        /// If no logger is set console output will be used
+        /// </summary>
+        /// <param name="logger">Logger to be used in output</param>
+        public static void SetLogger(ILogger<ODataCustomSwaggerFilter>? logger)
+        {
+            _logger = logger;
         }
 
         private static void AddOldOperationParametersThatAreNotReplacedToNewOperation(
