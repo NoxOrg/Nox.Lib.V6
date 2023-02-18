@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Nox.Core.Configuration;
+using Nox.Core.Helpers;
 using Nox.Messaging;
 using Samples.Cli.Commands;
 using Samples.Cli.Services;

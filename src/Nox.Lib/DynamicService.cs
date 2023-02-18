@@ -67,7 +67,7 @@ public class DynamicService : IDynamicService
 
     public DynamicService(ILogger<DynamicService> logger,
         IConfiguration appConfig,
-        INoxConfiguration noxConfig,
+        IProjectConfiguration projectConfig,
         IEtlExecutor etlExecutor,
         IDataProviderFactory factory,
         INoxMessenger messenger)
@@ -78,7 +78,7 @@ public class DynamicService : IDynamicService
         _metaService = new Configurator(this)
             .WithLogger(_logger)
             .WithAppConfiguration(appConfig)
-            .WithNoxConfiguration(noxConfig)
+            .WithNoxConfiguration(projectConfig)
             .WithDatabaseProviderFactory(factory)
             .WithMessenger(messenger)
             .Configure();
@@ -222,7 +222,7 @@ public class DynamicService : IDynamicService
         private ILogger? _logger;
         private IMetaService? _service;
         private IConfiguration? _appConfig;
-        private INoxConfiguration? _noxConfig;
+        private IProjectConfiguration? _noxConfig;
 #pragma warning disable IDE0052 // Remove unread private members
         private INoxMessenger? _messenger;
 #pragma warning restore IDE0052 // Remove unread private members
@@ -245,9 +245,9 @@ public class DynamicService : IDynamicService
             return this;
         }
 
-        public Configurator WithNoxConfiguration(INoxConfiguration noxConfig)
+        public Configurator WithNoxConfiguration(IProjectConfiguration projectConfig)
         {
-            _noxConfig = noxConfig;
+            _noxConfig = projectConfig;
             return this;
         }
         

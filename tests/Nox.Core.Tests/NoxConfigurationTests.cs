@@ -1,4 +1,4 @@
-using Nox.Core.Configuration;
+using Nox.Core.Helpers;
 using Nox.TestFixtures;
 using NUnit.Framework;
 using System.Linq;
@@ -11,7 +11,7 @@ public class ConfigurationTests: ConfigurationTestFixture
     public void Can_Load_Nox_Configuration_From_Yaml_Definitions()
     {
         var appSettings = ConfigurationHelper.GetNoxAppSettings();
-        var configurator = new NoxConfigurator(appSettings!["Nox:DefinitionRootPath"]!);
+        var configurator = new ProjectConfigurator(appSettings!["Nox:DefinitionRootPath"]!);
         var config = configurator.LoadConfiguration();
         Assert.That(config, Is.Not.Null);
         Assert.That(config!.Name, Is.EqualTo("Test"));

@@ -29,6 +29,22 @@
                 {
                     "const": "json",
                     "description": "Json file or URL provider"
+                },
+                {
+                    "const": "csv",
+                    "description": "Use CSV file or URL provider"
+                },
+                {
+                    "const": "excel",
+                    "description": "Use Excel file or URL provider"
+                },
+                {
+                    "const": "xml",
+                    "description": "Use XML file or URL provider"
+                },
+                {
+                    "const": "parquet",
+                    "description": "Use Parquet file or URL provider"
                 }
             ]
         },

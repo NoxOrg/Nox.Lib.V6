@@ -3,7 +3,7 @@ using Nox.Core.Configuration;
 
 namespace Nox.Core.Validation.Configuration;
 
-public class NoxConfigValidator: AbstractValidator<NoxConfiguration>
+public class NoxConfigValidator: AbstractValidator<ProjectConfiguration>
 {
     public NoxConfigValidator()
     {
