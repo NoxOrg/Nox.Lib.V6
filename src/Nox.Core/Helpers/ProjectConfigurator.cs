@@ -1,5 +1,6 @@
 using Nox.Core.Configuration;
 using Nox.Core.Constants;
+using Nox.Core.Interfaces.Configuration;
 using Serilog;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;

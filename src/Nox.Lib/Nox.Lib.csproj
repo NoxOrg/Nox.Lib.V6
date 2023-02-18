@@ -72,6 +72,7 @@
     <PackageReference Include="MySql.EntityFrameworkCore" Version="6.0.7" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="Nox.Cron" Version="1.0.10" />
+    <PackageReference Include="Nox.Utilities" Version="1.0.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
     <PackageReference Include="Parquet.Net" Version="3.10.0" />
     <PackageReference Include="Serilog" Version="2.12.0" />

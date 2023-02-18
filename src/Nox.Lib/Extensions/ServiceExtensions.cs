@@ -11,6 +11,7 @@ using Nox.Data;
 using Nox.Etl;
 using Nox.Jobs;
 using Nox.Messaging;
+using Nox.Utilities.Secrets;
 
 namespace Nox;
 
@@ -30,6 +31,7 @@ public static class ServiceExtensions
         if (services.AddNoxConfiguration(designRoot!))
         {
             services
+                .AddPersistedSecretStore()
                 .AddNoxMessaging(false)
                 .AddDataProviderFactory()
                 .AddDynamicApi(Configuration!)

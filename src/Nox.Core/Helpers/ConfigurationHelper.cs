@@ -3,6 +3,8 @@ using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
 using Nox.Core.Constants;
 using Nox.Core.Exceptions;
+using Nox.Core.Interfaces.Configuration;
+using Nox.Utilities.Secrets;
 
 namespace Nox.Core.Helpers;
 
@@ -77,43 +79,53 @@ public class ConfigurationHelper
         return env;
     }
 
-    public static async Task<IList<KeyValuePair<string, string>>?> GetNoxSecrets(IConfiguration config, string[] keys)
+    public static async Task<IList<KeyValuePair<string, string>>?> GetNoxSecrets(IProjectConfiguration projectConfig, IPersistedSecretStore secretCache, string[] keys)
     {
-        var keyVaultUri = config["Nox:KeyVaultUri"];
-
-        if (string.IsNullOrEmpty(keyVaultUri))
+        var resolvedSecrets = new List<KeyValuePair<string, string>>();
+        if (projectConfig.Secrets != null)
         {
-            keyVaultUri = KeyVault.DefaultKeyVaultUri;
-        }
+            var ttl = new TimeSpan(0, 30, 0);
+            var validFor = projectConfig.Secrets.ValidFor;
+            if (validFor != null)
+            {
+                ttl = new TimeSpan(validFor.Days ?? 0, validFor.Hours ?? 0, validFor.Minutes ?? 0, validFor.Seconds ?? 0);
 
-        return await GetSecretsFromVault(keyVaultUri, keys);
-    }
-
-
-    private static async Task<IList<KeyValuePair<string, string>>?> GetSecretsFromVault(string keyVaultUri, string[] keys)
-    {
-        var secrets = new List<KeyValuePair<string, string>>();
-
-        var azureServiceTokenProvider = new AzureServiceTokenProvider();
-
-        var keyVault = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
-
-        try
-        {
+            }
+            if (ttl == TimeSpan.Zero) ttl = new TimeSpan(0, 30, 0);
+            //Resolve the secret from the cache first
             foreach (var key in keys)
             {
-                var secret = await keyVault.GetSecretAsync(keyVaultUri, key.Replace(":", "--").Replace("_", "-"));
-                secrets.Add(new KeyValuePair<string, string>(key, secret.Value ?? ""));
+                var cachedSecret = await secretCache.LoadAsync($"{projectConfig.Name}.{key}", ttl);
+                resolvedSecrets.Add(new KeyValuePair<string, string>(key, cachedSecret ?? ""));
+            }
+            
+            //resolve any remaining secrets from the vaults
+            var unresolvedSecrets = resolvedSecrets.Where(s => s.Value == "").ToList();
+            if (unresolvedSecrets.Any() && projectConfig.Secrets.Providers != null)
+            {
+                foreach (var vault in projectConfig.Secrets.Providers)
+                {
+                    if (!unresolvedSecrets.Any()) break;
+                    switch (vault.Provider.ToLower())
+                    {
+                        case "azure-keyvault":
+                            var azureVault = new AzureSecretProvider(vault.Url);
+                            var azureSecrets = azureVault.GetSecretsAsync(unresolvedSecrets.Select(k => k.Key).ToArray()).Result;
+                            if (azureSecrets != null)
+                            {
+                                if (azureSecrets.Any()) resolvedSecrets.AddRange(azureSecrets);
+                                foreach (var azureSecret in azureSecrets)
+                                {
+                                    await secretCache.SaveAsync($"{projectConfig.Name}.{azureSecret.Key}", azureSecret.Value);
+                                }
+                            }
+                            break;
+                    }
+                    unresolvedSecrets = resolvedSecrets.Where(s => s.Value == "").ToList();
+                }
             }
         }
-        catch (Exception ex)
-        {
-            throw new ConfigurationException($"Error loading secrets from vault at '{keyVaultUri}'. ({ex.Message})");
-        }
 
-        return secrets;
+        return resolvedSecrets;
     }
-
-
-
 }

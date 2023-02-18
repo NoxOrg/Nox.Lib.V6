@@ -7,7 +7,7 @@ public interface IProjectConfiguration
 {
     string Name { get; set; }
     string Description { get; set; }
-    List<SecretConfiguration>? Secrets { get; set; }
+    SecretConfiguration? Secrets { get; set; }
     string EndpointProvider { get; set; }
     public VersionControlConfiguration? VersionControl { get; set; }
     public TeamConfiguration? Team { get; set; }

@@ -22,7 +22,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <AssemblyVersion>6.0.36.0</AssemblyVersion>
     <FileVersion>6.0.36.0</FileVersion>
-    <PackageVersion>6.0.36-beta2</PackageVersion>
+    <PackageVersion>6.0.36-beta3</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/NoxOrg/Nox</PackageProjectUrl>
     <RepositoryUrl>https://github.com/NoxOrg/Nox.git</RepositoryUrl>
@@ -52,6 +52,7 @@
     <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.9" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="Nox.Cron" Version="1.0.10" />
+    <PackageReference Include="Nox.Utilities" Version="1.0.0" />
     <PackageReference Include="Serilog" Version="2.12.0" />
     <PackageReference Include="SqlKata" Version="2.4.0" />
     <PackageReference Include="YamlDotNet" Version="12.1.0" />
