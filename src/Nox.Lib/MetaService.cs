@@ -93,8 +93,16 @@ public sealed class MetaService : MetaBase, IMetaService
         {
             foreach (var parent in entity.RelatedParents)
             {
-                entities
-                    .First(x => x.Name.Equals(parent, StringComparison.OrdinalIgnoreCase))
+                var parentEntity = entities.FirstOrDefault(x => x.Name.Equals(parent, StringComparison.OrdinalIgnoreCase));
+
+                if (parentEntity == null)
+                {
+#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+                    throw new ArgumentException($"Entity parent with name {parent} was not found. Please, check if entity name is correct.", "relatedParents");
+#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+                }
+
+                parentEntity
                     .RelatedChildren
                     .Add(entity.Name);
             }
