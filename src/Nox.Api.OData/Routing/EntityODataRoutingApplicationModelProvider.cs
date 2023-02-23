@@ -14,24 +14,22 @@ using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
+using Nox.Api.OData.Constants;
 using Nox.Api.OData.Routing.TemplateSegments;
 using Nox.Api.OData.Serializers;
-using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Database;
 
 namespace Nox.Api.OData.Routing
 {
     public class EntityODataRoutingApplicationModelProvider : IApplicationModelProvider
     {
-        private const string ROUTE_PREFIX = "odata";
-
         private readonly IDynamicModel _model;
 
         public EntityODataRoutingApplicationModelProvider(
             IOptions<ODataOptions> options,
             IDynamicModel model)
         {
-            options.Value.AddRouteComponents(ROUTE_PREFIX, EdmCoreModel.Instance, builder => builder.AddSingleton<IODataSerializerProvider, CustomODataSerializerProvider>());
+            options.Value.AddRouteComponents(RoutingConstants.ODATA_ROUTE_PREFIX, EdmCoreModel.Instance, builder => builder.AddSingleton<IODataSerializerProvider, CustomODataSerializerProvider>());
 
             _model = model;
         }
@@ -44,18 +42,17 @@ namespace Nox.Api.OData.Routing
         public void OnProvidersExecuted(ApplicationModelProviderContext context)
         {
             var model = _model.GetEdmModel();
-            const string prefix = ROUTE_PREFIX;
             foreach (var controllerModel in context.Result.Controllers)
             {
                 if (controllerModel.ControllerName == "OData")
                 {
-                    ProcessHandleAll(prefix, model, controllerModel);
+                    ProcessHandleAll(RoutingConstants.ODATA_ROUTE_PREFIX, model, controllerModel);
                     continue;
                 }
 
                 if (controllerModel.ControllerName == "ODataMetadata")
                 {
-                    ProcessODataMetadata(prefix, model, controllerModel);
+                    ProcessODataMetadata(RoutingConstants.ODATA_METADATA_ROUTE_PREFIX, model, controllerModel);
                     continue;
                 }
             }

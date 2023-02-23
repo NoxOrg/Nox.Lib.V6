@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using Nox.Api.OData.Constants;
 
 namespace Nox.Api.OData.Routing.TemplateSegments
 {
@@ -18,17 +19,17 @@ namespace Nox.Api.OData.Routing.TemplateSegments
     {
         public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
         {
-            yield return "({key})";
+            yield return $"({RoutingConstants.KeyParameterPathName})";
         }
 
         public override bool TryTranslate(ODataTemplateTranslateContext context)
         {
-            if (!context.RouteValues.TryGetValue("entityset", out object? entitysetNameObj))
+            if (!context.RouteValues.TryGetValue(RoutingConstants.EntitySetParameterName, out object? entitysetNameObj))
             {
                 return false;
             }
 
-            if (!context.RouteValues.TryGetValue("key", out object? keyObj))
+            if (!context.RouteValues.TryGetValue(RoutingConstants.KeyParameterName, out object? keyObj))
             {
                 return false;
             }
@@ -41,7 +42,7 @@ namespace Nox.Api.OData.Routing.TemplateSegments
 
             if (edmEntitySet != null)
             {
-                var  entitySet = new EntitySetSegment(edmEntitySet);
+                var entitySet = new EntitySetSegment(edmEntitySet);
                 IEdmEntityType entityType = entitySet.EntitySet.EntityType();
 
                 IEdmProperty keyProperty = entityType.Key().First();
@@ -49,13 +50,13 @@ namespace Nox.Api.OData.Routing.TemplateSegments
                 object newValue = ODataUriUtils.ConvertFromUriLiteral(keyValue, ODataVersion.V4, context.Model, keyProperty.Type);
 
                 // for non FromODataUri, so update it, for example, remove the single quote for string value.
-                context.UpdatedValues["key"] = newValue;
+                context.UpdatedValues[RoutingConstants.KeyParameterName] = newValue;
 
                 // For FromODataUri, let's refactor it later.
-                string prefixName = ODataParameterValue.ParameterValuePrefix + "key";
+                string prefixName = ODataParameterValue.ParameterValuePrefix + RoutingConstants.KeyParameterName;
                 context.UpdatedValues[prefixName] = new ODataParameterValue(newValue, keyProperty.Type);
 
-                IDictionary<string, object> keysValues =    new Dictionary<string, object>
+                IDictionary<string, object> keysValues = new Dictionary<string, object>
                 {
                     [keyProperty.Name] = newValue
                 };

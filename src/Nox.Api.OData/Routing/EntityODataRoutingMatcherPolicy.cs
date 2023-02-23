@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using Nox.Core.Interfaces;
+using Nox.Api.OData.Constants;
 using Nox.Core.Interfaces.Database;
 
 namespace Nox.Api.OData.Routing
@@ -97,7 +97,7 @@ namespace Nox.Api.OData.Routing
                     continue;
                 }
 
-                var translatorContext = new ODataTemplateTranslateContext(httpContext, 
+                var translatorContext = new ODataTemplateTranslateContext(httpContext,
                     candidate.Endpoint, candidate.Values, model);
 
                 try
@@ -105,7 +105,7 @@ namespace Nox.Api.OData.Routing
                     ODataPath odataPath = _translator.Translate(metadata.Template, translatorContext);
                     if (odataPath != null)
                     {
-                        odataFeature.RoutePrefix = metadata.Prefix;
+                        odataFeature.RoutePrefix = RoutingConstants.ODATA_ROUTE_PREFIX;
                         odataFeature.Model = model;
                         odataFeature.Path = odataPath;
 
