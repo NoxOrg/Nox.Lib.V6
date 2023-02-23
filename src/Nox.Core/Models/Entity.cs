@@ -1,10 +1,9 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations.Schema;
-using Humanizer;
+﻿using Humanizer;
 using Nox.Core.Components;
-using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Messaging;
+using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Nox.Core.Models;
 

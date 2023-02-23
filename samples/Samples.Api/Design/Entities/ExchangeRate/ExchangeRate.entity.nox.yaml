@@ -7,7 +7,6 @@
 #
 
 name: ExchangeRate
-pluralName: ExchangeRates
 
 description: The exchange rate at a piont in time vs CHF (reference currency)
 

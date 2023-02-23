@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Nox.Api.OData.Constants;
-using Nox.Core.Configuration;
-using Nox.Core.Interfaces.Configuration;
+using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Entity;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Nox.Api.OData.Swagger
@@ -13,7 +13,7 @@ namespace Nox.Api.OData.Swagger
     /// </summary>
     public class ODataCustomSwaggerFilter : IDocumentFilter
     {
-        private static IProjectConfiguration? _projectConfiguration;
+        private static IDynamicService? _dynamicService;
         private static ILogger? _logger;
 
         private static IReadOnlySet<string> _parametersToRemoveFromSwagger = new HashSet<string>
@@ -30,8 +30,8 @@ namespace Nox.Api.OData.Swagger
         /// <param name="context">Filterting context</param>
         public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {
-            if (_projectConfiguration?.Entities == null ||
-                !_projectConfiguration.Entities.Any())
+            if (_dynamicService?.Entities == null ||
+                !_dynamicService.Entities.Any())
             {
                 if (_logger != null)
                 {
@@ -49,8 +49,9 @@ namespace Nox.Api.OData.Swagger
                 return;
             }
 
-            var entities = _projectConfiguration!.Entities!
-                .Where(x => !string.IsNullOrWhiteSpace(x.PluralName));
+            var entities = _dynamicService!.Entities!
+                .Where(x => !string.IsNullOrWhiteSpace(x.Value.PluralName))
+                .Select(x => x.Value);
 
             var odataPathItems = swaggerDoc.Paths
                 .Where(p =>
@@ -109,9 +110,9 @@ namespace Nox.Api.OData.Swagger
         /// No change will be applied if empty
         /// </summary>
         /// <param name="projectConfiguration">Project configuration containing entities list</param>
-        public static void SetProjectConfiguration(IProjectConfiguration? projectConfiguration)
+        public static void SetDynamicService(IDynamicService? dynamicService)
         {
-            _projectConfiguration = projectConfiguration;
+            _dynamicService = dynamicService;
         }
 
         /// <summary>
@@ -152,7 +153,7 @@ namespace Nox.Api.OData.Swagger
 
         private void AddNewPathItemPerEachParentEntity(
             OpenApiDocument swaggerDoc,
-            EntityConfiguration entity,
+            IEntity entity,
             KeyValuePair<string, OpenApiPathItem> odataPathItem,
             OpenApiPathItem newPathItem)
         {
@@ -173,7 +174,7 @@ namespace Nox.Api.OData.Swagger
 
         private static void AddNewPathItemToItemsList(
             OpenApiDocument swaggerDoc,
-            EntityConfiguration entity,
+            IEntity entity,
             KeyValuePair<string, OpenApiPathItem> odataPathItem,
             OpenApiPathItem newPathItem)
         {
