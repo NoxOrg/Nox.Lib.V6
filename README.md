@@ -95,7 +95,7 @@ Nox is a .NET microservice framework that allows developers to rapidly build, ma
 It removes all the ceremony, repetition and technical details associated with building and maintaining applications without constraining developer creativity or control in any way.
 
 <div align="center">
-    <img src="docs/images/nox_overview.png" alt="Overview" width="100%">
+    <img src="https://noxorg.dev/docs/images/nox-lib_overview.png" alt="Overview" width="100%">
 </div>
 <br />
 
@@ -144,9 +144,7 @@ docker-compose --version
 ---
 Create .NET 6.0 web api project at the command line in your repositories using `dotnet`
 ```powershell
-dotnet new webapi -o
-
-SampleCurrencyService
+dotnet new webapi -o SampleCurrencyService
 
 cd SampleCurrencyService
 ```
@@ -284,7 +282,7 @@ dotnet run
 ```
 The application will start up, Nox will dynamically process the YAML files. Take note of the port that `dotnet new webapi` assigned to your project.
 
-![Http Port](docs/images/nox-startup-port.png)
+![Http Port](https://noxorg.dev/docs/images/nox-lib_startup-port.png)
 
 In this case the `http` port is `5237` and we will use it below (use your port number wherever you see `5237` instead).
 
@@ -307,15 +305,15 @@ You will then be able to follow the exploration section of these docs using the 
 
 ### Exploring Your New API
 ---
-Startup [Postman](https://www.postman.com/) or your browser and navigate to `http://localhost:5237/WeatherController` to see that the Microsoft standard controller works.
+Startup [Postman](https://www.postman.com/) or your browser and navigate to `http://localhost:5237/WeatherController` to see that the Microsoft standard weather forecast API works.
 
-![Explore 01](docs/images/nox-explore-01.png)
+![MS Weather Forecast API](https://noxorg.dev/docs/images/postman_get-weather-forecast.png)
 
 ### Swagger Docs
 ---
-To view the dynamic endpoints that Nox added to your project,browse to `http://localhost:5237/swagger`
+To view the dynamic endpoints that Nox added to your project, browse to `http://localhost:5237/swagger`
 
-![Swagger](docs/images/nox-explore-swagger.png)
+![Swagger](https://noxorg.dev/docs/images/localhost_swagger-endpoints.png)
 
 ### Add a Currency
 ---
@@ -331,7 +329,7 @@ In Postman, setup a `POST` request to `http://localhost:5237/odata/Currencies`, 
 ```
 When you click on the `Send` button, you should get a `201` (Created) response.
 
-![Swagger](docs/images/nox-explore-created.png)
+![Add a Currency](https://noxorg.dev/docs/images/postman_post-currency.png)
 
 You can create an entry for US Dollars by replacing the body with:
 
@@ -349,7 +347,7 @@ You can create an entry for US Dollars by replacing the body with:
 
 To display the currencies you've just added send a `GET` request to `http://localhost:5237/odata/Currencies`
 
-![Swagger](docs/images/nox-explore-display.png)
+![Display Currencies](https://noxorg.dev/docs/images/postman_get-currencies.png)
 
 
 ### Filtering and Pagination
@@ -366,7 +364,7 @@ http://localhost:5237/odata/Currencies?$filter=Name eq 'US Dollar'
 http://localhost:5237/odata/Currencies?$filter=Name ne 'US Dollar'
 ```
 
-You can read up more about the many features of OData at https://www.odata.org/
+You can read up more about the many features of OData at [www.odata.org/](https://www.odata.org/)
 
 ### Next Steps
 ---
