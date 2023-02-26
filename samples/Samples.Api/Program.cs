@@ -1,7 +1,7 @@
 using Microsoft.OpenApi.Models;
 using Nox;
 using Nox.Api.OData.Swagger;
-using Nox.Core.Interfaces.Configuration;
+using Nox.Core.Interfaces;
 using System.Globalization;
 
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
@@ -32,7 +32,7 @@ builder.Services.AddNox();
 
 var app = builder.Build();
 
-ODataCustomSwaggerFilter.SetProjectConfiguration(app.Services.GetService<IProjectConfiguration>());
+ODataCustomSwaggerFilter.SetDynamicService(app.Services.GetService<IDynamicService>());
 ODataCustomSwaggerFilter.SetLogger(app.Services.GetService<ILogger<ODataCustomSwaggerFilter>>());
 
 // Configure the HTTP request pipeline.
