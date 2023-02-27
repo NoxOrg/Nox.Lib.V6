@@ -1,9 +1,10 @@
+using Nox.Core.Components;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Etl;
 
 namespace Nox.Etl;
 
-public class EtlSources: IEtlSources
+public class EtlSources: MetaBase, IEtlSources
 {
     ICollection<IEtlMessageQueue>? IEtlSources.MessageQueues
     {

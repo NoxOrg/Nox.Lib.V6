@@ -26,6 +26,7 @@ using Nox.Messaging;
 
 namespace Nox.Lib;
 
+
 public class DynamicService : IDynamicService
 {
     private ILogger _logger;
@@ -61,6 +62,15 @@ public class DynamicService : IDynamicService
         get
         {
             if (_metaService.Loaders != null) return new ReadOnlyCollection<ILoader>(_metaService.Loaders.ToList());
+            return null;
+        }
+    }
+
+    public IEnumerable<IEtl>? Etls
+    {
+        get
+        {
+            if (_metaService.Etls != null) return new ReadOnlyCollection<IEtl>(_metaService.Etls.ToList());
             return null;
         }
     }
@@ -118,22 +128,52 @@ public class DynamicService : IDynamicService
 
         // setup recurring jobs based on cron schedule
 
-        foreach (var loader in Loaders!)
+        if (Loaders != null)
         {
-            var loaderInstance = (Loader)loader;
-            var entity = Entities![loaderInstance.Target!.Entity];
-            //
-
-            if (loaderInstance.Schedule!.RunOnStartup)
+            foreach (var loader in Loaders!)
             {
-                executor.ExecuteLoaderAsync(_metaService, loaderInstance, entity).GetAwaiter().GetResult();
-            }
+                var loaderInstance = (Loader)loader;
+                var entity = Entities![loaderInstance.Target!.Entity];
+                //
 
-            RecurringJob.AddOrUpdate(
-                $"{Name}.{loader.Name}",
-                () => executor.ExecuteLoaderAsync(_metaService, loader, entity),
-                loaderInstance.Schedule.CronExpression
-            );
+                if (loaderInstance.Schedule!.RunOnStartup)
+                {
+                    executor.ExecuteLoaderAsync(_metaService, loaderInstance, entity).GetAwaiter().GetResult();
+                }
+
+                RecurringJob.AddOrUpdate(
+                    $"{Name}.{loader.Name}",
+                    () => executor.ExecuteLoaderAsync(_metaService, loader, entity),
+                    loaderInstance.Schedule.CronExpression
+                );
+            }
+        }
+    }
+
+    public void SetupRecurringEtlTasks()
+    {
+        var executor = _etlExecutor;
+        // setup recurring jobs based on cron schedule
+
+        if (Etls != null)
+        {
+            foreach (var etl in Etls!)
+            {
+                var etlInstance = (Etl.Etl)etl;
+                var entity = Entities![etlInstance.TargetType];
+                //
+
+                // if (loaderInstance.Schedule!.RunOnStartup)
+                // {
+                //     executor.ExecuteLoaderAsync(_metaService, loaderInstance, entity).GetAwaiter().GetResult();
+                // }
+                //
+                // RecurringJob.AddOrUpdate(
+                //     $"{Name}.{loader.Name}",
+                //     () => executor.ExecuteLoaderAsync(_metaService, loader, entity),
+                //     loaderInstance.Schedule.CronExpression
+                // );
+            }
         }
     }
 

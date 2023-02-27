@@ -32,7 +32,9 @@ public static class ConfigurationExtensions
             cfg.CreateMap<LoaderTargetConfiguration, LoaderTarget>();
             cfg.CreateMap<MessageTargetConfiguration, MessageTarget>();
             cfg.CreateMap<LoaderSourceConfiguration, LoaderSource>();
-
+            //Etl
+            cfg.CreateMap<EtlConfiguration, Etl.Etl>();
+            
         });
         var mapper = mapperConfig.CreateMapper();
         return mapper.Map<MetaService>(source);

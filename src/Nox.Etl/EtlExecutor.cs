@@ -60,6 +60,16 @@ public class EtlExecutor : IEtlExecutor
 
         return true;
     }
+    
+    public async Task<bool> ExecuteEtlAsync(IMetaService service, IEtl etl, IEntity entity)
+    {
+        entity.ApplyDefaults();
+        entity.Attributes.ToList().ForEach(a => a.ApplyDefaults());
+        
+        return true;
+    }
+    
+    
 
     private async Task LoadDataFromSource(IMetaService service, ILoader loader, IEntity entity)
     {

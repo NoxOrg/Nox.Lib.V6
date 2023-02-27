@@ -1,8 +1,9 @@
+using Nox.Core.Components;
 using Nox.Core.Interfaces.Etl;
 
 namespace Nox.Etl;
 
-public class EtlTransform: IEtlTransform
+public class EtlTransform: MetaBase, IEtlTransform
 {
     ICollection<IEtlMap>? IEtlTransform.Map
     {

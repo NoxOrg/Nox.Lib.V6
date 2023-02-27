@@ -18,5 +18,6 @@ public class ProjectConfiguration: MetaBase, IProjectConfiguration
     public List<ApiConfiguration>? Apis { get; set; }
     public List<EntityConfiguration>? Entities { get; set; }
     public List<LoaderConfiguration>? Loaders { get; set; }
+    public List<EtlConfiguration>? Etls { get; set; }
     public List<DataSourceConfiguration>? DataSources { get; set; }
 }

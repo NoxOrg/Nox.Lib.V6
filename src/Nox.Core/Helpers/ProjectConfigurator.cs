@@ -1,5 +1,7 @@
+using System.Collections;
 using Nox.Core.Configuration;
 using Nox.Core.Constants;
+using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Configuration;
 using Serilog;
 using YamlDotNet.Serialization;
@@ -27,6 +29,7 @@ public class ProjectConfigurator
         if (_config == null) return _config;
         _config.Entities = ReadEntityDefinitionsFromFolder();
         _config.Loaders = ReadLoaderDefinitionsFromFolder();
+        _config.Etls = ReadEtlDefinitionsFromFolder();
         _config.Apis = ReadApiDefinitionsFromFolder();
         return _config;
     }
@@ -39,21 +42,7 @@ public class ProjectConfigurator
             {
                 var config = _deserializer.Deserialize<ProjectConfiguration>(ReadDefinitionFile(f));
                 config.DefinitionFileName = Path.GetFullPath(f);
-                if (config.Database != null) config.Database.DefinitionFileName = Path.GetFullPath(f);
-                if (config.MessagingProviders != null)
-                {
-                    foreach (var msgProviderConfig in config.MessagingProviders)
-                    {
-                        msgProviderConfig.DefinitionFileName = Path.GetFullPath(f);
-                    }    
-                }
-
-                if (config.DataSources == null) return config;
-                foreach (var dsConfig in config.DataSources)
-                {
-                    dsConfig.DefinitionFileName = Path.GetFullPath(f);
-                }
-
+                SetDefinitionFilename(config, Path.GetFullPath(f));
                 return config;
             })
             .FirstOrDefault();
@@ -66,8 +55,7 @@ public class ProjectConfigurator
             .Select(f =>
             {
                 var entity = _deserializer.Deserialize<EntityConfiguration>(ReadDefinitionFile(f));
-                entity.DefinitionFileName = Path.GetFullPath(f);
-                entity.Attributes.ToList().ForEach(a => { a.DefinitionFileName = Path.GetFullPath(f); });
+                SetDefinitionFilename(entity, Path.GetFullPath(f));
                 return entity;
             })
             .ToList();
@@ -80,13 +68,21 @@ public class ProjectConfigurator
             .Select(f =>
             {
                 var loader = _deserializer.Deserialize<LoaderConfiguration>(ReadDefinitionFile(f));
-                loader.DefinitionFileName = Path.GetFullPath(f);
-                loader.Sources?.ToList().ForEach(s => { s.DefinitionFileName = Path.GetFullPath(f); });
-                if (loader.LoadStrategy != null) loader.LoadStrategy.DefinitionFileName = Path.GetFullPath(f);
-                loader.Messaging?.ToList().ForEach(m => { m.DefinitionFileName = Path.GetFullPath(f); });
-                if (loader.Schedule != null) loader.Schedule.DefinitionFileName = Path.GetFullPath(f);
-                if (loader.Target != null) loader.Target.DefinitionFileName = Path.GetFullPath(f);
+                SetDefinitionFilename(loader, Path.GetFullPath(f));
                 return loader;
+            });
+        return loaders.ToList();
+    }
+
+    private List<EtlConfiguration> ReadEtlDefinitionsFromFolder()
+    {
+        var loaders = Directory
+            .EnumerateFiles(_designRoot, FileExtension.EtlDefinition, SearchOption.AllDirectories)
+            .Select(f =>
+            {
+                var etl = _deserializer.Deserialize<EtlConfiguration>(ReadDefinitionFile(f));
+                SetDefinitionFilename(etl, Path.GetFullPath(f));
+                return etl;
             });
         return loaders.ToList();
     }
@@ -98,7 +94,7 @@ public class ProjectConfigurator
             .Select(f =>
             {
                 var api = _deserializer.Deserialize<ApiConfiguration>(ReadDefinitionFile(f));
-                api.DefinitionFileName = Path.GetFullPath(f);
+                SetDefinitionFilename(api, Path.GetFullPath(f));
                 return api;
             })
             .ToList();
@@ -108,5 +104,27 @@ public class ProjectConfigurator
     {
         Log.Information("Reading definition from {fileName}", fileName.Replace('\\', '/'));
         return File.ReadAllText(fileName);
+    }
+
+    private static void SetDefinitionFilename(IMetaBase metaBase, string path)
+    {
+        metaBase.DefinitionFileName = path;
+        foreach (var prop in metaBase.GetType().GetProperties())
+        {
+            if (prop.PropertyType.IsAssignableTo(typeof(IMetaBase)))
+            {
+                var value = (IMetaBase)prop.GetValue(metaBase);
+                if (value != null) SetDefinitionFilename(value, path);
+            }
+            if (prop.PropertyType.IsGenericType && prop.PropertyType.GetGenericArguments().Any(a => a.IsAssignableTo(typeof(IMetaBase))))
+            {
+                var listValue = prop.GetValue(metaBase);
+                if (listValue == null) continue;
+                foreach (var item in (listValue as IEnumerable)!)
+                {
+                    SetDefinitionFilename((IMetaBase)item!, path);
+                }
+            }
+        }
     }
 }

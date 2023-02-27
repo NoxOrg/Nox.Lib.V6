@@ -58,6 +58,13 @@ public sealed class MetaService : MetaBase, IMetaService
         set => Loaders = value as ICollection<Loader>;
     }
     public ICollection<Loader>? Loaders { get; set; }
+    
+    ICollection<IEtl>? IMetaService.Etls
+    {
+        get => Etls?.ToList<IEtl>();
+        set => Etls = value as ICollection<Etl.Etl>;
+    }
+    public ICollection<Etl.Etl>? Etls { get; set; }
 
     ICollection<IApi>? IMetaService.Apis
     {

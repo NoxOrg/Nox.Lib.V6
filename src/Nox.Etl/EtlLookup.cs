@@ -1,8 +1,9 @@
+using Nox.Core.Components;
 using Nox.Core.Interfaces.Etl;
 
 namespace Nox.Etl;
 
-public class EtlLookup: IEtlLookup
+public class EtlLookup: MetaBase, IEtlLookup
 {
     public string SourceColumn { get; set; } = string.Empty;
     public string DataSource { get; set; } = string.Empty;

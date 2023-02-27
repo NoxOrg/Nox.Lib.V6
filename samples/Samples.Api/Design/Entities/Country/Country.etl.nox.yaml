@@ -1,0 +1,25 @@
+# Country.etl.nox.yaml
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Etl.json
+#
+
+name: CountryEtl
+
+description: Loads country data
+
+targetType: Country
+
+sources:
+  files:
+    - name: CountryJsonSeedData
+      format: json
+      path: ../../docs/sample-data/country-seeddata.json
+      minimumExpectedRecords: 160
+      schedule:
+        start: Every day at 3am CET
+        retry:
+          limit: 10
+          delaySeconds: 60
+          doubleDelayLimit: 5
+          
+          

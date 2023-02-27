@@ -1,8 +1,9 @@
+using Nox.Core.Components;
 using Nox.Core.Interfaces.Etl;
 
 namespace Nox.Etl;
 
-public class EtlTargets: IEtlTargets
+public class EtlTargets: MetaBase, IEtlTargets
 {
     ICollection<IEtlMessageQueue>? IEtlTargets.MessageQueues
     {

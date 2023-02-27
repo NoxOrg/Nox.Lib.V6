@@ -20,6 +20,7 @@ public static class ServiceExtension
             dbProvider.ConfigureJobScheduler(configuration);
             var dynamicService = serviceProvider.GetRequiredService<IDynamicService>();
             dynamicService.SetupRecurringLoaderTasks();
+            dynamicService.SetupRecurringEtlTasks();
         });
         services.AddHangfireServer();
         return services;

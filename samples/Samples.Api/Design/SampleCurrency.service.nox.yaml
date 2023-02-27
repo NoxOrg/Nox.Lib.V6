@@ -8,7 +8,7 @@ name: SampleCurrency
 
 description: A sample currency conversion microservice
 
-autoMigrations: false
+autoMigrations: true
 
 database:
   name: SampleCurrencyDb

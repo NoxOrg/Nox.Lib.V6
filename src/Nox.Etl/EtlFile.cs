@@ -16,5 +16,5 @@ public class EtlFile: MetaBase, IEtlFile
         set => Schedule = value as EtlSchedule;
     }
     
-    public IEtlSchedule? Schedule { get; set; }
+    public EtlSchedule? Schedule { get; set; }
 }
