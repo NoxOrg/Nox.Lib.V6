@@ -168,14 +168,12 @@ public class EtlExecutor : IEtlExecutor
             .Where(a => a.IsMappedAttribute())
             .Select(a => a.Name)
             .Concat(entity.RelatedParents.Select(p => p + "Id"))
-            .Concat(loader.LoadStrategy!.Columns.Select(c => c))
             .ToArray();
 
         sourceProvider.ApplyMergeInfo(loaderSource, lastMergeDateTimeStampInfo, loader.LoadStrategy!.Columns, targetColumns);
         await ExecuteMergeNewData(source, destinationDb, destinationTable, targetColumns, loader, entity, lastMergeDateTimeStampInfo);
 
         SetAllLastMergeDateTimeStamps(loader, targetProvider, lastMergeDateTimeStampInfo);
-
     }
 
     private async Task ExecuteMergeNewData(
@@ -188,7 +186,6 @@ public class EtlExecutor : IEtlExecutor
         LoaderMergeStates lastMergeDateTimeStampInfo
         )
     {
-
         var destination = new DbMerge(destinationDb, destinationTable)
         {
             CacheMode = ETLBox.DataFlow.Transformations.CacheMode.Partial,
@@ -203,11 +200,7 @@ public class EtlExecutor : IEtlExecutor
             .ToArray();
 
         destination.MergeProperties.CompareColumns =
-            targetColumns
-            .Skip(1)
-            .Take(targetColumns.Length - 1 - loader.LoadStrategy!.Columns.Length)
-            .Select(colName => new CompareColumn() { ComparePropertyName = colName })
-            .ToArray();
+            loader.LoadStrategy!.Columns.Select(colName => new CompareColumn() { ComparePropertyName = colName }).ToArray();
 
         source.LinkTo(destination);
 
@@ -262,7 +255,6 @@ public class EtlExecutor : IEtlExecutor
         }
 
         LogMergeAnalytics(inserts, updates, unchanged, lastMergeDateTimeStampInfo);
-
     }
 
     private void SendChangeEvent(ILoader loader, ExpandoObject row, INoxEvent message, NoxEventSource eventSource)
