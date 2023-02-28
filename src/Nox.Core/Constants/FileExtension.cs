@@ -6,6 +6,8 @@ public static class FileExtension
     public const string ServiceDefinition = @"*.service.nox.yaml";
 
     public const string EntityDefinition = @"*.entity.nox.yaml";
+    
+    public const string DtoDefinition = @"*.dto.nox.yaml";
 
     public const string LoaderDefinition = @"*.loader.nox.yaml";
     public const string EtlDefinition = @"*.etl.nox.yaml";

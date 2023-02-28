@@ -2,11 +2,12 @@ using Nox.Core.Components;
 
 namespace Nox.Core.Configuration;
 
-public class EtlFileConfiguration: MetaBase
+public class EtlSourceHttpConfiguration: MetaBase
 {
     public string Name { get; set; } = string.Empty;
     public string Format { get; set; } = string.Empty;
-    public string Path { get; set; } = string.Empty;
-    public int MinimumExpectedRecords { get; set; } = 0;
+    public string Verb { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
+    public EtlHttpAuthConfiguration? Auth { get; set; } = new();
     public EtlScheduleConfiguration? Schedule { get; set; } = new();
 }

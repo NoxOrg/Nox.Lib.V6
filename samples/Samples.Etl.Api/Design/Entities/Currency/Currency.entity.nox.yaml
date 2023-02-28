@@ -1,0 +1,68 @@
+﻿#
+# Currency.entity.nox.yaml
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
+#
+
+name: Currency
+description: Currency definition and related data
+pluralName: Currencies
+table: Currency
+schema: dbo
+
+messaging:
+  - messagingProvider: Mediator
+  - messagingProvider: AppServiceBus
+
+attributes:
+
+  - name: Id
+    description: The currency's unique identifier 
+    isPrimaryKey: true
+    type: int
+    canFilter: true
+    canSort: true
+
+  - name: Name
+    description: The currency's name 
+    isRequired: true
+    type: string
+    maxWidth: 128
+    canFilter: true
+    canSort: true
+
+  - name: PluralName
+    description: The currency's plural name
+    type: string
+    maxWidth: 128
+    canFilter: true
+    canSort: true
+
+  - name: ISO_Alpha3
+    description: The currency's official ISO 4217 alpha-3 code
+    isRequired: true
+    isUnicode: false
+    type: char
+    minWidth: 3
+    maxWidth: 3
+
+  - name: Symbol
+    description: The currency's well known symbol
+    type: string
+    maxWidth: 5
+
+  - name: LocalSymbol
+    description: The currency's well known symbol used locally
+    type: string
+    maxWidth: 5
+
+  - name: DecimalDigits
+    description: The number of decimal digits to display for monetary values
+    type: int
+
+  - name: DecimalRounding
+    description: The decimal rounding to apply to monetary values
+    type: decimal
+    maxWidth: 4
+    precision: 2
+

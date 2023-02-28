@@ -6,21 +6,21 @@ namespace Nox.Etl;
 
 public class EtlSources: MetaBase, IEtlSources
 {
-    ICollection<IEtlMessageQueue>? IEtlSources.MessageQueues
+    ICollection<IEtlTargetMessageQueue>? IEtlSources.MessageQueues
     {
-        get => MessageQueues?.ToList<IEtlMessageQueue>();
-        set => MessageQueues = value as ICollection<EtlMessageQueue>;
+        get => MessageQueues?.ToList<IEtlTargetMessageQueue>();
+        set => MessageQueues = value as ICollection<EtlTargetMessageQueue>;
     }
 
-    public ICollection<EtlMessageQueue>? MessageQueues { get; set; }
+    public ICollection<EtlTargetMessageQueue>? MessageQueues { get; set; }
     
-    ICollection<IEtlFile>? IEtlSources.Files
+    ICollection<IEtlSourceFile>? IEtlSources.Files
     {
-        get => Files?.ToList<IEtlFile>();
-        set => Files = value as ICollection<EtlFile>;
+        get => Files?.ToList<IEtlSourceFile>();
+        set => Files = value as ICollection<EtlSourceFile>;
     }
 
-    public ICollection<EtlFile>? Files { get; set; }
+    public ICollection<EtlSourceFile>? Files { get; set; }
     
     ICollection<IEtlSourceDatabase>? IEtlSources.Databases
     {
@@ -30,11 +30,11 @@ public class EtlSources: MetaBase, IEtlSources
     
     public ICollection<EtlSourceDatabase>? Databases { get; set; }
     
-    ICollection<IEtlHttp>? IEtlSources.Http
+    ICollection<IEtlSourceHttp>? IEtlSources.Http
     {
-        get => Http?.ToList<IEtlHttp>();
-        set => Http = value as ICollection<EtlHttp>;
+        get => Http?.ToList<IEtlSourceHttp>();
+        set => Http = value as ICollection<EtlSourceHttp>;
     }
     
-    public ICollection<EtlHttp>? Http { get; set; }
+    public ICollection<EtlSourceHttp>? Http { get; set; }
 }

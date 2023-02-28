@@ -28,6 +28,7 @@ public class ProjectConfigurator
         _config = ReadServiceDefinition();
         if (_config == null) return _config;
         _config.Entities = ReadEntityDefinitionsFromFolder();
+        _config.Dtos = ReadDtoDefinitionsFromFolder();
         _config.Loaders = ReadLoaderDefinitionsFromFolder();
         _config.Etls = ReadEtlDefinitionsFromFolder();
         _config.Apis = ReadApiDefinitionsFromFolder();
@@ -57,6 +58,19 @@ public class ProjectConfigurator
                 var entity = _deserializer.Deserialize<EntityConfiguration>(ReadDefinitionFile(f));
                 SetDefinitionFilename(entity, Path.GetFullPath(f));
                 return entity;
+            })
+            .ToList();
+    }
+    
+    private List<DtoConfiguration> ReadDtoDefinitionsFromFolder()
+    {
+        return Directory
+            .EnumerateFiles(_designRoot, FileExtension.DtoDefinition, SearchOption.AllDirectories)
+            .Select(f =>
+            {
+                var dto = _deserializer.Deserialize<DtoConfiguration>(ReadDefinitionFile(f));
+                SetDefinitionFilename(dto, Path.GetFullPath(f));
+                return dto;
             })
             .ToList();
     }

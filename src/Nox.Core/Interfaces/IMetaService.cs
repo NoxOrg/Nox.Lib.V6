@@ -1,5 +1,6 @@
 using Nox.Core.Interfaces.Api;
 using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces.Dto;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Etl;
 using Nox.Core.Interfaces.Messaging;
@@ -16,6 +17,7 @@ public interface IMetaService
     ICollection<IMessagingProvider>? MessagingProviders { get; set; }
     ICollection<IServiceDataSource>? DataSources { get; set; }
     ICollection<IEntity>? Entities { get; set; }
+    ICollection<IDto>? Dtos { get; set; }
     ICollection<ILoader>? Loaders { get; set; }
     ICollection<IEtl>? Etls { get; set; }
     ICollection<IApi>? Apis { get; set; }

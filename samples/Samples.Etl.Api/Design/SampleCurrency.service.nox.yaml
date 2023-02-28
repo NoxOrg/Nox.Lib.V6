@@ -1,0 +1,85 @@
+#
+# SampleCurrency.service.nox.yaml
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/NoxConfiguration.json
+#
+
+name: SampleCurrency
+
+description: A sample currency conversion microservice
+
+autoMigrations: true
+
+database:
+  name: SampleCurrencyDb
+  server: localhost
+
+  ### Sql Server
+  provider: sqlServer
+  options: Trusted_Connection=no;connection timeout=120;
+  user: sa  
+  password: Developer*123
+
+  ### Postgres
+  #provider: postgres
+  #port: 54320
+  #user: sa  
+  #password: Developer*123
+
+  ### MySql  
+  #provider: mySql
+  #port: 3306
+  #user: root
+  #password: Developer*123
+  
+messagingProviders:
+
+  - name: AppServiceBus
+
+    ## RabbitMQ
+    provider: rabbitMQ
+    connectionString: rabbitmq://guest:guest@localhost/
+
+    ### Azure Service Bus
+    #provider: azureServiceBus
+    #connectionString: ${ConnectionString:AzureServiceBus}
+  
+dataSources:
+
+  - name: JsonSeedData
+    provider: json
+    options: Source=File;Path=../../docs/sample-data/;
+
+  - name: CsvSeedData
+    provider: csv
+    options: Source=File;Path=../../docs/sample-data/;
+
+  - name: ExcelSeedData
+    provider: excel
+    options: Source=File;Path=../../docs/sample-data/;
+    
+  - name: ParquetSeedData
+    provider: parquet
+    options: Source=File;Path=../../docs/sample-data/;    
+
+  - name: XmlSeedData
+    provider: xml
+    options: Source=File;Path=../../docs/sample-data/;
+
+versionControl:
+  provider: azureDevOps
+  server: https://dev.azure.com/iwgplc
+  project: Nox.SampleCurrency
+  repository: SampleCurrency.Api.V1
+
+team:
+  developers:
+    - name: Andre Sharpe
+      userName: andre.sharpe@iwgplc.com
+      mobilePhoneNumber: +41789461056
+      isAdmin: true
+    - name: Jan Schutte
+      userName: jan.schutte@iwgplc.com
+      isAdmin: true
+    - name: Dionisis Stoubos
+      userName: dionisis.stoubos@iwgplc.com

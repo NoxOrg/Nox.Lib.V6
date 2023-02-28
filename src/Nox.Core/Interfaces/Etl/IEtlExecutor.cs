@@ -1,4 +1,5 @@
-﻿using Nox.Core.Interfaces.Entity;
+﻿using Nox.Core.Interfaces.Dto;
+using Nox.Core.Interfaces.Entity;
 
 namespace Nox.Core.Interfaces.Etl
 {
@@ -6,6 +7,13 @@ namespace Nox.Core.Interfaces.Etl
     {
         Task<bool> ExecuteAsync(IMetaService service);
         Task<bool> ExecuteLoaderAsync(IMetaService service, ILoader loader, IEntity entity);
-        Task<bool> ExecuteEtlAsync(IMetaService service, IEtl etl, IEntity entity);
+        Task<bool> ExecuteEtlAsync(IMetaService service, IEtlSourceFile source, IEntity entity);
+        Task<bool> ExecuteEtlAsync(IMetaService service, IEtlSourceHttp source, IEntity entity);
+        Task<bool> ExecuteEtlAsync(IMetaService service, IEtlSourceDatabase source, IEntity entity);
+        Task<bool> ExecuteEtlAsync(IMetaService service, IEtlSourceMessageQueue source, IEntity entity);
+        Task<bool> ExecuteEtlAsync(IMetaService service, IEtlSourceFile source, IDto dto);
+        Task<bool> ExecuteEtlAsync(IMetaService service, IEtlSourceHttp source, IDto dto);
+        Task<bool> ExecuteEtlAsync(IMetaService service, IEtlSourceDatabase source, IDto dto);
+        Task<bool> ExecuteEtlAsync(IMetaService service, IEtlSourceMessageQueue source, IDto dto);
     }
 }

@@ -117,4 +117,16 @@
     <data name="DbProviderInvalid" xml:space="preserve">
         <value>Data source provider must be one of {0} in {1}</value>
     </data>
+    <data name="DtoAttributeNameEmpty" xml:space="preserve">
+        <value>The attribute name must be specified in {0}</value>
+    </data>
+    <data name="DtoAttributeTypeEmpty" xml:space="preserve">
+        <value>Attribute '{0}' has no type defined in {1}</value>
+    </data>
+    <data name="DtoNameEmpty" xml:space="preserve">
+        <value>The DTO's name must be specified in {0}</value>
+    </data>
+    <data name="DtoAttributesEmpty" xml:space="preserve">
+        <value>The DTO '{0}' must have at least one property defined in {1}</value>
+    </data>
 </root>

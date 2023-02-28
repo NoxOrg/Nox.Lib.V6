@@ -15,6 +15,7 @@ using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Api;
 using Nox.Core.Interfaces.Configuration;
 using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces.Dto;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Etl;
 using Nox.Core.Interfaces.Messaging;
@@ -46,6 +47,18 @@ public class DynamicService : IDynamicService
             return null;
         }
     }
+    
+    public IReadOnlyDictionary<string, IDto>? Dtos
+    {
+        get
+        {
+            if (_metaService.Dtos != null)
+                return new ReadOnlyDictionary<string, IDto>(
+                    _metaService.Dtos.ToDictionary(x => x.Name, x => x));
+            return null;
+        }
+    }
+    
     public IReadOnlyDictionary<string, IApi>? Apis
     {
         get
@@ -160,9 +173,28 @@ public class DynamicService : IDynamicService
             foreach (var etl in Etls!)
             {
                 var etlInstance = (Etl.Etl)etl;
-                var entity = Entities![etlInstance.TargetType];
-                //
+                var targetType = etlInstance.TargetType;
+                
+                IEntity entity = null;
+                IDto dto = null;
+                if (Entities != null) entity = Entities[targetType];
+                if (entity == null && Dtos != null)
+                {
+                    dto = Dtos[targetType];
+                }
 
+                if (entity == null && dto == null) throw new NoxException($"Unable to execute ETL {etl.Name} because the target type: {targetType} is not available");
+
+                if (entity != null)
+                {
+                    executor.ExecuteEtlAsync(_metaService, etl, entity).GetAwaiter().GetResult();
+                    RecurringJob.AddOrUpdate($"{Name}.{etl.Name}", () => executor.ExecuteEtlAsync(_metaService, etl, entity), etl.);
+                }
+                else 
+                {
+                    executor.ExecuteEtlAsync(_metaService, etl, dto).GetAwaiter().GetResult();
+                }
+                
                 // if (loaderInstance.Schedule!.RunOnStartup)
                 // {
                 //     executor.ExecuteLoaderAsync(_metaService, loaderInstance, entity).GetAwaiter().GetResult();

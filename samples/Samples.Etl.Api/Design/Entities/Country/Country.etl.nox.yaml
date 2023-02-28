@@ -7,7 +7,7 @@ name: CountryEtl
 
 description: Loads country data
 
-targetType: Country
+targetType: CountryDto
 
 sources:
   files:

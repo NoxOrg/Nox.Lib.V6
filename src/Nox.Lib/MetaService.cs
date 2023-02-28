@@ -4,9 +4,11 @@ using Nox.Core.Constants;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Api;
 using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces.Dto;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Etl;
 using Nox.Core.Interfaces.Messaging;
+using Nox.Core.Models;
 using Nox.Core.Validation;
 using Nox.Data;
 using Nox.Etl;
@@ -50,7 +52,16 @@ public sealed class MetaService : MetaBase, IMetaService
         get => Entities?.ToList<IEntity>();
         set => Entities = value as ICollection<Core.Models.Entity>;
     }
+
     public ICollection<Core.Models.Entity>? Entities { get; set; }
+
+    ICollection<IDto>? IMetaService.Dtos
+    {
+        get => Dtos?.ToList<IDto>();
+        set => Dtos = value as ICollection<Dto>;
+    }
+    
+    public ICollection<Dto>? Dtos { get; set; }
 
     ICollection<ILoader>? IMetaService.Loaders
     {

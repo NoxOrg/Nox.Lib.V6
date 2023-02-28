@@ -34,6 +34,9 @@ public class NoxConfigValidator: AbstractValidator<ProjectConfiguration>
         RuleForEach(config => config.Entities)
             .SetValidator(config => new EntityConfigValidator(config.MessagingProviders));
         
+        RuleForEach(config => config.Dtos)
+            .SetValidator(config => new DtoConfigValidator());
+        
         RuleForEach(config => config.Loaders)
             .SetValidator(config => new LoaderConfigValidator(config.Entities, config.DataSources, config.MessagingProviders));
         

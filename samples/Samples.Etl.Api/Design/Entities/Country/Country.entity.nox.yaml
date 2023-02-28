@@ -1,0 +1,130 @@
+﻿#
+# Country.entity.nox.yaml
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
+#
+
+name: Country
+description: Countries and related data
+pluralName: Countries
+table: Country
+schema: dbo
+
+relatedParents: [Currency]
+
+messaging:
+  - messagingProvider: Mediator
+  - messagingProvider: AppServiceBus
+    
+attributes:
+
+  - name: Id
+    description: The country's unique identifier 
+    isPrimaryKey: true
+    type: int
+    canFilter: true
+    canSort: true
+
+  - name: Name
+    description: The country's common name 
+    isRequired: true
+    type: string
+    maxWidth: 64
+    canFilter: true
+    canSort: true
+
+  - name: FormalName
+    description: The country's official name
+    type: string
+    maxWidth: 64
+    canFilter: true
+    canSort: true
+
+  - name: ISO_Alpha3
+    description: The country's official ISO 4217 alpha-3 code
+    isRequired: true
+    isUnicode: false
+    type: char
+    minWidth: 3
+    maxWidth: 3
+
+  - name: ISO_Alpha2
+    description: The country's official ISO 4217 alpha-2 code
+    isRequired: true
+    isUnicode: false
+    type: char
+    minWidth: 2
+    maxWidth: 2
+
+  - name: ISO_Numeric
+    description: The country's official ISO 4217 alpha-3 code
+    isRequired: true
+    isUnicode: false
+    type: char
+    minWidth: 3
+    maxWidth: 3
+
+  - name: DialingCodes
+    description: The country's phone dialing codes (comma-delimited)
+    isUnicode: false
+    type: string
+    maxWidth: 32
+
+  - name: Capital
+    description: The capital city of the country
+    type: string
+    maxWidth: 64
+
+  - name: Demonym
+    description: Noun denoting the natives of the country
+    type: string
+    maxWidth: 64
+
+  - name: AreaInSquareKilometres
+    description: Country area in square kilometers 
+    type: int
+
+  - name: GeoLattitude
+    description: The the north–south position of the workplace's point on the surface of the Earth
+    type: decimal
+    maxWidth: 18
+    precision: 15
+    isRequired: true
+
+  - name: GeoLongitude
+    description: The the east-west position of the workplace's point on the surface of the Earth
+    type: decimal
+    maxWidth: 18
+    precision: 15
+    isRequired: true
+
+  - name: GeoRegion
+    description: The region the country is in
+    type: string
+    isUnicode: false
+    maxWidth: 8
+    isRequired: true
+
+  - name: GeoSubRegion
+    description: The sub-region the country is in
+    type: string
+    isUnicode: false
+    maxWidth: 32
+    isRequired: false
+
+  - name: GeoWorldRegion
+    description: The world region the country is in
+    type: string
+    isUnicode: false
+    maxWidth: 4
+    isRequired: true
+
+  - name: Population
+    description: The estimated population of the country
+    type: int
+
+  - name: TopLevelDomains
+    description: The top level internet domains regitered to the country (comma-delimited)
+    type: string
+    isUnicode: true
+    maxWidth: 32

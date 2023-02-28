@@ -9,7 +9,7 @@ public class MetaServiceValidator : AbstractValidator<IMetaService>
     {
         RuleForEach(service => service.Entities)
             .SetValidator(new EntityValidator());
-
+        
         RuleForEach(service => service.Loaders)
             .SetValidator(new LoaderValidator());
 

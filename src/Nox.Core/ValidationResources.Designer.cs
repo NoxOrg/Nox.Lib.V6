@@ -242,5 +242,29 @@ namespace Nox.Core {
                 return ResourceManager.GetString("DbProviderInvalid", resourceCulture);
             }
         }
+        
+        internal static string DtoAttributeNameEmpty {
+            get {
+                return ResourceManager.GetString("DtoAttributeNameEmpty", resourceCulture);
+            }
+        }
+        
+        internal static string DtoAttributeTypeEmpty {
+            get {
+                return ResourceManager.GetString("DtoAttributeTypeEmpty", resourceCulture);
+            }
+        }
+        
+        internal static string DtoNameEmpty {
+            get {
+                return ResourceManager.GetString("DtoNameEmpty", resourceCulture);
+            }
+        }
+        
+        internal static string DtoAttributesEmpty {
+            get {
+                return ResourceManager.GetString("DtoAttributesEmpty", resourceCulture);
+            }
+        }
     }
 }

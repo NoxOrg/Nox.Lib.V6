@@ -15,6 +15,7 @@ public interface IProjectConfiguration
     List<MessagingProviderConfiguration>? MessagingProviders { get; set; }
     List<ApiConfiguration>? Apis { get; set; }
     List<EntityConfiguration>? Entities { get; set; }
+    List<DtoConfiguration>? Dtos { get; set; }
     List<LoaderConfiguration>? Loaders { get; set; }
     List<DataSourceConfiguration>? DataSources { get; set; }
 }
