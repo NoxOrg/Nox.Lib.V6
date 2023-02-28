@@ -33,7 +33,7 @@
 -->
   <p align="center">
     <br />
-    Build and deploy enterprise–grade microservices in under an hour
+    Build and deploy enterprise-grade microservices in under an hour
     <br />
     <br />
     <a href="https://noxorg.dev"><strong>View the documentation »</strong></a>
@@ -90,7 +90,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 ***
-Nox is a .NET microservice framework that allows developers to rapidly build, maintain and deploy enterprise–grade, production–ready microservices. 
+Nox is a .NET microservice framework that allows developers to rapidly build, maintain and deploy enterprise-grade, production-ready microservices. 
 
 It removes all the ceremony, repetition and technical details associated with building and maintaining applications without constraining developer creativity or control in any way.
 
@@ -101,7 +101,7 @@ It removes all the ceremony, repetition and technical details associated with bu
 
 ### Main Features
 ---
-Nox lets you focus on your business problem and domain, and provides you with the following auto–magic features:
+Nox lets you focus on your business problem and domain, and provides you with the following auto-magic features:
 
 - Declaration of your core application and domain (models, data, entities, attributes and bounded contexts) in a declaritive and easily maintainable way (YAML, using YamlDotNet)
 - Automatic (and selective) Create, Read, Update and Delete (CRUD) API for entities and/or aggregate roots (supports REST with OData, with GraphQL and gRPC in the making)
@@ -110,7 +110,7 @@ Nox lets you focus on your business problem and domain, and provides you with th
 - Validation of entities and attributes (using FluentValidation)
 - Logging, Observability and Monitoring (using SeriLog)
 - Events and Messaging (In process/Mediator, Azure Servicebus, Amazon SQS, RabbitMQ) using MassTransit
-- Extract, transform and load (ETL) definitions from any database, file or API with bulk–load and merge support
+- Extract, transform and load (ETL) definitions from any database, file or API with bulk-load and merge support
 - A task scheduler for running recurring tasks at periodic intervals (using Hangfire)
 - Automated DevOps including testing and deployment
 
@@ -369,25 +369,25 @@ You can read up more about the many features of OData at [www.odata.org/](https:
 ### Next Steps
 ---
 
-This quick–start is really just the tip of the Nox iceberg. To develop serious microservices for business requires quite a bit more than a quick API.
+This quick-start is really just the tip of the Nox iceberg. To develop serious microservices for business requires quite a bit more than a quick API.
 
-More documentation will be added shortly to help illustrate the broader feature–set of Nox–enabled applications.
+More documentation will be added shortly to help illustrate the broader feature-set of Nox-enabled applications.
 
 <!-- ROADMAP -->
 ## Roadmap
 ***
-- [ ] Model–driven gRPC API's automatically for high–performance inter–service communication
+- [ ] Model-driven gRPC API's automatically for high-performance inter-service communication
 - [ ] GraphQL API automatically from YAML definitions
 - [ ] Health monitoring and observability as a first class features
 - [ ] ETL from files, API's and other database types
 - [ ] Production caching usin ElasticSearch
 - [ ] Full DevOps automation for creating, deploying and apgrading applications
-- [ ] Multi–environment support (dev/test/uat/prod/...)
+- [ ] Multi-environment support (dev/test/uat/prod/...)
 - [ ] Proper versioning of application changes accross deployments
 - [ ] DotNet command line tooling for Nox to interactively create YAML files, Helm charts and other required DevOps artifacts
 - [ ] E-Mail and other notification mechanisms for applications
-- [ ] Automated Backend–for–Frontend (BFF) creation
-- [ ] A universal Blazor–based UX that is dynamic rendered from the YAML definition
+- [ ] Automated Backend-for-Frontend (BFF) creation
+- [ ] A universal Blazor-based UX that is dynamic rendered from the YAML definition
 - [ ] Better Swagger and user project documentation generation
 - [ ] A universal admin console to combine the various underlying library frontends (eg Hangfire) 
 
@@ -415,7 +415,7 @@ Don't forget to give the project a star! Thanks again!
 ### Hassle-free Development
 ---
 
-The Nox project uses the [goo](https://goo.dev/) cross–platform development to make building and testing code hassle free.
+The Nox project uses the [goo](https://goo.dev/) cross-platform development to make building and testing code hassle free.
 
 ```powershell
 git clone https://github.com/noxorg/nox.git
