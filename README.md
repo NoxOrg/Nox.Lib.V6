@@ -203,6 +203,8 @@ name: SampleCurrencyService
 
 description: Sample Currency Microservice
 
+autoMigrations: true
+
 database:
   name: SampleCurrencyDb
   provider: sqlServer
