@@ -22,9 +22,9 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Copyright>Copyright (c) Andre Sharpe 2022</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>6.0.38.0</AssemblyVersion>
-    <FileVersion>6.0.38.0</FileVersion>
-    <PackageVersion>6.0.38</PackageVersion>
+    <AssemblyVersion>6.0.39.0</AssemblyVersion>
+    <FileVersion>6.0.39.0</FileVersion>
+    <PackageVersion>6.0.39</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/NoxOrg/Nox</PackageProjectUrl>
     <RepositoryUrl>https://github.com/NoxOrg/Nox.git</RepositoryUrl>
@@ -77,6 +77,7 @@
     <PackageReference Include="Parquet.Net" Version="3.10.0" />
     <PackageReference Include="Serilog" Version="2.12.0" />
     <PackageReference Include="SqlKata" Version="2.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.116" />
     <PackageReference Include="YamlDotNet" Version="12.1.0" />
   </ItemGroup>
