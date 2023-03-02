@@ -1,7 +1,6 @@
 using Microsoft.OpenApi.Models;
 using Nox;
 using Nox.Api.OData.Swagger;
-using Nox.Core.Interfaces;
 using System.Globalization;
 
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
@@ -24,7 +23,7 @@ builder.Services.AddSwaggerGen(cfg =>
         Title = "Nox Sample API"
     });
 
-    cfg.DocumentFilter<ODataCustomSwaggerFilter>();
+    cfg.DocumentFilter<ODataEntitySectionsSwaggerFilter>();
 });
 
 // Add Nox to the service collection
@@ -32,8 +31,7 @@ builder.Services.AddNox();
 
 var app = builder.Build();
 
-ODataCustomSwaggerFilter.SetDynamicService(app.Services.GetService<IDynamicService>());
-ODataCustomSwaggerFilter.SetLogger(app.Services.GetService<ILogger<ODataCustomSwaggerFilter>>());
+app.UseODataEntitySectionsSwaggerFilter();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

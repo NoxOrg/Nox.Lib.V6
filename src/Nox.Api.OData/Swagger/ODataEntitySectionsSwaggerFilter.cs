@@ -11,7 +11,7 @@ namespace Nox.Api.OData.Swagger
     /// This filter is intended to format default OData generated API
     /// to more usable form specyfing particular entities available
     /// </summary>
-    public class ODataCustomSwaggerFilter : IDocumentFilter
+    public class ODataEntitySectionsSwaggerFilter : IDocumentFilter
     {
         private static IDynamicService? _dynamicService;
         private static ILogger? _logger;
@@ -110,19 +110,13 @@ namespace Nox.Api.OData.Swagger
         /// No change will be applied if empty
         /// </summary>
         /// <param name="projectConfiguration">Project configuration containing entities list</param>
-        public static void SetDynamicService(IDynamicService? dynamicService)
-        {
-            _dynamicService = dynamicService;
-        }
-
-        /// <summary>
-        /// Dependency injection is not available for filters, so this needs to be set manually.
-        /// If no logger is set console output will be used
-        /// </summary>
         /// <param name="logger">Logger to be used in output</param>
-        public static void SetLogger(ILogger<ODataCustomSwaggerFilter>? logger)
+        public static void Initialize(
+            ILogger<ODataEntitySectionsSwaggerFilter>? logger,
+            IDynamicService? dynamicService)
         {
             _logger = logger;
+            _dynamicService = dynamicService;
         }
 
         private static void AddOldOperationParametersThatAreNotReplacedToNewOperation(
