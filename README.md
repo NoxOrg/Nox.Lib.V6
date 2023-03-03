@@ -134,7 +134,7 @@ Nox lets you focus on your business problem and domain, and provides you with th
 ### Prerequisites
 ---
 
-Make sure you have .NET 6 or later and Docker installed on your PC.
+Make sure you have .NET 6 and Docker installed on your PC.
 ```powershell
 dotnet --version
 
@@ -142,7 +142,7 @@ docker-compose --version
 ```
 ### Creating a Project
 ---
-Create .NET 6.0 web api project at the command line in your repositories using `dotnet`
+Create a .NET 6.0 web api project at the command line in your repositories using the `dotnet` command-line tool.
 ```powershell
 dotnet new webapi -o SampleCurrencyService
 
@@ -156,23 +156,42 @@ Add the Nox.Lib nuget package to your project.
 ```powershell
 dotnet add package Nox.Lib
 ```
-Edit your Program.cs file and add the following three lines:
+Edit your Program.cs file and add/modify the following 👇 code sections:
 ```csharp
-using Nox; // <--- Add this (1) <---
+// (1) 👇 Add the following use library statements 
+using Nox;
+using Nox.Api.OData.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddNox(); // <--- Add this (2) <---
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// (2) 👇 Replace builder.Services.AddSwaggerGen() with codeblock below 
+builder.Services.AddSwaggerGen(cfg =>
+{
+    //Add this to ensure swagger document is correctly annotated
+    cfg.EnableAnnotations();
+
+    cfg.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo 
+    {
+        Version = "0.01",
+        Title = "Nox Sample API"
+    });
+
+    cfg.DocumentFilter<ODataEntitySectionsSwaggerFilter>();
+});
+
+// (3) 👇 Add Nox to the service collection
+builder.Services.AddNox();
 
 var app = builder.Build();
 
-app.UseNox(); // <--- Add this (3) <---
+// (4) 👇 Add this line for context-specific Swagger endpoints
+app.UseODataEntitySectionsSwaggerFilter();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -182,6 +201,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// (5) Add Nox to the application middleware 👇
+app.UseNox();
 
 app.UseAuthorization();
 
@@ -307,19 +329,19 @@ You will then be able to follow the exploration section of these docs using the 
 
 ### Exploring Your New API
 ---
-Startup [Postman](https://www.postman.com/) or your browser and navigate to `http://localhost:5237/WeatherController` to see that the Microsoft standard weather forecast API works.
+Startup [Postman](https://www.postman.com/) or your browser and navigate to `http://localhost:5237/WeatherForecast` to see that the Microsoft standard weather forecast API works.
 
-![MS Weather Forecast API](https://noxorg.dev/docs/images/postman_get-weather-forecast.png)
+![MS Weather Forecast API](https://noxorg.dev/docs/images/postman_get-weatherforecast.gif)
 
 ### Swagger Docs
 ---
 To view the dynamic endpoints that Nox added to your project, browse to `http://localhost:5237/swagger`
 
-![Swagger](https://noxorg.dev/docs/images/localhost_swagger-endpoints.png)
+![Swagger](https://noxorg.dev/docs/images/localhost_swagger-endpoints.gif)
 
 ### Add a Currency
 ---
-In Postman, setup a `POST` request to `http://localhost:5237/odata/Currencies`, and on the `Body` tab, set the `content-type` to `raw` and `JSON` and the body content to:
+In Postman, setup a `POST` request to `http://localhost:5237/api/Currencies`, and on the `Body` tab, set the `content-type` to `raw` and `JSON` and the body content to:
 
 ```json
 {
@@ -331,7 +353,7 @@ In Postman, setup a `POST` request to `http://localhost:5237/odata/Currencies`, 
 ```
 When you click on the `Send` button, you should get a `201` (Created) response.
 
-![Add a Currency](https://noxorg.dev/docs/images/postman_post-currency.png)
+![Add Bitcoin Currency](https://noxorg.dev/docs/images/postman_post-currency-bitcoin.gif)
 
 You can create an entry for US Dollars by replacing the body with:
 
@@ -343,13 +365,14 @@ You can create an entry for US Dollars by replacing the body with:
     "ISO_Alpha3": "USD"
 }
 ```
+![Add US Dollar Currency](https://noxorg.dev/docs/images/postman_post-currency-usdollar.gif)
 
 ### Display Currencies
 ---
 
-To display the currencies you've just added send a `GET` request to `http://localhost:5237/odata/Currencies`
+To display the currencies you've just added send a `GET` request to `http://localhost:5237/api/Currencies`
 
-![Display Currencies](https://noxorg.dev/docs/images/postman_get-currencies.png)
+![Display Currencies](https://noxorg.dev/docs/images/postman_get-currencies.gif)
 
 
 ### Filtering and Pagination
