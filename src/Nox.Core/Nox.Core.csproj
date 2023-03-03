@@ -56,7 +56,6 @@
     <PackageReference Include="YamlDotNet" Version="12.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Configuration\Dto" />
     <Folder Include="Exceptions" />
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +68,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ValidationResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Remove="Configuration\Dto\**" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="ValidationResources.Designer.cs">
@@ -76,8 +76,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>ValidationResources.resx</DependentUpon>
     </Compile>
+    <Compile Remove="Configuration\Dto\**" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\docs\images\nox.png" Pack="true" PackagePath="" />
+    <None Remove="Configuration\Dto\**" />
   </ItemGroup>
 </Project>

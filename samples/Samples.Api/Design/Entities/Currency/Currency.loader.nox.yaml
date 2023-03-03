@@ -14,6 +14,7 @@ schedule:
     limit: 10
     delaySeconds: 60
     doubleDelayLimit: 5
+  runOnStartup: false
 
 loadStrategy: 
   type: MergeNew
