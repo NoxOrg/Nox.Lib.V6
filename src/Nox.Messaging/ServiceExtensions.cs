@@ -155,7 +155,7 @@ public static class ServiceExtensions
             //todo By default, sagas are in-memory, but should be changed to a durable saga repository.
             mt.SetInMemorySagaRepositoryProvider();
             
-            if(isExternalListener)
+            if (isExternalListener)
             {
                 var entryAssembly = Assembly.GetEntryAssembly();
                 mt.AddConsumers(entryAssembly);
