@@ -158,9 +158,8 @@ dotnet add package Nox.Lib
 ```
 Edit your Program.cs file and add/modify the following 👇 code sections:
 ```csharp
-// (1) 👇 Add the following use library statements 
+// (1) 👇 Add the following use library statement
 using Nox;
-using Nox.Api.OData.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -170,28 +169,16 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-// (2) 👇 Replace builder.Services.AddSwaggerGen() with codeblock below 
-builder.Services.AddSwaggerGen(cfg =>
-{
-    //Add this to ensure swagger document is correctly annotated
-    cfg.EnableAnnotations();
-
-    cfg.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo 
-    {
-        Version = "0.01",
-        Title = "Nox Sample API"
-    });
-
-    cfg.DocumentFilter<ODataEntitySectionsSwaggerFilter>();
-});
+// (2) 👇 The Nox library has Swagger built-in. Comment the line below out.
+//builder.Services.AddSwaggerGen();
 
 // (3) 👇 Add Nox to the service collection
 builder.Services.AddNox();
 
 var app = builder.Build();
 
-// (4) 👇 Add this line for context-specific Swagger endpoints
-app.UseODataEntitySectionsSwaggerFilter();
+// (4) 👇 Add Nox to the application middleware
+app.UseNox();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -201,9 +188,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// (5) Add Nox to the application middleware 👇
-app.UseNox();
 
 app.UseAuthorization();
 
