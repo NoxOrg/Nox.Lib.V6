@@ -214,6 +214,7 @@ autoMigrations: true
 database:
   name: SampleCurrencyDb
   provider: sqlServer
+  options: Trusted_Connection=no;connection timeout=120;TrustServerCertificate=True
   server: localhost
   user: sa  
   password: Developer*123
