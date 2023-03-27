@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>6.0.38.0</AssemblyVersion>
-    <FileVersion>6.0.38.0</FileVersion>
+    <AssemblyVersion>6.0.41.0</AssemblyVersion>
+    <FileVersion>6.0.41.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>

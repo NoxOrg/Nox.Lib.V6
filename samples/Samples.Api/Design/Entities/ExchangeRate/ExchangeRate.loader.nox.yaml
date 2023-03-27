@@ -10,11 +10,12 @@ description: Loads exchange rate data
 
 schedule:
   start: Every day at 1am
+  runOnStartup: false
 
 loadStrategy: 
   type: MergeNew
   columns: [CreateDate]
-
+  
 target:
   entity: ExchangeRate
   
