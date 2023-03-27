@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Nox.Core.Components;
-using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Entity;
 
 namespace Nox.Core.Models;
@@ -34,7 +33,6 @@ public sealed class EntityAttribute : MetaBase, IEntityAttribute
 
     public bool ApplyDefaults()
     {
-
         if (MaxWidth < 1)
             MaxWidth = 512;
 

@@ -1,0 +1,40 @@
+﻿#
+# ReservationInfo.entity.nox.yaml
+#
+# https://open.er-api.com/v6/latest/CHF
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
+#
+
+name: ReservationInfo
+
+attributes:
+
+  - name: Id
+    description: The unique identifier of an resrvation operation
+    isPrimaryKey: true
+    type: int
+    canFilter: true
+    canSort: true
+
+  - name: ExpirationTime
+    description: The date and time when resrvation expires
+    type: datetime
+
+  - name: SourceCurrencyId
+    type: int
+
+  - name: DestinationCurrencyId
+    type: int
+
+  - name: SourceAmount
+    type: decimal
+    maxWidth: 14
+    precision: 8
+
+  - name: Rate
+    type: decimal
+    maxWidth: 14
+    precision: 8
+
+    # TODO: add customer

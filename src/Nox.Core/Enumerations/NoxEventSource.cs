@@ -4,5 +4,6 @@ public enum NoxEventSource
 {
     EtlLoad,
     EtlMerge,
-    NoxDbContext
+    NoxDbContext,
+    Command
 }

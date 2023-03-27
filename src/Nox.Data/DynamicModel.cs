@@ -257,7 +257,6 @@ public class DynamicModel : IDynamicModel
             }
 
             dynamicTypes.Add(entity.Name, (entity, tb));
-
         }
 
         foreach (var (key, entity) in entities)
@@ -274,11 +273,23 @@ public class DynamicModel : IDynamicModel
 
                     relatedTb.AddPublicGetSetPropertyAsList(entity.PluralName, tb);
                 }
+            }
 
+            foreach (var relation in entity.Relations)
+            {
+                var relatedTb = dynamicTypes[relation.Entity].TypeBuilder;
+
+                if (relation.IsCollection)
+                {
+                    tb.AddPublicGetSetPropertyAsList(relation.Entity, relatedTb);
+                }
+                else
+                {
+                    tb.AddPublicGetSetProperty(relation.Entity, relatedTb);
+                }
             }
         }
 
         return dynamicTypes;
-
     }
 }

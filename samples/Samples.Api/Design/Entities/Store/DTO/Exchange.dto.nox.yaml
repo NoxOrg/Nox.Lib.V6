@@ -1,0 +1,33 @@
+﻿#
+# Exchange.dto.nox.yaml
+#
+# https://open.er-api.com/v6/latest/CHF
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
+#
+
+name: Exchange
+
+attributes:
+
+  - name: Id
+    type: int
+
+  - name: StoreId
+    type: int
+
+  - name: SourceCurrencyId
+    type: int
+
+  - name: DestinationCurrencyId
+    type: int
+
+  - name: SourceAmount
+    type: decimal
+    maxWidth: 14
+    precision: 8
+
+  - name: Rate
+    type: decimal
+    maxWidth: 14
+    precision: 8

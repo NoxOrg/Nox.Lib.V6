@@ -181,7 +181,7 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
 
         var item = collection.Where(whereLambda).Single();
 
-        PatchItem<T>(item, json);
+        PatchItem(item, json);
         
         var repo = Set<T>();
 
@@ -249,7 +249,7 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
         }
     }
 
-    private void PatchItem<TEntity>(TEntity item, string json) where TEntity: class
+    private static void PatchItem<TEntity>(TEntity item, string json) where TEntity: class
     {
         var itemProps = item.GetType().GetProperties();
         var jsonValues = JsonSerializer.Deserialize<IDictionary<string, JsonElement>>(json);
@@ -259,10 +259,7 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
             foreach (var jsonValue in jsonValues)
             {
                 var itemProp = itemProps.FirstOrDefault(ip => ip.Name.Equals(jsonValue.Key, StringComparison.OrdinalIgnoreCase));
-                if (itemProp != null)
-                {
-                    itemProp.SetValue(item, jsonValue.Value.Deserialize(itemProp.PropertyType));
-                }
+                itemProp?.SetValue(item, jsonValue.Value.Deserialize(itemProp.PropertyType));
             }    
         }
     } 

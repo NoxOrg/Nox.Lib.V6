@@ -15,7 +15,12 @@ relatedParents: [Currency]
 messaging:
   - messagingProvider: Mediator
   - messagingProvider: AppServiceBus
-    
+
+raiseCrudEvents: 
+  create: yes
+  update: yes
+  delete: yes
+
 attributes:
 
   - name: Id

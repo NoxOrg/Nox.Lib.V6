@@ -1,0 +1,45 @@
+﻿#
+# ExchangeRate.entity.nox.yaml
+#
+# https://open.er-api.com/v6/latest/CHF
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
+#
+
+name: Reservation
+
+description: The cache reservation in Store
+
+relations:
+  - name: Store
+    entity: Store
+    isCollection: false
+    isRequired: true
+
+  - name: Currency
+    entity: Currency
+    isCollection: false
+    isRequired: true
+
+attributes:
+
+  - name: Id
+    description: The unique identifier of an resrvation operation
+    isPrimaryKey: true
+    type: int
+    canFilter: true
+    canSort: true
+
+  - name: ExpirationTime
+    description: The date and time when resrvation expires
+    type: datetime
+
+  - name: Amount
+    description: The amount
+    type: decimal
+    maxWidth: 14
+    precision: 8
+
+  - name: IsActive
+    description: Is active
+    type: bool

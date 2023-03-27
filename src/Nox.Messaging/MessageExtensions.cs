@@ -1,12 +1,9 @@
-using System.Collections.Immutable;
-using System.Dynamic;
-using Amazon.SimpleNotificationService.Model;
-using AutoMapper;
 using Newtonsoft.Json;
 using Nox.Core.Enumerations;
-using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Messaging.Events;
+using System.Collections.Immutable;
+using System.Dynamic;
 
 namespace Nox.Messaging;
 
@@ -18,10 +15,11 @@ public static class MessageExtensions
         {
             var type = msg.GetType();
             var baseType = type.BaseType;
+            
             if (baseType == null) return null;
+            
             if (baseType.GenericTypeArguments.Any(gta => gta.Name == entityName))
             {
-
                 switch (eventType)
                 {
                     case NoxEventType.Created:
@@ -36,12 +34,14 @@ public static class MessageExtensions
                 }
             }
         }
+
         return null;
     }
 
     public static object MapInstance(this INoxEvent template, ExpandoObject source, NoxEventSource eventSource)
     {
         var sourceDict = source as IDictionary<string, object?>;
+        
         return template
             .ToInstance(eventSource)
             .ResolvePayload(template, sourceDict);
@@ -60,10 +60,7 @@ public static class MessageExtensions
         var result = Activator.CreateInstance(template.GetType())!;
         var props = template.GetType().GetProperties();
         var eventSourceProp = props.FirstOrDefault(p => p.Name.ToLower() == "eventsource");
-        if (eventSourceProp != null)
-        {
-            eventSourceProp.SetValue(result, eventSource);
-        }
+        eventSourceProp?.SetValue(result, eventSource);
 
         return result;
     }

@@ -1,4 +1,5 @@
 ﻿using Nox.Core.Interfaces.Messaging;
+using Nox.Core.Models;
 using EntityAttribute = Nox.Core.Models.EntityAttribute;
 
 namespace Nox.Core.Interfaces.Entity;
@@ -11,6 +12,7 @@ public interface IEntity : IMetaBase
     string Name { get; set; }
     string PluralName { get; set; }
     List<string> RelatedChildren { get; set; }
+    List<EntityRelation> Relations { get; set; }
     string RelatedChildrenJson { get; set; }
     List<string> RelatedParents { get; set; }
     string RelatedParentsJson { get; set; }

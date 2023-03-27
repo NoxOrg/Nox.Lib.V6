@@ -1,12 +1,10 @@
-using System.Text.Json;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using Nox;
-using Nox.Core.Enumerations;
+using Nox.Events;
 
 namespace Samples.Cli.Consumers;
 
-public class CountryCreatedEventConsumer : IConsumer<CountryCreatedDomainEvent>
+public class CountryCreatedEventConsumer : IConsumer<CountryCreatedEvent>
 {
     readonly ILogger<CountryCreatedEventConsumer> _logger;
 
@@ -15,7 +13,7 @@ public class CountryCreatedEventConsumer : IConsumer<CountryCreatedDomainEvent>
         _logger = logger;
     }
 
-    public Task Consume(ConsumeContext<CountryCreatedDomainEvent> context)
+    public Task Consume(ConsumeContext<CountryCreatedEvent> context)
     {
         _logger.LogInformation("Country Created by {source}: {@payload}", context.Message.EventSource, context.Message.Payload);
         return Task.CompletedTask;

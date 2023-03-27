@@ -12,7 +12,7 @@ public class EntityAttributeConfiguration: MetaBase
     public bool IsForeignKey { get; set; } = false;
     public bool IsRequired { get; set; } = false;
     public bool IsUnicode { get; set; } = true;
-    public bool IsTemporalOnly { get; set; } = false;
+    public bool IsTemporalOnly { get; set; } = false; // discuss
     public bool CanFilter { get; set; } = false;
     public bool CanSort { get; set; } = false;
     public int MinWidth { get; set; } = 0;

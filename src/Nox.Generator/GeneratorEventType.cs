@@ -4,5 +4,6 @@ public enum GeneratorEventType
 {
     Created,
     Updated,
-    Deleted
+    Deleted,
+    Domain,
 }

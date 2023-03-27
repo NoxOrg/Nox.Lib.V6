@@ -16,6 +16,9 @@ public sealed class Entity : MetaBase, IEntity
     public string Schema { get; set; } = "dbo";
     [NotMapped]
     public List<string> RelatedParents { get; set; } = new();
+
+    public List<EntityRelation> Relations { get; set; } = new ();
+    
     [NotMapped]
     public List<string> RelatedChildren { get; set; } = new();
     public string RelatedParentsJson { get => string.Join('|',RelatedParents.ToArray()); set => RelatedParents = value.Split('|').ToList(); }

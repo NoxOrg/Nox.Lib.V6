@@ -23,6 +23,7 @@ public static class ConfigurationExtensions
             cfg.CreateMap<ApiRouteResponseConfiguration, Api.ApiRouteResponse>();
             cfg.CreateMap<MessagingProviderConfiguration, MessagingProvider>();
             cfg.CreateMap<EntityConfiguration, Core.Models.Entity>();
+            cfg.CreateMap<EntityRelationConfiguration, Core.Models.EntityRelation>();
             cfg.CreateMap<EntityAttributeConfiguration, EntityAttribute>();
             cfg.CreateMap<MessageTargetConfiguration, MessageTarget>();
             cfg.CreateMap<LoaderConfiguration, Loader>();
@@ -32,8 +33,8 @@ public static class ConfigurationExtensions
             cfg.CreateMap<LoaderTargetConfiguration, LoaderTarget>();
             cfg.CreateMap<MessageTargetConfiguration, MessageTarget>();
             cfg.CreateMap<LoaderSourceConfiguration, LoaderSource>();
-
         });
+
         var mapper = mapperConfig.CreateMapper();
         return mapper.Map<MetaService>(source);
     }
