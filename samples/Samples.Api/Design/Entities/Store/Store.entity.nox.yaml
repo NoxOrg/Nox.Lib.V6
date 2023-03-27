@@ -35,23 +35,23 @@ queries:
     - name: ActiveReservations
       parameters:  # simple parameters or DTO in case of complex parameters set with validation / permissions etc
        - name: storeId
-         description: The store's unique identifier 
          type: int # can be DTO here
-      responseDto: ReservationInfoDto
-      isCollection: true
+      response:
+        responseDto: ReservationInfoDto
+        isCollection: true
 
 commands:
     - name: Reserve
       parameters: 
        - name: reserveCommandDto
          type: ReserveDto # can be DTO or simple type here
-      events: 
-      - name: BalanceChanged
+      events: [BalanceChanged]
       
     - name: Exchange
       parameters: 
        - name: exchangeCommandDto
          type: ExchangeDto # can be DTO or simple type here
+      events: [BalanceChanged]
 
 events:
     - name: BalanceChanged

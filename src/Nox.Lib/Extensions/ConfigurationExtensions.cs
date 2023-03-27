@@ -23,7 +23,7 @@ public static class ConfigurationExtensions
             cfg.CreateMap<ApiRouteResponseConfiguration, Api.ApiRouteResponse>();
             cfg.CreateMap<MessagingProviderConfiguration, MessagingProvider>();
             cfg.CreateMap<EntityConfiguration, Core.Models.Entity>();
-            cfg.CreateMap<EntityRelationConfiguration, Core.Models.EntityRelation>();
+            cfg.CreateMap<EntityRelationConfiguration, EntityRelation>();
             cfg.CreateMap<EntityAttributeConfiguration, EntityAttribute>();
             cfg.CreateMap<MessageTargetConfiguration, MessageTarget>();
             cfg.CreateMap<LoaderConfiguration, Loader>();

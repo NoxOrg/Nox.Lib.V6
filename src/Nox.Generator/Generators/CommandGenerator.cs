@@ -32,9 +32,9 @@ namespace Nox.Generator.Generators
             command.TryGetValue("events", out var events);
             if (events != null)
             {
-                foreach (var domainEvent in ((List<object>)events).Cast<Dictionary<object, object>>())
+                foreach (var domainEvent in (List<object>)events)
                 {
-                    AddDomainEvent(sb, (string)domainEvent["name"]);
+                    AddDomainEvent(sb, (string)domainEvent);
                 }
             }
 

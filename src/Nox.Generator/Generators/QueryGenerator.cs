@@ -31,8 +31,12 @@ namespace Nox.Generator.Generators
             // Add params (which can be DTO)
             string parameters = GetParametersString(query["parameters"]);
 
-            bool isCollection = bool.Parse((string)query["isCollection"]);
-            var typeDefinition = isCollection ? $"IList<{query["responseDto"]}>" : $"{query["responseDto"]}";
+            var response = (Dictionary<object, object>)query["response"];
+
+            bool isCollection = bool.Parse((string)response["isCollection"]);
+            var dto = response["responseDto"];
+
+            var typeDefinition = isCollection ? $"IList<{dto}>" : $"{dto}";
             
             sb.AppendLine($@"   public abstract Task<{typeDefinition}> ExecuteAsync({parameters});");
 
