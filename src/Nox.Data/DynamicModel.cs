@@ -154,11 +154,8 @@ public class DynamicModel : IDynamicModel
                     {
                         prop.IsFixedLength();
                     }
-
                 }
-
             });
-
         }
         
         _dynamicService.AddMetadata(modelBuilder);
@@ -231,7 +228,6 @@ public class DynamicModel : IDynamicModel
 
         _dynamicDbEntities[dbSetName].DbContextDeleteMethod.Invoke(context, parameters);
     }
-
 
     private Dictionary<string, (IEntity Entity, TypeBuilder TypeBuilder)> GetTablesAndTypeBuilders()
     {

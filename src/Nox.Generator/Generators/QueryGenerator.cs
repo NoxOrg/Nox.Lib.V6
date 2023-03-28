@@ -20,7 +20,11 @@ namespace Nox.Generator.Generators
                 "IDynamicQuery",
                 "Nox.Queries",
                 isAbstract: true,
-                new[] { "Nox.Core.Interfaces.Entity", "Nox.Dto" });
+                new[] 
+                { 
+                    "Nox.Core.Interfaces.Entity",
+                    "Nox.Dto"
+                });
 
             // Add Db Context
             AddDbContextProperty(sb);

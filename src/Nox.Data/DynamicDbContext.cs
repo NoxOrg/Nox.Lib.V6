@@ -43,7 +43,6 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
 
             provider.ConfigureDbContext(optionsBuilder);
         }
-
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

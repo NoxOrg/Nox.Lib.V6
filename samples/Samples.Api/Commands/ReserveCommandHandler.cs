@@ -19,7 +19,7 @@ namespace Samples.Api.Commands
             // Check balance - aggregate validation
 
             var store = await DbContext
-                .Set<Store>().AsQueryable()
+                .Store
                 .FirstOrDefaultAsync(s => s.Id == reserveCommandDto.StoreId);
 
             if (store == null)
@@ -31,8 +31,7 @@ namespace Samples.Api.Commands
                 new Reservation
                 {
                     IsActive = true,
-                    Amount = reserveCommandDto.Amount,
-                    ExpirationTime = reserveCommandDto.ExpirationTime,
+                    SourceAmount = reserveCommandDto.SourceAmount,
                 });
 
             await DbContext.SaveChangesAsync();

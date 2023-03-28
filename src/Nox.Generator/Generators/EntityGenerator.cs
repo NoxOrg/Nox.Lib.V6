@@ -1,13 +1,14 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace Nox.Generator.Generators
 {
     internal class EntityGenerator : BaseGenerator
     {
+        internal List<string> AggregateRoots { get; set; } = new List<string>();
+
         internal EntityGenerator(GeneratorExecutionContext context) : base(context) { }
 
         private readonly List<string> _entityNames = new();
@@ -70,6 +71,11 @@ namespace Nox.Generator.Generators
             sb.AppendLine(@"}");
 
             GenerateFile(sb, entityName);
+
+            if (isAggreagteRoot)
+            {
+                AggregateRoots.Add(entityName);
+            }
         }
 
         private void GenerateEvents(Dictionary<object, object> entity, string entityName)

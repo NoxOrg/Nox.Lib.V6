@@ -1,9 +1,9 @@
 ﻿#
-# Reserve.entity.nox.yaml
+# Reserve.dto.nox.yaml
 #
 # https://open.er-api.com/v6/latest/CHF
 #
-# yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
+# yaml-language-server: $schema=https://noxorg.dev/schemas/DTO.json
 #
 
 name: Reserve
@@ -13,16 +13,18 @@ attributes:
   - name: StoreId
     type: int
 
-  - name: CustomerId
+  - name: SourceCurrencyId
     type: int
-    
-  - name: ExpirationTime
-    type: datetime
 
-  - name: Amount
+  - name: DestinationCurrencyId
+    type: int
+
+  - name: SourceAmount
     type: decimal
     maxWidth: 14
     precision: 8
 
-  - name: CurrencyId
-    type: int
+  - name: Rate
+    type: decimal
+    maxWidth: 14
+    precision: 8

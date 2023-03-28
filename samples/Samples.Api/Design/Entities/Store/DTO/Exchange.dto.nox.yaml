@@ -3,7 +3,7 @@
 #
 # https://open.er-api.com/v6/latest/CHF
 #
-# yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
+# yaml-language-server: $schema=https://noxorg.dev/schemas/DTO.json
 #
 
 name: Exchange

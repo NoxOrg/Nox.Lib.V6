@@ -20,7 +20,13 @@ namespace Nox.Generator.Generators
                 "IDynamicCommandHandler",
                 "Nox.Commands",
                 isAbstract: true,
-                new[] { "Nox.Core.Interfaces.Entity.Commands", "Nox.Events", "Nox.Dto", "Nox.Core.Interfaces.Messaging" });
+                new[] 
+                {
+                    "Nox.Core.Interfaces.Entity.Commands",
+                    "Nox.Core.Interfaces.Messaging",
+                    "Nox.Dto",
+                    "Nox.Events"
+                });
 
             // Add Db Context
             AddDbContextProperty(sb);

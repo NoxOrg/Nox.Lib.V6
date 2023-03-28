@@ -16,7 +16,12 @@ relations:
     isCollection: false
     isRequired: true
 
-  - name: Currency
+  - name: SourceCurrency
+    entity: Currency
+    isCollection: false
+    isRequired: true
+
+  - name: DestinationCurrency
     entity: Currency
     isCollection: false
     isRequired: true
@@ -34,8 +39,12 @@ attributes:
     description: The date and time when resrvation expires
     type: datetime
 
-  - name: Amount
-    description: The amount
+  - name: SourceAmount
+    type: decimal
+    maxWidth: 14
+    precision: 8
+
+  - name: Rate
     type: decimal
     maxWidth: 14
     precision: 8

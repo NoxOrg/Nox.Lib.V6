@@ -19,7 +19,7 @@ namespace Samples.Api.Commands
             // Check balance - aggregate validation
 
             var store = await DbContext
-                .Set<Store>().AsQueryable()
+                .Store
                 .FirstOrDefaultAsync(s => s.Id == exchangeCommandDto.StoreId);
 
             if (store == null)
