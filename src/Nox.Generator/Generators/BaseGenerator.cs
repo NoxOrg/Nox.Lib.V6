@@ -23,13 +23,20 @@ namespace Nox.Generator.Generators
             Context.AddSource(hintName, source);
         }
 
-        protected static void AddConstructor(StringBuilder sb, string className)
+        protected static void AddConstructor(StringBuilder sb, string className, Dictionary<string, string> parameters)
         {
             sb.AppendLine($@"   public {className}(");
-            sb.AppendLine($@"      NoxDbContext dbContext");
+            for (int i = 0; i < parameters.Count; i++)
+            {
+                var parameter = parameters.ElementAt(i);
+                sb.AppendLine($@"      {parameter.Key} {ToLowerFirstChar(parameter.Value)}{(i < parameters.Count - 1 ? "," : "")}");
+            }
             sb.AppendLine($@"      )");
             sb.AppendLine($@"   {{");
-            sb.AppendLine($@"      DbContext = dbContext;");
+            foreach (var parameter in parameters)
+            {
+                sb.AppendLine($@"      {parameter.Value} = {ToLowerFirstChar(parameter.Value)};");
+            }
             sb.AppendLine($@"   }}");
             sb.AppendLine($@"");
         }
@@ -52,7 +59,7 @@ namespace Nox.Generator.Generators
 
             foreach (var attr in attributes.Cast<Dictionary<object, object>>())
             {
-                sb.AppendLine($@"   public {ClassDataType((string)attr["type"])} {attr["name"]} {{get; set;}}");
+                sb.AppendLine($@"   public {ClassDataType((string)attr["type"])} {attr["name"]} {{ get; set; }}");
                 sb.AppendLine($@"");
             }
         }
@@ -60,12 +67,6 @@ namespace Nox.Generator.Generators
         protected static void AddNoxMessangerProperty(StringBuilder sb)
         {
             sb.AppendLine($@"   protected INoxMessenger Messenger {{ get; init; }}");
-            sb.AppendLine($@"");
-        }
-
-        protected static void AddDomainEvent(StringBuilder sb, string eventName)
-        {
-            sb.AppendLine($@"   public {eventName}DomainEvent {eventName} {{get; init;}}");
             sb.AppendLine($@"");
         }
 
@@ -133,6 +134,16 @@ namespace Nox.Generator.Generators
                 "bigfloat" => "double",
                 _ => "string"
             };
+        }
+
+        public static string ToLowerFirstChar(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return input;
+            }
+
+            return char.ToLower(input[0]) + input.Substring(1);
         }
     }
 }

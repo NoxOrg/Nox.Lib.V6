@@ -27,6 +27,11 @@ attributes:
     maxWidth: 14
     precision: 8
 
+  - name: DestinationAmount
+    type: decimal
+    maxWidth: 14
+    precision: 8
+
   - name: Rate
     type: decimal
     maxWidth: 14

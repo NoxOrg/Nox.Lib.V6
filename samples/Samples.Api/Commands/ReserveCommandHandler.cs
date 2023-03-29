@@ -1,14 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Nox;
 using Nox.Core.Interfaces.Entity.Commands;
+using Nox.Core.Interfaces.Messaging;
 using Nox.Dto;
 
 namespace Samples.Api.Commands
 {
     public class ReserveCommandHandler : Nox.Commands.ReserveCommandHandlerBase
     {
-        public ReserveCommandHandler(NoxDbContext dbContext)
-            : base(dbContext)
+        public ReserveCommandHandler(NoxDbContext dbContext, INoxMessenger messenger)
+            : base(dbContext, messenger)
         {
         }
 
@@ -36,7 +37,17 @@ namespace Samples.Api.Commands
 
             await DbContext.SaveChangesAsync();
 
-            // emit event
+            // emit events
+            await SendBalanceChangedDomainEventAsync(
+                new Nox.Events.BalanceChangedDomainEvent
+                {
+                    Payload = new BalanceChangedDto
+                    {
+                        StoreId = reserveCommandDto.StoreId,
+                        Amount = reserveCommandDto.SourceAmount,
+                        CurrencyId = reserveCommandDto.SourceCurrencyId
+                    }
+                });
 
             return new NoxCommandResult { IsSuccess = true };
         }

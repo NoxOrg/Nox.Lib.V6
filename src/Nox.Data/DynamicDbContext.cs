@@ -241,7 +241,7 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
                     var toSend = msg.MapInstance(json, NoxEventSource.NoxDbContext);
                     if (dynamicEntity.Value.Entity.Messaging != null)
                     {
-                        await _messenger!.SendMessage(dynamicEntity.Value.Entity.Messaging, toSend);    
+                        await _messenger!.SendMessage(dynamicEntity.Value.Entity.Messaging, toSend);
                     }
                 }
             }

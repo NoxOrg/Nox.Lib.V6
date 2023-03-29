@@ -32,9 +32,9 @@ namespace Nox.Generator.Generators
 
             GenerateQueries(entity);
 
-            GenerateCommands(entity);
+            var events = GenerateEvents(entity, entityName);
 
-            GenerateEvents(entity, entityName);
+            GenerateCommands(entity, events);            
 
             return true;
         }
@@ -78,7 +78,7 @@ namespace Nox.Generator.Generators
             }
         }
 
-        private void GenerateEvents(Dictionary<object, object> entity, string entityName)
+        private Dictionary<string, string> GenerateEvents(Dictionary<object, object> entity, string entityName)
         {
             var eventsGenerator = new EventsGenerator(Context);
 
@@ -105,17 +105,22 @@ namespace Nox.Generator.Generators
                 }
             }
 
+            var eventsProviders = new Dictionary<string, string>();
+
             entity.TryGetValue("events", out var events);
             if (events != null)
-            {
+            {                
                 foreach (var domainEvent in ((List<object>)events).Cast<Dictionary<object, object>>())
                 {
                     eventsGenerator.AddDomainEvent((string)domainEvent["name"], (string)domainEvent["dto"]);
+                    eventsProviders.Add((string)domainEvent["name"], (string)domainEvent["provider"]);
                 }
             }
+
+            return eventsProviders;
         }
 
-        private void GenerateCommands(Dictionary<object, object> entity)
+        private void GenerateCommands(Dictionary<object, object> entity, Dictionary<string, string> eventsProviders)
         {
             entity.TryGetValue("commands", out var commands);
             if (commands != null)
@@ -124,7 +129,7 @@ namespace Nox.Generator.Generators
 
                 foreach (var command in ((List<object>)commands).Cast<Dictionary<object, object>>())
                 {
-                    commandGenerator.AddCommandHandler(command);
+                    commandGenerator.AddCommandHandler(command, eventsProviders);
                 }
             }
         }
