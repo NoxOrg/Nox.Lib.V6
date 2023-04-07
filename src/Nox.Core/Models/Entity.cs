@@ -9,20 +9,20 @@ namespace Nox.Core.Models;
 
 public sealed class Entity : MetaBase, IEntity
 {
+    public EntityKey Key { get; set; } = new();
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string PluralName { get; set; } = string.Empty;
     public string Table { get; set; } = null!;
     public string Schema { get; set; } = "dbo";
-    [NotMapped]
-    public List<string> RelatedParents { get; set; } = new();
 
-    public List<EntityRelation> Relations { get; set; } = new();
+    public ICollection<EntityRelationship> Relationships { get; set; } = new Collection<EntityRelationship>();
 
     [NotMapped]
-    public List<string> RelatedChildren { get; set; } = new();
-    public string RelatedParentsJson { get => string.Join('|', RelatedParents.ToArray()); set => RelatedParents = value.Split('|').ToList(); }
-    public string RelatedChildrenJson { get => string.Join('|', RelatedChildren.ToArray()); set => RelatedChildren = value.Split('|').ToList(); }
+    public ICollection<string> RelatedParents { get => Relationships.Where(r => !r.IsMany).Select(r => r.Entity).ToList(); }
+
+    [NotMapped]
+    public ICollection<string> RelatedChildren { get => Relationships.Where(r => r.IsMany).Select(r => r.Entity).ToList(); }
     public int SortOrder { get; set; }
     public ICollection<EntityAttribute> Attributes { get; set; } = new Collection<EntityAttribute>();
 
@@ -44,10 +44,6 @@ public sealed class Entity : MetaBase, IEntity
 
         if (string.IsNullOrWhiteSpace(Schema))
             Schema = "dbo";
-
-        RelatedChildren = RelatedChildren.Where(x => x.Trim().Length > 0).ToList();
-
-        RelatedParents = RelatedParents.Where(x => x.Trim().Length > 0).ToList();
 
         return true;
     }

@@ -6,16 +6,15 @@ namespace Nox.Core.Interfaces.Entity;
 
 public interface IEntity : IMetaBase
 {
+    EntityKey Key { get; }
+    string Name { get; set; }
+    string Description { get; set; }
+    ICollection<string> RelatedParents { get; }
     ICollection<EntityAttribute> Attributes { get; set; }
     ICollection<IMessageTarget>? Messaging { get; set; }
-    string Description { get; set; }
-    string Name { get; set; }
+    ICollection<EntityRelationship> Relationships { get; set; }
+    ICollection<string> RelatedChildren { get; }
     string PluralName { get; set; }
-    List<string> RelatedChildren { get; set; }
-    List<EntityRelation> Relations { get; set; }
-    string RelatedChildrenJson { get; set; }
-    List<string> RelatedParents { get; set; }
-    string RelatedParentsJson { get; set; }
     string Schema { get; set; }
     int SortOrder { get; set; }
     string Table { get; set; }

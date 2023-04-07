@@ -1,14 +1,15 @@
-using System.Data.SqlClient;
 using ETLBox.Connection;
 using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Nox.Core.Components;
+using Nox.Core.Constants;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
+using Nox.Core.Models;
 using SqlKata.Compilers;
-using Nox.Core.Components;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Nox.Core.Constants;
+using System.Data.SqlClient;
 
 namespace Nox.Data.SqlServer;
 
@@ -63,7 +64,7 @@ public class SqlServerDatabaseProvider: DatabaseProviderBase
         );
     }
 
-    public override string ToDatabaseColumnType(IEntityAttribute entityAttribute)
+    public override string ToDatabaseColumnType(BaseEntityAttribute entityAttribute)
     {
         var propType = entityAttribute.Type?.ToLower() ?? "string";
         var propWidth = entityAttribute.MaxWidth < 1 ? "max" : entityAttribute.MaxWidth.ToString();
@@ -119,6 +120,7 @@ public class SqlServerDatabaseProvider: DatabaseProviderBase
             SchemaName = "jobs",
             PrepareSchemaIfNecessary = true,
         });
+
         return configuration;
     }
 
@@ -131,5 +133,4 @@ public class SqlServerDatabaseProvider: DatabaseProviderBase
     {
         return $"{schema}.{table}";
     }
-
 }

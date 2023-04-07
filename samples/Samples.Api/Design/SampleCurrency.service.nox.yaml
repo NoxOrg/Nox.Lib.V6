@@ -40,10 +40,9 @@ messagingProviders:
     provider: rabbitMQ
     connectionString: rabbitmq://guest:guest@localhost/
   
-  - name: IntegrationServiceBus
     ### Azure Service Bus
-    provider: azureServiceBus
-    connectionString: ${ConnectionString:AzureServiceBus}
+    #provider: azureServiceBus
+    #connectionString: ${ConnectionString:AzureServiceBus}
   
 dataSources:
 

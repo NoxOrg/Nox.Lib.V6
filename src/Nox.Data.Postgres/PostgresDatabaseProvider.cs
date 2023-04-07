@@ -9,6 +9,7 @@ using SqlKata.Compilers;
 using Nox.Core.Components;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Nox.Core.Constants;
+using Nox.Core.Models;
 
 namespace Nox.Data.Postgres;
 
@@ -67,7 +68,7 @@ public class PostgresDatabaseProvider: DatabaseProviderBase
         );
     }
 
-    public override string ToDatabaseColumnType(IEntityAttribute entityAttribute)
+    public override string ToDatabaseColumnType(BaseEntityAttribute entityAttribute)
     {
         var propType = entityAttribute.Type?.ToLower() ?? "string";
         var propWidth = entityAttribute.MaxWidth < 1 ? "2048" : entityAttribute.MaxWidth.ToString();

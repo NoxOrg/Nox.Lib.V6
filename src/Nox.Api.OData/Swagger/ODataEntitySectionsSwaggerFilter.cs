@@ -16,7 +16,7 @@ namespace Nox.Api.OData.Swagger
         private static IDynamicService? _dynamicService;
         private static ILogger? _logger;
 
-        private static IReadOnlySet<string> _parametersToRemoveFromSwagger = new HashSet<string>
+        private static readonly IReadOnlySet<string> _parametersToRemoveFromSwagger = new HashSet<string>
         {
             RoutingConstants.EntitySetParameterName,
             RoutingConstants.PropertyParameterName,
@@ -132,7 +132,7 @@ namespace Nox.Api.OData.Swagger
             }
         }
 
-        private void AddSectionTag(
+        private static void AddSectionTag(
             OpenApiOperation newOperation,
             string sectionName)
         {
@@ -145,7 +145,7 @@ namespace Nox.Api.OData.Swagger
             };
         }
 
-        private void AddNewPathItemPerEachParentEntity(
+        private static void AddNewPathItemPerEachParentEntity(
             OpenApiDocument swaggerDoc,
             IEntity entity,
             KeyValuePair<string, OpenApiPathItem> odataPathItem,
@@ -182,7 +182,7 @@ namespace Nox.Api.OData.Swagger
             return currentPath.Replace($"/{RoutingConstants.ODATA_ROUTE_PREFIX}/{RoutingConstants.EntitySetParameterPathName}", $"/{RoutingConstants.ODATA_ROUTE_PREFIX}/{pluralEntityName}", StringComparison.OrdinalIgnoreCase);
         }
 
-        private OpenApiPathItem CreateACopyOfExistingPathItem(KeyValuePair<string, OpenApiPathItem> odataPathItem)
+        private static OpenApiPathItem CreateACopyOfExistingPathItem(KeyValuePair<string, OpenApiPathItem> odataPathItem)
         {
             return new OpenApiPathItem()
             {
@@ -194,7 +194,7 @@ namespace Nox.Api.OData.Swagger
             };
         }
 
-        private OpenApiOperation CreateACopyOfExistingOperation(KeyValuePair<OperationType, OpenApiOperation> operation)
+        private static OpenApiOperation CreateACopyOfExistingOperation(KeyValuePair<OperationType, OpenApiOperation> operation)
         {
             return new OpenApiOperation()
             {

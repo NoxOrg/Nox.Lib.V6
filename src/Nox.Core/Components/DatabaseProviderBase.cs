@@ -98,7 +98,7 @@ public abstract class DatabaseProviderBase : IDataProvider
         throw new NotImplementedException();
     }
 
-    public virtual string ToDatabaseColumnType(IEntityAttribute entityAttribute)
+    public virtual string ToDatabaseColumnType(BaseEntityAttribute entityAttribute)
     {
         throw new NotImplementedException();
     }

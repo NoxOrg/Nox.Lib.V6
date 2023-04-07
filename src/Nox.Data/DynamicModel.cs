@@ -1,5 +1,6 @@
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.Logging;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -9,6 +10,7 @@ using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Messaging;
 using Nox.Core.Interfaces.Messaging.Events;
+using Nox.Core.Models;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -104,62 +106,77 @@ public class DynamicModel : IDynamicModel
             {
                 _databaseProvider.ConfigureEntityTypeBuilder(b, entity.Entity.Table, entity.Entity.Schema);
 
+                var key = entity.Entity.Key;
+                if (key.IsComposite)
+                {
+                    b.HasKey(key.Entities);
+                }
+                else
+                {
+                    var prop = SetAttribute(b, key);
+
+                    b.HasKey(new string[] { key.Name });
+
+                    if (!key.IsAutoNumber)
+                    {
+                        prop.ValueGeneratedNever();
+                    }
+                }
+
                 foreach (var attr in entity.Entity.Attributes)
                 {
-                    var prop = b.Property(attr.Name);
-
-                    var netType = attr.NetDataType();
-
-                    prop.HasColumnType(_databaseProvider.ToDatabaseColumnType(attr));
-
-                    if (netType == typeof(string))
-                    {
-                        prop.HasMaxLength(attr.MaxWidth);
-                    }
-
-                    else if (attr.IsDateTimeType())
-                    {
-                        // don't set MaxWidth, throw's error on db create
-                    }
-
-                    else if (attr.MaxWidth > 0 && attr.Precision > 0)
-                    {
-                        prop.HasPrecision(attr.MaxWidth, attr.Precision);
-                    }
-
-                    try
-                    {
-                        prop.IsRequired(attr.IsRequired);
-                    }
-                    catch
-                    {
-                    }
-
-                    if (attr.IsPrimaryKey)
-                    {
-                        b.HasKey(new string[] { attr.Name });
-
-                        if (!attr.IsAutoNumber)
-                        {
-                            prop.ValueGeneratedNever();
-                        }
-                    }
-
-                    if (attr.IsUnicode)
-                    {
-                        prop.IsUnicode();
-                    }
-
-                    if (attr.MinWidth == attr.MaxWidth)
-                    {
-                        prop.IsFixedLength();
-                    }
+                    SetAttribute(b, attr);
                 }
             });
         }
         
         _dynamicService.AddMetadata(modelBuilder);
+
         return modelBuilder;
+    }
+
+    private Microsoft.EntityFrameworkCore.Metadata.Builders.PropertyBuilder SetAttribute(EntityTypeBuilder builder, BaseEntityAttribute attr)
+    {
+        var prop = builder.Property(attr.Name);
+
+        var netType = attr.NetDataType();
+
+        prop.HasColumnType(_databaseProvider.ToDatabaseColumnType(attr));
+
+        if (netType == typeof(string))
+        {
+            prop.HasMaxLength(attr.MaxWidth);
+        }
+
+        else if (attr.IsDateTimeType())
+        {
+            // don't set MaxWidth, throw's error on db create
+        }
+
+        else if (attr.MaxWidth > 0 && attr.Precision > 0)
+        {
+            prop.HasPrecision(attr.MaxWidth, attr.Precision);
+        }
+
+        try
+        {
+            prop.IsRequired(attr.IsRequired);
+        }
+        catch
+        {
+        }
+
+        if (attr.IsUnicode)
+        {
+            prop.IsUnicode();
+        }
+
+        if (attr.MinWidth == attr.MaxWidth)
+        {
+            prop.IsFixedLength();
+        }
+
+        return prop;
     }
 
     public IEdmModel GetEdmModel()
@@ -259,23 +276,11 @@ public class DynamicModel : IDynamicModel
         {
             var tb = dynamicTypes[entity.Name].TypeBuilder;
 
-            foreach (var col in entity.Attributes)
-            {
-                foreach (var relatedEntityName in entity.RelatedParents)
-                {
-                    var relatedTb = dynamicTypes[relatedEntityName].TypeBuilder;
-
-                    tb.AddPublicGetSetProperty(relatedEntityName, relatedTb);
-
-                    relatedTb.AddPublicGetSetPropertyAsList(entity.PluralName, tb);
-                }
-            }
-
-            foreach (var relation in entity.Relations)
+            foreach (var relation in entity.Relationships)
             {
                 var relatedTb = dynamicTypes[relation.Entity].TypeBuilder;
 
-                if (relation.IsCollection)
+                if (relation.IsMany)
                 {
                     tb.AddPublicGetSetPropertyAsList(relation.Entity, relatedTb);
                 }
@@ -283,6 +288,19 @@ public class DynamicModel : IDynamicModel
                 {
                     tb.AddPublicGetSetProperty(relation.Entity, relatedTb);
                 }
+            }
+
+            if (entity.Key.IsComposite)
+            {
+                foreach (var keyEntity in entity.Key.Entities)
+                {
+                    var relatedTb = dynamicTypes[keyEntity].TypeBuilder;
+                    tb.AddPublicGetSetProperty(keyEntity, relatedTb);
+                }
+            }
+            else
+            {
+                tb.AddPublicGetSetProperty(entity.Key.Name, entity.Key.NetDataType());
             }
         }
 

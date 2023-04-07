@@ -6,5 +6,7 @@ public class ResponseConfiguration : MetaBase
 {
     public string ResponseDto { get; set; } = string.Empty;
 
-    public bool IsCollection { get; set; } = false;
+    public string Description { get; set; } = string.Empty;
+
+    public bool IsMany { get; set; } = false;
 }

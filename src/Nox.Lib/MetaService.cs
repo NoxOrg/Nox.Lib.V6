@@ -84,7 +84,6 @@ public sealed class MetaService : MetaBase, IMetaService
         return Loaders!.OrderBy(l => entities[l.Target!.Entity].SortOrder).ToList();
     }
 
-
     private ICollection<Core.Models.Entity> SortEntitiesByDependency()
     {
         var entities = Entities!.ToList();
@@ -101,10 +100,6 @@ public sealed class MetaService : MetaBase, IMetaService
                     throw new ArgumentException($"Entity parent with name {parent} was not found. Please, check if entity name is correct.", "relatedParents");
 #pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
                 }
-
-                parentEntity
-                    .RelatedChildren
-                    .Add(entity.Name);
             }
         }
 
@@ -140,7 +135,6 @@ public sealed class MetaService : MetaBase, IMetaService
         sortedEntities.ForEach(e => e.SortOrder = i++);
 
         return sortedEntities;
-
     }
 
     private static int CountParentsInSortedEntities(
@@ -157,11 +151,4 @@ public sealed class MetaService : MetaBase, IMetaService
 
         return result;
     }
-
 }
-
-
-
-
-
-

@@ -4,6 +4,8 @@ namespace Nox.Core.Configuration;
 
 public class EntityConfiguration : MetaBase
 {
+    public EntityKeyConfiguration Key { get; set; } = new();
+
     public List<EntityAttributeConfiguration> Attributes { get; set; } = new();
 
     public List<MessageTargetConfiguration>? Messaging { get; set; } = new();
@@ -13,8 +15,6 @@ public class EntityConfiguration : MetaBase
     public string Description { get; set; } = string.Empty;
 
     public string PluralName { get; set; } = string.Empty;
-
-    public List<string>? RelatedParents { get; set; }
 
     public string Schema { get; set; } = string.Empty;
 
@@ -26,7 +26,7 @@ public class EntityConfiguration : MetaBase
 
     public CrudEventsConfiguration RaiseCrudEvents { get; set; } = new();
 
-    public List<EntityRelationConfiguration>? Relations { get; set; } = new();
+    public List<EntityRelationshipConfiguration>? Relationships { get; set; } = new();
 
     public List<CommandConfiguration>? Commands { get; set; } = new();
 

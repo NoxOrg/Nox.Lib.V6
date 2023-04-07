@@ -45,7 +45,7 @@ public class ConfigurationTests: ConfigurationTestFixture
         Assert.That(vehicle.Description, Is.EqualTo("Vehicles"));
         Assert.That(vehicle.Name, Is.EqualTo("Vehicle"));
         Assert.That(vehicle.PluralName, Is.EqualTo("Vehicles"));
-        Assert.That(vehicle.RelatedParents!.Count, Is.EqualTo(1));
+        Assert.That(vehicle.Relationships!.Count, Is.EqualTo(1));
         Assert.That(vehicle.Schema, Is.EqualTo("dbo"));
         Assert.That(vehicle.Table, Is.EqualTo("Vehicle"));
 

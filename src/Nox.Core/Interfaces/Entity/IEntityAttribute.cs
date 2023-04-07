@@ -12,7 +12,6 @@ public interface IEntityAttribute : IMetaBase
     string Formula { get; set; }
     bool IsAutoNumber { get; set; }
     bool IsForeignKey { get; set; }
-    bool IsPrimaryKey { get; set; }
     bool IsRequired { get; set; }
     bool IsTemporalOnly { get; set; }
     bool IsUnicode { get; set; }

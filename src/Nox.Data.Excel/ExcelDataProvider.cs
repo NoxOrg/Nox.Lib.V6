@@ -130,7 +130,7 @@ public class ExcelDataProvider : IDataProvider
         return _dataFlowExecutableSource;
     }
 
-    public string ToDatabaseColumnType(IEntityAttribute entityAttribute)
+    public string ToDatabaseColumnType(BaseEntityAttribute entityAttribute)
     {
         throw new NotImplementedException();
     }

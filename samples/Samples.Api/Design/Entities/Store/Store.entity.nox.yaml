@@ -44,13 +44,16 @@ queries:
 
 commands:
     - name: Reserve
+      description:
       events: [BalanceChanged]
       
     - name: Exchange
+      description:
       events: [BalanceChanged]
 
 events:
     - name: BalanceChanged
+      description:
       type: BalanceChangedDto
 
 key: 

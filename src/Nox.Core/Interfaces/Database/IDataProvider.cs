@@ -3,7 +3,6 @@ using ETLBox.DataFlow;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Etl;
 using Nox.Core.Models;
 using SqlKata.Compilers;
@@ -23,7 +22,7 @@ namespace Nox.Core.Interfaces.Database
         EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema);
         IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration);
 
-        string ToDatabaseColumnType(IEntityAttribute entityAttribute);
+        string ToDatabaseColumnType(BaseEntityAttribute entityAttribute);
         string ToTableNameForSql(string table, string schema);
         string ToTableNameForSqlRaw(string table, string schema);
 

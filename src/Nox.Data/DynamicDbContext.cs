@@ -226,7 +226,6 @@ public class DynamicDbContext : DbContext, IDynamicDbContext
                     throw t.Exception;
                 }
             }, TaskContinuationOptions.OnlyOnFaulted);
-
     }
 
     private async Task SendChangeEvent(string entityName, NoxEventType eventType, string json)

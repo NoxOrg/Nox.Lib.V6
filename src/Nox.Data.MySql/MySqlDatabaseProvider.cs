@@ -9,6 +9,7 @@ using Nox.Core.Components;
 using Nox.Core.Constants;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
+using Nox.Core.Models;
 using SqlKata.Compilers;
 
 namespace Nox.Data.MySql;
@@ -64,7 +65,7 @@ public class MySqlDatabaseProvider: DatabaseProviderBase
         );
     }
 
-    public override string ToDatabaseColumnType(IEntityAttribute entityAttribute)
+    public override string ToDatabaseColumnType(BaseEntityAttribute entityAttribute)
     {
         var propType = entityAttribute.Type?.ToLower() ?? "string";
         var propWidth = entityAttribute.MaxWidth < 1 ? "65535" : entityAttribute.MaxWidth.ToString();

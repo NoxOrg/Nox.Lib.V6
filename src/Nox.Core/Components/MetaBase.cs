@@ -8,5 +8,5 @@ public class MetaBase : IMetaBase
     public int Id { get; set; }
 
     [NotMapped]
-    public string DefinitionFileName { get; set; } = String.Empty;
+    public string DefinitionFileName { get; set; } = string.Empty;
 }
