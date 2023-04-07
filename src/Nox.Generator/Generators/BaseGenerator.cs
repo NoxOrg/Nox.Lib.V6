@@ -23,6 +23,17 @@ namespace Nox.Generator.Generators
             Context.AddSource(hintName, source);
         }
 
+        protected static void AddSimpleProperty(object type, object name, StringBuilder sb)
+        {
+            AddProperty(ClassDataType((string)type), name, sb);
+        }
+
+        protected static void AddProperty(string type, object name, StringBuilder sb, bool initOnly = false)
+        {
+            sb.AppendLine($@"   public {type} {name} {{ get; {(initOnly ? "init" : "set")}; }}");
+            sb.AppendLine($@"");
+        }
+
         protected static void AddConstructor(StringBuilder sb, string className, Dictionary<string, string> parameters)
         {
             sb.AppendLine($@"   public {className}(");
@@ -49,8 +60,7 @@ namespace Nox.Generator.Generators
 
         protected static void AddDbContextProperty(StringBuilder sb)
         {
-            sb.AppendLine($@"   protected NoxDbContext DbContext {{ get; init; }}");
-            sb.AppendLine($@"");
+            AddProperty("NoxDbContext", "DbContext", sb, initOnly: true);
         }
 
         protected static void AddAttributes(Dictionary<object, object> entity, StringBuilder sb)
@@ -59,15 +69,13 @@ namespace Nox.Generator.Generators
 
             foreach (var attr in attributes.Cast<Dictionary<object, object>>())
             {
-                sb.AppendLine($@"   public {ClassDataType((string)attr["type"])} {attr["name"]} {{ get; set; }}");
-                sb.AppendLine($@"");
+                AddSimpleProperty(attr["type"], attr["name"], sb);
             }
         }
 
         protected static void AddNoxMessangerProperty(StringBuilder sb)
         {
-            sb.AppendLine($@"   protected INoxMessenger Messenger {{ get; init; }}");
-            sb.AppendLine($@"");
+            AddProperty("INoxMessenger", "Messenger", sb, initOnly: true);
         }
 
         protected static void AddBaseTypeDefinition(

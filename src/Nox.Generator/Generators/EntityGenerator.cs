@@ -53,7 +53,7 @@ namespace Nox.Generator.Generators
                 isAbstract: false,
                 new[] { "Nox.Core.Interfaces.Entity" });
 
-            AddKey(entity, sb);
+            AddPrimaryKey(entity, sb);
 
             // Attributes
             AddAttributes(entity, sb);
@@ -64,10 +64,7 @@ namespace Nox.Generator.Generators
             {
                 foreach (var attr in ((List<object>)relations).Cast<Dictionary<object, object>>())
                 {
-                    bool isMany = bool.Parse((string)attr["isMany"]);
-                    var typeDefinition = isMany ? $"IList<{attr["entity"]}>" : $"{attr["entity"]}";
-                    sb.AppendLine($@"   public {typeDefinition} {attr["name"]} {{ get; set; }}");
-                    sb.AppendLine($@"");
+                    AddRelationship(sb, attr);
                 }
             }
 
@@ -81,7 +78,14 @@ namespace Nox.Generator.Generators
             }
         }
 
-        private void AddKey(Dictionary<object, object> entity, StringBuilder sb)
+        private void AddRelationship(StringBuilder sb, Dictionary<object, object> attr)
+        {
+            bool isMany = bool.Parse((string)attr["isMany"]);
+            var typeDefinition = isMany ? $"IList<{attr["entity"]}>" : $"{attr["entity"]}";
+            AddProperty(typeDefinition, attr["name"], sb);
+        }
+
+        private void AddPrimaryKey(Dictionary<object, object> entity, StringBuilder sb)
         {
             entity.TryGetValue("key", out var keyValue);
             if (keyValue != null)
@@ -93,14 +97,12 @@ namespace Nox.Generator.Generators
                 {
                     foreach (var keyEntity in ((List<object>)entities).Cast<string>())
                     {
-                        sb.AppendLine($@"   public {keyEntity} {keyEntity} {{ get; set; }}");
-                        sb.AppendLine($@"");
+                        AddProperty(keyEntity, keyEntity, sb);
                     }
                 }
                 else
                 {
-                    sb.AppendLine($@"   public {ClassDataType((string)key["type"])} {key["name"]} {{ get; set; }}");
-                    sb.AppendLine($@"");
+                    AddSimpleProperty(key["type"], key["name"], sb);
                 }
             }
         }
