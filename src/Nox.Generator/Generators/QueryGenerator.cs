@@ -39,10 +39,10 @@ namespace Nox.Generator.Generators
 
             var response = (Dictionary<object, object>)query["response"];
 
-            bool isCollection = bool.Parse((string)response["isCollection"]);
+            bool isMany = bool.Parse((string)response["isMany"]);
             var dto = response["responseDto"];
 
-            var typeDefinition = isCollection ? $"IList<{dto}>" : $"{dto}";
+            var typeDefinition = isMany ? $"IList<{dto}>" : $"{dto}";
             
             sb.AppendLine($@"   public abstract Task<{typeDefinition}> ExecuteAsync({parameters});");
 

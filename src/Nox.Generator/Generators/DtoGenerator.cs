@@ -12,7 +12,7 @@ namespace Nox.Generator.Generators
         {
             var sb = new StringBuilder();
 
-            var className = $"{dto["name"]}Dto";
+            var className = $"{dto["name"]}{NamingConstants.DtoSuffix}";
 
             AddBaseTypeDefinition(sb,
                 className,

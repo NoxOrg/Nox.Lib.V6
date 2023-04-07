@@ -10,7 +10,11 @@ pluralName: Countries
 table: Country
 schema: dbo
 
-relatedParents: [Currency]
+relationships:
+  - name: Currency
+    entity: Currency
+    isMany: false
+    isRequired: true
 
 messaging:
   - messagingProvider: Mediator
@@ -21,14 +25,12 @@ raiseCrudEvents:
   update: yes
   delete: yes
 
-attributes:
+key: 
+  name: Id
+  description: The country's unique identifier 
+  type: int
 
-  - name: Id
-    description: The country's unique identifier 
-    isPrimaryKey: true
-    type: int
-    canFilter: true
-    canSort: true
+attributes:
 
   - name: Name
     description: The country's common name 

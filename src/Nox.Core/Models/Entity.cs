@@ -17,15 +17,15 @@ public sealed class Entity : MetaBase, IEntity
     [NotMapped]
     public List<string> RelatedParents { get; set; } = new();
 
-    public List<EntityRelation> Relations { get; set; } = new ();
-    
+    public List<EntityRelation> Relations { get; set; } = new();
+
     [NotMapped]
     public List<string> RelatedChildren { get; set; } = new();
-    public string RelatedParentsJson { get => string.Join('|',RelatedParents.ToArray()); set => RelatedParents = value.Split('|').ToList(); }
-    public string RelatedChildrenJson { get => string.Join('|',RelatedChildren.ToArray()); set => RelatedChildren = value.Split('|').ToList(); }
+    public string RelatedParentsJson { get => string.Join('|', RelatedParents.ToArray()); set => RelatedParents = value.Split('|').ToList(); }
+    public string RelatedChildrenJson { get => string.Join('|', RelatedChildren.ToArray()); set => RelatedChildren = value.Split('|').ToList(); }
     public int SortOrder { get; set; }
     public ICollection<EntityAttribute> Attributes { get; set; } = new Collection<EntityAttribute>();
-    
+
     ICollection<IMessageTarget>? IEntity.Messaging
     {
         get => Messaging?.ToList<IMessageTarget>();
@@ -52,6 +52,3 @@ public sealed class Entity : MetaBase, IEntity
         return true;
     }
 }
-
-
-

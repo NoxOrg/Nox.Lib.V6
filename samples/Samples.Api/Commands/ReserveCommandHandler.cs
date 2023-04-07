@@ -2,6 +2,7 @@
 using Nox;
 using Nox.Core.Interfaces.Entity.Commands;
 using Nox.Core.Interfaces.Messaging;
+using Nox.Commands;
 using Nox.Dto;
 
 namespace Samples.Api.Commands
@@ -13,7 +14,7 @@ namespace Samples.Api.Commands
         {
         }
 
-        public override async Task<INoxCommandResult> ExecuteAsync(ReserveDto reserveCommandDto)
+        public override async Task<INoxCommandResult> ExecuteAsync(ReserveCommand reserveCommandDto)
         {
             // DTO validation
 
@@ -28,6 +29,7 @@ namespace Samples.Api.Commands
                 return new NoxCommandResult { IsSuccess = false, Message = "Store cannot be found" };
             }
 
+            // Add reservation
             store.Reservations.Add(
                 new Reservation
                 {

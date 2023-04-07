@@ -7,7 +7,7 @@ namespace Nox.Generator.Generators
     {
         internal EventsGenerator(GeneratorExecutionContext context) : base(context) { }
 
-        internal void AddDomainEvent(string eventName, string dtoName)
+        internal void AddDomainEvent(string eventName, string typeName)
         {
             var sb = new StringBuilder();
 
@@ -15,7 +15,7 @@ namespace Nox.Generator.Generators
             
             AddBaseTypeDefinition(sb,
                 className,
-                $"Nox{GeneratorEventType.Domain}Event<{dtoName}Dto>",
+                $"Nox{GeneratorEventType.Domain}Event<{typeName}>",
                 "Nox.Events",
                 isAbstract: false,
                 new[] { "Nox.Core.Interfaces.Messaging.Events", "Nox.Dto" });

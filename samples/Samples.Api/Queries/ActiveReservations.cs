@@ -14,14 +14,8 @@ namespace Samples.Api.Queries
         {
             var store = await DbContext
                 .Store
-                .FirstOrDefaultAsync(s => s.Id == storeId);
-
-            if (store == null)
-            {
-                // TODO: Add proper not found
-                throw new Exception("Store cannot be found");
-            }
-
+                .FirstOrDefaultAsync(s => s.Id == storeId) ?? throw new Exception("Store cannot be found");
+            
             return store.Reservations
                 .Where(r => r.IsActive)
                 .Select(r => new ReservationInfoDto

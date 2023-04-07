@@ -10,25 +10,10 @@ name: CurrencyCacheBalance
 
 description: The cache balance in Store
 
-relations:
-  - name: Store
-    entity: Store
-    isCollection: false
-    isRequired: true
-
-  - name: Currency
-    entity: Currency
-    isCollection: false
-    isRequired: true
+key:
+  entities: [Store, Currency]
 
 attributes:
-
-  - name: Id
-    description: The unique identifier of an resrvation operation
-    isPrimaryKey: true
-    type: int
-    canFilter: true
-    canSort: true
 
   - name: Amount
     description: The amount

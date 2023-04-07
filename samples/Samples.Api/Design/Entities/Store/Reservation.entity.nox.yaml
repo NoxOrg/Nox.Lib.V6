@@ -10,30 +10,28 @@ name: Reservation
 
 description: The cache reservation in Store
 
-relations:
+relationships:
   - name: Store
     entity: Store
-    isCollection: false
+    isMany: false
     isRequired: true
 
   - name: SourceCurrency
     entity: Currency
-    isCollection: false
+    isMany: false
     isRequired: true
 
   - name: DestinationCurrency
     entity: Currency
-    isCollection: false
+    isMany: false
     isRequired: true
 
-attributes:
+key: 
+   name: Id
+   description: The unique identifier of an resrvation operation
+   type: int
 
-  - name: Id
-    description: The unique identifier of an resrvation operation
-    isPrimaryKey: true
-    type: int
-    canFilter: true
-    canSort: true
+attributes:
 
   - name: ExpirationTime
     description: The date and time when resrvation expires

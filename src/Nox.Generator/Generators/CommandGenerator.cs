@@ -8,7 +8,27 @@ namespace Nox.Generator.Generators
     {
         internal CommandGenerator(GeneratorExecutionContext context) : base(context) { }
 
-        internal void AddCommandHandler(Dictionary<object, object> command, Dictionary<string, string> eventsProviders)
+        internal void AddCommand(Dictionary<object, object> command)
+        {
+            var sb = new StringBuilder();
+
+            var className = $"{command["name"]}{NamingConstants.CommandSuffix}";
+
+            AddBaseTypeDefinition(sb,
+                className,
+                "IDynamicDTO",
+                "Nox.Commands",
+                isAbstract: false,
+                "Nox.Core.Interfaces.Entity");
+
+            AddAttributes(command, sb);
+
+            sb.AppendLine($@"}}");
+
+            GenerateFile(sb, className);
+        }
+
+        internal void AddCommandHandler(Dictionary<object, object> command)
         {
             var sb = new StringBuilder();
 
@@ -23,7 +43,6 @@ namespace Nox.Generator.Generators
                 {
                     "Nox.Core.Interfaces.Entity.Commands",
                     "Nox.Core.Interfaces.Messaging",
-                    "Nox.Dto",
                     "Nox.Events"
                 });
 
@@ -38,12 +57,9 @@ namespace Nox.Generator.Generators
                 { "NoxDbContext", "DbContext" },
                 { "INoxMessenger", "Messenger" }
             });
-
-            // Add params (which can be DTO)
-            string parameters = GetParametersString(command["parameters"]);
-
-            // Add DTO or params
-            sb.AppendLine($@"   public abstract Task<INoxCommandResult> ExecuteAsync({parameters});");
+                        
+            // Add params
+            sb.AppendLine($@"   public abstract Task<INoxCommandResult> ExecuteAsync({command["name"]}{NamingConstants.CommandSuffix} command);");
 
             // Add Events
             command.TryGetValue("events", out var events);
@@ -51,7 +67,7 @@ namespace Nox.Generator.Generators
             {
                 foreach (var domainEvent in (List<object>)events)
                 {
-                    AddDomainEvent(sb, (string)domainEvent, eventsProviders);
+                    AddDomainEvent(sb, (string)domainEvent);
                 }
             }
 
@@ -60,12 +76,12 @@ namespace Nox.Generator.Generators
             GenerateFile(sb, className);
         }
 
-        private static void AddDomainEvent(StringBuilder sb, string eventName, Dictionary<string, string> eventsProviders)
+        private static void AddDomainEvent(StringBuilder sb, string eventName)
         {
             sb.AppendLine($@"");
             sb.AppendLine($@"   public async Task Send{eventName}DomainEventAsync({eventName}DomainEvent domainEvent)");
             sb.AppendLine($@"   {{");
-            sb.AppendLine($@"       await Messenger.SendMessageAsync(new string[] {{ ""{eventsProviders[eventName]}"" }}, domainEvent);");
+            sb.AppendLine($@"       await Messenger.SendMessageAsync(new string[] {{ ""{NamingConstants.DefaultMessagingProvider}"" }}, domainEvent);");
             sb.AppendLine($@"   }}");
         }
     }

@@ -10,16 +10,18 @@ name: ExchangeRate
 
 description: The exchange rate at a piont in time vs CHF (reference currency)
 
-relatedParents: [Currency]
+relationships:
+  - name: Currency
+    entity: Currency
+    isMany: false
+    isRequired: true
+
+key: 
+  name: Id
+  description: The unique identifier of an exchange rate
+  type: int
 
 attributes:
-
-  - name: Id
-    description: The unique identifier of an exchange rate
-    isPrimaryKey: true
-    type: int
-    canFilter: true
-    canSort: true
 
   - name: AsAt
     description: The date and time at which the rate changed

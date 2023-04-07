@@ -9,10 +9,7 @@ description: Cache Store
 pluralName: Stores
 table: Store
 schema: dbo
-
-messaging:
-  - messagingProvider: Mediator
-    
+      
 isAggregateRoot: true
 
 raiseCrudEvents: 
@@ -20,52 +17,48 @@ raiseCrudEvents:
   update: yes
   delete: no
 
-relations:
+relationships:
   - name: Reservations
     entity: Reservation
-    isCollection: true
+    description: Pre-arranged excanged operation at the store by a specific client.
+    isMany: true
     isRequired: true # to model 1-1* or 1-0* relations
 
   - name: CacheBalances
     entity: CurrencyCacheBalance
-    isCollection: true
+    description:
+    isMany: true
     isRequired: true
 
 queries:
     - name: ActiveReservations
+      description: 
       parameters:  # simple parameters or DTO in case of complex parameters set with validation / permissions etc
        - name: storeId
+         description: 
          type: int # can be DTO here
       response:
         responseDto: ReservationInfoDto
-        isCollection: true
+        description: 
+        isMany: true
 
 commands:
     - name: Reserve
-      parameters: 
-       - name: reserveCommandDto
-         type: ReserveDto # can be DTO or simple type here
       events: [BalanceChanged]
       
     - name: Exchange
-      parameters: 
-       - name: exchangeCommandDto
-         type: ExchangeDto # can be DTO or simple type here
       events: [BalanceChanged]
 
 events:
     - name: BalanceChanged
-      dto: BalanceChanged # TODO discuss naming
-      provider: Mediator
+      type: BalanceChangedDto
 
+key: 
+   name: Id
+   description: The store's unique identifier 
+   type: int
+    
 attributes:
-
-  - name: Id
-    description: The store's unique identifier 
-    isPrimaryKey: true
-    type: int
-    canFilter: true
-    canSort: true
 
   - name: Name
     description: The store's common name 

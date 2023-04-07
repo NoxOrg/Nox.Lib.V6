@@ -2,6 +2,7 @@
 using Nox;
 using Nox.Core.Interfaces.Entity.Commands;
 using Nox.Core.Interfaces.Messaging;
+using Nox.Commands;
 using Nox.Dto;
 
 namespace Samples.Api.Commands
@@ -13,7 +14,7 @@ namespace Samples.Api.Commands
         {
         }
 
-        public override async Task<INoxCommandResult> ExecuteAsync(ExchangeDto exchangeCommandDto)
+        public override async Task<INoxCommandResult> ExecuteAsync(ExchangeCommand exchangeCommandDto)
         {
             // DTO validation
 

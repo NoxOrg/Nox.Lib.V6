@@ -19,14 +19,12 @@ raiseCrudEvents:
   update: yes
   delete: yes
 
-attributes:
+key: 
+  name: Id
+  description: The currency's unique identifier 
+  type: int
 
-  - name: Id
-    description: The currency's unique identifier 
-    isPrimaryKey: true
-    type: int
-    canFilter: true
-    canSort: true
+attributes:
 
   - name: Name
     description: The currency's name 

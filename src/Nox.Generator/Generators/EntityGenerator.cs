@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,9 +33,9 @@ namespace Nox.Generator.Generators
 
             GenerateQueries(entity);
 
-            var events = GenerateEvents(entity, entityName);
+            GenerateEvents(entity, entityName);
 
-            GenerateCommands(entity, events);            
+            GenerateCommands(entity);            
 
             return true;
         }
@@ -52,17 +53,19 @@ namespace Nox.Generator.Generators
                 isAbstract: false,
                 new[] { "Nox.Core.Interfaces.Entity" });
 
+            AddKey(entity, sb);
+
             // Attributes
             AddAttributes(entity, sb);
 
-            // Relations
-            entity.TryGetValue("relations", out var relations);
+            // Relationships
+            entity.TryGetValue("relationships", out var relations);
             if (relations != null)
             {
                 foreach (var attr in ((List<object>)relations).Cast<Dictionary<object, object>>())
                 {
-                    bool isCollection = bool.Parse((string)attr["isCollection"]);
-                    var typeDefinition = isCollection ? $"IList<{attr["entity"]}>" : $"{attr["entity"]}";
+                    bool isMany = bool.Parse((string)attr["isMany"]);
+                    var typeDefinition = isMany ? $"IList<{attr["entity"]}>" : $"{attr["entity"]}";
                     sb.AppendLine($@"   public {typeDefinition} {attr["name"]} {{ get; set; }}");
                     sb.AppendLine($@"");
                 }
@@ -78,7 +81,31 @@ namespace Nox.Generator.Generators
             }
         }
 
-        private Dictionary<string, string> GenerateEvents(Dictionary<object, object> entity, string entityName)
+        private void AddKey(Dictionary<object, object> entity, StringBuilder sb)
+        {
+            entity.TryGetValue("key", out var keyValue);
+            if (keyValue != null)
+            {
+                var key = (Dictionary<object, object>)keyValue;
+
+                key.TryGetValue("entities", out var entities);
+                if (entities != null)
+                {
+                    foreach (var keyEntity in ((List<object>)entities).Cast<string>())
+                    {
+                        sb.AppendLine($@"   public {keyEntity} {keyEntity} {{ get; set; }}");
+                        sb.AppendLine($@"");
+                    }
+                }
+                else
+                {
+                    sb.AppendLine($@"   public {ClassDataType((string)key["type"])} {key["name"]} {{ get; set; }}");
+                    sb.AppendLine($@"");
+                }
+            }
+        }
+
+        private void GenerateEvents(Dictionary<object, object> entity, string entityName)
         {
             var eventsGenerator = new EventsGenerator(Context);
 
@@ -105,22 +132,17 @@ namespace Nox.Generator.Generators
                 }
             }
 
-            var eventsProviders = new Dictionary<string, string>();
-
             entity.TryGetValue("events", out var events);
             if (events != null)
             {                
                 foreach (var domainEvent in ((List<object>)events).Cast<Dictionary<object, object>>())
                 {
-                    eventsGenerator.AddDomainEvent((string)domainEvent["name"], (string)domainEvent["dto"]);
-                    eventsProviders.Add((string)domainEvent["name"], (string)domainEvent["provider"]);
+                    eventsGenerator.AddDomainEvent((string)domainEvent["name"], (string)domainEvent["type"]);
                 }
             }
-
-            return eventsProviders;
         }
 
-        private void GenerateCommands(Dictionary<object, object> entity, Dictionary<string, string> eventsProviders)
+        private void GenerateCommands(Dictionary<object, object> entity)
         {
             entity.TryGetValue("commands", out var commands);
             if (commands != null)
@@ -129,7 +151,7 @@ namespace Nox.Generator.Generators
 
                 foreach (var command in ((List<object>)commands).Cast<Dictionary<object, object>>())
                 {
-                    commandGenerator.AddCommandHandler(command, eventsProviders);
+                    commandGenerator.AddCommandHandler(command);
                 }
             }
         }

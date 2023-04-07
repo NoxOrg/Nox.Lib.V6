@@ -83,6 +83,13 @@ public class NoxDynamicGenerator : ISourceGenerator
             DtoGenerator.AddDTO(dto);
         }
 
+        List<object?> commands = GetConfigurationByType(designRootFullPath, deserializer, "command");
+        var commandGenerator = new CommandGenerator(context);
+        foreach (var command in commands.Cast<Dictionary<object, object>>())
+        {
+            commandGenerator.AddCommand(command);
+        }
+
         var DbContextGenerator = new DbContextGenerator(context);
         DbContextGenerator.AddDbContext(EntityGenerator.AggregateRoots.ToArray());
     }
