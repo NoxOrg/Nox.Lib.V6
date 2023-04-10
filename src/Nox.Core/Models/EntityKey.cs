@@ -1,4 +1,6 @@
-﻿namespace Nox.Core.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Nox.Core.Models;
 
 public sealed class EntityKey : BaseEntityAttribute
 {
@@ -6,6 +8,7 @@ public sealed class EntityKey : BaseEntityAttribute
 
     public bool IsAutoNumber { get; set; } = false;
 
+    [NotMapped]
     public string[] Entities { get; set; } = Array.Empty<string>();
 
     public bool IsComposite { get => Entities.Any(); }

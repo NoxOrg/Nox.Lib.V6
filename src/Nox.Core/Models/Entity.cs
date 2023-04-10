@@ -19,10 +19,12 @@ public sealed class Entity : MetaBase, IEntity
     public ICollection<EntityRelationship> Relationships { get; set; } = new Collection<EntityRelationship>();
 
     [NotMapped]
-    public ICollection<string> RelatedParents { get => Relationships.Where(r => !r.IsMany).Select(r => r.Entity).ToList(); }
+    public ICollection<string> RelatedParents => Relationships
+            .Where(r => !r.IsMany)
+            .Select(r => r.Entity)
+            .Union(Key.IsComposite ? Key.Entities.AsEnumerable() : Enumerable.Empty<string>()) // Include composite key if exists
+            .ToList();
 
-    [NotMapped]
-    public ICollection<string> RelatedChildren { get => Relationships.Where(r => r.IsMany).Select(r => r.Entity).ToList(); }
     public int SortOrder { get; set; }
     public ICollection<EntityAttribute> Attributes { get; set; } = new Collection<EntityAttribute>();
 

@@ -24,7 +24,7 @@ public class DynamicModel : IDynamicModel
     private readonly Dictionary<string, IDynamicDbEntity> _dynamicDbEntities = new();
 
     public DynamicModel(
-        ILogger<DynamicModel> logger, 
+        ILogger<DynamicModel> logger,
         IDynamicService dynamicService,
         IEnumerable<INoxEvent>? messages = null,
         INoxMessenger? messenger = null)
@@ -46,24 +46,30 @@ public class DynamicModel : IDynamicModel
         var dbContextGetNavigationMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedNavigation));
 
         var dbContextPostMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.PostDynamicTypedObject));
-        
+
         var dbContextPutMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.PutDynamicTypedObject));
-        
+
         var dbContextPatchMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.PatchDynamicTypedObject));
-        
+
         var dbContextDeleteMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.DeleteDynamicTypedObject));
 
         foreach (var (entityName, (entity, typeBuilder)) in GetTablesAndTypeBuilders())
         {
             var t = typeBuilder.CreateType();
-
-            var entityType = builder.AddEntityType(t);
-
             var pluralName = entityName.Pluralize();
 
-            builder.AddEntitySet(pluralName, entityType);
+            if (entity.Key.IsComposite)
+            {
+                // add complex type to handle composite keys
+                builder.AddComplexType(t);
+            }
+            else
+            {
+                var entityType = builder.AddEntityType(t);
+                builder.AddEntitySet(pluralName, entityType);
+            }
 
-            _dynamicDbEntities[pluralName] = new DynamicDbEntity()
+            _dynamicDbEntities[pluralName] = new DynamicDbEntity
             {
                 Name = entityName,
                 PluralName = pluralName,
@@ -109,7 +115,8 @@ public class DynamicModel : IDynamicModel
                 var key = entity.Entity.Key;
                 if (key.IsComposite)
                 {
-                    b.HasKey(key.Entities);
+                    // Create composite key
+                    b.HasKey(key.Entities.Select(e => $"{e}Id").ToArray());
                 }
                 else
                 {
@@ -129,7 +136,7 @@ public class DynamicModel : IDynamicModel
                 }
             });
         }
-        
+
         _dynamicService.AddMetadata(modelBuilder);
 
         return modelBuilder;
@@ -282,16 +289,17 @@ public class DynamicModel : IDynamicModel
 
                 if (relation.IsMany)
                 {
-                    tb.AddPublicGetSetPropertyAsList(relation.Entity, relatedTb);
+                    tb.AddPublicGetSetPropertyAsList(relation.Name, relatedTb);
                 }
                 else
                 {
-                    tb.AddPublicGetSetProperty(relation.Entity, relatedTb);
+                    tb.AddPublicGetSetProperty(relation.Name, relatedTb);
                 }
             }
 
             if (entity.Key.IsComposite)
             {
+                // Add properties for each composite key entity
                 foreach (var keyEntity in entity.Key.Entities)
                 {
                     var relatedTb = dynamicTypes[keyEntity].TypeBuilder;
@@ -300,6 +308,7 @@ public class DynamicModel : IDynamicModel
             }
             else
             {
+                // Add simple key
                 tb.AddPublicGetSetProperty(entity.Key.Name, entity.Key.NetDataType());
             }
         }
