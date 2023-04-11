@@ -1,14 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using MassTransit;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Nox.Core.Configuration;
 using Nox.Core.Helpers;
 using Nox.Messaging;
-using Samples.Cli.Commands;
-using Samples.Cli.Services;
 using Serilog;
-using Spectre.Console.Cli;
 
-namespace Samples.Cli;
+namespace Samples.Listener;
 
 internal class Program
 {
@@ -18,28 +15,8 @@ internal class Program
     {
         var hostBuilder = CreateHostBuilder(args);
         
-        // MassTransit doesn't like Spectre Executor
-        if (args.Length > 0 && args[0].Equals("listen", StringComparison.OrdinalIgnoreCase))
-        {
-            await hostBuilder.Build().RunAsync();
-            return 0;
-        }
-
-        var registrar = new TypeRegistrar(hostBuilder);
-        var app = new CommandApp(registrar);
-
-        app.Configure(config =>
-        {
-            // Register available commands
-
-            config.AddCommand<SyncCommand>("sync")
-                .WithDescription("Builds database and syncs data.")
-                .WithExample(new[] { "sync" });
-
-        });
-
-        return await app.RunAsync(args); 
-
+        await hostBuilder.Build().RunAsync();
+        return 0;
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args)
@@ -55,7 +32,7 @@ internal class Program
        
         // HostBuilder
         var hostBuilder = Host
-            .CreateDefaultBuilder(args)
+            .CreateDefaultBuilder()
             .ConfigureServices((_, services) =>
             {
                 services.AddNoxListeners();
