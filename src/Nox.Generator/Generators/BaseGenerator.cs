@@ -60,7 +60,7 @@ namespace Nox.Generator.Generators
 
         protected static void AddDbContextProperty(StringBuilder sb)
         {
-            AddProperty("NoxDbContext", "DbContext", sb, initOnly: true);
+            AddProperty("NoxDomainDbContext", "DbContext", sb, initOnly: true);
         }
 
         protected static void AddAttributes(Dictionary<object, object> entity, StringBuilder sb)

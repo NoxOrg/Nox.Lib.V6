@@ -91,7 +91,7 @@ public class NoxDynamicGenerator : ISourceGenerator
         }
 
         var DbContextGenerator = new DbContextGenerator(context);
-        DbContextGenerator.AddDbContext(EntityGenerator.AggregateRoots.ToArray());
+        DbContextGenerator.AddDbContext(EntityGenerator.AggregateRoots.ToArray(), EntityGenerator.CompositeKeys.ToArray());
     }
 
     private static List<object?> GetConfigurationByType(string designRootFullPath, IDeserializer deserializer, string configType)

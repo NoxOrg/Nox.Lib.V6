@@ -1,5 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
-using System;
+using Nox.Generator.Generators.Entities;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +10,10 @@ namespace Nox.Generator.Generators
     {
         internal List<string> AggregateRoots { get; set; } = new List<string>();
 
-        internal EntityGenerator(GeneratorExecutionContext context) : base(context) { }
+        internal List<EntityWithCompositeKey> CompositeKeys { get; set; } = new List<EntityWithCompositeKey>();
+        
+        internal EntityGenerator(GeneratorExecutionContext context) 
+            : base(context) { }
 
         private readonly List<string> _entityNames = new();
 
@@ -53,7 +56,7 @@ namespace Nox.Generator.Generators
                 isAbstract: false,
                 new[] { "Nox.Core.Interfaces.Entity" });
 
-            AddPrimaryKey(entity, sb);
+            AddPrimaryKey(entity, sb, entityName);
 
             // Attributes
             AddAttributes(entity, sb);
@@ -85,7 +88,7 @@ namespace Nox.Generator.Generators
             AddProperty(typeDefinition, attr["name"], sb);
         }
 
-        private void AddPrimaryKey(Dictionary<object, object> entity, StringBuilder sb)
+        private void AddPrimaryKey(Dictionary<object, object> entity, StringBuilder sb, string entityName)
         {
             entity.TryGetValue("key", out var keyValue);
             if (keyValue != null)
@@ -95,10 +98,14 @@ namespace Nox.Generator.Generators
                 key.TryGetValue("entities", out var entities);
                 if (entities != null)
                 {
+                    var entityWithCompositeKey = new EntityWithCompositeKey(entityName);
                     foreach (var keyEntity in ((List<object>)entities).Cast<string>())
                     {
                         AddProperty(keyEntity, keyEntity, sb);
+                        entityWithCompositeKey.KeyEntities.Add(keyEntity);
                     }
+
+                    CompositeKeys.Add(entityWithCompositeKey);
                 }
                 else
                 {

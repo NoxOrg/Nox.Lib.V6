@@ -7,9 +7,9 @@ using Nox.Dto;
 
 namespace Samples.Api.Commands
 {
-    public class ExchangeCommandHandler : Nox.Commands.ExchangeCommandHandlerBase
+    public class ExchangeCommandHandler : ExchangeCommandHandlerBase
     {
-        public ExchangeCommandHandler(NoxDbContext dbContext, INoxMessenger messenger)
+        public ExchangeCommandHandler(NoxDomainDbContext dbContext, INoxMessenger messenger)
             : base(dbContext, messenger)
         {
         }
