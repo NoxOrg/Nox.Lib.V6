@@ -22,6 +22,8 @@ namespace Samples.Api.Commands
 
             var store = await DbContext
                 .Store
+                .Include(s => s.Reservations)
+                .Include(s => s.CacheBalances)
                 .FirstOrDefaultAsync(s => s.Id == exchangeCommandDto.StoreId);
 
             if (store == null)

@@ -76,8 +76,10 @@ public static class MessageExtensions
             {
                 foreach (var prop in payload.GetType().GetProperties())
                 {
-                    var sourceVal = source?[prop.Name];
-                    if (sourceVal == null) continue;
+                    if (source.TryGetValue(prop.Name, out var sourceVal) || sourceVal is null)
+                    {
+                        continue;
+                    }
 
                     try
                     {
@@ -88,7 +90,7 @@ public static class MessageExtensions
                         }
                         else if (sourceVal is long) 
                         {
-                            if (prop.PropertyType.Equals(typeof(Int32)))
+                            if (prop.PropertyType.Equals(typeof(int)))
                             {
                                 prop.SetValue(payload, Convert.ToInt32(sourceVal));
                             }

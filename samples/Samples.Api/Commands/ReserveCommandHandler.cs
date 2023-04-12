@@ -22,6 +22,7 @@ namespace Samples.Api.Commands
 
             var store = await DbContext
                 .Store
+                .Include(s => s.Reservations)
                 .FirstOrDefaultAsync(s => s.Id == reserveCommandDto.StoreId);
 
             if (store == null)
