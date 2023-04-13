@@ -71,6 +71,8 @@ versionControl:
   server: https://dev.azure.com/iwgplc
   project: Nox.SampleCurrency
   repository: SampleCurrency.Api.V1
+  relativeProjectSourceFolder: ./
+  relativeDockerFilePath: /Dockerfile
 
 team:
   developers:
