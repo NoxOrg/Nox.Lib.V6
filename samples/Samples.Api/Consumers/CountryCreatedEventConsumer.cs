@@ -1,6 +1,9 @@
 using MassTransit;
+using MassTransit.Logging;
+using Microsoft.EntityFrameworkCore;
 using Nox;
 using Nox.Core.Enumerations;
+using Nox.Data;
 
 namespace Samples.Api.Consumers;
 
