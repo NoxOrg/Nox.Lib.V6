@@ -7,7 +7,7 @@ using Serilog;
 
 namespace Samples.Listener;
 
-internal class Program
+internal static class Program
 {
     private static IConfiguration Configuration { get; set; } = null!;
 
