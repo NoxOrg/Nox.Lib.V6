@@ -1,5 +1,6 @@
 using MassTransit;
 using Nox.Events;
+using Nox.Data;
 
 namespace Samples.Api.Consumers;
 

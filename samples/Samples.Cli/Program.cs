@@ -61,7 +61,7 @@ internal class Program
                 services.AddNoxListeners();
             })
             .UseSerilog();
-
+        
         return hostBuilder;
     }
 

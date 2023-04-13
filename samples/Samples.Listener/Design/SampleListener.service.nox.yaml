@@ -1,0 +1,31 @@
+#
+# SampleListener.service.nox.yaml
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/NoxConfiguration.json
+#
+
+name: SampleListener
+
+description: A sample Currency Service Listener
+
+database:
+  name: SampleCurrencyDb
+  server: localhost
+
+  ### Sql Server
+  provider: sqlServer
+  options: Trusted_Connection=no;connection timeout=120;
+  user: sa
+  password: Developer*123
+
+messagingProviders:
+
+  - name: AppServiceBus
+
+    ## RabbitMQ
+    provider: rabbitMQ
+    connectionString: rabbitmq://guest:guest@localhost/
+
+    ### Azure Service Bus
+    #provider: azureServiceBus
+    #connectionString: ${ConnectionString:AzureServiceBus}

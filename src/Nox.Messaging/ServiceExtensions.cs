@@ -1,5 +1,7 @@
 using System.Reflection;
 using MassTransit;
+using MassTransit.Configuration;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.Extensions.DependencyInjection;
 using Nox.Core.Configuration;
 using Nox.Core.Extensions;

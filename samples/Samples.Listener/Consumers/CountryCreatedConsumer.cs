@@ -2,7 +2,7 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using Nox.Events;
 
-namespace Samples.Cli.Consumers;
+namespace Samples.Listener.Consumers;
 
 public class CountryCreatedEventConsumer : IConsumer<CountryCreatedEvent>
 {
@@ -16,9 +16,9 @@ public class CountryCreatedEventConsumer : IConsumer<CountryCreatedEvent>
     public Task Consume(ConsumeContext<CountryCreatedEvent> context)
     {
         _logger.LogInformation("Country Created by {source}: {@payload}", context.Message.EventSource, context.Message.Payload);
-        //Developer code here
-        return Task.CompletedTask;
-    }
+         //Developer code here
+         return Task.CompletedTask;
+     }
 }
 
 public class CountryCreatedEventConsumerDefinition : ConsumerDefinition<CountryCreatedEventConsumer>
