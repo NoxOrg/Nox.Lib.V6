@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Nox.Generator.Generators
@@ -20,8 +21,12 @@ namespace Nox.Generator.Generators
                 "Nox.Dto",
                 isAbstract: false,
                 "Nox.Core.Interfaces.Entity");
-            
+
+            // Attributes
             AddAttributes(dto, sb);
+
+            // Relationships
+            AddRelationships(dto, sb);
 
             sb.AppendLine($@"}}");
 

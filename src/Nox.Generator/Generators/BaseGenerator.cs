@@ -22,6 +22,24 @@ namespace Nox.Generator.Generators
 
             Context.AddSource(hintName, source);
         }
+        protected void AddRelationships(Dictionary<object, object> dto, StringBuilder sb)
+        {
+            dto.TryGetValue("relationships", out var relations);
+            if (relations != null)
+            {
+                foreach (var attr in ((List<object>)relations).Cast<Dictionary<object, object>>())
+                {
+                    AddRelationship(sb, attr);
+                }
+            }
+        }
+
+        protected void AddRelationship(StringBuilder sb, Dictionary<object, object> attr)
+        {
+            bool isMany = bool.Parse((string)attr["isMany"]);
+            var typeDefinition = isMany ? $"IList<{attr["entity"]}>" : $"{attr["entity"]}";
+            AddProperty(typeDefinition, attr["name"], sb);
+        }
 
         protected static void AddSimpleProperty(object type, object name, StringBuilder sb)
         {

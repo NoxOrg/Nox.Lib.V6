@@ -10,9 +10,6 @@ name: Exchange
 
 attributes:
 
-  - name: Id
-    type: int
-
   - name: StoreId
     type: int
 

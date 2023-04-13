@@ -133,7 +133,7 @@ public class CsvDataProvider : IDataProvider
         return _dataFlowExecutableSource;
     }
 
-    public string ToDatabaseColumnType(BaseEntityAttribute entityAttribute)
+    public string ToDatabaseColumnType(IBaseEntityAttribute entityAttribute)
     {
         throw new NotImplementedException();
     }

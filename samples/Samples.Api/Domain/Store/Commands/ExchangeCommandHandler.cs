@@ -5,7 +5,7 @@ using Nox.Core.Interfaces.Messaging;
 using Nox.Commands;
 using Nox.Dto;
 
-namespace Samples.Api.Commands
+namespace Samples.Api.Domain.Store.Commands
 {
     public class ExchangeCommandHandler : ExchangeCommandHandlerBase
     {
@@ -20,20 +20,31 @@ namespace Samples.Api.Commands
 
             // Check balance - aggregate validation
 
-            var store = await DbContext
+            using var transaction = await DbContext.Database.BeginTransactionAsync();
+
+            try
+            {
+                var store = await DbContext
                 .Store
                 .Include(s => s.Reservations)
                 .Include(s => s.CacheBalances)
                 .FirstOrDefaultAsync(s => s.Id == exchangeCommandDto.StoreId);
 
-            if (store == null)
-            {
-                return new NoxCommandResult { IsSuccess = false, Message = "Store cannot be found" };
+                if (store == null)
+                {
+                    return new NoxCommandResult { IsSuccess = false, Message = "Store cannot be found" };
+                }
+
+                // TODO: change balances
+
+                await DbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
             }
-
-            // TODO: change balances
-
-            await DbContext.SaveChangesAsync();
+            catch (Exception)
+            {
+                // TODO: Handle failure
+                return new NoxCommandResult { IsSuccess = false };
+            }
 
             // emit events
             await SendBalanceChangedDomainEventAsync(

@@ -1,19 +1,22 @@
 ﻿using Nox.Core.Components;
+using Nox.Core.Interfaces.Entity;
 
 namespace Nox.Core.Models;
 
-public abstract class BaseEntityAttribute : MetaBase
+public abstract class BaseEntityAttribute : MetaBase, IBaseEntityAttribute
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Type { get; set; } = "string";
+
     public virtual bool IsRequired { get; set; } = false;
+
+    public int Precision { get; set; } = 2;
+
+    public bool IsAutoNumber { get; set; } = false;
     public int MinWidth { get; set; } = 0;
     public int MaxWidth { get; set; } = 512;
     public bool IsUnicode { get; set; } = true;
-    public int Precision { get; set; } = 2;
-
-    public bool IsDateTimeType() => "|date|time|timespan|datetime|".Contains($"|{Type}|");
 
     public Type NetDataType()
     {

@@ -48,7 +48,7 @@ public class SqLiteDatabaseProvider: DatabaseProviderBase
         );
     }
 
-    public override string ToDatabaseColumnType(BaseEntityAttribute entityAttribute)
+    public override string ToDatabaseColumnType(IBaseEntityAttribute entityAttribute)
     {
         var propType = entityAttribute.Type?.ToLower() ?? "string";
 

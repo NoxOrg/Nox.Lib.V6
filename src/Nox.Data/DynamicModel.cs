@@ -142,7 +142,7 @@ public class DynamicModel : IDynamicModel
         return modelBuilder;
     }
 
-    private Microsoft.EntityFrameworkCore.Metadata.Builders.PropertyBuilder SetAttribute(EntityTypeBuilder builder, BaseEntityAttribute attr)
+    private Microsoft.EntityFrameworkCore.Metadata.Builders.PropertyBuilder SetAttribute(EntityTypeBuilder builder, IBaseEntityAttribute attr)
     {
         var prop = builder.Property(attr.Name);
 
@@ -155,7 +155,7 @@ public class DynamicModel : IDynamicModel
             prop.HasMaxLength(attr.MaxWidth);
         }
 
-        else if (attr.IsDateTimeType())
+        else if (attr is EntityAttribute attribute && attribute.IsDateTimeType())
         {
             // don't set MaxWidth, throw's error on db create
         }

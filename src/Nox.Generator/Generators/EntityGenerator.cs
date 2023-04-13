@@ -62,14 +62,7 @@ namespace Nox.Generator.Generators
             AddAttributes(entity, sb);
 
             // Relationships
-            entity.TryGetValue("relationships", out var relations);
-            if (relations != null)
-            {
-                foreach (var attr in ((List<object>)relations).Cast<Dictionary<object, object>>())
-                {
-                    AddRelationship(sb, attr);
-                }
-            }
+            AddRelationships(entity, sb);
 
             sb.AppendLine(@"}");
 
@@ -79,13 +72,6 @@ namespace Nox.Generator.Generators
             {
                 AggregateRoots.Add(entityName);
             }
-        }
-
-        private void AddRelationship(StringBuilder sb, Dictionary<object, object> attr)
-        {
-            bool isMany = bool.Parse((string)attr["isMany"]);
-            var typeDefinition = isMany ? $"IList<{attr["entity"]}>" : $"{attr["entity"]}";
-            AddProperty(typeDefinition, attr["name"], sb);
         }
 
         private void AddPrimaryKey(Dictionary<object, object> entity, StringBuilder sb, string entityName)

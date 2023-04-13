@@ -2,7 +2,7 @@
 using Nox;
 using Nox.Dto;
 
-namespace Samples.Api.Queries
+namespace Samples.Api.Domain.Store.Queries
 {
     public class ActiveReservations : Nox.Queries.ActiveReservationsQuery
     {
@@ -16,7 +16,7 @@ namespace Samples.Api.Queries
                 .Store
                 .Include(s => s.Reservations)
                 .FirstOrDefaultAsync(s => s.Id == storeId) ?? throw new Exception("Store cannot be found");
-            
+
             return store.Reservations
                 .Where(r => r.IsActive)
                 .Select(r => new ReservationInfoDto

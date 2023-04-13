@@ -64,7 +64,7 @@ public class SqlServerDatabaseProvider: DatabaseProviderBase
         );
     }
 
-    public override string ToDatabaseColumnType(BaseEntityAttribute entityAttribute)
+    public override string ToDatabaseColumnType(IBaseEntityAttribute entityAttribute)
     {
         var propType = entityAttribute.Type?.ToLower() ?? "string";
         var propWidth = entityAttribute.MaxWidth < 1 ? "max" : entityAttribute.MaxWidth.ToString();

@@ -5,7 +5,7 @@ using Nox.Core.Interfaces.Messaging;
 using Nox.Commands;
 using Nox.Dto;
 
-namespace Samples.Api.Commands
+namespace Samples.Api.Domain.Store.Commands
 {
     public class ReserveCommandHandler : ReserveCommandHandlerBase
     {
@@ -20,25 +20,36 @@ namespace Samples.Api.Commands
 
             // Check balance - aggregate validation
 
-            var store = await DbContext
+            using var transaction = await DbContext.Database.BeginTransactionAsync();
+
+            try
+            {
+                var store = await DbContext
                 .Store
                 .Include(s => s.Reservations)
                 .FirstOrDefaultAsync(s => s.Id == reserveCommandDto.StoreId);
 
-            if (store == null)
-            {
-                return new NoxCommandResult { IsSuccess = false, Message = "Store cannot be found" };
-            }
-
-            // Add reservation
-            store.Reservations.Add(
-                new Reservation
+                if (store == null)
                 {
-                    IsActive = true,
-                    SourceAmount = reserveCommandDto.SourceAmount,
-                });
+                    return new NoxCommandResult { IsSuccess = false, Message = "Store cannot be found" };
+                }
 
-            await DbContext.SaveChangesAsync();
+                // Add reservation
+                store.Reservations.Add(
+                    new Reservation
+                    {
+                        IsActive = true,
+                        SourceAmount = reserveCommandDto.SourceAmount,
+                    });
+
+                await DbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (Exception)
+            {
+                // TODO: Handle failure
+                return new NoxCommandResult { IsSuccess = false };
+            }
 
             // emit events
             await SendBalanceChangedDomainEventAsync(

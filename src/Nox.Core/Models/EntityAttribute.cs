@@ -5,7 +5,6 @@ namespace Nox.Core.Models;
 
 public sealed class EntityAttribute : BaseEntityAttribute, IEntityAttribute
 {
-    public bool IsAutoNumber { get; set; } = false;
     public bool IsForeignKey { get; set; } = false;
     public bool IsTemporalOnly { get; set; } = false;
     public bool CanFilter { get; set; } = false;
@@ -14,13 +13,14 @@ public sealed class EntityAttribute : BaseEntityAttribute, IEntityAttribute
     public int MaxValue { get; set; } = int.MaxValue;
     public object? Default { get; set; }
 
+    public bool IsDateTimeType() => "|date|time|timespan|datetime|".Contains($"|{Type}|");
+
     [NotMapped]
     public string[] DefaultFromParents { get; set; } = Array.Empty<string>();
     public string DefaultFromParentsJson { get => string.Join('|', DefaultFromParents.ToArray()); set => DefaultFromParents = value.Split('|'); }
     public string Formula { get; set; } = string.Empty;
 
     public bool IsMappedAttribute() => (string.IsNullOrEmpty(Formula) && !DefaultFromParents.Any());
-
 
     public bool ApplyDefaults()
     {

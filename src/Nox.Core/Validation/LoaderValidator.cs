@@ -17,6 +17,5 @@ public class LoaderValidator : AbstractValidator<ILoader>
 
         RuleForEach(loader => loader.Sources)
             .SetValidator(new LoaderSourceValidator());
-
     }
 }
