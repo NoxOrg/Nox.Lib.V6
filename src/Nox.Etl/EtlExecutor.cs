@@ -199,8 +199,8 @@ public class EtlExecutor : IEtlExecutor
             .Select(colName => new IdColumn() { IdPropertyName = colName })
             .ToArray();
 
-        destination.MergeProperties.CompareColumns =
-            loader.LoadStrategy!.Columns.Select(colName => new CompareColumn() { ComparePropertyName = colName }).ToArray();
+        // destination.MergeProperties.CompareColumns =
+        //     loader.LoadStrategy!.Columns.Select(colName => new CompareColumn() { ComparePropertyName = colName }).ToArray();
 
         source.LinkTo(destination);
 
@@ -272,9 +272,9 @@ public class EtlExecutor : IEtlExecutor
     {
         foreach (var dateColumn in lastMergeDateTimeStampInfo.Keys)
         {
-            if (record[dateColumn] == null) continue;
+            if (record["ChangeDate"] == null) continue;
 
-            if (DateTime.TryParse(record[dateColumn]!.ToString(), out var fieldValue))
+            if (DateTime.TryParse(record["ChangeDate"]!.ToString(), out var fieldValue))
             {
                 if (fieldValue > lastMergeDateTimeStampInfo[dateColumn].LastDateLoadedUtc)
                 {

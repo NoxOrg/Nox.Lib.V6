@@ -68,7 +68,7 @@ public abstract class DatabaseProviderBase : IDataProvider
         {
             if (!lastMergeDateTimeStampInfo[dateColumn].LastDateLoadedUtc.Equals(NoxDateTime.MinSqlDate))
             {
-                query = query.Where(
+                query = query.OrWhere(
                     q => q.WhereNotNull(dateColumn).Where(dateColumn, ">", lastMergeDateTimeStampInfo[dateColumn].LastDateLoadedUtc)
                 );
             }
