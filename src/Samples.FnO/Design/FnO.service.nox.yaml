@@ -1,0 +1,34 @@
+#
+# FnO.service.nox.yaml
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/NoxConfiguration.json
+#
+
+name: Fno
+
+description: An FnO Test microservice
+
+autoMigrations: false
+
+database:
+  name: SampleCurrencyDb
+  server: localhost
+
+  ### Sql Server
+  provider: sqlServer
+  options: Trusted_Connection=no;connection timeout=120;
+  user: sa  
+  password: Developer*123
+  
+messagingProviders:
+
+  - name: AppServiceBus
+
+    ## RabbitMQ
+    provider: rabbitMQ
+    connectionString: rabbitmq://guest:guest@localhost/
+  
+dataSources:
+  - name: SourceDb
+    provider: SqlServer
+    connectionString: data source=localhost,1433;user id=sa; password=Developer*123; database=SampleCurrencyDb; pooling=false; encrypt=false
