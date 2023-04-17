@@ -199,9 +199,6 @@ public class EtlExecutor : IEtlExecutor
             .Select(colName => new IdColumn() { IdPropertyName = colName })
             .ToArray();
 
-        // destination.MergeProperties.CompareColumns =
-        //     loader.LoadStrategy!.Columns.Select(colName => new CompareColumn() { ComparePropertyName = colName }).ToArray();
-
         source.LinkTo(destination);
 
         var postProcessDestination = new CustomDestination();
