@@ -198,7 +198,7 @@ public class EtlExecutor : IEtlExecutor
             .Take(1)
             .Select(colName => new IdColumn() { IdPropertyName = colName })
             .ToArray();
-
+        
         destination.MergeProperties.CompareColumns =
             loader.LoadStrategy!.Columns.Select(colName => new CompareColumn() { ComparePropertyName = colName }).ToArray();
 
@@ -321,7 +321,7 @@ public class EtlExecutor : IEtlExecutor
     private static DateTime GetLastMergeDateTimeStamp(string loaderName, string dateColumn, 
         IDataProvider destinationDbProvider)
     {
-        var lastMergeDateTime = DateTime.MinValue;
+        var lastMergeDateTime = NoxDateTime.MinSqlDate;
 
         var mergeStateTableName = destinationDbProvider.ToTableNameForSqlRaw(DatabaseObject.MergeStateTableName, DatabaseObject.MetadataSchemaName);
 

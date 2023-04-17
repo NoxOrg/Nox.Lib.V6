@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using Hangfire;
+using Hangfire.Storage;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
@@ -115,6 +116,15 @@ public class DynamicService : IDynamicService
     public void SetupRecurringLoaderTasks()
     {
         var executor = _etlExecutor;
+        
+        //Remove old jobs
+        using (var connection = JobStorage.Current.GetConnection())
+        {
+            foreach (var recurringJob in connection.GetRecurringJobs())
+            {
+                RecurringJob.RemoveIfExists(recurringJob.Id);
+            }
+        }
 
         // setup recurring jobs based on cron schedule
 
