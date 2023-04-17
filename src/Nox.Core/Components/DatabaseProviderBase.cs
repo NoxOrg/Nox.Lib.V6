@@ -12,6 +12,7 @@ using Nox.Core.Models;
 using SqlKata;
 using Nox.Core.Interfaces.Database;
 using Hangfire;
+using Nox.Core.Constants;
 
 namespace Nox.Core.Components;
 
@@ -48,11 +49,9 @@ public abstract class DatabaseProviderBase : IDataProvider
 
     public IDataFlowExecutableSource<ExpandoObject> DataFlowSource(ILoaderSource loaderSource)
     {
-        return new DbSource<ExpandoObject>()
-        {
-            ConnectionManager = _connectionManager,
-            Sql = loaderSource.Query
-        };
+        _dataFlowExecutableSource.ConnectionManager = _connectionManager;
+        _dataFlowExecutableSource.Sql = loaderSource.Query;
+        return _dataFlowExecutableSource;
     }
 
     public void ApplyMergeInfo(
@@ -67,19 +66,19 @@ public abstract class DatabaseProviderBase : IDataProvider
 
         foreach (var dateColumn in dateTimeStampColumns)
         {
-            if (!lastMergeDateTimeStampInfo[dateColumn].Equals(DateTime.MinValue))
+            if (!lastMergeDateTimeStampInfo[dateColumn].LastDateLoadedUtc.Equals(NoxDateTime.MinSqlDate))
             {
                 query = query.Where(
-                    q => q.WhereNotNull(dateColumn).Where(dateColumn, ">", lastMergeDateTimeStampInfo[dateColumn])
+                    q => q.WhereNotNull(dateColumn).Where(dateColumn, ">", lastMergeDateTimeStampInfo[dateColumn].LastDateLoadedUtc)
                 );
             }
         }
 
         var compiledQuery = _sqlCompiler.Compile(query);
 
-        _dataFlowExecutableSource.Sql = compiledQuery.Sql;
-
-        _dataFlowExecutableSource.SqlParameter = compiledQuery.NamedBindings.Select(nb => new QueryParameter(nb.Key, nb.Value));
+         _dataFlowExecutableSource.Sql = compiledQuery.Sql;
+        
+         _dataFlowExecutableSource.SqlParameter = compiledQuery.NamedBindings.Select(nb => new QueryParameter(nb.Key, nb.Value));
 
     }
 

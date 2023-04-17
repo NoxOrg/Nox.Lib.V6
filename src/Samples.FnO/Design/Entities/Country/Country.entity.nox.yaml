@@ -1,0 +1,32 @@
+﻿#
+# Country.entity.nox.yaml
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
+#
+
+name: CountryTarget
+description: Countries and related data
+pluralName: CountryTargets
+table: CountryTarget
+schema: dbo
+
+messaging:
+  - messagingProvider: Mediator
+  - messagingProvider: AppServiceBus
+    
+attributes:
+
+  - name: Id
+    description: The country's unique identifier 
+    isPrimaryKey: true
+    type: int
+    canFilter: true
+    canSort: true
+
+  - name: Name
+    description: The country's common name 
+    isRequired: true
+    type: string
+    maxWidth: 64
+    canFilter: true
+    canSort: true

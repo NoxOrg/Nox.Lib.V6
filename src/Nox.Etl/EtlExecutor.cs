@@ -321,7 +321,7 @@ public class EtlExecutor : IEtlExecutor
     private static DateTime GetLastMergeDateTimeStamp(string loaderName, string dateColumn, 
         IDataProvider destinationDbProvider)
     {
-        var lastMergeDateTime = DateTime.MinValue;
+        var lastMergeDateTime = NoxDateTime.MinSqlDate;
 
         var mergeStateTableName = destinationDbProvider.ToTableNameForSqlRaw(DatabaseObject.MergeStateTableName, DatabaseObject.MetadataSchemaName);
 
