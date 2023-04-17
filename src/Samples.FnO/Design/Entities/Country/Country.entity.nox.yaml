@@ -30,3 +30,9 @@ attributes:
     maxWidth: 64
     canFilter: true
     canSort: true
+    
+  - name: CreateDate
+    type: dateTime
+    
+  - name: EditDate
+    type: dateTime
