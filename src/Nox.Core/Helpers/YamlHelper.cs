@@ -5,11 +5,12 @@ namespace Nox.Core.Helpers;
 
 public static class YamlHelper
 {
-    private static readonly Regex _referenceRegex = new(@"\$ref\s*(?<variable>[\w\.\/]+\b[\w\.\/]+)\s*", RegexOptions.Compiled | RegexOptions.IgnoreCase, TimeSpan.FromSeconds(5));
+    private static readonly Regex _referenceRegex = new(@"\$ref\S*:\s*(?<variable>[\w:\.\/\\]+\b[\w\-\.\/]+)\s*", RegexOptions.Compiled | RegexOptions.IgnoreCase, TimeSpan.FromSeconds(5));
 
     /// <summary>
     /// Resolve $ref &lt;path&gt; tags in a yaml source yaml file. <br/>
     /// Loads the source yaml file, resolves the $ref's and replaces them with the yaml from the files specified in &lt;path&gt;<br/>
+    /// Note: This call is recursive, all $refs in the yaml hierarchy will be resolved.
     /// Note: child nodes are added at the same indentation as the $ref tag.
     /// </summary>
     /// <param name="path">Full or relative path to the source yaml file.</param>
@@ -21,16 +22,22 @@ public static class YamlHelper
         var sourcePath = Path.GetDirectoryName(sourceFullPath);
         
         var sourceLines = File.ReadAllLines(path);
+        var outputLines = ResolveYamlReferences(sourceLines.ToList(), sourcePath!);
+
+        return string.Join('\n', outputLines.ToArray());
+    }
+
+    private static List<string> ResolveYamlReferences(List<string> sourceLines, string path)
+    {
         var outputLines = new List<string>();
         foreach (var sourceLine in sourceLines)
         {
             var match = _referenceRegex.Match(sourceLine);
             if (match.Success)
             {
-                var sourceTag = match.Groups[0].Value;
                 var padding = new string(' ', match.Index);
                 var childPath = match.Groups[1].Value;
-                if (!Path.IsPathRooted(childPath)) childPath = Path.Combine(sourcePath!, childPath);
+                if (!Path.IsPathRooted(childPath)) childPath = Path.Combine(path!, childPath);
                 if (!File.Exists(childPath)) throw new NoxYamlException($"Referenced yaml file does not exist for reference: {match.Groups[1].Value}");
                 var childLines = File.ReadAllLines(childPath);
                 foreach (var childLine in childLines)
@@ -44,7 +51,12 @@ public static class YamlHelper
             }
         }
 
-        return string.Join('\n', outputLines.ToArray());
+        if (outputLines.Any(ol => ol.Contains("$ref:")))
+        {
+            outputLines = ResolveYamlReferences(outputLines, path);    
+        }
+        
+        return outputLines;
     }
 
 }

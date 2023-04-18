@@ -1,2 +1,3 @@
 - child: lorem ipsum
 - child: dolor sit amet
+$ref: grand-child.yaml
