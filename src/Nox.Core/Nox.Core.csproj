@@ -56,9 +56,6 @@
     <PackageReference Include="YamlDotNet" Version="12.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Exceptions" />
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="ETLBox">
       <HintPath>..\Nox.Tle\ETLBox.dll</HintPath>
     </Reference>

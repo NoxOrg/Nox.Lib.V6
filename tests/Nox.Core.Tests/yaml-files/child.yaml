@@ -1,2 +1,2 @@
-- child-attr-1: lorem ipsum
-- child-attr-2: dolor sit amet
+- child: lorem ipsum
+- child: dolor sit amet
