@@ -20,6 +20,7 @@ namespace Nox.Generator.Generators
                 "IDynamicQuery",
                 "Nox.Queries",
                 isAbstract: true,
+                isPartial: false,
                 new[] 
                 { 
                     "Nox.Core.Interfaces.Entity",

@@ -42,7 +42,7 @@ namespace Nox.Generator.Generators
             sb.AppendLine(@"{");
             sb.AppendLine(@"    private readonly IDynamicModel _dynamicDbModel;");
             sb.AppendLine(@"");
-            // Generate strongly typed DbSets for Queries / Commands
+            // Generate strongly typed DbSets for each aggreagate root or independent entity
             foreach (var setEntity in dbSets)
             {
                 sb.AppendLine($@"    public DbSet<{setEntity}> {setEntity} {{ get; set; }}");
@@ -73,8 +73,9 @@ namespace Nox.Generator.Generators
             sb.AppendLine(@"        base.OnModelCreating(modelBuilder);");
             sb.AppendLine(@"    }");
             sb.AppendLine(@"}");
-
             sb.AppendLine(@"");
+
+            // Add for MySql compatibility
             sb.AppendLine(@"// https://www.svrz.com/unable-to-resolve-service-for-type-microsoft-entityframeworkcore-storage-typemappingsourcedependencies/");
             sb.AppendLine(@"");
             sb.AppendLine(@"public class MysqlEntityFrameworkDesignTimeServices : IDesignTimeServices");

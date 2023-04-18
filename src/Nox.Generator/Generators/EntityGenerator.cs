@@ -8,14 +8,22 @@ namespace Nox.Generator.Generators
 {
     internal class EntityGenerator : BaseGenerator
     {
-        internal List<string> AggregateRoots { get; set; } = new List<string>();
+        internal IReadOnlyList<string> AggregateRoots
+        {
+            get =>
+                _entityNames.Where(e => !_ownedEntities.Contains(e))
+                .Distinct()
+                .ToList();
+        }
 
         internal List<EntityWithCompositeKey> CompositeKeys { get; set; } = new List<EntityWithCompositeKey>();
-        
-        internal EntityGenerator(GeneratorExecutionContext context) 
+
+        internal EntityGenerator(GeneratorExecutionContext context)
             : base(context) { }
 
         private readonly List<string> _entityNames = new();
+
+        private readonly List<string> _ownedEntities = new();
 
         internal bool AddEntity(string assemblyName, Dictionary<object, object> entity)
         {
@@ -38,7 +46,7 @@ namespace Nox.Generator.Generators
 
             GenerateEvents(entity, entityName);
 
-            GenerateCommands(entity);            
+            GenerateCommands(entity);
 
             return true;
         }
@@ -47,13 +55,12 @@ namespace Nox.Generator.Generators
         {
             var sb = new StringBuilder();
 
-            bool isAggreagteRoot = GetBooleanValueOrDefault(entity, "isAggregateRoot");
-
             AddBaseTypeDefinition(sb,
                 entityName,
-                isAggreagteRoot ? "IDynamicAggregateRoot" : "IDynamicEntity",
+                "IDynamicEntity",
                 "Nox",
                 isAbstract: false,
+                isPartial: true,
                 new[] { "Nox.Core.Interfaces.Entity" });
 
             AddPrimaryKey(entity, sb, entityName);
@@ -64,14 +71,12 @@ namespace Nox.Generator.Generators
             // Relationships
             AddRelationships(entity, sb);
 
+            // Owned Relationships - define Aggregate Root boundaries
+            _ownedEntities.AddRange(AddRelationships(entity, sb, key: "ownedRelationships"));
+
             sb.AppendLine(@"}");
 
             GenerateFile(sb, entityName);
-
-            if (isAggreagteRoot)
-            {
-                AggregateRoots.Add(entityName);
-            }
         }
 
         private void AddPrimaryKey(Dictionary<object, object> entity, StringBuilder sb, string entityName)
@@ -129,7 +134,7 @@ namespace Nox.Generator.Generators
 
             entity.TryGetValue("events", out var events);
             if (events != null)
-            {                
+            {
                 foreach (var domainEvent in ((List<object>)events).Cast<Dictionary<object, object>>())
                 {
                     eventsGenerator.AddDomainEvent((string)domainEvent["name"], (string)domainEvent["type"]);

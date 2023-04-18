@@ -9,15 +9,13 @@ description: Cache Store
 pluralName: Stores
 table: Store
 schema: dbo
-      
-isAggregateRoot: true
 
 raiseCrudEvents: 
   create: yes
   update: yes
   delete: no
 
-relationships:
+ownedRelationships:
   - name: Reservations
     entity: Reservation
     description: Pre-arranged excanged operation at the store by a specific client.

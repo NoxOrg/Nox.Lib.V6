@@ -19,6 +19,7 @@ namespace Nox.Generator.Generators
                 "IDynamicDTO",
                 "Nox.Commands",
                 isAbstract: false,
+                isPartial: false,
                 "Nox.Core.Interfaces.Entity");
 
             AddAttributes(command, sb);
@@ -39,6 +40,7 @@ namespace Nox.Generator.Generators
                 "IDynamicCommandHandler",
                 "Nox.Commands",
                 isAbstract: true,
+                isPartial: false,
                 new[] 
                 {
                     "Nox.Core.Interfaces.Entity.Commands",

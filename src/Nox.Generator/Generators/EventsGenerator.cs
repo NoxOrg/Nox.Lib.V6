@@ -18,6 +18,7 @@ namespace Nox.Generator.Generators
                 $"Nox{GeneratorEventType.Domain}Event<{typeName}>",
                 "Nox.Events",
                 isAbstract: false,
+                isPartial: false,
                 new[] { "Nox.Core.Interfaces.Messaging.Events", "Nox.Dto" });
 
             sb.AppendLine($@"}}");
@@ -38,6 +39,7 @@ namespace Nox.Generator.Generators
                 $"Nox{eventTypeName}Event<{entityName}>",
                 "Nox.Events",
                 isAbstract: false,
+                isPartial: false,
                 new[] { "Nox.Core.Interfaces.Messaging.Events" });
 
             sb.AppendLine($@"}}");

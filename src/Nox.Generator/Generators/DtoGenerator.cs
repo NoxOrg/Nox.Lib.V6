@@ -20,6 +20,7 @@ namespace Nox.Generator.Generators
                 "IDynamicDTO",
                 "Nox.Dto",
                 isAbstract: false,
+                isPartial: false,
                 "Nox.Core.Interfaces.Entity");
 
             // Attributes
