@@ -5,7 +5,7 @@ namespace Nox.Core.Helpers;
 
 public static class YamlHelper
 {
-    private static readonly Regex _referenceRegex = new(@"\$ref\s*(?<variable>[\w\.\/]+\b[\w\.\/]+)\s*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex _referenceRegex = new(@"\$ref\s*(?<variable>[\w\.\/]+\b[\w\.\/]+)\s*", RegexOptions.Compiled | RegexOptions.IgnoreCase, TimeSpan.FromSeconds(5));
 
     /// <summary>
     /// Resolve $ref &lt;path&gt; tags in a yaml source yaml file. <br/>
