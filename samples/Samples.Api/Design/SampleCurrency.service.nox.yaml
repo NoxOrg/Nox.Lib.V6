@@ -1,7 +1,7 @@
 #
 # SampleCurrency.service.nox.yaml
 #
-# yaml-language-server: $schema=https://noxorg.dev/schemas/NoxConfiguration.json
+# xyaml-language-server: $schema=https://noxorg.dev/schemas/NoxConfiguration.json
 #
 
 name: SampleCurrency
