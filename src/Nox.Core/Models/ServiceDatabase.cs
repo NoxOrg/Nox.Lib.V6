@@ -1,5 +1,5 @@
 using Nox.Core.Components;
 
-namespace Nox.Data;
+namespace Nox.Core.Models;
 
 public sealed class ServiceDatabase : DataSourceBase  {}

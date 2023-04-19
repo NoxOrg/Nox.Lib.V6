@@ -1,26 +1,24 @@
 using AutoMapper;
 using Nox.Core.Configuration;
+using Nox.Core.Configuration.Secrets;
 using Nox.Core.Interfaces.Configuration;
 using Nox.Core.Models;
-using Nox.Data;
-using Nox.Etl;
-using Nox.Lib;
-using Nox.Messaging;
 
-namespace Nox;
+namespace Nox.Core.Extensions;
 
-public static class ConfigurationExtensions
+public static class ProjectConfigurationExtensions
 {
-    public static MetaService ToMetaService(this IProjectConfiguration source)
+    internal static Models.ProjectConfiguration ToMetaService(this IYamlConfiguration source)
     {
         var mapperConfig = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<ProjectConfiguration, MetaService>();
+            cfg.CreateMap<YamlConfiguration, ProjectConfiguration>();
+            cfg.CreateMap<SecretConfiguration, Secret>();
             cfg.CreateMap<DataSourceConfiguration, ServiceDatabase>();
-            cfg.CreateMap<ApiConfiguration, Api.Api>();
-            cfg.CreateMap<ApiRouteConfiguration, Api.ApiRoute>();
-            cfg.CreateMap<ApiRouteParameterConfiguration, Api.ApiRouteParameter>();
-            cfg.CreateMap<ApiRouteResponseConfiguration, Api.ApiRouteResponse>();
+            cfg.CreateMap<ApiConfiguration, Core.Models.Api>();
+            cfg.CreateMap<ApiRouteConfiguration, Core.Models.ApiRoute>();
+            cfg.CreateMap<ApiRouteParameterConfiguration, ApiRouteParameter>();
+            cfg.CreateMap<ApiRouteResponseConfiguration, ApiRouteResponse>();
             cfg.CreateMap<MessagingProviderConfiguration, MessagingProvider>();
             cfg.CreateMap<EntityConfiguration, Core.Models.Entity>();
             cfg.CreateMap<EntityAttributeConfiguration, EntityAttribute>();
@@ -35,6 +33,7 @@ public static class ConfigurationExtensions
 
         });
         var mapper = mapperConfig.CreateMapper();
-        return mapper.Map<MetaService>(source);
+        return mapper.Map<Models.ProjectConfiguration>(source);
     }
+
 }

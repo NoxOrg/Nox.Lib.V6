@@ -10,6 +10,7 @@ using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Configuration;
 using Nox.Core.Interfaces.Messaging;
 using Nox.Core.Interfaces.Messaging.Events;
+using Nox.Core.Models;
 using Nox.Messaging.AmazonSQS;
 using Nox.Messaging.AzureServiceBus;
 using Nox.Messaging.RabbitMQ;
@@ -43,12 +44,12 @@ public static class ServiceExtensions
         services.AddSingleton<INoxMessenger, NoxMessenger>();
 
         //Create the messaging providers if not defined in yaml
-        noxConfig.MessagingProviders ??= new List<MessagingProviderConfiguration>();
+        noxConfig.MessagingProviders ??= new List<IMessagingProvider>();
 
         //Ensure Mediator is added
         if (noxConfig.MessagingProviders.All(mp => !mp.Provider!.ToLower().Equals("mediator")))
         {
-            noxConfig.MessagingProviders.Add(new MessagingProviderConfiguration() { Provider = "Mediator", Name = "Mediator" });
+            noxConfig.MessagingProviders.Add(new MessagingProvider() { Provider = "Mediator", Name = "Mediator" });
         }
 
         var isRabbitAdded = false;
@@ -63,7 +64,7 @@ public static class ServiceExtensions
                 case "rabbitmq":
                     if (!isRabbitAdded)
                     {
-                        services.AddRabbitMqBus(msgProvider, isExternalListener);
+                        services.AddRabbitMqBus((MessagingProvider)msgProvider, isExternalListener);
                         isRabbitAdded = true;
                     }
 
@@ -71,7 +72,7 @@ public static class ServiceExtensions
                 case "azureservicebus":
                     if (!isAzureAdded)
                     {
-                        services.AddAzureBus(msgProvider, isExternalListener);
+                        services.AddAzureBus((MessagingProvider)msgProvider, isExternalListener);
                         isAzureAdded = true;
                     }
 
@@ -79,7 +80,7 @@ public static class ServiceExtensions
                 case "amazonsqs":
                     if (!isAmazonAdded)
                     {
-                        services.AddAmazonBus(msgProvider, isExternalListener);
+                        services.AddAmazonBus((MessagingProvider)msgProvider, isExternalListener);
                         isAmazonAdded = true;
                     }
 
@@ -127,7 +128,7 @@ public static class ServiceExtensions
         });
     }
 
-    private static void AddRabbitMqBus(this IServiceCollection services, MessagingProviderConfiguration config, bool isExternalListener)
+    private static void AddRabbitMqBus(this IServiceCollection services, MessagingProvider config, bool isExternalListener)
     {
         services.AddMassTransit<IRabbitMqBus>(mt =>
         {
@@ -148,7 +149,7 @@ public static class ServiceExtensions
         });
     }
     
-    private static void AddAzureBus(this IServiceCollection services, MessagingProviderConfiguration config, bool isExternalListener)
+    private static void AddAzureBus(this IServiceCollection services, MessagingProvider config, bool isExternalListener)
     {
         services.AddMassTransit<IAzureBus>(mt =>
         {
@@ -170,7 +171,7 @@ public static class ServiceExtensions
         });
     }
     
-    private static void AddAmazonBus(this IServiceCollection services, MessagingProviderConfiguration config, bool isExternalListener)
+    private static void AddAmazonBus(this IServiceCollection services, MessagingProvider config, bool isExternalListener)
     {
         services.AddMassTransit<IAmazonBus>(mt =>
         {

@@ -34,7 +34,7 @@ public class EtlExecutor : IEtlExecutor
         _messenger = messenger;
     }
 
-    public async Task<bool> ExecuteAsync(IMetaService service)
+    public async Task<bool> ExecuteAsync(IProjectConfiguration service)
     {
         // ETLBox.Logging.Logging.LogInstance = _logger;
 
@@ -50,7 +50,7 @@ public class EtlExecutor : IEtlExecutor
         return true;
     }
 
-    public async Task<bool> ExecuteLoaderAsync(IMetaService service, ILoader loader, IEntity entity)
+    public async Task<bool> ExecuteLoaderAsync(IProjectConfiguration service, ILoader loader, IEntity entity)
     {
         entity.ApplyDefaults();
         
@@ -61,7 +61,7 @@ public class EtlExecutor : IEtlExecutor
         return true;
     }
 
-    private async Task LoadDataFromSource(IMetaService service, ILoader loader, IEntity entity)
+    private async Task LoadDataFromSource(IProjectConfiguration service, ILoader loader, IEntity entity)
     {
         var loaderInstance = (Loader)loader;
         var targetProvider = service.Database!.DataProvider!;

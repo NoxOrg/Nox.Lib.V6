@@ -2,7 +2,7 @@
 using Nox.Core.Components;
 using Nox.Core.Interfaces.Etl;
 
-namespace Nox.Etl;
+namespace Nox.Core.Models;
 
 public sealed class LoaderSource : MetaBase, ILoaderSource
 {

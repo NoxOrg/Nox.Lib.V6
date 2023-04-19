@@ -3,9 +3,9 @@ using Nox.Core.Configuration;
 
 namespace Nox.Core.Validation.Configuration;
 
-public class NoxConfigValidator: AbstractValidator<ProjectConfiguration>
+public class YamlConfigValidator: AbstractValidator<YamlConfiguration>
 {
-    public NoxConfigValidator()
+    public YamlConfigValidator()
     {
         RuleFor(config => config.Name)
             .NotEmpty()

@@ -3,9 +3,8 @@ using Nox.Core.Components;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Etl;
 using Nox.Core.Interfaces.Messaging;
-using Nox.Core.Models;
 
-namespace Nox.Etl;
+namespace Nox.Core.Models;
 
 public sealed class Loader : MetaBase, ILoader
 {

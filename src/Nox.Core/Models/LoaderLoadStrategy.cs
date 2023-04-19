@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Nox.Core.Components;
 using Nox.Core.Interfaces.Etl;
 
-namespace Nox.Etl
+namespace Nox.Core.Models
 {
     public sealed class LoaderLoadStrategy : MetaBase, ILoaderLoadStrategy
     {

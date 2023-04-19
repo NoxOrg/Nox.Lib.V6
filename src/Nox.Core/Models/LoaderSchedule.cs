@@ -3,7 +3,7 @@ using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Etl;
 using Nox.Cron;
 
-namespace Nox.Etl
+namespace Nox.Core.Models
 {
     public sealed class LoaderSchedule : MetaBase, ILoaderSchedule
     {

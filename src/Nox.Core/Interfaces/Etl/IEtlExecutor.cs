@@ -4,7 +4,7 @@ namespace Nox.Core.Interfaces.Etl
 {
     public interface IEtlExecutor
     {
-        Task<bool> ExecuteAsync(IMetaService service);
-        Task<bool> ExecuteLoaderAsync(IMetaService service, ILoader loader, IEntity entity);
+        Task<bool> ExecuteAsync(IProjectConfiguration service);
+        Task<bool> ExecuteLoaderAsync(IProjectConfiguration service, ILoader loader, IEntity entity);
     }
 }

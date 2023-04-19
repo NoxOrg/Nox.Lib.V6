@@ -3,7 +3,7 @@ using Nox.Core.Interfaces;
 
 namespace Nox.Core.Validation;
 
-public class MetaServiceValidator : AbstractValidator<IMetaService>
+public class MetaServiceValidator : AbstractValidator<IProjectConfiguration>
 {
     public MetaServiceValidator()
     {

@@ -3,10 +3,11 @@ using Nox.Core.Configuration.Secrets;
 
 namespace Nox.Core.Interfaces.Configuration;
 
-public interface IProjectConfiguration
+internal interface IYamlConfiguration
 {
     string Name { get; set; }
     string Description { get; set; }
+    bool AutoMigrations { get; set; }
     SecretConfiguration? Secrets { get; set; }
     string EndpointProvider { get; set; }
     public VersionControlConfiguration? VersionControl { get; set; }

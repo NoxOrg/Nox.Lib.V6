@@ -7,14 +7,13 @@ using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Etl;
 using Nox.Core.Interfaces.Messaging;
+using Nox.Core.Interfaces.Secrets;
 using Nox.Core.Validation;
-using Nox.Data;
-using Nox.Etl;
-using Nox.Messaging;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Nox.Lib;
+namespace Nox.Core.Models;
 
-public sealed class MetaService : MetaBase, IMetaService
+public sealed class ProjectConfiguration : MetaBase, IProjectConfiguration
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
@@ -22,14 +21,15 @@ public sealed class MetaService : MetaBase, IMetaService
     public string KeyVaultUri { get; set; } = KeyVault.DefaultKeyVaultUri;
     public bool AutoMigrations { get; set; } = true;
 
-    IServiceDataSource? IMetaService.Database
+
+    IServiceDataSource? IProjectConfiguration.Database
     {
         get => Database;
         set => Database = value as ServiceDatabase;
     }
     public ServiceDatabase? Database { get; set; } = new();
     
-    ICollection<IMessagingProvider>? IMetaService.MessagingProviders
+    ICollection<IMessagingProvider>? IProjectConfiguration.MessagingProviders
     {
         get => MessagingProviders?.ToList<IMessagingProvider>();
         set => MessagingProviders = value as ICollection<MessagingProvider>;
@@ -37,7 +37,7 @@ public sealed class MetaService : MetaBase, IMetaService
     
     public ICollection<MessagingProvider>? MessagingProviders { get; set; }
 
-    ICollection<IServiceDataSource>? IMetaService.DataSources
+    ICollection<IServiceDataSource>? IProjectConfiguration.DataSources
     {
         get => DataSources?.ToList<IServiceDataSource>();
         set => DataSources = value as ICollection<ServiceDatabase>;
@@ -45,26 +45,29 @@ public sealed class MetaService : MetaBase, IMetaService
 
     public ICollection<ServiceDatabase>? DataSources { get; set; }
 
-    ICollection<IEntity>? IMetaService.Entities
+    ICollection<IEntity>? IProjectConfiguration.Entities
     {
         get => Entities?.ToList<IEntity>();
         set => Entities = value as ICollection<Core.Models.Entity>;
     }
     public ICollection<Core.Models.Entity>? Entities { get; set; }
 
-    ICollection<ILoader>? IMetaService.Loaders
+    ICollection<ILoader>? IProjectConfiguration.Loaders
     {
         get => Loaders?.ToList<ILoader>();
         set => Loaders = value as ICollection<Loader>;
     }
     public ICollection<Loader>? Loaders { get; set; }
 
-    ICollection<IApi>? IMetaService.Apis
+    ICollection<IApi>? IProjectConfiguration.Apis
     {
         get => Apis?.ToList<IApi>();
-        set => Apis = value as ICollection<Api.Api>;
+        set => Apis = value as ICollection<Api>;
     }
-    public ICollection<Api.Api>? Apis { get; set; }
+    public ICollection<Api>? Apis { get; set; }
+
+    [NotMapped]
+    public ISecret? Secrets { get; set; }
 
     public void Validate()
     {
@@ -93,15 +96,9 @@ public sealed class MetaService : MetaBase, IMetaService
         {
             foreach (var parent in entity.RelatedParents)
             {
-                var parentEntity = entities.FirstOrDefault(x => x.Name.Equals(parent, StringComparison.OrdinalIgnoreCase));
-
-                if (parentEntity == null)
-                {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+                var parentEntity = entities.FirstOrDefault(x => x.Name.Equals(parent, StringComparison.OrdinalIgnoreCase)) ?? 
                     throw new ArgumentException($"Entity parent with name {parent} was not found. Please, check if entity name is correct.", "relatedParents");
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-                }
-
+ 
                 parentEntity
                     .RelatedChildren
                     .Add(entity.Name);

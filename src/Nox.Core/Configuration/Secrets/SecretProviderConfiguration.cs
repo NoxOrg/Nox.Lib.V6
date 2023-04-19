@@ -1,6 +1,6 @@
 namespace Nox.Core.Configuration.Secrets;
 
-public class SecretProviderConfiguration
+public class SecretProviderConfiguration 
 {
     public string Provider { get; set; } = "azure-keyvault";
 

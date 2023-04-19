@@ -10,7 +10,7 @@ namespace Nox.Core.Interfaces
         string Name { get; }
         string KeyVaultUri { get; }
         bool AutoMigrations { get; }
-        IMetaService MetaService { get; }
+        IProjectConfiguration MetaService { get; }
         IReadOnlyDictionary<string, IApi>? Apis { get; }
         IReadOnlyDictionary<string, IEntity>? Entities { get; }
         IEnumerable<ILoader>? Loaders { get; }

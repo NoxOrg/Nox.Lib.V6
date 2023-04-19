@@ -2,7 +2,7 @@
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Api;
 
-namespace Nox.Api
+namespace Nox.Core.Models
 {
     public sealed class ApiRouteResponse : MetaBase, IApiRouteResponse
     {

@@ -3,7 +3,7 @@ using Nox.Core.Components;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Api;
 
-namespace Nox.Api
+namespace Nox.Core.Models
 {
     public sealed class ApiRouteParameter : MetaBase, IApiRouteParameter
     {

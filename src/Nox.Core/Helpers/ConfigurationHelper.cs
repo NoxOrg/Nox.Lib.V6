@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Configuration;
 using Nox.Utilities.Secrets;
 
