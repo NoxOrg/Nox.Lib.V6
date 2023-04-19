@@ -1,0 +1,41 @@
+﻿@page "/ui/{Entity}"
+
+<PageTitle>Nox User Interface Component</PageTitle>
+
+<h1>@Entity</h1>
+
+
+@if (entity is not null)
+{
+    <p>@entity.Description</p>
+
+    @if(data is not null)
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in data)
+                {
+                    <tr>
+                        <td>@row.Id</td>
+                        <td>@row.Name</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <ul>
+            @foreach (var attr in entity.Attributes)
+            {
+                <li>@attr.Name</li>
+            }
+        </ul>
+
+    }
+}
+
