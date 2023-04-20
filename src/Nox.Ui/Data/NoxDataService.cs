@@ -5,20 +5,22 @@ using System.Net.Http.Json;
 
 namespace Nox.Ui.Data;
 
-internal class NoxDataService
+internal class NoxDataService : INoxDataService
 {
-    private readonly HttpClient _client;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public NoxDataService(HttpClient client)
+    public NoxDataService(IHttpClientFactory httpClientFactory)
     {
-        _client = client;
+        _httpClientFactory = httpClientFactory;
     }
 
     public async Task<IEnumerable<dynamic>> Find(IEntity entity, int skip = 0, int top = 10)
     {
-        var query = $"https://localhost:5001/api/{entity.PluralName}?skip={skip}&top={top}";
+        var httpClient = _httpClientFactory.CreateClient("NoxUi");
 
-        var data = await _client.GetFromJsonAsync<OData>(query);
+        var query = $"{entity.PluralName}?skip={skip}&top={top}";
+
+        var data = await httpClient.GetFromJsonAsync<OData>(query);
 
         return data!.Value;
     }
