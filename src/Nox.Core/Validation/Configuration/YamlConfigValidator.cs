@@ -3,7 +3,7 @@ using Nox.Core.Configuration;
 
 namespace Nox.Core.Validation.Configuration;
 
-public class YamlConfigValidator: AbstractValidator<YamlConfiguration>
+internal class YamlConfigValidator: AbstractValidator<YamlConfiguration>
 {
     public YamlConfigValidator()
     {

@@ -21,7 +21,7 @@ public class ProjectConfigurator
             .Build();
     }
 
-    public YamlConfiguration? LoadConfiguration()
+    internal YamlConfiguration? LoadConfiguration()
     {
         _config = ReadServiceDefinition();
         if (_config == null) return _config;
