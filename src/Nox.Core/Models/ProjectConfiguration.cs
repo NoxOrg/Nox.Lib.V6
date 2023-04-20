@@ -37,6 +37,11 @@ public sealed class ProjectConfiguration : MetaBase, IProjectConfiguration
     
     public ICollection<MessagingProvider>? MessagingProviders { get; set; }
 
+    public void AddMessagingProvider(IMessagingProvider provider)
+    {
+        MessagingProviders?.Add((MessagingProvider)provider);
+    }
+
     ICollection<IServiceDataSource>? IProjectConfiguration.DataSources
     {
         get => DataSources?.ToList<IServiceDataSource>();

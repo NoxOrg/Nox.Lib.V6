@@ -24,6 +24,7 @@ public interface IProjectConfiguration
     ICollection<ILoader>? Loaders { get; set; }
     ICollection<IApi>? Apis { get; set; }
 
+    void AddMessagingProvider(IMessagingProvider provider);
     void Validate();
     void Configure();
 }

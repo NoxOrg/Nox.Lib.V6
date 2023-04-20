@@ -39,17 +39,20 @@ public static class ServiceExtensions
 
         if (services == null) throw new ArgumentNullException(nameof(services));
         var svcProvider = services.BuildServiceProvider();
-        var noxConfig = svcProvider.GetRequiredService<IProjectConfiguration>();
+        var projectConfig = svcProvider.GetRequiredService<IProjectConfiguration>();
 
         services.AddSingleton<INoxMessenger, NoxMessenger>();
 
         //Create the messaging providers if not defined in yaml
-        noxConfig.MessagingProviders ??= new List<IMessagingProvider>();
+        projectConfig.MessagingProviders ??= new List<IMessagingProvider>();
 
         //Ensure Mediator is added
-        if (noxConfig.MessagingProviders.All(mp => !mp.Provider!.ToLower().Equals("mediator")))
+        if (projectConfig.MessagingProviders.All(mp => !mp.Provider!.ToLower().Equals("mediator")))
         {
-            noxConfig.MessagingProviders.Add(new MessagingProvider() { Provider = "Mediator", Name = "Mediator" });
+            projectConfig.AddMessagingProvider(new MessagingProvider() { 
+                Provider = "Mediator", 
+                Name = "Mediator" 
+            });
         }
 
         var isRabbitAdded = false;
@@ -57,7 +60,7 @@ public static class ServiceExtensions
         var isAmazonAdded = false;
         var isMemoryAdded = false;
 
-        foreach (var msgProvider in noxConfig.MessagingProviders)
+        foreach (var msgProvider in projectConfig.MessagingProviders)
         {
             switch (msgProvider.Provider!.ToLower())
             {
