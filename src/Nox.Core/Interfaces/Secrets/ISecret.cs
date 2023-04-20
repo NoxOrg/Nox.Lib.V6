@@ -5,7 +5,7 @@ namespace Nox.Core.Interfaces.Secrets
 {
     public interface ISecret
     {
-        ICollection<SecretProvider>? Providers { get; set; }
+        ICollection<ISecretProvider>? Providers { get; set; }
         ISecretsValidFor? ValidFor { get; set; }
     }
 }

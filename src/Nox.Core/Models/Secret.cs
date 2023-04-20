@@ -5,10 +5,13 @@ namespace Nox.Core.Models;
 
 internal class Secret : ISecret
 {
-    public ICollection<SecretProvider>? Providers {
-        get => Providers?.ToList<SecretProvider>();
-        set => Providers = value;
+    ICollection<ISecretProvider>? ISecret.Providers
+    {
+        get => Providers?.ToList<ISecretProvider>();
+        set => Providers = value as ICollection<SecretProvider>;
     }
+
+    public ICollection<SecretProvider>? Providers;
 
     public ISecretsValidFor? ValidFor { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 }
