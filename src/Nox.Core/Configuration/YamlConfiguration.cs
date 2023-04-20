@@ -4,7 +4,7 @@ using Nox.Core.Interfaces.Configuration;
 
 namespace Nox.Core.Configuration;
 
-public class YamlConfiguration: MetaBase, IYamlConfiguration
+internal class YamlConfiguration: MetaBase, IYamlConfiguration
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
