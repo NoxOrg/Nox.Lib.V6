@@ -13,6 +13,7 @@ public interface IEntity : IMetaBase
     ICollection<EntityAttribute> Attributes { get; set; }
     ICollection<IMessageTarget>? Messaging { get; set; }
     ICollection<EntityRelationship> Relationships { get; set; }
+    ICollection<EntityRelationship> OwnedRelationships { get; set; }
     string PluralName { get; set; }
     string Schema { get; set; }
     int SortOrder { get; set; }

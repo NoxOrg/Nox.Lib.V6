@@ -8,14 +8,12 @@ pluralName: Persons
 table: Person
 schema: dbo
 
-attributes:
+key: 
+  name: Id
+  description: The person's unique identifier 
+  type: int
 
-  - name: Id
-    description: The person's unique identifier 
-    isPrimaryKey: true
-    type: int
-    canFilter: true
-    canSort: true
+attributes:
 
   - name: Name
     description: The name of the person

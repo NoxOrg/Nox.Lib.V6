@@ -1,120 +1,246 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <root>
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-        <xsd:element name="root" msdata:IsDataSet="true">
-            
-        </xsd:element>
-    </xsd:schema>
-    <resheader name="resmimetype">
-        <value>text/microsoft-resx</value>
-    </resheader>
-    <resheader name="version">
-        <value>1.3</value>
-    </resheader>
-    <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <data name="ApiNameEmpty" xml:space="preserve">
-        <value>The api's name must be specified in {0}</value>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
     </data>
-    <data name="ApiRoutesEmpty" xml:space="preserve">
-        <value>The api must have at least one route defined in {0}</value>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
     </data>
-    <data name="ApiRouteNameEmpty" xml:space="preserve">
-        <value>The api route name must be specified in {0}</value>
-    </data>
-    <data name="ApiRouteVerbEmpty" xml:space="preserve">
-        <value>The api route http verb must be specified in {0}</value>
-    </data>
-    <data name="ApiRouteTargetUrlEmpty" xml:space="preserve">
-        <value>The api route target url must be specified in {0}</value>
-    </data>
-    <data name="ApiRouteParameterNameEmpty" xml:space="preserve">
-        <value>Api route parameter must have a name specified in {0}</value>
-    </data>
-    <data name="ApiRouteParameterTypeEmpty" xml:space="preserve">
-        <value>Api route parameter '{0}' must have a type specified in {1}</value>
-    </data>
-    <data name="ApiRouteResponseTypeEmpty" xml:space="preserve">
-        <value>Api route response must have a type specified in {0}</value>
-    </data>
-    <data name="DbNameEmpty" xml:space="preserve">
-        <value>The database/datasource name must be specified in {0}</value>
-    </data>
-    <data name="DbProviderEmpty" xml:space="preserve">
-        <value>The database/datasource '{0}' provider must be specified in {1}</value>
-    </data>
-    <data name="EntityAttributeNameEmpty" xml:space="preserve">
-        <value>The attribute name must be specified in {0}</value>
-    </data>
-    <data name="EntityAttributeTypeEmpty" xml:space="preserve">
-        <value>Attribute '{0}' has no type defined in {1}</value>
-    </data>
-    <data name="EntityNameEmpty" xml:space="preserve">
-        <value>The entity's name must be specified in {0}</value>
-    </data>
-    <data name="EntityAttributesEmpty" xml:space="preserve">
-        <value>The entity '{0}' must have at least one property defined in {1}</value>
-    </data>
-    <data name="LoaderNameEmpty" xml:space="preserve">
-        <value>The loader name must be specified in {0}</value>
-    </data>
-    <data name="LoadStrategyTypeInvalid" xml:space="preserve">
-        <value>Load strategy Type must be one of {0} in {1}</value>
-    </data>
-    <data name="MessagingProviderNameEmpty" xml:space="preserve">
-        <value>The messaging provider name must be specified in {0}</value>
-    </data>
-    <data name="MessagingProviderProviderEmpty" xml:space="preserve">
-        <value>The provider for messaging provider '{0}' must be specified in {1}</value>
-    </data>
-    <data name="LoaderLoadStrategyEmpty" xml:space="preserve">
-        <value>a Load Strategy must be supplied for Loader '{0}' in {1}</value>
-    </data>
-    <data name="LoaderTargetEmpty" xml:space="preserve">
-        <value>The target for loader '{0}' must be specified in {1}</value>
-    </data>
-    <data name="LoaderTargetEntityEmpty" xml:space="preserve">
-        <value>The loader target entity must be specified in {0}</value>
-    </data>
-    <data name="LoaderMessageTargetProviderEmpty" xml:space="preserve">
-        <value>The messaging provider must be specified in {0}</value>
-    </data>
-    <data name="LoaderDataSourceEmpty" xml:space="preserve">
-        <value>a Loader source is missing a DataSource value in {0}</value>
-    </data>
-    <data name="LoaderQueryEmpty" xml:space="preserve">
-        <value>a Loader source is missing a Query statement in {0}</value>
-    </data>
-    <data name="ConfigNameEmpty" xml:space="preserve">
-        <value>a Name must be specified in {0}</value>
-    </data>
-    <data name="ConfigDbEmpty" xml:space="preserve">
-        <value>a Database definition must be specified in {0}</value>
-    </data>
-    <data name="ConfigEntitiesEmpty" xml:space="preserve">
-        <value>The service definition '{0}' must have at least one entity in {1}</value>
-    </data>
-    <data name="LoaderScheduleStartEmpty" xml:space="preserve">
-        <value>Loader Schedule must have a Start specified in {0}</value>
-    </data>
-    <data name="LoadStrategyTypeEmpty" xml:space="preserve">
-        <value>Loader load strategy must have a type specified in {0}</value>
-    </data>
-    <data name="LoaderTargetEntityMissing" xml:space="preserve">
-        <value>The loader targets a non existing entity {0} in {1}</value>
-    </data>
-    <data name="LoaderDataSourceMissing" xml:space="preserve">
-        <value>The Loader data source {0} in {1} does not exist in the service definition yaml</value>
-    </data>
-    <data name="LoaderMessageTargetMissing" xml:space="preserve">
-        <value>The Loader messaging target {0} in {1} does not exist in the service definition yaml</value>
-    </data>
-    <data name="DbProviderInvalid" xml:space="preserve">
-        <value>Data source provider must be one of {0} in {1}</value>
-    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ApiNameEmpty" xml:space="preserve">
+    <value>The api's name must be specified in {0}</value>
+  </data>
+  <data name="ApiRoutesEmpty" xml:space="preserve">
+    <value>The api must have at least one route defined in {0}</value>
+  </data>
+  <data name="ApiRouteNameEmpty" xml:space="preserve">
+    <value>The api route name must be specified in {0}</value>
+  </data>
+  <data name="ApiRouteVerbEmpty" xml:space="preserve">
+    <value>The api route http verb must be specified in {0}</value>
+  </data>
+  <data name="ApiRouteTargetUrlEmpty" xml:space="preserve">
+    <value>The api route target url must be specified in {0}</value>
+  </data>
+  <data name="ApiRouteParameterNameEmpty" xml:space="preserve">
+    <value>Api route parameter must have a name specified in {0}</value>
+  </data>
+  <data name="ApiRouteParameterTypeEmpty" xml:space="preserve">
+    <value>Api route parameter '{0}' must have a type specified in {1}</value>
+  </data>
+  <data name="ApiRouteResponseTypeEmpty" xml:space="preserve">
+    <value>Api route response must have a type specified in {0}</value>
+  </data>
+  <data name="DbNameEmpty" xml:space="preserve">
+    <value>The database/datasource name must be specified in {0}</value>
+  </data>
+  <data name="DbProviderEmpty" xml:space="preserve">
+    <value>The database/datasource '{0}' provider must be specified in {1}</value>
+  </data>
+  <data name="EntityAttributeNameEmpty" xml:space="preserve">
+    <value>The attribute name must be specified in {0}</value>
+  </data>
+  <data name="EntityAttributeTypeEmpty" xml:space="preserve">
+    <value>Attribute '{0}' has no type defined in {1}</value>
+  </data>
+  <data name="EntityNameEmpty" xml:space="preserve">
+    <value>The entity's name must be specified in {0}</value>
+  </data>
+  <data name="EntityAttributesEmpty" xml:space="preserve">
+    <value>The entity '{0}' must have at least one property defined in {1}</value>
+  </data>
+  <data name="LoaderNameEmpty" xml:space="preserve">
+    <value>The loader name must be specified in {0}</value>
+  </data>
+  <data name="LoadStrategyTypeInvalid" xml:space="preserve">
+    <value>Load strategy Type must be one of {0} in {1}</value>
+  </data>
+  <data name="MessagingProviderNameEmpty" xml:space="preserve">
+    <value>The messaging provider name must be specified in {0}</value>
+  </data>
+  <data name="MessagingProviderProviderEmpty" xml:space="preserve">
+    <value>The provider for messaging provider '{0}' must be specified in {1}</value>
+  </data>
+  <data name="LoaderLoadStrategyEmpty" xml:space="preserve">
+    <value>a Load Strategy must be supplied for Loader '{0}' in {1}</value>
+  </data>
+  <data name="LoaderTargetEmpty" xml:space="preserve">
+    <value>The target for loader '{0}' must be specified in {1}</value>
+  </data>
+  <data name="LoaderTargetEntityEmpty" xml:space="preserve">
+    <value>The loader target entity must be specified in {0}</value>
+  </data>
+  <data name="LoaderMessageTargetProviderEmpty" xml:space="preserve">
+    <value>The messaging provider must be specified in {0}</value>
+  </data>
+  <data name="LoaderDataSourceEmpty" xml:space="preserve">
+    <value>a Loader source is missing a DataSource value in {0}</value>
+  </data>
+  <data name="LoaderQueryEmpty" xml:space="preserve">
+    <value>a Loader source is missing a Query statement in {0}</value>
+  </data>
+  <data name="ConfigNameEmpty" xml:space="preserve">
+    <value>a Name must be specified in {0}</value>
+  </data>
+  <data name="ConfigDbEmpty" xml:space="preserve">
+    <value>a Database definition must be specified in {0}</value>
+  </data>
+  <data name="ConfigEntitiesEmpty" xml:space="preserve">
+    <value>The service definition '{0}' must have at least one entity in {1}</value>
+  </data>
+  <data name="LoaderScheduleStartEmpty" xml:space="preserve">
+    <value>Loader Schedule must have a Start specified in {0}</value>
+  </data>
+  <data name="LoadStrategyTypeEmpty" xml:space="preserve">
+    <value>Loader load strategy must have a type specified in {0}</value>
+  </data>
+  <data name="LoaderTargetEntityMissing" xml:space="preserve">
+    <value>The loader targets a non existing entity {0} in {1}</value>
+  </data>
+  <data name="LoaderDataSourceMissing" xml:space="preserve">
+    <value>The Loader data source {0} in {1} does not exist in the service definition yaml</value>
+  </data>
+  <data name="LoaderMessageTargetMissing" xml:space="preserve">
+    <value>The Loader messaging target {0} in {1} does not exist in the service definition yaml</value>
+  </data>
+  <data name="DbProviderInvalid" xml:space="preserve">
+    <value>Data source provider must be one of {0} in {1}</value>
+  </data>
+  <data name="EntityCommandNameEmpty" xml:space="preserve">
+    <value>The command name must be specified in {0}</value>
+  </data>
+  <data name="EntityDomainEventNameEmpty" xml:space="preserve">
+    <value>The event name must be specified in {0}</value>
+  </data>
+  <data name="EntityDomainEventTypeEmpty" xml:space="preserve">
+    <value>The event type must be specified in {0} for event {1}</value>
+  </data>
+  <data name="EntityKeyNameEmpty" xml:space="preserve">
+    <value>The key name must be specified in {0}</value>
+  </data>
+  <data name="EntityKeyTypeEmpty" xml:space="preserve">
+    <value>Key '{0}' has no type defined in {1}</value>
+  </data>
+  <data name="EntityQueryNameEmpty" xml:space="preserve">
+    <value>The query name must be specified in {0}</value>
+  </data>
+  <data name="EntityQueryParameterNameEmpty" xml:space="preserve">
+    <value>The query parameter name must be specified in {0}</value>
+  </data>
+  <data name="EntityQueryParameterTypeEmpty" xml:space="preserve">
+    <value>The query parameter '{0}' has no type defined in {1}</value>
+  </data>
+  <data name="EntityQueryResponseEmpty" xml:space="preserve">
+    <value>The query {0} ResponseDto must be specified in {1}</value>
+  </data>
 </root>

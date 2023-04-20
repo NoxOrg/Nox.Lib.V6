@@ -1,7 +1,7 @@
 ﻿#
 # Store.entity.nox.yaml
 #
-## TODO: yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
 #
 
 name: Store

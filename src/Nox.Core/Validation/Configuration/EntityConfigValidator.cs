@@ -17,7 +17,19 @@ public class EntityConfigValidator: AbstractValidator<EntityConfiguration>
 
         RuleForEach(entity => entity.Attributes)
             .SetValidator(new EntityAttributeConfigValidator());
-        
+
+        RuleForEach(entity => entity.Commands)
+            .SetValidator(new EntityCommandConfigValidator());
+
+        RuleForEach(entity => entity.Queries)
+            .SetValidator(new EntityQueryConfigValidator());
+
+        RuleForEach(entity => entity.Events)
+            .SetValidator(new EntityEventConfigValidator());
+
+        RuleFor(entity => entity.Key)
+            .SetValidator(new EntityKeyConfigValidator());
+
         RuleForEach(entity => entity.Messaging)
             .SetValidator(new MessageTargetConfigValidator(msgProviders));
     }

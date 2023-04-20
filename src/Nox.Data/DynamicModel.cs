@@ -283,7 +283,7 @@ public class DynamicModel : IDynamicModel
         {
             var tb = dynamicTypes[entity.Name].TypeBuilder;
 
-            foreach (var relation in entity.Relationships)
+            foreach (var relation in entity.Relationships.Union(entity.OwnedRelationships))
             {
                 var relatedTb = dynamicTypes[relation.Entity].TypeBuilder;
 

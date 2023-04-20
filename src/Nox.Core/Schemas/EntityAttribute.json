@@ -45,10 +45,6 @@
                 {"const": "bigfloat", "description": "A large floating point number" }
             ]
         },
-        "isPrimaryKey": {
-            "type": "boolean",
-            "description": "Indicates if this attribute is a Primary Key in the database"
-        },
         "isAutoNumber": {
             "type": "boolean",
             "description": "Indicates if this attribute is automatically inremented"

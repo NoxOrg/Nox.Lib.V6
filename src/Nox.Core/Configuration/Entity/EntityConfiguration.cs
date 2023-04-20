@@ -28,6 +28,8 @@ public class EntityConfiguration : MetaBase
 
     public List<EntityRelationshipConfiguration>? Relationships { get; set; } = new();
 
+    public List<EntityRelationshipConfiguration>? OwnedRelationships { get; set; } = new();
+
     public List<CommandConfiguration>? Commands { get; set; } = new();
 
     public List<EventConfiguration>? Events { get; set; } = new();

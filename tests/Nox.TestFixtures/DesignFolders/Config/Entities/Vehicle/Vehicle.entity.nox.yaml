@@ -8,15 +8,18 @@ pluralName: Vehicles
 table: Vehicle
 schema: dbo
 
-relatedParents: [Person]
+relationships:
+  - name: Person
+    entity: Person
+    isMany: false
+    isRequired: true
+
+key: 
+  name: Id
+  description: The vehicle's unique identifier 
+  type: int
 
 attributes:
-  - name: Id
-    description: The vehicle's unique identifier 
-    isPrimaryKey: true
-    type: int
-    canFilter: true
-    canSort: true
 
   - name: Brand
     description: The brand of the vehicle

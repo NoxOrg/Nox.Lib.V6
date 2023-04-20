@@ -76,7 +76,7 @@ public static class MessageExtensions
             {
                 foreach (var prop in payload.GetType().GetProperties())
                 {
-                    if (source.TryGetValue(prop.Name, out var sourceVal) || sourceVal is null)
+                    if (!source.TryGetValue(prop.Name, out var sourceVal) || sourceVal is null)
                     {
                         continue;
                     }

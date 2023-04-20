@@ -18,8 +18,11 @@ public sealed class Entity : MetaBase, IEntity
 
     public ICollection<EntityRelationship> Relationships { get; set; } = new Collection<EntityRelationship>();
 
+    public ICollection<EntityRelationship> OwnedRelationships { get; set; } = new Collection<EntityRelationship>();
+
     [NotMapped]
     public ICollection<string> RelatedParents => Relationships
+            .Union(OwnedRelationships)
             .Where(r => !r.IsMany)
             .Select(r => r.Entity)
             .Union(Key.IsComposite ? Key.Entities.AsEnumerable() : Enumerable.Empty<string>()) // Include composite key if exists

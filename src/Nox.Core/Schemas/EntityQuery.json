@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NOX Entity Query",
+  "description": "Defines a NOX entity query",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [ "name" ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the query"
+    },
+    "description": {
+      "type": "string",
+      "description": "The query description"
+    },
+    "parameters": {
+      "type": "array",
+      "description": "Indicates if this attribute is a Primary Key in the database",
+      "items": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the parameter"
+          },
+          "description": {
+            "type": "string",
+            "description": "The parameter description"
+          },
+          "type": {
+            "type": "string",
+            "description": "The parameter type"
+          }
+        }
+      }
+    },
+    "response": {
+      "type": "boolean",
+      "description": "Indicates if this attribute is a required value",
+      "properties": {
+        "responseDto": {
+          "type": "string",
+          "description": "The Key name"
+        },
+        "isMany": {
+          "type": "string",
+          "description": "The Key type"
+        }
+      }
+    }
+  }
+}

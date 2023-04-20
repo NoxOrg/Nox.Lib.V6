@@ -5,7 +5,7 @@ namespace Nox.Core.Models;
 
 public sealed class EntityKey : BaseEntityAttribute, IEntityKey
 {
-    public override bool IsRequired { get; set; } = true;
+    public override bool IsRequired { get => true; }
 
     [NotMapped]
     public string[] Entities { get; set; } = Array.Empty<string>();
