@@ -14,6 +14,8 @@ public partial class Ui : ComponentBase
     [Inject] IProjectConfiguration? NoxService { get; set; }
     [Inject] NoxDataService NoxDataService { get; set; } = null!;
 
+    protected bool isLoading = false;
+
     protected IEntity? entity;
 
     protected IEnumerable<dynamic> data = Enumerable.Empty<dynamic>();
@@ -22,6 +24,8 @@ public partial class Ui : ComponentBase
     {
         if (NoxService?.Entities != null )
         {
+            isLoading = true;
+
             entity = NoxService.Entities.FirstOrDefault( e => 
                 e.PluralName.Equals(Entity,StringComparison.OrdinalIgnoreCase)
             );
@@ -35,6 +39,7 @@ public partial class Ui : ComponentBase
                 data = Enumerable.Empty<dynamic>();
             }
 
+            isLoading = false;
         }
     }
 

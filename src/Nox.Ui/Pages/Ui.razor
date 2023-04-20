@@ -4,6 +4,12 @@
 
 <h1>@Entity</h1>
 
+@if(isLoading)
+{
+    <div class="spinner">Loading...</div>
+}    
+else
+{
 
 @if (entity is not null)
 {
@@ -39,3 +45,4 @@
     }
 }
 
+}
