@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Nox.Core.Interfaces.Database;
-using Nox.Data;
+using Nox.Core.Models;
 using Nox.Data.Csv;
 
 namespace Nox.DataProvider.Tests;

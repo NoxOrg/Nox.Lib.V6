@@ -1,6 +1,8 @@
+using Nox.Core.Interfaces.Secrets;
+
 namespace Nox.Core.Configuration.Secrets;
 
-public class SecretsValidForConfiguration
+public class SecretsValidForConfiguration : ISecretsValidFor
 {
     public int? Days { get; set; }
     public int? Hours { get; set; }

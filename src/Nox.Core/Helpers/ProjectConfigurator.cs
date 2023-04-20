@@ -11,7 +11,7 @@ public class ProjectConfigurator
 {
     private readonly string _designRoot;
     private readonly IDeserializer _deserializer;
-    private ProjectConfiguration? _config;
+    private YamlConfiguration? _config;
     
     public ProjectConfigurator(string designRoot)
     {
@@ -21,7 +21,7 @@ public class ProjectConfigurator
             .Build();
     }
 
-    public ProjectConfiguration? LoadConfiguration()
+    internal YamlConfiguration? LoadConfiguration()
     {
         _config = ReadServiceDefinition();
         if (_config == null) return _config;
@@ -31,13 +31,13 @@ public class ProjectConfigurator
         return _config;
     }
 
-    private ProjectConfiguration? ReadServiceDefinition()
+    private YamlConfiguration? ReadServiceDefinition()
     {
         return Directory
             .EnumerateFiles(_designRoot, FileExtension.ServiceDefinition, SearchOption.AllDirectories)
             .Select(f =>
             {
-                var config = _deserializer.Deserialize<ProjectConfiguration>(ReadDefinitionFile(f));
+                var config = _deserializer.Deserialize<YamlConfiguration>(ReadDefinitionFile(f));
                 config.DefinitionFileName = Path.GetFullPath(f);
                 if (config.Database != null) config.Database.DefinitionFileName = Path.GetFullPath(f);
                 if (config.MessagingProviders != null)
