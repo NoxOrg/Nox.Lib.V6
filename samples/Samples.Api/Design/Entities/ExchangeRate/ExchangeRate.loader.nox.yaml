@@ -10,7 +10,7 @@ description: Loads exchange rate data
 
 schedule:
   start: Every day at 1am
-  runOnStartup: false
+  runOnStartup: true
 
 loadStrategy: 
   type: MergeNew

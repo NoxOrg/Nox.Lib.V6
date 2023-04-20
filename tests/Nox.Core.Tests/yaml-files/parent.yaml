@@ -1,0 +1,13 @@
+name: This is the parent yaml file
+description: This file contains a $ref tag
+
+attributeOne: 
+  $ref: ./child.yaml
+  
+attributeTwo:
+  $ref: child.yaml
+  
+closure: This is the end of the line
+  
+
+  

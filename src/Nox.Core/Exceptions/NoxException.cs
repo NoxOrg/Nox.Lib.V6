@@ -3,8 +3,7 @@ using System.Runtime.Serialization;
 namespace Nox.Core.Exceptions;
 
 [Serializable]
-public class NoxException :
-    Exception
+public class NoxException : Exception
 {
     public NoxException()
     {

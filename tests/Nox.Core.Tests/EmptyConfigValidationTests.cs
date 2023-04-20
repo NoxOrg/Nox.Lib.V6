@@ -10,8 +10,8 @@ public class EmptyConfigValidationTests
     [Test]
     public void Must_validate_empty_config()
     {
-        var config = new ProjectConfiguration();
-        var validator = new NoxConfigValidator();
+        var config = new YamlConfiguration();
+        var validator = new YamlConfigValidator();
         var result = validator.Validate(config);
         Assert.That(result.IsValid, Is.False);
         Assert.That(result.Errors.Count, Is.EqualTo(2));

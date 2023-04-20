@@ -35,7 +35,7 @@ namespace Samples.Api.Domain.Store.Commands
                 }
 
                 // Add reservation
-                store.Reservations.Add(
+                store.AddReservation(
                     new Reservation
                     {
                         IsActive = true,

@@ -9,6 +9,7 @@ using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Nox.Core.Extensions;
 using Nox.Core.Components;
 using Nox.Core.Constants;
 using Nox.Core.Exceptions;
@@ -20,20 +21,17 @@ using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Etl;
 using Nox.Core.Interfaces.Messaging;
 using Nox.Core.Models;
-using Nox.Data;
 using Nox.Entity.XtendedAttributes;
-using Nox.Etl;
-using Nox.Messaging;
 
 namespace Nox.Lib;
 
 public class DynamicService : IDynamicService
 {
     private ILogger _logger;
-    private readonly IMetaService _metaService;
+    private readonly IProjectConfiguration _metaService;
     private readonly IEtlExecutor _etlExecutor;
     public string Name => _metaService.Name;
-    public IMetaService MetaService => _metaService;
+    public IProjectConfiguration MetaService => _metaService;
     public string KeyVaultUri => _metaService.KeyVaultUri;
     public bool AutoMigrations => _metaService.AutoMigrations;
     public IReadOnlyDictionary<string, IEntity>? Entities
@@ -68,10 +66,9 @@ public class DynamicService : IDynamicService
 
     public DynamicService(ILogger<DynamicService> logger,
         IConfiguration appConfig,
-        IProjectConfiguration projectConfig,
         IEtlExecutor etlExecutor,
         IDataProviderFactory factory,
-        INoxMessenger messenger)
+        IProjectConfiguration metaService)
     {
         _logger = logger;
         _etlExecutor = etlExecutor;
@@ -79,9 +76,8 @@ public class DynamicService : IDynamicService
         _metaService = new Configurator(this)
             .WithLogger(_logger)
             .WithAppConfiguration(appConfig)
-            .WithNoxConfiguration(projectConfig)
+            .WithMetaService(metaService)
             .WithDatabaseProviderFactory(factory)
-            .WithMessenger(messenger)
             .Configure();
 
     }
@@ -108,7 +104,7 @@ public class DynamicService : IDynamicService
         AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(Loader)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
         AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(DataSourceBase)), typeof(DataSourceBase), DatabaseObject.MetadataSchemaName);
         AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(ServiceDatabase)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
-        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(Api.Api)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(Core.Models.Api)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
         AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(MessagingProvider)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
         AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(XtendedAttributeValue)), typeof(XtendedAttributeValue), "dbo");
     }
@@ -153,7 +149,7 @@ public class DynamicService : IDynamicService
         {
             if (dbContext.Database.EnsureCreated())
             {
-                dbContext.Add((MetaService)_metaService);
+                dbContext.Add((ProjectConfiguration)_metaService);
                 dbContext.SaveChanges();
             }
         }
@@ -230,22 +226,24 @@ public class DynamicService : IDynamicService
         private readonly DynamicService _dynamicService;
         private IDataProviderFactory? _factory;
         private ILogger? _logger;
-        private IMetaService? _service;
+        private IProjectConfiguration _metaService = null!;
         private IConfiguration? _appConfig;
-        private IProjectConfiguration? _noxConfig;
-#pragma warning disable IDE0052 // Remove unread private members
-        private INoxMessenger? _messenger;
-#pragma warning restore IDE0052 // Remove unread private members
-        
+
         public Configurator(DynamicService dynamicService)
         {
             _dynamicService = dynamicService;
         }
-        
+
         public Configurator WithLogger(ILogger logger)
         {
             _dynamicService._logger = logger;
             _logger = logger;
+            return this;
+        }
+
+        public Configurator WithMetaService(IProjectConfiguration metaService)
+        {
+            _metaService = metaService;
             return this;
         }
 
@@ -255,139 +253,33 @@ public class DynamicService : IDynamicService
             return this;
         }
 
-        public Configurator WithNoxConfiguration(IProjectConfiguration projectConfig)
-        {
-            _noxConfig = projectConfig;
-            return this;
-        }
-        
         public Configurator WithDatabaseProviderFactory(IDataProviderFactory factory)
         {
             _factory = factory;
             return this;
         }
 
-        public Configurator WithMessenger(INoxMessenger messenger)
+        public IProjectConfiguration Configure()
         {
-            _messenger = messenger;
-            return this;
-        }
-        
-        public IMetaService Configure()
-        {
-            _service = _noxConfig!.ToMetaService();
             var serviceDatabases = GetServiceDatabasesFromNoxConfig();
-            ResolveConfigurationVariables(serviceDatabases);
-
-            _service.Validate();
-            _service.Configure();
-            // if (_messenger != null) _messenger.Configure(_service.MessagingProviders);
             
             serviceDatabases.ToList().ForEach(db =>
             {
                 db.DataProvider = _factory!.Create(db.Provider);
-                db.DataProvider.Configure(db, _service.Name);
+                db.DataProvider.Configure(db, _metaService.Name);
             });
 
-            return _service;
-        }
-        
-        private void ResolveConfigurationVariables(IList<IServiceDataSource> serviceDatabases)
-        {
-            _logger!.LogInformation("Resolving all configuration variables...");
-            // populate variables from application config
-            var databases = serviceDatabases
-                .Where(d => string.IsNullOrEmpty(d.ConnectionString))
-                .Where(d => !string.IsNullOrEmpty(d.ConnectionVariable));
-
-            var variables = databases
-                .Select(d => d.ConnectionVariable!)
-                .ToHashSet()
-                .ToDictionary(v => v, v => _appConfig?[v], StringComparer.OrdinalIgnoreCase);
-
-            if (_service!.MessagingProviders is { Count: > 0 })
-            {
-                foreach (var item in _service.MessagingProviders)
-                {
-                    if (string.IsNullOrEmpty(item.ConnectionString) && !string.IsNullOrEmpty(item.ConnectionVariable))
-                    {
-                        variables.Add(item.ConnectionVariable, _appConfig?[item.ConnectionVariable]);
-                    }
-                }    
-            }
-            
-            // try key vault where app configuration is missing 
-            if (variables.Any(v => v.Value == null))
-            {
-                TryAddMissingConfigsFromKeyVault(_service.KeyVaultUri, variables!);
-            }
-
-            if (variables.Any(v => v.Value == null))
-            {
-                var variableNames = string.Join(',', variables
-                    .Where(v => v.Value == null)
-                    .Select(v => v.Key)
-                    .ToArray()
-                );
-                throw new ConfigurationNotFoundException(variableNames);
-            }
-
-            databases.ToList().ForEach(db =>
-                db.ConnectionString = variables[db.ConnectionVariable!]
-            );
-            
-            if (_service.MessagingProviders is { Count: > 0 })
-            {
-                foreach (var item in _service.MessagingProviders)
-                {
-                    if (string.IsNullOrEmpty(item.ConnectionString) && !string.IsNullOrEmpty(item.ConnectionVariable))
-                    {
-                        item.ConnectionString = variables[item.ConnectionVariable!];
-                    }        
-                }    
-            }
-        }
-
-        private void TryAddMissingConfigsFromKeyVault(string vaultUri, Dictionary<string, string> variables)
-        {
-            var azureServiceTokenProvider = new AzureServiceTokenProvider();
-
-            var keyVault = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
-
-            try
-            {
-                var test = keyVault.GetSecretAsync(vaultUri, "Test").GetAwaiter().GetResult().Value;
-            }
-            catch (Exception ex)
-            {
-                _logger!.LogWarning("...unable to connect to key vault because [{msg}]", ex.Message);
-                return;
-            }
-
-            foreach (var key in variables.Keys)
-            {
-
-                if (string.IsNullOrEmpty(variables[key]))
-                {
-                    _logger!.LogInformation("...Resolving variable [{key}] from secrets vault {vault}", key, vaultUri);
-                    variables[key] = keyVault.GetSecretAsync(vaultUri, key.Replace(":", "--")).GetAwaiter().GetResult().Value;
-                }
-                else
-                {
-                    _logger!.LogInformation("...Resolving variable [{key}] from app configuration", key);
-                }
-
-            }
+            return _metaService;
         }
 
         private IList<IServiceDataSource> GetServiceDatabasesFromNoxConfig()
         {
             var serviceDatabases = new List<IServiceDataSource>
             {
-                _service!.Database!
+                _metaService!.Database!
             };
 
-            foreach (var dataSource in _service.DataSources!)
+            foreach (var dataSource in _metaService.DataSources!)
             {
                 serviceDatabases.Add(dataSource);
             }

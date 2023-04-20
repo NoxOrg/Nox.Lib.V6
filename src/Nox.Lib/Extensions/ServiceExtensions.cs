@@ -5,6 +5,7 @@ using Nox.Api.OData.Swagger;
 using Nox.Core.Extensions;
 using Nox.Core.Helpers;
 using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Configuration;
 using Nox.Data;
 using Nox.Etl;
 using Nox.Jobs;
@@ -31,7 +32,7 @@ public static class ServiceExtensions
             designRoot = Configuration["Nox:DefinitionRootPath"];
         }
 
-        if (services.AddNoxConfiguration(designRoot!))
+        if (services.AddNoxConfiguration(designRoot!).ConfirmNoxConfigurationAdded())
         {
             services
                 .AddPersistedSecretStore()
