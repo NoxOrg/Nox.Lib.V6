@@ -4,7 +4,9 @@ using Samples.Ui.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddNoxUi();
+builder.Services.AddNoxUi( cfg => 
+    cfg.BaseAddress = new Uri("https://localhost:5001/api/") 
+);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
