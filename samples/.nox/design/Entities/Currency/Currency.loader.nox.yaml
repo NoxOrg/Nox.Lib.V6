@@ -1,0 +1,33 @@
+﻿#
+# Currency.loader.nox.yaml
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Loader.json
+#
+
+name: CurrencyLoader
+
+description: Loads currency data 
+
+schedule:
+  start: Every 2 minutes
+  retry:
+    limit: 10
+    delaySeconds: 60
+    doubleDelayLimit: 5
+  runOnStartup: true
+
+loadStrategy: 
+  type: MergeNew
+  columns: [CreateDate,EditDate]
+
+target:
+  entity: Currency
+  
+messaging:
+  - messagingProvider: AppServiceBus
+  - messagingProvider: Mediator  
+
+sources:
+  - dataSource: JsonSeedData
+    minimumExpectedRecords: 160
+    query: currency-seeddata.json 

@@ -1,0 +1,111 @@
+#
+# SampleCurrency.service.nox.yaml
+#
+# xyaml-language-server: $schema=https://noxorg.dev/schemas/NoxConfiguration.json
+#
+
+name: SampleCurrency
+
+description: A sample currency conversion microservice
+
+configuration:
+  autoMigrations: false
+  autoReference: false
+  environment:
+    UI_SERVER_PROVIDER: ${{ env. org.secrets. solution.secrets config.version }}
+
+versionControl:
+  provider: azureDevOps
+  server: https://dev.azure.com/iwgplc
+  project: Nox.SampleCurrency
+  repository: SampleCurrency.Api.V1
+  relative-project-sourceFolder: ./
+  relative-docker-file-path: /Dockerfile
+
+team:
+  developers:
+    - name: Andre Sharpe
+      userName: andre.sharpe@iwgplc.com
+      mobile-phoneNumber: +41789461056
+      is-admin: true
+    - name: Jan Schutte
+      user-name: jan.schutte@iwgplc.com
+      is-admin: true
+    - name: Dionisis Stoubos
+      user-name: dionisis.stoubos@iwgplc.com
+
+domain:
+  entities:
+    - $ref: Country.entity.nox.yaml
+    - $ref: Currency.entity.nox.yaml
+    - $ref: ExchangeRate.entity.nox.yaml
+
+infrastructure:
+
+  database-provider:
+    $ref: SampleCurrency.database.nox.yaml
+
+  api-server-provider:
+    baseUrl:
+    port: 80
+    httpsPort: 432
+
+  ui-server-provider:
+    base-url:
+    port: ${{ $env.UI_SERVER_PROVIDER }}
+    https-port: 432
+
+  authProvider:
+
+  secretsProviders:
+  
+  searchProvider:
+
+  notificationProviders:
+  
+    emailProvider:
+      provider: sendgrid | ...
+
+    smsProvider:
+
+    instantMessagingProvider:
+     povider: telegram | skype | teams | webex | whatsapp
+
+  logProviders:
+
+  translationProvider:
+  
+  messagingProviders:
+
+    - name: AppServiceBus
+
+      ## RabbitMQ
+      provider: rabbitMQ
+      connectionString: rabbitmq://guest:guest@localhost/
+
+      ### Azure Service Bus
+      #provider: azureServiceBus
+      #connectionString: ${ConnectionString:AzureServiceBus}
+    
+  dataProviders:
+
+    - name: JsonSeedData
+      provider: json
+      options: Source=File;Path=../../docs/sample-data/;
+
+    - name: CsvSeedData
+      provider: csv
+      options: Source=File;Path=../../docs/sample-data/;
+
+    - name: ExcelSeedData
+      provider: excel
+      options: Source=File;Path=../../docs/sample-data/;
+      
+    - name: ParquetSeedData
+      provider: parquet
+      options: Source=File;Path=../../docs/sample-data/;    
+
+    - name: XmlSeedData
+      provider: xml
+      options: Source=File;Path=../../docs/sample-data/;
+

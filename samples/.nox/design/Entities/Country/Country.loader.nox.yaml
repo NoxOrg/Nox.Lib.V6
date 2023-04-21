@@ -1,0 +1,33 @@
+﻿#
+# Country.loader.nox.yaml
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Loader.json
+#
+
+name: CountryLoader
+
+description: Loads country data 
+
+schedule:
+  start: Every month on the 1st at 2am
+  retry:
+    limit: 10
+    delaySeconds: 60
+    doubleDelayLimit: 5
+  runOnStartup: true
+
+loadStrategy: 
+  type: MergeNew
+  columns: [CreateDate,EditDate]
+
+target:
+  entity: Country
+  
+messaging:
+  - messagingProvider: Mediator
+  - messagingProvider: AppServiceBus
+  
+sources:
+  - dataSource: JsonSeedData
+    minimumExpectedRecords: 160
+    query: country-seeddata.json 

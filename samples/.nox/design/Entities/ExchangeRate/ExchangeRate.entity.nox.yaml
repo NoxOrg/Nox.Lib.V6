@@ -1,0 +1,32 @@
+﻿#
+# ExchangeRate.entity.nox.yaml
+#
+# https://open.er-api.com/v6/latest/CHF
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
+#
+
+name: ExchangeRate
+
+description: The exchange rate at a piont in time vs CHF (reference currency)
+
+relatedParents: [Currency]
+
+attributes:
+
+  - name: Id
+    description: The unique identifier of an exchange rate
+    isPrimaryKey: true
+    type: int
+    canFilter: true
+    canSort: true
+
+  - name: AsAt
+    description: The date and time at which the rate changed
+    type: datetime
+
+  - name: Rate
+    description: The exchange rate relative to Swiss Franc (CHF)
+    type: decimal
+    maxWidth: 14
+    precision: 8

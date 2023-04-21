@@ -1,0 +1,20 @@
+name: SampleCurrencyDb
+server: localhost
+
+### Sql Server
+provider: sqlServer
+options: Trusted_Connection=no;connection timeout=120;
+user: sa  
+password: Developer*123
+
+### Postgres
+#provider: postgres
+#port: 54320
+#user: sa  
+#password: Developer*123
+
+### MySql  
+#provider: mySql
+#port: 3306
+#user: root
+#password: Developer*123
