@@ -1,0 +1,36 @@
+﻿#
+# Vehcile data loader definition
+#
+
+name: VehicleLoader
+
+description: Loads vehicle data 
+
+schedule:
+  start: Daily at 2am UTC
+  retry:
+    limit: 10
+    delaySeconds: 60
+    doubleDelayLimit: 5
+
+loadStrategy: 
+  type: DropAndLoad
+  columns: [CreateDate,EditDate]
+
+
+target:
+  entity: Vehicle
+  
+messaging:
+  - messagingProvider: TestMessagingProvider2
+
+sources:
+  - dataSource: TestDataSource2
+    minimumExpectedRecords: 30 
+    query: >-
+      SELECT 
+           [Id]
+          ,[PersonId] AS [PersonId]
+          ,[VehicleBrand] AS [Brand]
+          ,[VehicleColor] AS [Color]
+      FROM SourceVehicle

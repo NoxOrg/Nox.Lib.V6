@@ -31,6 +31,9 @@ public static class ProjectConfigurationExtensions
             cfg.CreateMap<LoaderTargetConfiguration, LoaderTarget>();
             cfg.CreateMap<MessageTargetConfiguration, MessageTarget>();
             cfg.CreateMap<LoaderSourceConfiguration, LoaderSource>();
+            cfg.CreateMap<VersionControlConfiguration, VersionControl>();
+            cfg.CreateMap<TeamConfiguration, Team>();
+            cfg.CreateMap<TeamMemberConfiguration, TeamMember>();
 
         });
         var mapper = mapperConfig.CreateMapper();

@@ -10,6 +10,7 @@ using Nox.Core.Interfaces.Messaging;
 using Nox.Core.Interfaces.Secrets;
 using Nox.Core.Validation;
 using System.ComponentModel.DataAnnotations.Schema;
+using Nox.Core.Interfaces.VersionControl;
 
 namespace Nox.Core.Models;
 
@@ -36,6 +37,14 @@ public sealed class ProjectConfiguration : MetaBase, IProjectConfiguration
     }
     
     public ICollection<MessagingProvider>? MessagingProviders { get; set; }
+
+    ITeam? IProjectConfiguration.Team
+    {
+        get => Team;
+        set => Team = value as Team;
+    }
+
+    public Team? Team { get; set; } = new();
 
     public void AddMessagingProvider(IMessagingProvider provider)
     {
@@ -69,6 +78,15 @@ public sealed class ProjectConfiguration : MetaBase, IProjectConfiguration
         get => Apis?.ToList<IApi>();
         set => Apis = value as ICollection<Api>;
     }
+    
+    IVersionControl? IProjectConfiguration.VersionControl
+    {
+        get => VersionControl;
+        set => VersionControl = value as VersionControl;
+    }
+
+    public VersionControl? VersionControl { get; set; } = new();
+
     public ICollection<Api>? Apis { get; set; }
 
     [NotMapped]

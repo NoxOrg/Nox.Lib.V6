@@ -13,14 +13,14 @@ namespace Nox.Core.Models
 
         ICollection<IApiRouteParameter>? IApiRoute.Parameters
         {
-            get => (ICollection<IApiRouteParameter>?)Parameters;
+            get => Parameters?.ToList<IApiRouteParameter>();
             set => Parameters = value as ICollection<ApiRouteParameter>;
         }
         public ICollection<ApiRouteParameter>? Parameters { get; set; } = new Collection<ApiRouteParameter>();
 
         ICollection<IApiRouteResponse>? IApiRoute.Responses
         {
-            get => (ICollection<IApiRouteResponse>?)Responses;
+            get => Responses?.ToList<IApiRouteResponse>();
             set => Responses = value as ICollection<ApiRouteResponse>;
         }
         

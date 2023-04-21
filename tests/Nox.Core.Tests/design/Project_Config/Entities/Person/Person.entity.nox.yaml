@@ -4,6 +4,7 @@
 
 name: Person
 description: Persons
+pluralName: Persons
 table: Person
 schema: dbo
 

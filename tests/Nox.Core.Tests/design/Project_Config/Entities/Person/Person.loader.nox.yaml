@@ -1,0 +1,33 @@
+﻿#
+# Person data loader definition
+#
+
+name: PersonLoader
+
+description: Loads person data 
+
+schedule:
+  start: Daily at 2am UTC
+  retry:
+    limit: 10
+    delaySeconds: 60
+    doubleDelayLimit: 5
+loadStrategy: 
+  type: DropAndLoad
+  columns: [CreateDate,EditDate]
+
+target:
+  entity: Person
+  
+messaging:
+  - messagingProvider: TestMessagingProvider1
+
+sources:
+  - dataSource: TestDataSource1
+    minimumExpectedRecords: 30 
+    query: >-
+      SELECT 
+           [Id]
+          ,[PersonName] AS [Name]
+          ,[PersonAge] AS [Age]
+      FROM dbo.SourcePerson WITH (NOLOCK)

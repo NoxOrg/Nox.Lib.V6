@@ -1,0 +1,35 @@
+﻿#
+# Vehicle entity definition
+#
+
+name: Vehicle
+description: Vehicles
+pluralName: Vehicles
+table: Vehicle
+schema: dbo
+
+relatedParents: [Person]
+
+attributes:
+  - name: Id
+    description: The vehicle's unique identifier 
+    isPrimaryKey: true
+    type: int
+    canFilter: true
+    canSort: true
+
+  - name: Brand
+    description: The brand of the vehicle
+    isRequired: true
+    type: string
+    maxWidth: 128
+    canFilter: true
+    canSort: true
+
+  - name: Color
+    description: The color of the person
+    isRequired: true
+    type: string
+    maxWidth: 30
+    canFilter: true
+    canSort: true
