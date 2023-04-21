@@ -9,11 +9,12 @@ using Nox.Core.Interfaces.VersionControl;
 
 namespace Nox.Core.Interfaces;
 
-public interface IProjectConfiguration 
+public interface IProjectConfiguration: IMetaBase
 {
     string Name { get; set; }
     string Description { get; set; }
     string KeyVaultUri { get; set; }
+    string EndpointProvider { get; set; }
     bool AutoMigrations { get; set; }
 
     ISecret? Secrets { get; set; }
