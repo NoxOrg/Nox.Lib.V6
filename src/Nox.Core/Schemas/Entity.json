@@ -18,13 +18,6 @@
       "type": "string",
       "description": "The plural name for the entity. Will be guessed by NOX if not specified."
     },
-    "relatedParents": {
-      "type": "array",
-      "description": "The related parent entities (one-to-many relationship from parent).",
-      "items": {
-        "type": "string"
-      }
-    },
     "schema": {
       "type": "string",
       "description": "The database schema that this entity will be persisted in (default 'dbo')"

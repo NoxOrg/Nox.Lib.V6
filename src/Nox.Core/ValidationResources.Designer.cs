@@ -304,6 +304,24 @@ namespace Nox.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The entity relationship {0} entity type name must be specified in {1}.
+        /// </summary>
+        internal static string EntityRelationshipEntityEmpty {
+            get {
+                return ResourceManager.GetString("EntityRelationshipEntityEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The entity relationship name must be specified in {0}.
+        /// </summary>
+        internal static string EntityRelationshipNameEmpty {
+            get {
+                return ResourceManager.GetString("EntityRelationshipNameEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to a Loader source is missing a DataSource value in {0}.
         /// </summary>
         internal static string LoaderDataSourceEmpty {

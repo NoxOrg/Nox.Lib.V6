@@ -243,4 +243,10 @@
   <data name="EntityQueryResponseEmpty" xml:space="preserve">
     <value>The query {0} ResponseDto must be specified in {1}</value>
   </data>
+  <data name="EntityRelationshipEntityEmpty" xml:space="preserve">
+    <value>The entity relationship {0} entity type name must be specified in {1}</value>
+  </data>
+  <data name="EntityRelationshipNameEmpty" xml:space="preserve">
+    <value>The entity relationship name must be specified in {0}</value>
+  </data>
 </root>

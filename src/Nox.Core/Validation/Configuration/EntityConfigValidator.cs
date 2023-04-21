@@ -3,7 +3,7 @@ using Nox.Core.Configuration;
 
 namespace Nox.Core.Validation.Configuration;
 
-public class EntityConfigValidator: AbstractValidator<EntityConfiguration>
+public class EntityConfigValidator : AbstractValidator<EntityConfiguration>
 {
     public EntityConfigValidator(List<MessagingProviderConfiguration>? msgProviders)
     {
