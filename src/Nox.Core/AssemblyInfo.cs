@@ -1,5 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo("Nox.Core.Tests")]
+[assembly: InternalsVisibleTo("Nox.Core.Tests")]
 namespace Nox.Core;
 

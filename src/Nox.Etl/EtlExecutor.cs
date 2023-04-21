@@ -162,7 +162,7 @@ public class EtlExecutor : IEtlExecutor
         IDataProvider targetProvider
     )
     {
-        var lastMergeDateTimeStampInfo = GetAllLastMergeDateTimeStamps(loader, targetProvider);
+        var lastMergeDateTimeStampInfo = GetAllLastMergeDateTimeStamps(loader, targetProvider, entity);
 
         var targetColumns = entity.Attributes
             .Where(a => a.IsMappedAttribute())
@@ -198,10 +198,19 @@ public class EtlExecutor : IEtlExecutor
             .Take(1)
             .Select(colName => new IdColumn() { IdPropertyName = colName })
             .ToArray();
-        
-        destination.MergeProperties.CompareColumns =
-            loader.LoadStrategy!.Columns.Select(colName => new CompareColumn() { ComparePropertyName = colName }).ToArray();
 
+        foreach (var dateColumn in lastMergeDateTimeStampInfo)
+        {
+            if (entity.Attributes.Any(a => a.Name.Equals(dateColumn.Value.Property, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                if (destination.MergeProperties.CompareColumns == null) destination.MergeProperties.CompareColumns = new List<CompareColumn>();
+                destination.MergeProperties.CompareColumns.Add(new CompareColumn
+                {
+                    ComparePropertyName = dateColumn.Value.Property
+                });
+            }
+        }
+        
         source.LinkTo(destination);
 
         var postProcessDestination = new CustomDestination();
@@ -272,35 +281,75 @@ public class EtlExecutor : IEtlExecutor
     {
         foreach (var dateColumn in lastMergeDateTimeStampInfo.Keys)
         {
-            if (record[dateColumn] == null) continue;
-
-            if (DateTime.TryParse(record[dateColumn]!.ToString(), out var fieldValue))
+            if (record.TryGetValue(dateColumn, out var dateColumnValue))
             {
-                if (fieldValue > lastMergeDateTimeStampInfo[dateColumn].LastDateLoadedUtc)
+                if (dateColumnValue == null) continue;
+
+                if (DateTime.TryParse(dateColumnValue.ToString(), out var fieldValue))
                 {
-                    var changeEntry = lastMergeDateTimeStampInfo[dateColumn];
-                    changeEntry.LastDateLoadedUtc = fieldValue;
-                    changeEntry.Updated = true;
-                    lastMergeDateTimeStampInfo[dateColumn] = changeEntry;
+                    if (fieldValue > lastMergeDateTimeStampInfo[dateColumn].LastDateLoadedUtc)
+                    {
+                        var changeEntry = lastMergeDateTimeStampInfo[dateColumn];
+                        changeEntry.LastDateLoadedUtc = fieldValue;
+                        changeEntry.Updated = true;
+                        lastMergeDateTimeStampInfo[dateColumn] = changeEntry;
+                    }
+                }
+            }
+            else
+            {
+                if (record.TryGetValue("ChangeDate", out var changeDate))
+                {
+                    if (changeDate == null) continue;
+                    if (DateTime.TryParse(changeDate.ToString(), out var changeDateValue))
+                    {
+                        var changeEntry = lastMergeDateTimeStampInfo[EtlExecutorConstants.DefaultMergeProperty];
+                        changeEntry.LastDateLoadedUtc = changeDateValue.ToUniversalTime();
+                        changeEntry.Updated = true;
+                        lastMergeDateTimeStampInfo[EtlExecutorConstants.DefaultMergeProperty] = changeEntry;    
+                    }
                 }
             }
         }
     }
 
-    private static LoaderMergeStates GetAllLastMergeDateTimeStamps(ILoader loader, IDataProvider dataProvider)
+    private static LoaderMergeStates GetAllLastMergeDateTimeStamps(ILoader loader, IDataProvider dataProvider, IEntity entity)
     {
         var lastMergeDateTimeStampInfo = new LoaderMergeStates();
 
+        var addedMergeColumn = false;
+        
         foreach (var dateColumn in loader.LoadStrategy!.Columns)
         {
-            var lastMergeDateTimeStamp = GetLastMergeDateTimeStamp(loader.Name, dateColumn, dataProvider);
+            if (entity.Attributes.Any(a => a.Name.Equals(dateColumn, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                addedMergeColumn = true;
+                var lastMergeDateTimeStamp = GetLastMergeDateTimeStamp(loader.Name, dateColumn, dataProvider);
 
-            lastMergeDateTimeStampInfo[dateColumn] = new MergeState()
+                lastMergeDateTimeStampInfo[dateColumn] = new MergeState()
+                {
+                    Loader = loader.Name,
+                    Property = dateColumn,
+                    LastDateLoadedUtc = lastMergeDateTimeStamp,
+                };    
+            }
+            
+        }
+
+        if (!addedMergeColumn)
+        {
+            var lastMergeDateTimeStamp = GetLastMergeDateTimeStamp(loader.Name, EtlExecutorConstants.DefaultMergeProperty, dataProvider);
+            lastMergeDateTimeStampInfo[EtlExecutorConstants.DefaultMergeProperty] = new MergeState()
             {
                 Loader = loader.Name,
-                Property = dateColumn,
+                Property = EtlExecutorConstants.DefaultMergeProperty,
                 LastDateLoadedUtc = lastMergeDateTimeStamp,
             };
+            RemoveEntityMergeDateTimeStamps(loader.Name, dataProvider);
+        }
+        else
+        {
+            RemoveDefaultMergeDateTimeStamp(loader.Name, dataProvider);
         }
 
         return lastMergeDateTimeStampInfo;
@@ -316,7 +365,6 @@ public class EtlExecutor : IEtlExecutor
             }
         }
     }
-
 
     private static DateTime GetLastMergeDateTimeStamp(string loaderName, string dateColumn, 
         IDataProvider destinationDbProvider)
@@ -381,6 +429,28 @@ public class EtlExecutor : IEtlExecutor
         var result = SqlTask.ExecuteNonQuery(destinationDbProvider.ConnectionManager, updateSql);
 
         return result == 1;
+    }
+
+    private static void RemoveDefaultMergeDateTimeStamp(string loaderName, IDataProvider destinationDbProvider)
+    {
+        var mergeStateTableName = destinationDbProvider.ToTableNameForSqlRaw(DatabaseObject.MergeStateTableName, DatabaseObject.MetadataSchemaName);
+        var deleteQuery = new SqlKata.Query(mergeStateTableName)
+            .Where("Loader", loaderName)
+            .Where("Property", EtlExecutorConstants.DefaultMergeProperty)
+            .AsDelete();
+        var deleteSql = destinationDbProvider.SqlCompiler.Compile(deleteQuery).ToString();
+        SqlTask.ExecuteNonQuery(destinationDbProvider.ConnectionManager, deleteSql);
+    }
+    
+    private static void RemoveEntityMergeDateTimeStamps(string loaderName, IDataProvider destinationDbProvider)
+    {
+        var mergeStateTableName = destinationDbProvider.ToTableNameForSqlRaw(DatabaseObject.MergeStateTableName, DatabaseObject.MetadataSchemaName);
+        var deleteQuery = new SqlKata.Query(mergeStateTableName)
+            .Where("Loader", loaderName)
+            .Where("Property", "!=", EtlExecutorConstants.DefaultMergeProperty)
+            .AsDelete();
+        var deleteSql = destinationDbProvider.SqlCompiler.Compile(deleteQuery).ToString();
+        SqlTask.ExecuteNonQuery(destinationDbProvider.ConnectionManager, deleteSql);
     }
 
     private void LogReloadAnalytics(int inserts)

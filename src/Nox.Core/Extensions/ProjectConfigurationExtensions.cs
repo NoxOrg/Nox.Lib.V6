@@ -1,6 +1,7 @@
 using AutoMapper;
 using Nox.Core.Configuration;
 using Nox.Core.Configuration.Secrets;
+using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Configuration;
 using Nox.Core.Models;
 
@@ -8,7 +9,7 @@ namespace Nox.Core.Extensions;
 
 public static class ProjectConfigurationExtensions
 {
-    internal static Models.ProjectConfiguration ToMetaService(this IYamlConfiguration source)
+    internal static IProjectConfiguration ToMetaService(this IYamlConfiguration source)
     {
         var mapperConfig = new MapperConfiguration(cfg =>
         {
