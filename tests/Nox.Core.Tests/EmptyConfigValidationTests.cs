@@ -1,4 +1,5 @@
 using System.Linq;
+using FluentValidation;
 using Nox.Core.Configuration;
 using Nox.Core.Validation.Configuration;
 using NUnit.Framework;
