@@ -4,15 +4,17 @@
 
 name: Person
 description: Persons
+pluralName: Persons
 table: Person
 schema: dbo
 
-key: 
-  name: Id
-  description: The person's unique identifier 
-  type: int
-
 attributes:
+  - name: Id
+    description: The person's unique identifier 
+    isPrimaryKey: true
+    type: int
+    canFilter: true
+    canSort: true
 
   - name: Name
     description: The name of the person

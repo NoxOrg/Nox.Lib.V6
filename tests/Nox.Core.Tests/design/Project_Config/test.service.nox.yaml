@@ -1,0 +1,47 @@
+#
+# Service definition
+#
+
+name: Test
+
+description: Test Microservice
+
+database:
+  name: Test
+  provider: SqLite
+  connectionString: Data Source=./DataTest.db
+
+messagingProviders:
+  - name: TestMessagingProvider1
+    provider: InMemory
+  - name: TestMessagingProvider2
+    provider: InMemory
+    
+dataSources:
+  - name: TestDataSource1
+    provider: SqLite
+    connectionString: Data Source=Test;Mode=Memory;Cache=Shared
+  - name: TestDataSource2
+    provider: SqLite
+    server: localhost
+    port: 1433
+    user: sa
+    password: Developer*123
+  - name: TestDataSource3
+    provider: SqLite
+    connectionVariable: TestConnectionVariable
+
+versionControl:
+  provider: azureDevOps
+  server: https://dev.azure.com/iwgplc
+  project: Nox.Test
+  repository: Test.Api.V1
+  relativeProjectSourceFolder: ./
+  relativeDockerFilePath: /Dockerfile
+
+team:
+  developers:
+    - name: Test User
+      userName: test.user@iwgplc.com
+      mobilePhoneNumber: +1234567890
+      isAdmin: true

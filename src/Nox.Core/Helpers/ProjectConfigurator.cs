@@ -1,6 +1,7 @@
 using Nox.Core.Configuration;
 using Nox.Core.Constants;
 using Nox.Core.Interfaces.Configuration;
+using Nox.Core.Models;
 using Serilog;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -37,6 +38,7 @@ public class ProjectConfigurator
             .EnumerateFiles(_designRoot, FileExtension.ServiceDefinition, SearchOption.AllDirectories)
             .Select(f =>
             {
+                var definitionFullPath = Path.GetFullPath(f);
                 var config = _deserializer.Deserialize<YamlConfiguration>(ReadDefinitionFile(f));
                 config.DefinitionFileName = Path.GetFullPath(f);
                 if (config.Database != null) config.Database.DefinitionFileName = Path.GetFullPath(f);
@@ -44,16 +46,32 @@ public class ProjectConfigurator
                 {
                     foreach (var msgProviderConfig in config.MessagingProviders)
                     {
-                        msgProviderConfig.DefinitionFileName = Path.GetFullPath(f);
+                        msgProviderConfig.DefinitionFileName = definitionFullPath;
                     }    
                 }
 
-                if (config.DataSources == null) return config;
-                foreach (var dsConfig in config.DataSources)
+                if (config.DataSources != null)
                 {
-                    dsConfig.DefinitionFileName = Path.GetFullPath(f);
+                    foreach (var dsConfig in config.DataSources)
+                    {
+                        dsConfig.DefinitionFileName = definitionFullPath;
+                    }
                 }
 
+                if (config.VersionControl != null)
+                {
+                    config.VersionControl.DefinitionFileName = definitionFullPath;
+                }
+
+                if (config.Team != null)
+                {
+                    config.Team.DefinitionFileName = definitionFullPath;
+                    foreach (var dev in config.Team.Developers)
+                    {
+                        dev.DefinitionFileName = definitionFullPath;
+                    }
+                }
+                
                 return config;
             })
             .FirstOrDefault();

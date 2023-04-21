@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Nox.Core.Tests;
 
-public class ConfigurationTests: ConfigurationTestFixture
+public class YamlConfigurationTests: ConfigurationTestFixture
 {
     [Test]
     public void Can_Load_Nox_Configuration_From_Yaml_Definitions()
