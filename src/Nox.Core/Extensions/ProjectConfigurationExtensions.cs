@@ -36,9 +36,9 @@ public static class ProjectConfigurationExtensions
             cfg.CreateMap<VersionControlConfiguration, VersionControl>();
             cfg.CreateMap<TeamConfiguration, Team>();
             cfg.CreateMap<TeamMemberConfiguration, TeamMember>();
+        });
 
         var mapper = mapperConfig.CreateMapper();
         return mapper.Map<Models.ProjectConfiguration>(source);
     }
-
 }
