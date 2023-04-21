@@ -11,25 +11,23 @@ using Nox.Etl;
 using Nox.Jobs;
 using Nox.Lib;
 using Nox.Messaging;
-using Nox.Model;
 using Nox.Utilities.Secrets;
 
 namespace Nox;
 
 public static class ServiceExtensions
 {
-    private static readonly IConfiguration? Configuration = ConfigurationHelper.GetNoxAppSettings();
+    private static readonly IConfiguration? _configuration = ConfigurationHelper.GetNoxAppSettings();
 
     public static IServiceCollection AddNox(
         this IServiceCollection services,
         NoxSwaggerConfiguration? swaggerConfiguration = null)
     {
-        HandleSwaggerGeneration(services, swaggerConfiguration);
 
         var designRoot = "./";
-        if (Configuration?["Nox:DefinitionRootPath"] != null)
+        if (_configuration?["Nox:DefinitionRootPath"] != null)
         {
-            designRoot = Configuration["Nox:DefinitionRootPath"];
+            designRoot = _configuration["Nox:DefinitionRootPath"];
         }
 
         if (services.AddNoxConfiguration(designRoot!).ConfirmNoxConfigurationAdded())
@@ -38,25 +36,28 @@ public static class ServiceExtensions
                 .AddPersistedSecretStore()
                 .AddNoxMessaging(false)
                 .AddDataProviderFactory()
-                .AddDynamicApi(Configuration!)
+                .AddDynamicApi(_configuration!)
                 .AddData()
                 .AddEtl()
                 .AddMicroservice()
                 .AddJobScheduler();
         }
 
+        services.AddNoxSwaggerGeneration(swaggerConfiguration);
+
+
         return services;
     }
 
-    private static void HandleSwaggerGeneration(
-        IServiceCollection services,
+    public static IServiceCollection AddNoxSwaggerGeneration(
+        this IServiceCollection services,
         NoxSwaggerConfiguration? swaggerConfiguration)
     {
         swaggerConfiguration ??= new NoxSwaggerConfiguration();
 
         if (!swaggerConfiguration.UseSwaggerGen)
         {
-            return;
+            return services;
         }
 
         services.AddSwaggerGen(cfg =>
@@ -71,6 +72,8 @@ public static class ServiceExtensions
 
             swaggerConfiguration.SetupAction(cfg);
         });
+
+        return services;
     }
 
     private static IServiceCollection AddMicroservice(this IServiceCollection services)
