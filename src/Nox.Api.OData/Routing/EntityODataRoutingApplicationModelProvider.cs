@@ -50,7 +50,7 @@ namespace Nox.Api.OData.Routing
                     continue;
                 }
 
-                if (controllerModel.ControllerName == "ODataMetadata")
+                if (controllerModel.ControllerName == "Meta")
                 {
                     ProcessODataMetadata(RoutingConstants.ODATA_METADATA_ROUTE_PREFIX, model, controllerModel);
                     continue;
