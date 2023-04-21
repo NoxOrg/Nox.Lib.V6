@@ -13,6 +13,11 @@ namespace Nox.Core.Extensions;
 
 public static class ServiceCollectionExtensions
 {
+
+    private static IProjectConfiguration? _projectConfig;
+
+    public static IProjectConfiguration? NoxProjectConfiguration => _projectConfig;
+
     public static IServiceCollection AddNoxConfiguration(this IServiceCollection services, string? designRoot = null)
     {
         var configuration = ConfigurationHelper.GetNoxAppSettings();
@@ -38,11 +43,11 @@ public static class ServiceCollectionExtensions
             var validator = new YamlConfigValidator();
             validator.ValidateAndThrow(yamlConfig);
 
-            var projectConfig = new Configurator(yamlConfig)
+            _projectConfig = new Configurator(yamlConfig)
                 .WithAppConfiguration(configuration!)
                 .Configure();
 
-            services.AddSingleton(projectConfig);
+            services.AddSingleton(_projectConfig);
 
         }
 
