@@ -27,7 +27,7 @@ public static class ServiceCollectionExtensions
 
     }
 
-    private static IServiceCollection AddAndConfigureNoxUiServices(this IServiceCollection services, Action<HttpClient> configureClient = null)
+    private static IServiceCollection AddAndConfigureNoxUiServices(this IServiceCollection services, Action<HttpClient>? configureClient = null)
     {
         services.AddHttpClient("NoxUi", httpClient =>
         {
