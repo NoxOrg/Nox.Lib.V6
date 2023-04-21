@@ -33,19 +33,7 @@ namespace Nox.Api.OData.Swagger
             if (_dynamicService?.Entities == null ||
                 !_dynamicService.Entities.Any())
             {
-                if (_logger != null)
-                {
-                    _logger!.LogWarning("Warning! Nox configuration or entities were not found in ODataCustomSwaggerFilter. Using default API definitions.");
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Warning! Logger was not set to ODataCustomSwaggerFilter. Falling back to console output.");
-                    Console.WriteLine("Warning! Nox configuration or entities were not found in ODataCustomSwaggerFilter. Using default API definitions.");
-                    Console.ResetColor();
-                }
-
+                _logger?.LogWarning("Warning! Nox configuration or entities were not found in ODataCustomSwaggerFilter. Using default API definitions.");
                 return;
             }
 
@@ -60,7 +48,7 @@ namespace Nox.Api.OData.Swagger
                 .ToList();
 
             // Loop to convert generic odata path items to per entity ones
-            foreach (var entity in entities)
+            foreach (var entity in entities.OrderBy(e => e.PluralName))
             {
                 foreach (var odataPathItem in odataPathItems)
                 {

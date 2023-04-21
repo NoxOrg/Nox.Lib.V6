@@ -16,9 +16,10 @@ database:
 
   ### Sql Server
   provider: sqlServer
-  options: Trusted_Connection=no;connection timeout=120;
-  user: sa  
-  password: Developer*123
+  connectionVariable: DbConnection
+#  options: Trusted_Connection=no;connection timeout=120;
+#  user: sa  
+#  password: Developer*123
   
 messagingProviders:
 

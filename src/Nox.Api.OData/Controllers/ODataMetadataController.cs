@@ -2,7 +2,7 @@
 
 namespace Nox.Api.OData.Controllers
 {
-    public class ODataMetadataController : MetadataController
+    public class MetaController : MetadataController
     {
     }
 }

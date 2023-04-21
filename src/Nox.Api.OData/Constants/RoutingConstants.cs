@@ -3,7 +3,7 @@
     public static class RoutingConstants
     {
         public const string ODATA_ROUTE_PREFIX = "api";
-        public const string ODATA_METADATA_ROUTE_PREFIX = "odata";
+        public const string ODATA_METADATA_ROUTE_PREFIX = "api";
 
         public const string EntitySetParameterName = "entityset";
         public const string PropertyParameterName = "property";

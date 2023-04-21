@@ -28,7 +28,5 @@ internal class NoxDataService : INoxDataService
 
 internal class OData
 {
-    [JsonProperty("odata.metadata")]
-    public string Metadata { get; set; } = null!;
     public List<ExpandoObject> Value { get; set; } = null!;
 }

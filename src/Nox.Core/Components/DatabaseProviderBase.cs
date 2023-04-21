@@ -66,11 +66,26 @@ public abstract class DatabaseProviderBase : IDataProvider
 
         foreach (var dateColumn in dateTimeStampColumns)
         {
-            if (!lastMergeDateTimeStampInfo[dateColumn].LastDateLoadedUtc.Equals(NoxDateTime.MinSqlDate))
+            if (lastMergeDateTimeStampInfo.Any(c => c.Key.Equals(dateColumn, StringComparison.InvariantCultureIgnoreCase)))
             {
-                query = query.OrWhere(
-                    q => q.WhereNotNull(dateColumn).Where(dateColumn, ">", lastMergeDateTimeStampInfo[dateColumn].LastDateLoadedUtc)
-                );
+                if (!lastMergeDateTimeStampInfo[dateColumn].LastDateLoadedUtc.Equals(NoxDateTime.MinSqlDate))
+                { 
+                    query = query.OrWhere(
+                        q => q.WhereNotNull(dateColumn).Where(dateColumn, ">", lastMergeDateTimeStampInfo[dateColumn].LastDateLoadedUtc)
+                    );
+                }    
+            }
+            else
+            {
+                if (lastMergeDateTimeStampInfo.Any(c => c.Key.Equals(EtlExecutorConstants.DefaultMergeProperty, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    if (!lastMergeDateTimeStampInfo[EtlExecutorConstants.DefaultMergeProperty].LastDateLoadedUtc.Equals(NoxDateTime.MinSqlDate))
+                    { 
+                        query = query.OrWhere(
+                            q => q.WhereNotNull(dateColumn).Where(dateColumn, ">", lastMergeDateTimeStampInfo[EtlExecutorConstants.DefaultMergeProperty].LastDateLoadedUtc)
+                        );
+                    }    
+                }
             }
         }
 
