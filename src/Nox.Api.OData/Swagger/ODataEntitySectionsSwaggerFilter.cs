@@ -37,8 +37,15 @@ namespace Nox.Api.OData.Swagger
                 return;
             }
 
+            var ownedEntities = _dynamicService
+                .Entities
+                .SelectMany(e => e.Value.OwnedRelationships)
+                .Select(r => r.Entity)
+                .Distinct();
+
             var entities = _dynamicService!.Entities!
-                .Where(x => !string.IsNullOrWhiteSpace(x.Value.PluralName))
+                .Where(x => !string.IsNullOrWhiteSpace(x.Value.PluralName)
+                    && !ownedEntities.Contains(x.Key)) // show only independent entities
                 .Select(x => x.Value);
 
             var odataPathItems = swaggerDoc.Paths

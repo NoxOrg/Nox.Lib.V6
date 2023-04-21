@@ -16,18 +16,16 @@ namespace Samples.Api.Domain.Store.Commands
 
         public override async Task<INoxCommandResult> ExecuteAsync(ReserveCommand reserveCommandDto)
         {
-            // DTO validation
-
-            // Check balance - aggregate validation
+            // DTO validation           
 
             using var transaction = await DbContext.Database.BeginTransactionAsync();
 
             try
             {
                 var store = await DbContext
-                .Store
-                .Include(s => s.Reservations)
-                .FirstOrDefaultAsync(s => s.Id == reserveCommandDto.StoreId);
+                    .Store
+                    .Include(s => s.Reservations)
+                    .FirstOrDefaultAsync(s => s.Id == reserveCommandDto.StoreId);
 
                 if (store == null)
                 {

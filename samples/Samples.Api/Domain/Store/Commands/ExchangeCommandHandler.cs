@@ -18,8 +18,6 @@ namespace Samples.Api.Domain.Store.Commands
         {
             // DTO validation
 
-            // Check balance - aggregate validation
-
             using var transaction = await DbContext.Database.BeginTransactionAsync();
 
             try
@@ -35,6 +33,8 @@ namespace Samples.Api.Domain.Store.Commands
                     return new NoxCommandResult { IsSuccess = false, Message = "Store cannot be found" };
                 }
 
+                // Check balance - aggregate validation
+
                 // TODO: change balances
 
                 await DbContext.SaveChangesAsync();
@@ -42,11 +42,18 @@ namespace Samples.Api.Domain.Store.Commands
             }
             catch (Exception)
             {
-                // TODO: Handle failure
+                // TODO: Handle failure and add logger
                 return new NoxCommandResult { IsSuccess = false };
             }
 
             // emit events
+            await RaiseDomainEvents(exchangeCommandDto);
+
+            return new NoxCommandResult { IsSuccess = true };
+        }
+
+        private async Task RaiseDomainEvents(ExchangeCommand exchangeCommandDto)
+        {
             await SendBalanceChangedDomainEventAsync(
                 new Nox.Events.BalanceChangedDomainEvent
                 {
@@ -68,8 +75,6 @@ namespace Samples.Api.Domain.Store.Commands
                         CurrencyId = exchangeCommandDto.DestinationCurrencyId
                     }
                 });
-
-            return new NoxCommandResult { IsSuccess = true };
         }
     }
 }

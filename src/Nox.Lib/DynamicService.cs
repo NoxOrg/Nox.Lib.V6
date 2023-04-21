@@ -1,27 +1,21 @@
+using Hangfire;
+using Hangfire.Storage;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Nox.Core.Components;
+using Nox.Core.Constants;
+using Nox.Core.Interfaces;
+using Nox.Core.Interfaces.Api;
+using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces.Entity;
+using Nox.Core.Interfaces.Etl;
+using Nox.Core.Models;
+using Nox.Entity.XtendedAttributes;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
-using Hangfire;
-using Hangfire.Storage;
-using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Nox.Core.Extensions;
-using Nox.Core.Components;
-using Nox.Core.Constants;
-using Nox.Core.Exceptions;
-using Nox.Core.Interfaces;
-using Nox.Core.Interfaces.Api;
-using Nox.Core.Interfaces.Configuration;
-using Nox.Core.Interfaces.Database;
-using Nox.Core.Interfaces.Entity;
-using Nox.Core.Interfaces.Etl;
-using Nox.Core.Interfaces.Messaging;
-using Nox.Core.Models;
-using Nox.Entity.XtendedAttributes;
 
 namespace Nox.Lib;
 
@@ -79,7 +73,6 @@ public class DynamicService : IDynamicService
             .WithMetaService(metaService)
             .WithDatabaseProviderFactory(factory)
             .Configure();
-
     }
 
     public async Task<bool> ExecuteDataLoadersAsync()
@@ -87,7 +80,6 @@ public class DynamicService : IDynamicService
         _logger.LogInformation("Executing data load tasks");
 
         return await _etlExecutor.ExecuteAsync(_metaService);
-
     }
 
     public async Task<bool> ExecuteDataLoaderAsync(ILoader loader)
