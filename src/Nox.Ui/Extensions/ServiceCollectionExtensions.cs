@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
+using MudBlazor.Services;
 using Nox.Core.Extensions;
 using Nox.Ui.Data;
-using System.Runtime.CompilerServices;
 
 namespace Nox;
 
@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddNoxUi(this IServiceCollection services)
     {
 
-        services.AddAndConfigureNoxUiServices();
+        services.AddAndConfigureNoxUiServices(c => c.BaseAddress = new Uri(DefaultBaseUrl)); ;
 
         return services; 
 
@@ -32,7 +32,7 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient("NoxUi", httpClient =>
         {
             httpClient.DefaultRequestHeaders.Add(
-                HeaderNames.Accept, "application/json;odata=verbose");
+                HeaderNames.Accept, "application/json;odata.metadata=verbose");
             httpClient.DefaultRequestHeaders.Add(
                 HeaderNames.UserAgent, $"NoxUi-{AppDomain.CurrentDomain.FriendlyName}");
 
@@ -42,6 +42,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<NoxDataService>();
 
         services.AddNoxConfiguration();
+
+        services.AddMudServices();
 
         return services;
     }

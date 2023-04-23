@@ -1,0 +1,24 @@
+﻿@using Microsoft.AspNetCore.Components.Routing;
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <CascadingValue Value="this">
+        @ChildContent
+    </CascadingValue>
+</MudLayout>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    public bool IsNavMenuOpen = true;
+
+    public void ToggleNavMenuOpen()
+    {
+        IsNavMenuOpen = !IsNavMenuOpen;
+        StateHasChanged();
+    }
+}

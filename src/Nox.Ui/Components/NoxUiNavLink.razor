@@ -1,0 +1,15 @@
+﻿@using Microsoft.AspNetCore.Components.Routing
+
+<MudNavLink Href="@Href" Icon="@Icon" Match="NavLinkMatch.All">@ChildContent</MudNavLink>
+
+@code
+{
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string Href { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Icon { get; set; } = string.Empty;
+}

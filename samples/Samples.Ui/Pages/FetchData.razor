@@ -1,48 +1,39 @@
 ﻿@page "/fetchdata"
+@inject WeatherForecastService ForecastService
+@using Samples.Ui.Data
 
 <PageTitle>Weather forecast</PageTitle>
 
-@using Samples.Ui.Data
-@inject WeatherForecastService ForecastService
-
-<h1>Weather forecast</h1>
+<MudText Typo="Typo.h5">Weather forecast</MudText>
 
 <p>This component demonstrates fetching data from a service.</p>
 
-@if (forecasts == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<MudTable Items="@_forecasts" Hover="true" 
+            Breakpoint="Breakpoint.Sm"
+            Loading="@_loading" LoadingProgressColor="Color.Info"> 
+    <HeaderContent>
+        <MudTh>Date</MudTh>
+        <MudTh>Temp. (C)</MudTh>
+        <MudTh>Temp. (F)</MudTh>
+        <MudTh>Summary</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Date.ToShortDateString()</MudTd>
+        <MudTd>@context.TemperatureC</MudTd>
+        <MudTd>@context.TemperatureF</MudTd>
+        <MudTd>@context.Summary</MudTd>
+    </RowTemplate>
+</MudTable>
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private WeatherForecast[]? _forecasts;
+
+    private bool _loading = false;
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+        _loading = true;
+        _forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+        _loading = false;
     }
 }

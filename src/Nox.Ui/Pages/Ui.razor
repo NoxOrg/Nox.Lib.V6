@@ -1,48 +1,112 @@
 ﻿@page "/ui/{Entity}"
 
-<PageTitle>Nox User Interface Component</PageTitle>
+@using Nox.Ui.Data
+@using System.Linq.Expressions;
 
-<h1>@Entity</h1>
+<PageTitle>@Entity</PageTitle>
 
-@if(isLoading)
+<MudText Typo="Typo.h5">@Entity</MudText>
+
+@if (entityWhilstLoading != null && entity == null)
 {
-    <div class="spinner">Loading...</div>
-}    
-else
+    <MudText Typo="Typo.subtitle1">@entityWhilstLoading.Description</MudText>
+
+    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="50px"/>
+
+    <MudDataGrid Items="@dummyData" Dense="true"
+        Filterable="false" SortMode="@SortMode.None" Groupable="false"
+        Loading="@isLoading" LoadingProgressColor="@Color.Info">
+
+        <Columns>
+            <TemplateColumn>
+                <CellTemplate>
+                    <MudSkeleton />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+}
+
+@if (entity != null && entityWhilstLoading == null)
 {
+    <MudText Typo="Typo.subtitle1">@entity?.Description</MudText>
 
-@if (entity is not null)
-{
-    <p>@entity.Description</p>
+    <MudDataGrid T="NoxDataRow" ServerData="LoadServerData" Dense="true" FixedHeader="true"
+             Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" Fil
+             SortMode="@SortMode.Single" 
+             Groupable="false"
+        Loading="@isLoading" LoadingProgressColor="@Color.Info"
+        @ref="mainGrid">
 
-    @if(data is not null)
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var row in data)
-                {
-                    <tr>
-                        <td>@row.Id</td>
-                        <td>@row.Name</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <ToolBarContent>
+  
+            <MudSpacer />
+            <MudTextField 
+                T="string"
+                Placeholder="Search" Adornment="Adornment.Start" Immediate="false" Clearable="true"
+                AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" 
+                ValueChanged="s => ApplyFilter(s)"
+            />
+            
+        </ToolBarContent>
 
-        <ul>
-            @foreach (var attr in entity.Attributes)
+        <Columns>
+
+            @if (columnCount > 0)
             {
-                <li>@attr.Name</li>
+                <PropertyColumn T="NoxDataRow" TProperty="string" Title="@headers[0]" Property="x => x.Columns[0]" />
             }
-        </ul>
 
-    }
+            @if (columnCount > 1)
+            {
+                <PropertyColumn T="NoxDataRow" TProperty="string" Title="@headers[1]" Property="x => x.Columns[1]" />
+            }
+
+            @if (columnCount > 2)
+            {
+                <PropertyColumn T="NoxDataRow" TProperty="string" Title="@headers[2]" Property="x => x.Columns[2]" />
+            }
+
+            @if (columnCount > 3)
+            {
+                <PropertyColumn T="NoxDataRow" TProperty="string" Title="@headers[3]" Property="x => x.Columns[3]" />
+            }
+
+            @if (columnCount > 4)
+            {
+                <PropertyColumn T="NoxDataRow" TProperty="string" Title="@headers[4]" Property="x => x.Columns[4]" />
+            }
+
+            @if (columnCount > 5)
+            {
+                <PropertyColumn T="NoxDataRow" TProperty="string" Title="@headers[5]" Property="x => x.Columns[5]" />
+            }
+
+            @if (columnCount > 6)
+            {
+                <PropertyColumn T="NoxDataRow" TProperty="string" Title="@headers[6]" Property="x => x.Columns[6]" />
+            }
+
+            @if (columnCount > 7)
+            {
+                <PropertyColumn T="NoxDataRow" TProperty="string" Title="@headers[7]" Property="x => x.Columns[7]" />
+            }
+
+            @if (columnCount > 8)
+            {
+                <PropertyColumn T="NoxDataRow" TProperty="string" Title="@headers[8]" Property="x => x.Columns[8]" />
+            }
+
+            @if (columnCount > 9)
+            {
+                <PropertyColumn T="NoxDataRow" TProperty="string" Title="@headers[9]" Property="x => x.Columns[9]" />
+            }
+        </Columns>
+
+        <PagerContent>
+            <MudDataGridPager T="NoxDataRow"/>
+        </PagerContent>
+
+    </MudDataGrid>
 }
 
-}

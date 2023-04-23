@@ -1,0 +1,18 @@
+﻿<MudDrawer @bind-Open="Parent.IsNavMenuOpen" ClipMode="DrawerClipMode.Always"
+           Elevation="2"
+           Variant="@DrawerVariant.Mini" OpenMiniOnHover="true">
+
+    <MudNavMenu>
+        @ChildContent
+    </MudNavMenu>
+
+</MudDrawer>
+
+@code
+{
+    [CascadingParameter]
+    private NoxUiLayout Parent { get; set; } = null!;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

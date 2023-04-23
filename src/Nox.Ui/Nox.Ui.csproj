@@ -37,6 +37,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.15" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
     <PackageReference Include="Microsoft.Net.Http.Headers" Version="2.2.0" />
+    <PackageReference Include="MudBlazor" Version="6.2.2" />
     <ProjectReference Include="..\Nox.Core\Nox.Core.csproj" />
   </ItemGroup>
   <ItemGroup>

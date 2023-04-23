@@ -1,0 +1,15 @@
+﻿<MudMainContent>
+    <div style="padding-top:1em;padding-left:1em">
+    @ChildContent
+    </div>
+</MudMainContent>
+
+@code
+{
+    [CascadingParameter]
+    private NoxUiLayout? Parent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+}

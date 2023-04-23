@@ -81,7 +81,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples.FnO", "Samples.FnO\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nox.Ui", "Nox.Ui\Nox.Ui.csproj", "{12DA6E5C-97D1-4DED-A1A9-8F3D1BEDDC45}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Samples.Ui", "..\samples\Samples.Ui\Samples.Ui.csproj", "{54E72C29-82D0-4224-A81E-0C2769AC8F64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples.Ui", "..\samples\Samples.Ui\Samples.Ui.csproj", "{54E72C29-82D0-4224-A81E-0C2769AC8F64}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
