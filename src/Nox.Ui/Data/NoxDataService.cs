@@ -51,6 +51,7 @@ internal class NoxDataService : INoxDataService
         foreach (var row in data.Value)
         {
             var dataRow = new NoxDataRow();
+            dataRow.Columns.Clear();
             grid.Rows.Add(dataRow);
             foreach(var header in grid.Headers) 
             {
@@ -75,7 +76,7 @@ public class NoxDataGrid
 
 public class NoxDataRow
 {
-    public IList<string> Columns = new List<string>();
+    public IList<string> Columns = Enumerable.Range(0, 10).Select(i => string.Empty).ToList();
 }
 
 internal class ODataResponse

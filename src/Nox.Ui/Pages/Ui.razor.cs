@@ -50,14 +50,15 @@ public partial class Ui : Microsoft.AspNetCore.Components.ComponentBase
                 isNotFound = false;
                 entity = entityWhilstLoading;
                 entityWhilstLoading = null;
+                searchFilter = string.Empty;
             }
 
         }
     }
 
-    protected void ApplyFilter(string fillterText)
+    protected void ApplyFilter(string filterText)
     {
-        searchFilter = fillterText;
+        searchFilter = filterText;
         mainGrid?.ReloadServerData();
     }
 
@@ -70,11 +71,12 @@ public partial class Ui : Microsoft.AspNetCore.Components.ComponentBase
 
         string? orderByParameter = null;
         bool? orderDescendingParameter = null;
-        string? gridFilter = null;
-        string? columnFilters = null;
         string? filterParameter;
         int skipParameter = pageNum * pageSize;
         int topParameter = pageSize;
+
+        string? gridFilter = null;
+        string? columnFilters = null;
 
         if (orderState != null)
         {
@@ -133,7 +135,9 @@ public partial class Ui : Microsoft.AspNetCore.Components.ComponentBase
         string searchFilter = string.Empty;
 
         var prefix = string.Empty;
-        foreach (var h in entity!.Attributes.Where<Core.Models.EntityAttribute>(a => a.NetDataType().Name.Equals("String")))
+        var stringAttributes = entity!.Attributes.Where(a => a.NetDataType().Name.Equals("String"));
+
+        foreach (var h in stringAttributes)
         {
             searchFilter += $"{prefix}contains({h.Name},'{filterString.Trim()}')";
 
@@ -144,27 +148,41 @@ public partial class Ui : Microsoft.AspNetCore.Components.ComponentBase
         return searchFilter;
     }
 
-    private static string BuildColumnFilters(ICollection<FilterDefinition<NoxDataRow>> filterStates)
+    private string BuildColumnFilters(ICollection<FilterDefinition<NoxDataRow>> filterStates)
     {
         string fieldsFilter = string.Empty;
         var prefix = string.Empty;
+        var attributeTypes = entity!.Attributes.ToDictionary(a => a.Name, a=> a.NetDataType().Name);
+
 
         foreach (var f in filterStates)
         {
-            var field = f.Title;
+            string field = f.Title ?? string.Empty;
             var op = f.Operator;
             var value = f.Value;
 
+            var quote = (attributeTypes[field] ?? string.Empty) switch
+            {
+                "String" => "'",
+                _ => string.Empty,
+            };
+
+            var emptyToken = (attributeTypes[field] ?? string.Empty) switch
+            {
+                "String" => "''",
+                _ => "0",
+            };
+
             var clause = op!.ToLower() switch
             {
-                "contains" => $"{prefix}contains({field},'{value}')",
-                "not contains" => $"{prefix}contains({field},'{value}') ne true",
-                "equals" => $"{prefix}{field} eq '{value}'",
-                "not equals" => $"{prefix}{field} ne '{value}'",
-                "starts with" => $"{prefix}startswith({field},'{value}')",
-                "ends with" => $"{prefix}endswith({field},'{value}')",
-                "is empty" => $"{prefix}{field} eq ''",
-                "is not empty" => $"{prefix}{field} ne ''",
+                "contains" => $"{prefix}contains({field},{quote}{value}{quote})",
+                "not contains" => $"{prefix}contains({field},{quote}{value}{quote}) ne true",
+                "equals" => $"{prefix}{field} eq {quote}{value}{quote}",
+                "not equals" => $"{prefix}{field} ne {quote}{value}{quote}",
+                "starts with" => $"{prefix}startswith({field},{quote}{value}{quote})",
+                "ends with" => $"{prefix}endswith({field},{quote}{value}{quote})",
+                "is empty" => $"{prefix}{field} eq {emptyToken}",
+                "is not empty" => $"{prefix}{field} ne {emptyToken}",
                 _ => string.Empty,
             }; ;
 

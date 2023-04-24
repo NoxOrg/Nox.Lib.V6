@@ -11,11 +11,11 @@
 {
     <MudText Typo="Typo.subtitle1">@entityWhilstLoading.Description</MudText>
 
-    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="50px"/>
+    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="90px"/>
 
     <MudDataGrid Items="@dummyData" Dense="true"
         Filterable="false" SortMode="@SortMode.None" Groupable="false"
-        Loading="@isLoading" LoadingProgressColor="@Color.Info">
+             Loading="@isLoading" LoadingProgressColor="@Color.Default">
 
         <Columns>
             <TemplateColumn>
@@ -33,12 +33,27 @@
 
     <MudDataGrid T="NoxDataRow" ServerData="LoadServerData" 
              Dense="true" FixedHeader="true"
-             ColumnResizeMode="ResizeMode.Column"
-             Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" Fil
+             ColumnResizeMode="ResizeMode.Column" 
+             Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" 
              SortMode="@SortMode.Single" 
              Groupable="false"
-        Loading="@isLoading" LoadingProgressColor="@Color.Info"
-        @ref="mainGrid">
+             Loading="@isLoading" LoadingProgressColor="@Color.Default"
+             @ref="mainGrid">
+
+        <LoadingContent>
+            <MudDataGrid Items="@dummyData" Dense="true"
+                     Filterable="false" SortMode="@SortMode.None" Groupable="false"
+                     Loading="@isLoading" LoadingProgressColor="@Color.Default">
+
+                <Columns>
+                    <TemplateColumn>
+                        <CellTemplate>
+                            <MudSkeleton />
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+            </MudDataGrid>
+        </LoadingContent>
 
         <ToolBarContent>
   
