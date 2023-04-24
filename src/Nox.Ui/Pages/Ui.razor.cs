@@ -71,9 +71,12 @@ public partial class Ui : Microsoft.AspNetCore.Components.ComponentBase
         var pageSize = state.PageSize;
         var pageNum = state.Page;
         var orderState = state.SortDefinitions.FirstOrDefault();
+        var filterStates = state.FilterDefinitions;
 
         string? orderBy = null;
         bool? orderDescending = null;
+        string? searchFilter = null;
+        string? fieldsFilter = null;
         string? filter = null;
 
         if (orderState != null)
@@ -84,16 +87,61 @@ public partial class Ui : Microsoft.AspNetCore.Components.ComponentBase
             orderDescending = orderState.Descending;
         }
 
-        if (!string.IsNullOrWhiteSpace(globalFilter))
+        if (!string.IsNullOrWhiteSpace(this.globalFilter))
         {
-            filter = string.Empty;
+            searchFilter = string.Empty;
             var prefix = string.Empty;
-            foreach (var h in entity!.Attributes.Where(a => a.NetDataType().Name.Equals("String")))
+            foreach (var h in entity!.Attributes.Where<Core.Models.EntityAttribute>(a => a.NetDataType().Name.Equals("String")))
             {
-                filter += $"{prefix}contains({h.Name},'{globalFilter.Trim()}')";
+                searchFilter += $"{prefix}contains({h.Name},'{this.globalFilter.Trim()}')";
+
                 if (prefix.Length == 0)
                     prefix = " or ";
             }
+        }
+
+        if(filterStates.Any()) 
+        {
+            fieldsFilter = string.Empty;
+            var prefix = string.Empty;
+
+            foreach (var f in filterStates)
+            {
+                var field = f.Title;
+                var op = f.Operator;
+                var value = f.Value;
+
+                var clause = op!.ToLower() switch
+                {
+                    "contains" => $"{prefix}contains({field},'{value}')",
+                    "not contains" => $"{prefix}contains({field},'{value}') ne true",
+                    "equals" => $"{prefix}{field} eq '{value}'",
+                    "not equals" => $"{prefix}{field} ne '{value}'",
+                    "starts with" => $"{prefix}startswith({field},'{value}')",
+                    "ends with" => $"{prefix}endswith({field},'{value}')",
+                    "is empty" => $"{prefix}{field} eq ''",
+                    "is not empty" => $"{prefix}{field} ne ''",
+                    _ => string.Empty,
+                }; ;
+
+                fieldsFilter += clause;
+
+                if (prefix.Length == 0)
+                    prefix = " and ";
+            }
+        }
+
+        if (fieldsFilter != null && searchFilter != null)
+        {
+            filter = $"({fieldsFilter}) and ({searchFilter})";
+        }
+        else if (fieldsFilter != null)
+        {
+            filter = fieldsFilter;
+        }
+        else if (searchFilter != null)
+        {
+            filter = searchFilter;
         }
 
         var result = await NoxDataService.Find(entity!, 
