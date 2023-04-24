@@ -31,7 +31,9 @@
 {
     <MudText Typo="Typo.subtitle1">@entity?.Description</MudText>
 
-    <MudDataGrid T="NoxDataRow" ServerData="LoadServerData" Dense="true" FixedHeader="true"
+    <MudDataGrid T="NoxDataRow" ServerData="LoadServerData" 
+             Dense="true" FixedHeader="true"
+             ColumnResizeMode="ResizeMode.Column"
              Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" Fil
              SortMode="@SortMode.Single" 
              Groupable="false"

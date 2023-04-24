@@ -1,13 +1,8 @@
-﻿using Humanizer;
-using Microsoft.AspNetCore.Components;
-using Microsoft.EntityFrameworkCore.Update;
-using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Entity;
 using Nox.Ui.Data;
-using System.Net.Http;
-using static MassTransit.ValidationResultExtensions;
 
 namespace Nox.Ui.Pages;
 
@@ -32,7 +27,7 @@ public partial class Ui : Microsoft.AspNetCore.Components.ComponentBase
     protected IList<string> headers = null!;
 
     protected MudDataGrid<NoxDataRow>? mainGrid;
-    protected string globalFilter = string.Empty;
+    protected string searchFilter = string.Empty;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -62,7 +57,7 @@ public partial class Ui : Microsoft.AspNetCore.Components.ComponentBase
 
     protected void ApplyFilter(string fillterText)
     {
-        globalFilter = fillterText;
+        searchFilter = fillterText;
         mainGrid?.ReloadServerData();
     }
 
@@ -73,88 +68,115 @@ public partial class Ui : Microsoft.AspNetCore.Components.ComponentBase
         var orderState = state.SortDefinitions.FirstOrDefault();
         var filterStates = state.FilterDefinitions;
 
-        string? orderBy = null;
-        bool? orderDescending = null;
-        string? searchFilter = null;
-        string? fieldsFilter = null;
-        string? filter = null;
+        string? orderByParameter = null;
+        bool? orderDescendingParameter = null;
+        string? gridFilter = null;
+        string? columnFilters = null;
+        string? filterParameter;
+        int skipParameter = pageNum * pageSize;
+        int topParameter = pageSize;
 
         if (orderState != null)
         {
-            var stringIndex = new string(orderState.SortBy.Where(c => char.IsDigit(c)).ToArray());
-            var intIndex = int.Parse(stringIndex);
-            orderBy = headers[intIndex];
-            orderDescending = orderState.Descending;
+            orderByParameter = BuildOrder(orderState);
+            orderDescendingParameter = orderState.Descending;
         }
 
-        if (!string.IsNullOrWhiteSpace(this.globalFilter))
+        if (!string.IsNullOrWhiteSpace(searchFilter))
         {
-            searchFilter = string.Empty;
-            var prefix = string.Empty;
-            foreach (var h in entity!.Attributes.Where<Core.Models.EntityAttribute>(a => a.NetDataType().Name.Equals("String")))
-            {
-                searchFilter += $"{prefix}contains({h.Name},'{this.globalFilter.Trim()}')";
-
-                if (prefix.Length == 0)
-                    prefix = " or ";
-            }
+            gridFilter = BuildGridFilter(searchFilter);
         }
 
-        if(filterStates.Any()) 
+        if (filterStates.Any())
         {
-            fieldsFilter = string.Empty;
-            var prefix = string.Empty;
-
-            foreach (var f in filterStates)
-            {
-                var field = f.Title;
-                var op = f.Operator;
-                var value = f.Value;
-
-                var clause = op!.ToLower() switch
-                {
-                    "contains" => $"{prefix}contains({field},'{value}')",
-                    "not contains" => $"{prefix}contains({field},'{value}') ne true",
-                    "equals" => $"{prefix}{field} eq '{value}'",
-                    "not equals" => $"{prefix}{field} ne '{value}'",
-                    "starts with" => $"{prefix}startswith({field},'{value}')",
-                    "ends with" => $"{prefix}endswith({field},'{value}')",
-                    "is empty" => $"{prefix}{field} eq ''",
-                    "is not empty" => $"{prefix}{field} ne ''",
-                    _ => string.Empty,
-                }; ;
-
-                fieldsFilter += clause;
-
-                if (prefix.Length == 0)
-                    prefix = " and ";
-            }
+            columnFilters = BuildColumnFilters(filterStates);
         }
 
-        if (fieldsFilter != null && searchFilter != null)
-        {
-            filter = $"({fieldsFilter}) and ({searchFilter})";
-        }
-        else if (fieldsFilter != null)
-        {
-            filter = fieldsFilter;
-        }
-        else if (searchFilter != null)
-        {
-            filter = searchFilter;
-        }
+        filterParameter = CombineGridAndColumnFilters(gridFilter, columnFilters);
 
-        var result = await NoxDataService.Find(entity!, 
-            skip: pageNum * pageSize, top: pageSize, 
-            orderby: orderBy, desc: orderDescending,
-            filter: filter    
+        var result = await NoxDataService.Find(entity!,
+            skip: skipParameter, top: topParameter,
+            orderby: orderByParameter, desc: orderDescendingParameter,
+            filter: filterParameter
         );
 
-        return new GridData<NoxDataRow>() { 
-            Items = result?.Rows ?? Enumerable.Empty<NoxDataRow>(), 
+        return new GridData<NoxDataRow>()
+        {
+            Items = result?.Rows ?? Enumerable.Empty<NoxDataRow>(),
             TotalItems = result?.RowCount ?? 0
         };
     }
+
+    private static string? CombineGridAndColumnFilters(string? gridFilter, string? columnFilters)
+    {
+        if (columnFilters != null && gridFilter != null)
+            return $"({columnFilters}) and ({gridFilter})";
+
+        else if (columnFilters != null)
+            return columnFilters;
+
+        else if (gridFilter != null)
+            return  gridFilter;
+
+        return null;
+    }
+
+    private string BuildOrder(SortDefinition<NoxDataRow> orderState)
+    {
+        var stringIndex = new string(orderState.SortBy.Where(c => char.IsDigit(c)).ToArray());
+        var intIndex = int.Parse(stringIndex);
+        return headers[intIndex];
+    }
+
+    private string BuildGridFilter(string filterString)
+    {
+        string searchFilter = string.Empty;
+
+        var prefix = string.Empty;
+        foreach (var h in entity!.Attributes.Where<Core.Models.EntityAttribute>(a => a.NetDataType().Name.Equals("String")))
+        {
+            searchFilter += $"{prefix}contains({h.Name},'{filterString.Trim()}')";
+
+            if (prefix.Length == 0)
+                prefix = " or ";
+        }
+
+        return searchFilter;
+    }
+
+    private static string BuildColumnFilters(ICollection<FilterDefinition<NoxDataRow>> filterStates)
+    {
+        string fieldsFilter = string.Empty;
+        var prefix = string.Empty;
+
+        foreach (var f in filterStates)
+        {
+            var field = f.Title;
+            var op = f.Operator;
+            var value = f.Value;
+
+            var clause = op!.ToLower() switch
+            {
+                "contains" => $"{prefix}contains({field},'{value}')",
+                "not contains" => $"{prefix}contains({field},'{value}') ne true",
+                "equals" => $"{prefix}{field} eq '{value}'",
+                "not equals" => $"{prefix}{field} ne '{value}'",
+                "starts with" => $"{prefix}startswith({field},'{value}')",
+                "ends with" => $"{prefix}endswith({field},'{value}')",
+                "is empty" => $"{prefix}{field} eq ''",
+                "is not empty" => $"{prefix}{field} ne ''",
+                _ => string.Empty,
+            }; ;
+
+            fieldsFilter += clause;
+
+            if (prefix.Length == 0)
+                prefix = " and ";
+        }
+
+        return fieldsFilter;
+    }
+
 
 }
 
