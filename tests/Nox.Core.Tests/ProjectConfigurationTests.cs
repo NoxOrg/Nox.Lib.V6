@@ -109,7 +109,7 @@ public class ProjectConfigurationTests: ConfigurationTestFixture
         Assert.That(config.VersionControl, Is.Not.Null);
         Assert.That(config.VersionControl!.DefinitionFileName, Is.Not.Empty);
         Assert.That(config.VersionControl!.Provider, Is.EqualTo("azureDevOps"));
-        Assert.That(config.VersionControl!.Server, Is.EqualTo("https://dev.azure.com/iwgplc"));
+        Assert.That(config.VersionControl!.Server, Is.EqualTo("https://dev.azure.com/test"));
         Assert.That(config.VersionControl!.Project, Is.EqualTo("Nox.Test"));
         Assert.That(config.VersionControl!.Repository, Is.EqualTo("Test.Api.V1"));
         Assert.That(config.VersionControl!.RelativeProjectSourceFolder, Is.EqualTo("./"));
@@ -122,8 +122,12 @@ public class ProjectConfigurationTests: ConfigurationTestFixture
         var devs = config.Team.Developers!.ToList();
         Assert.That(devs[0].DefinitionFileName, Is.Not.Empty);
         Assert.That(devs[0].Name, Is.EqualTo("Test User"));
-        Assert.That(devs[0].UserName, Is.EqualTo("test.user@iwgplc.com"));
+        Assert.That(devs[0].UserName, Is.EqualTo("test.user@test.com"));
         Assert.That(devs[0].MobilePhoneNumber, Is.EqualTo("+1234567890"));
         Assert.That(devs[0].IsAdmin, Is.True);
+        Assert.That(devs[1].DefinitionFileName, Is.Not.Empty);
+        Assert.That(devs[1].Name, Is.EqualTo("Product Owner"));
+        Assert.That(devs[1].UserName, Is.EqualTo("product.owner@test.com"));
+        Assert.That(devs[1].IsProductOwner, Is.True);
     }
 }

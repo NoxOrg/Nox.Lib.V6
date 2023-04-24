@@ -33,7 +33,7 @@ dataSources:
 
 versionControl:
   provider: azureDevOps
-  server: https://dev.azure.com/iwgplc
+  server: https://dev.azure.com/test
   project: Nox.Test
   repository: Test.Api.V1
   relativeProjectSourceFolder: ./
@@ -42,6 +42,9 @@ versionControl:
 team:
   developers:
     - name: Test User
-      userName: test.user@iwgplc.com
+      userName: test.user@test.com
       mobilePhoneNumber: +1234567890
       isAdmin: true
+    - name: Product Owner
+      userName: product.owner@test.com
+      isProductOwner: true
