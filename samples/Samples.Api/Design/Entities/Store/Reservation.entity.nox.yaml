@@ -8,7 +8,7 @@
 
 name: Reservation
 
-description: The cache reservation in Store
+description: The cash reservation in Store
 
 relationships:
   - name: Store

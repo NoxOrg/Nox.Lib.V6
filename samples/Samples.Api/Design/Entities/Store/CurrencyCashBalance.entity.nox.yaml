@@ -1,14 +1,14 @@
 ﻿#
-# CurrencyCacheBalance.entity.nox.yaml
+# CurrencyCashBalance.entity.nox.yaml
 #
 # https://open.er-api.com/v6/latest/CHF
 #
 # yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
 #
 
-name: CurrencyCacheBalance
+name: CurrencyCashBalance
 
-description: The cache balance in Store
+description: The cash balance in Store
 
 key:
   entities: [Store, Currency]
