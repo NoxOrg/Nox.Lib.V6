@@ -5,7 +5,7 @@
 #
 
 name: Store
-description: Cache Store
+description: Cash Store
 pluralName: Stores
 table: Store
 schema: dbo
@@ -24,14 +24,14 @@ ownedRelationships:
 
   - name: CashBalances
     entity: CurrencyCashBalance
-    description:
+    description: Cash balances by currency.
     isMany: true
     isRequired: true
 
 queries:
     - name: ActiveReservations
-      description: 
-      parameters:  # simple parameters or DTO in case of complex parameters set with validation / permissions etc
+      description: Gets active reservations by store.
+      parameters:
        - name: storeId
          description: 
          type: int # can be DTO here
@@ -42,16 +42,16 @@ queries:
 
 commands:
     - name: Reserve
-      description:
+      description: Reserves amount of cash in a store for a specific customer.
       events: [BalanceChanged]
       
     - name: Exchange
-      description:
+      description: Performs an exchange operation in a store.
       events: [BalanceChanged]
 
 events:
     - name: BalanceChanged
-      description:
+      description: Represents a cash balance change in a store.
       type: BalanceChangedDto
 
 key: 

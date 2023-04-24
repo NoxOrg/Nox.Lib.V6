@@ -39,7 +39,7 @@ messagingProviders:
     ## RabbitMQ
     provider: rabbitMQ
     connectionString: rabbitmq://guest:guest@localhost/
-  
+    
     ### Azure Service Bus
     #provider: azureServiceBus
     #connectionString: ${ConnectionString:AzureServiceBus}

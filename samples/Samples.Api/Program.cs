@@ -16,7 +16,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddNox();
 
 // Register queries/commands implementations - TODO: make automatic
-NoxDomainConfiguration.AddServices(builder.Services);
+NoxDomainApiConfiguration.AddServices(builder.Services);
 
 var app = builder.Build();
 
@@ -37,6 +37,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Register queries/commands endpoints - TODO: make automatic according to *.api.nox.yaml
-NoxDomainConfiguration.ConfigureEndpoints(app);
+NoxDomainApiConfiguration.ConfigureEndpoints(app);
 
 app.Run();

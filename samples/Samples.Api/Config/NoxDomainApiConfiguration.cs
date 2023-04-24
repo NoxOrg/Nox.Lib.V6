@@ -4,8 +4,12 @@ using Samples.Api.Domain.Store.Queries;
 
 namespace Samples.Api.Config
 {
-    public static class NoxDomainConfiguration
+    public static class NoxDomainApiConfiguration
     {
+        /// <summary>
+        /// Registers queries/commands implememntations.
+        /// </summary>
+        /// <param name="services">The services.</param>
         public static void AddServices(IServiceCollection services)
         {
             services.AddDbContext<NoxDomainDbContext>();
@@ -15,6 +19,11 @@ namespace Samples.Api.Config
             services.AddScoped<Nox.Commands.ReserveCommandHandlerBase, ReserveCommandHandler>();
         }
 
+        /// <summary>
+        /// Configures custom endpoints for queries/commands.
+        /// Will be moved to *.api.nox.yaml.
+        /// </summary>
+        /// <param name="app"></param>
         public static void ConfigureEndpoints(WebApplication app)
         {
             app.MapGet("api/Stores/{storeId}/activeReservations",

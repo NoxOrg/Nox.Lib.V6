@@ -112,7 +112,13 @@ namespace Nox.Generator.Generators
             // Basic CRUD events
             entity.TryGetValue("raiseCrudEvents", out var raiseCrudEvents);
 
-            if (raiseCrudEvents != null)
+            if (raiseCrudEvents == null)
+            {
+                // Generate Created and Updated by default
+                eventsGenerator.AddCrudEvent(GeneratorEventType.Created, entityName);
+                eventsGenerator.AddCrudEvent(GeneratorEventType.Updated, entityName);
+            }
+            else
             {
                 var crudEvents = (Dictionary<object, object>)raiseCrudEvents;
 

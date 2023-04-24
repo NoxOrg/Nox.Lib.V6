@@ -34,7 +34,6 @@ namespace Samples.Api.Domain.Store.Commands
                 }
 
                 // Check balance - aggregate validation
-
                 // TODO: change balances
 
                 await DbContext.SaveChangesAsync();
