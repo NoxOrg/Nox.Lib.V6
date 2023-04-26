@@ -33,7 +33,7 @@
 -->
   <p align="center">
     <br />
-    Build and deploy enterprise-grade microservices in under an hour
+    Build and deploy enterprise-grade business solutions in under an hour
     <br />
     <br />
     <a href="https://noxorg.dev"><strong>View the documentation »</strong></a>
@@ -90,7 +90,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 ***
-Nox is a .NET microservice framework that allows developers to rapidly build, maintain and deploy enterprise-grade, production-ready microservices. 
+Nox is a .NET framework that allows developers to rapidly build, maintain and deploy enterprise-grade, production-ready business solutions. 
 
 It removes all the ceremony, repetition and technical details associated with building and maintaining applications without constraining developer creativity or control in any way.
 
@@ -148,7 +148,7 @@ dotnet new webapi -o SampleCurrencyService
 
 cd SampleCurrencyService
 ```
-At this point you can do a normal `dotnet run` which will present you with the standard Microsoft demo WeatherController.
+At this point you can do a normal `dotnet run` which will present you with the standard Microsoft demo WeatherForecast.
 
 ### Adding Nox
 ---
@@ -195,9 +195,9 @@ app.MapControllers();
 
 app.Run();
 ```
-### Define Your Service and Entities
+### Define your Solution and Entities
 ---
-Create a new file to define your service called `SampleCurrency.service.nox.yaml`
+Create a new file to define your solution called `SampleCurrency.service.nox.yaml`
 ```yaml
 #
 # SampleCurrency.service.nox.yaml
