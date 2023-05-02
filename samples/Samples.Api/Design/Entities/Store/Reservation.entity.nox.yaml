@@ -20,9 +20,16 @@ relationships:
     entity: Currency
     isMany: false
     isRequired: true
+    isOneWay: true
 
   - name: DestinationCurrency
     entity: Currency
+    isMany: false
+    isRequired: false # temporaly to avoid cascading problem
+    isOneWay: true
+
+  - name: Customer
+    entity: Customer
     isMany: false
     isRequired: true
 

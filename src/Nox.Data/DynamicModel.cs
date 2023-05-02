@@ -134,6 +134,16 @@ public class DynamicModel : IDynamicModel
                 {
                     SetAttribute(b, attr);
                 }
+
+                // Set relationship properties
+                foreach (var relation in entity.Entity.AllRelationships)
+                {
+                    if (!relation.IsMany)
+                    {
+                        var relationProperty = b.Property($"{relation.Name}Id");
+                        SetIsRequired(relationProperty, relation.IsRequired);
+                    }
+                }
             });
         }
 
@@ -165,13 +175,7 @@ public class DynamicModel : IDynamicModel
             prop.HasPrecision(attr.MaxWidth, attr.Precision);
         }
 
-        try
-        {
-            prop.IsRequired(attr.IsRequired);
-        }
-        catch
-        {
-        }
+        SetIsRequired(prop, attr.IsRequired);
 
         if (attr.IsUnicode)
         {
@@ -184,6 +188,17 @@ public class DynamicModel : IDynamicModel
         }
 
         return prop;
+    }
+
+    private static void SetIsRequired(Microsoft.EntityFrameworkCore.Metadata.Builders.PropertyBuilder prop, bool isRequired)
+    {
+        try
+        {
+            prop.IsRequired(isRequired);
+        }
+        catch
+        {
+        }
     }
 
     public IEdmModel GetEdmModel()
@@ -283,17 +298,31 @@ public class DynamicModel : IDynamicModel
         {
             var tb = dynamicTypes[entity.Name].TypeBuilder;
 
-            foreach (var relation in entity.Relationships.Union(entity.OwnedRelationships))
+            foreach (var relation in entity.AllRelationships)
             {
-                var relatedTb = dynamicTypes[relation.Entity].TypeBuilder;
+                var relatedEntity = dynamicTypes[relation.Entity];
+                var relatedTb = relatedEntity.TypeBuilder;
 
                 if (relation.IsMany)
                 {
                     tb.AddPublicGetSetPropertyAsList(relation.Name, relatedTb);
+
+                    // Add reciprocal property in the related type if needed
+                    if (!relation.IsOneWay
+                        && !relatedEntity.Entity.AllRelationships.Any(r => !r.IsMany && r.Entity.Equals(entity.Name)))
+                    {
+                        relatedTb.AddPublicGetSetProperty(entity.Name, tb);
+                    }
                 }
                 else
                 {
-                    tb.AddPublicGetSetProperty(relation.Name, relatedTb);
+                    var property = tb.AddPublicGetSetProperty(relation.Name, relatedTb);
+
+                    if (!relation.IsOneWay
+                        && !relatedEntity.Entity.AllRelationships.Any(r => r.IsMany && r.Entity.Equals(entity.Name)))
+                    {
+                        relatedTb.AddPublicGetSetPropertyAsList(entity.Name.Pluralize(), tb);
+                    }
                 }
             }
 

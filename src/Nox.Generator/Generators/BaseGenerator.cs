@@ -15,6 +15,16 @@ namespace Nox.Generator.Generators
             Context = context;
         }
 
+        public static string ToLowerFirstChar(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return input;
+            }
+
+            return char.ToLower(input[0]) + input.Substring(1);
+        }
+
         protected void GenerateFile(StringBuilder sb, string className)
         {
             var hintName = $"{className}.g.cs";
@@ -79,9 +89,9 @@ namespace Nox.Generator.Generators
         }
 
         protected static string GetParametersString(object entity)
-        {
+        {            
             return string.Join(", ", ((List<object>)entity).Cast<Dictionary<object, object>>()
-                .Select(parameter => $"{parameter["type"]} {parameter["name"]}"));
+                .Select(parameter => $"{parameter["type"]} {parameter["name"]}{GetDefaultIfDefined(parameter, "defaultValue")}"));
         }
 
         protected static void AddDbContextProperty(StringBuilder sb)
@@ -171,14 +181,14 @@ namespace Nox.Generator.Generators
             };
         }
 
-        public static string ToLowerFirstChar(string input)
+        private static string GetDefaultIfDefined(Dictionary<object, object> parameter, string key)
         {
-            if (string.IsNullOrEmpty(input))
+            if (!parameter.TryGetValue(key, out object val))
             {
-                return input;
+                return string.Empty;
             }
 
-            return char.ToLower(input[0]) + input.Substring(1);
+            return $" = {val ?? "null"}";
         }
     }
 }

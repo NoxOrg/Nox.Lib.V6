@@ -18,9 +18,15 @@ raiseCrudEvents:
 ownedRelationships:
   - name: Reservations
     entity: Reservation
-    description: Pre-arranged excanged operation at the store by a specific client.
+    description: Pre-arranged exchange operation at the store by a specific client.
     isMany: true
     isRequired: true # to model 1-1* or 1-0* relations
+
+  #- name: Exchanges
+  #  entity: Exchange
+  #  description: Exchange operation at the store by a specific client.
+  #  isMany: true
+  #  isRequired: true
 
   - name: CashBalances
     entity: CurrencyCashBalance
@@ -35,6 +41,10 @@ queries:
        - name: storeId
          description: 
          type: int # can be DTO here
+       - name: customerId
+         description: 
+         type: int?
+         defaultValue: null
       response:
         responseDto: ReservationInfoDto
         description: 

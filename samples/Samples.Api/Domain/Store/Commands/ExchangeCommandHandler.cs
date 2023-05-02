@@ -25,6 +25,7 @@ namespace Samples.Api.Domain.Store.Commands
                 var store = await DbContext
                                 .Store
                                 .Include(s => s.Reservations)
+                                .ThenInclude(r => r.Customer)
                                 .Include(s => s.CashBalances)
                                 .FirstOrDefaultAsync(s => s.Id == exchangeCommandDto.StoreId);
 
@@ -33,34 +34,45 @@ namespace Samples.Api.Domain.Store.Commands
                     return new NoxCommandResult { IsSuccess = false, Message = "Store cannot be found" };
                 }
 
+                var reservation = store.Reservations.FirstOrDefault(r => r.Id == exchangeCommandDto.ReservationId);
+
+                if (reservation == null)
+                {
+                    return new NoxCommandResult { IsSuccess = false, Message = "Reservation cannot be found" };
+                }
+
                 // Check balance - aggregate validation
                 // TODO: change balances
 
+                var destinatonAmount = reservation.SourceAmount * reservation.Rate;
+
+                reservation.IsActive = false;
+
                 await DbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
+
+                // emit events
+                await RaiseDomainEvents(reservation, destinatonAmount);
             }
             catch (Exception)
             {
                 // TODO: Handle failure and add logger
                 return new NoxCommandResult { IsSuccess = false };
-            }
-
-            // emit events
-            await RaiseDomainEvents(exchangeCommandDto);
+            }            
 
             return new NoxCommandResult { IsSuccess = true };
         }
 
-        private async Task RaiseDomainEvents(ExchangeCommand exchangeCommandDto)
+        private async Task RaiseDomainEvents(Reservation exchangeCommandDto, decimal destinatonAmount)
         {
             await SendBalanceChangedDomainEventAsync(
                 new Nox.Events.BalanceChangedDomainEvent
                 {
                     Payload = new BalanceChangedDto
                     {
-                        StoreId = exchangeCommandDto.StoreId,
+                        StoreId = exchangeCommandDto.Store.Id,
                         Amount = exchangeCommandDto.SourceAmount,
-                        CurrencyId = exchangeCommandDto.SourceCurrencyId
+                        CurrencyId = exchangeCommandDto.SourceCurrency.Id                     
                     }
                 });
 
@@ -69,9 +81,9 @@ namespace Samples.Api.Domain.Store.Commands
                 {
                     Payload = new BalanceChangedDto
                     {
-                        StoreId = exchangeCommandDto.StoreId,
-                        Amount = -exchangeCommandDto.DestinationAmount,
-                        CurrencyId = exchangeCommandDto.DestinationCurrencyId
+                        StoreId = exchangeCommandDto.Store.Id,
+                        Amount = -destinatonAmount,
+                        CurrencyId = exchangeCommandDto.DestinationCurrency.Id
                     }
                 });
         }

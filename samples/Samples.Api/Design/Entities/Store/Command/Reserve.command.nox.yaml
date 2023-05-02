@@ -12,6 +12,9 @@ attributes:
 
   - name: StoreId
     type: int
+    
+  - name: CustomerId
+    type: int
 
   - name: SourceCurrencyId
     type: int

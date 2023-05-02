@@ -19,6 +19,11 @@ raiseCrudEvents:
   update: yes
   delete: yes
 
+relationships:
+  - name: ExchangeRates
+    entity: ExchangeRate
+    isMany: true
+
 key: 
   name: Id
   description: The currency's unique identifier 

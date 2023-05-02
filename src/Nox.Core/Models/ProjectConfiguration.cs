@@ -22,7 +22,6 @@ public sealed class ProjectConfiguration : MetaBase, IProjectConfiguration
     public string KeyVaultUri { get; set; } = KeyVault.DefaultKeyVaultUri;
     public bool AutoMigrations { get; set; } = true;
 
-
     IServiceDataSource? IProjectConfiguration.Database
     {
         get => Database;
@@ -110,7 +109,7 @@ public sealed class ProjectConfiguration : MetaBase, IProjectConfiguration
         return Loaders!.OrderBy(l => entities[l.Target!.Entity].SortOrder).ToList();
     }
 
-    private ICollection<Core.Models.Entity> SortEntitiesByDependency()
+    private ICollection<Entity> SortEntitiesByDependency()
     {
         var entities = Entities!.ToList();
 
@@ -137,7 +136,7 @@ public sealed class ProjectConfiguration : MetaBase, IProjectConfiguration
         // hierarchy sort to place entities in dependency order
 
         var i = 0;
-        var sortedEntities = new List<Core.Models.Entity>();
+        var sortedEntities = new List<Entity>();
         while (entities.Count > 0)
         {
             var count = CountParentsInSortedEntities(entities, sortedEntities, i);
@@ -164,8 +163,8 @@ public sealed class ProjectConfiguration : MetaBase, IProjectConfiguration
     }
 
     private static int CountParentsInSortedEntities(
-            IList<Core.Models.Entity> unsortedEntities,
-            IList<Core.Models.Entity> sortedEntities,
+            IList<Entity> unsortedEntities,
+            IList<Entity> sortedEntities,
             int iteration)
     {
         var result = 0;

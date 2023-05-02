@@ -15,7 +15,7 @@ public class ReflectionExtensionTests
         var asmBuilder = AssemblyBuilder.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.Run);
         var moduleBuilder = asmBuilder.DefineDynamicModule(asmName.Name!);
         var typeBuilder = moduleBuilder.DefineType("Person", TypeAttributes.Public, null);
-        var fb = typeBuilder.AddPublicGetSetProperty("Lastname", typeof(string));
+        typeBuilder.AddPublicGetSetProperty("Lastname", typeof(string));
         typeBuilder.DefineDefaultConstructor(MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName);
         var type = typeBuilder.CreateType();
         var instance = Activator.CreateInstance(type!);
@@ -31,7 +31,7 @@ public class ReflectionExtensionTests
         var asmBuilder = AssemblyBuilder.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.Run);
         var moduleBuilder = asmBuilder.DefineDynamicModule(asmName.Name!);
         var typeBuilder = moduleBuilder.DefineType("Person", TypeAttributes.Public, null);
-        var fb = typeBuilder.AddPublicGetSetPropertyAsList("Names", typeof(string));
+        typeBuilder.AddPublicGetSetPropertyAsList("Names", typeof(string));
         typeBuilder.DefineDefaultConstructor(MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName);
         var type = typeBuilder.CreateType();
         var instance = Activator.CreateInstance(type!);

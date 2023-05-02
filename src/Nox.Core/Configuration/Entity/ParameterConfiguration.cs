@@ -10,5 +10,7 @@ public class ParameterConfiguration : MetaBase
 
     public string Type { get; set; } = "int";
 
+    public string DefaultValue { get; set; } = string.Empty;
+
     public bool IsRequired { get; set; } = true;
 }

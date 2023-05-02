@@ -12,8 +12,8 @@ public interface IEntity : IMetaBase
     ICollection<string> RelatedParents { get; }
     ICollection<EntityAttribute> Attributes { get; set; }
     ICollection<IMessageTarget>? Messaging { get; set; }
-    ICollection<EntityRelationship> Relationships { get; set; }
     ICollection<EntityRelationship> OwnedRelationships { get; set; }
+    ICollection<EntityRelationship> AllRelationships { get; }
     string PluralName { get; set; }
     string Schema { get; set; }
     int SortOrder { get; set; }

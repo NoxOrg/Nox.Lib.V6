@@ -32,12 +32,22 @@ namespace Samples.Api.Domain.Store.Commands
                     return new NoxCommandResult { IsSuccess = false, Message = "Store cannot be found" };
                 }
 
+                var customer = await DbContext
+                    .Customer
+                    .FirstOrDefaultAsync(s => s.Id == reserveCommandDto.CustomerId);
+
+                if (customer == null)
+                {
+                    return new NoxCommandResult { IsSuccess = false, Message = "Customer cannot be found" };
+                }
+
                 // Add reservation
                 store.AddReservation(
                     new Reservation
                     {
                         IsActive = true,
                         SourceAmount = reserveCommandDto.SourceAmount,
+                        Customer = customer
                     });
 
                 await DbContext.SaveChangesAsync();

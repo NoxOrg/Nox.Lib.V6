@@ -10,7 +10,7 @@ namespace Samples.Api.Domain.Store.Queries
         {
         }
 
-        public async override Task<IList<ReservationInfoDto>> ExecuteAsync(int storeId)
+        public async override Task<IList<ReservationInfoDto>> ExecuteAsync(int storeId, int? customerId = null)
         {
             var store = await DbContext
                 .Store
