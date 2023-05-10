@@ -125,5 +125,6 @@ public class ProjectConfigurationTests: ConfigurationTestFixture
         Assert.That(devs[0].UserName, Is.EqualTo("test.user@iwgplc.com"));
         Assert.That(devs[0].MobilePhoneNumber, Is.EqualTo("+1234567890"));
         Assert.That(devs[0].IsAdmin, Is.True);
+        Assert.That(devs[0].IsProductOwner, Is.True);
     }
 }

@@ -45,3 +45,4 @@ team:
       userName: test.user@iwgplc.com
       mobilePhoneNumber: +1234567890
       isAdmin: true
+      isProductOwner: true
