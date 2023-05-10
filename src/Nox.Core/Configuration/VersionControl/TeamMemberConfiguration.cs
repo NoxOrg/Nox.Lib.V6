@@ -11,5 +11,6 @@ public class TeamMemberConfiguration : MetaBase
     public string MobilePhoneNumber { get; set; } = string.Empty;
     public bool IsAdmin { get; set; } = false;
     public bool IsProductOwner { get; set; }
+    // Added this comment to force push
 }
 
