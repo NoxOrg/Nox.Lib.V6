@@ -1,6 +1,6 @@
 ﻿using Nox.Core.Components;
 
-namespace Nox.Core.Models;
+namespace Nox.Core.Models.Entity;
 
 public sealed class EntityRelationship : MetaBase
 {

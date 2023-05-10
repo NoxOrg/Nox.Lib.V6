@@ -11,6 +11,7 @@ using Nox.Core.Interfaces.Secrets;
 using Nox.Core.Validation;
 using System.ComponentModel.DataAnnotations.Schema;
 using Nox.Core.Interfaces.VersionControl;
+using Nox.Core.Models.Entity;
 
 namespace Nox.Core.Models;
 
@@ -61,9 +62,9 @@ public sealed class ProjectConfiguration : MetaBase, IProjectConfiguration
     ICollection<IEntity>? IProjectConfiguration.Entities
     {
         get => Entities?.ToList<IEntity>();
-        set => Entities = value as ICollection<Core.Models.Entity>;
+        set => Entities = value as ICollection<Entity.Entity>;
     }
-    public ICollection<Core.Models.Entity>? Entities { get; set; }
+    public ICollection<Entity.Entity>? Entities { get; set; }
 
     ICollection<ILoader>? IProjectConfiguration.Loaders
     {
@@ -109,7 +110,7 @@ public sealed class ProjectConfiguration : MetaBase, IProjectConfiguration
         return Loaders!.OrderBy(l => entities[l.Target!.Entity].SortOrder).ToList();
     }
 
-    private ICollection<Entity> SortEntitiesByDependency()
+    private ICollection<Entity.Entity> SortEntitiesByDependency()
     {
         var entities = Entities!.ToList();
 
@@ -136,7 +137,7 @@ public sealed class ProjectConfiguration : MetaBase, IProjectConfiguration
         // hierarchy sort to place entities in dependency order
 
         var i = 0;
-        var sortedEntities = new List<Entity>();
+        var sortedEntities = new List<Entity.Entity>();
         while (entities.Count > 0)
         {
             var count = CountParentsInSortedEntities(entities, sortedEntities, i);
@@ -163,8 +164,8 @@ public sealed class ProjectConfiguration : MetaBase, IProjectConfiguration
     }
 
     private static int CountParentsInSortedEntities(
-            IList<Entity> unsortedEntities,
-            IList<Entity> sortedEntities,
+            IList<Entity.Entity> unsortedEntities,
+            IList<Entity.Entity> sortedEntities,
             int iteration)
     {
         var result = 0;

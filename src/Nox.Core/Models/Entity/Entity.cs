@@ -5,7 +5,7 @@ using Nox.Core.Interfaces.Messaging;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Nox.Core.Models;
+namespace Nox.Core.Models.Entity;
 
 public sealed class Entity : MetaBase, IEntity
 {
@@ -16,15 +16,19 @@ public sealed class Entity : MetaBase, IEntity
     public string Table { get; set; } = null!;
     public string Schema { get; set; } = "dbo";
 
+    public ICollection<EntityQuery> Queries { get; set; } = new Collection<EntityQuery>();
+
+    public ICollection<EntityCommand> Commands { get; set; } = new Collection<EntityCommand>();
+
     public ICollection<EntityRelationship> Relationships { get; set; } = new Collection<EntityRelationship>();
 
     public ICollection<EntityRelationship> OwnedRelationships { get; set; } = new Collection<EntityRelationship>();
 
     public ICollection<EntityRelationship> AllRelationships => Relationships
             .Union(OwnedRelationships)
-            .Union(Key.IsComposite 
-                    ? Key.Entities.Select(key => new EntityRelationship 
-                    { 
+            .Union(Key.IsComposite
+                    ? Key.Entities.Select(key => new EntityRelationship
+                    {
                         Entity = key,
                         Name = key,
                         IsMany = false,

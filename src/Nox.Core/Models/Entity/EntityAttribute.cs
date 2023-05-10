@@ -1,7 +1,7 @@
 ﻿using Nox.Core.Interfaces.Entity;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Nox.Core.Models;
+namespace Nox.Core.Models.Entity;
 
 public sealed class EntityAttribute : BaseEntityAttribute, IEntityAttribute
 {
@@ -20,7 +20,7 @@ public sealed class EntityAttribute : BaseEntityAttribute, IEntityAttribute
     public string DefaultFromParentsJson { get => string.Join('|', DefaultFromParents.ToArray()); set => DefaultFromParents = value.Split('|'); }
     public string Formula { get; set; } = string.Empty;
 
-    public bool IsMappedAttribute() => (string.IsNullOrEmpty(Formula) && !DefaultFromParents.Any());
+    public bool IsMappedAttribute() => string.IsNullOrEmpty(Formula) && !DefaultFromParents.Any();
 
     public bool ApplyDefaults()
     {

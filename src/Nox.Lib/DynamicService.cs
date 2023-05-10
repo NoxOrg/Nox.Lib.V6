@@ -11,6 +11,7 @@ using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Etl;
 using Nox.Core.Models;
+using Nox.Core.Models.Entity;
 using Nox.Entity.XtendedAttributes;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
@@ -198,7 +199,7 @@ public class DynamicService : IDynamicService
                     }
                     else if (typeString == "object")
                     {
-                        var dbType = _metaService.Database.DataProvider!.ToDatabaseColumnType(new EntityAttribute() { Type = "object" });
+                        var dbType = _metaService.Database.DataProvider!.ToDatabaseColumnType(new EntityAttribute { Type = "object" });
                         if (dbType == null)
                         {
                             b.Ignore(prop.Name);

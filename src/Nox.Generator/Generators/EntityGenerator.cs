@@ -18,6 +18,10 @@ namespace Nox.Generator.Generators
 
         internal List<EntityWithCompositeKey> CompositeKeys { get; set; } = new List<EntityWithCompositeKey>();
 
+        internal List<Dictionary<object, object>> AllQueries { get; set; } = new List<Dictionary<object, object>>();
+
+        internal List<Dictionary<object, object>> AllCommands { get; set; } = new List<Dictionary<object, object>>();
+
         internal EntityGenerator(GeneratorExecutionContext context)
             : base(context) { }
 
@@ -42,11 +46,11 @@ namespace Nox.Generator.Generators
 
             GenerateEntity(entity, entityName);
 
-            GenerateQueries(entity);
+            AllQueries.AddRange(GenerateQueries(entity));
 
             GenerateEvents(entity, entityName);
 
-            GenerateCommands(entity);
+            AllCommands.AddRange(GenerateCommands(entity));
 
             return true;
         }
@@ -148,8 +152,9 @@ namespace Nox.Generator.Generators
             }
         }
 
-        private void GenerateCommands(Dictionary<object, object> entity)
+        private IEnumerable<Dictionary<object, object>> GenerateCommands(Dictionary<object, object> entity)
         {
+            var commandsList = new List<Dictionary<object, object>>();
             entity.TryGetValue("commands", out var commands);
             if (commands != null)
             {
@@ -158,12 +163,17 @@ namespace Nox.Generator.Generators
                 foreach (var command in ((List<object>)commands).Cast<Dictionary<object, object>>())
                 {
                     commandGenerator.AddCommandHandler(command);
+                    commandsList.Add(command);
                 }
             }
+
+            return commandsList;
         }
 
-        private void GenerateQueries(Dictionary<object, object> entity)
+        private IEnumerable<Dictionary<object, object>> GenerateQueries(Dictionary<object, object> entity)
         {
+            var queriesList = new List<Dictionary<object, object>>();
+
             entity.TryGetValue("queries", out var queries);
             if (queries != null)
             {
@@ -172,8 +182,11 @@ namespace Nox.Generator.Generators
                 foreach (var query in ((List<object>)queries).Cast<Dictionary<object, object>>())
                 {
                     queryGenerator.AddQuery(query);
+                    queriesList.Add(query);
                 }
             }
+
+            return queriesList;
         }
     }
 }

@@ -10,7 +10,7 @@ using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Messaging;
 using Nox.Core.Interfaces.Messaging.Events;
-using Nox.Core.Models;
+using Nox.Core.Models.Entity;
 using System.Reflection;
 using System.Reflection.Emit;
 

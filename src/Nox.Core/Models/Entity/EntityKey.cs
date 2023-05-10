@@ -1,7 +1,7 @@
 ﻿using Nox.Core.Interfaces.Entity;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Nox.Core.Models;
+namespace Nox.Core.Models.Entity;
 
 public sealed class EntityKey : BaseEntityAttribute, IEntityKey
 {

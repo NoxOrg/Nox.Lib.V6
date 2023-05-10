@@ -38,7 +38,7 @@ namespace Nox.Generator.Generators
             sb.AppendLine(@"");
             
             // Strongly typed DbContext for Queries / Commands
-            sb.AppendLine($@"public class NoxDomainDbContext : DbContext");
+            sb.AppendLine($@"public class NoxDomainDbContext : DbContext, IDynamicNoxDomainDbContext");
             sb.AppendLine(@"{");
             sb.AppendLine(@"    private readonly IDynamicModel _dynamicDbModel;");
             sb.AppendLine(@"");
@@ -55,6 +55,11 @@ namespace Nox.Generator.Generators
             sb.AppendLine(@"    : base(options)");
             sb.AppendLine(@"    {");
             sb.AppendLine(@"        _dynamicDbModel = dynamicDbModel;");
+            sb.AppendLine(@"    }");
+            sb.AppendLine(@"");
+            sb.AppendLine(@"    public static void RegisterContext(IServiceCollection services)");
+            sb.AppendLine(@"    {");
+            sb.AppendLine(@"        services.AddDbContext<NoxDomainDbContext>();");
             sb.AppendLine(@"    }");
             sb.AppendLine(@"");
             sb.AppendLine(@"    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)");

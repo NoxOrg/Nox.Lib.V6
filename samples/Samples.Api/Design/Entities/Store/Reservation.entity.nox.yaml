@@ -35,7 +35,7 @@ relationships:
 
 key: 
    name: Id
-   description: The unique identifier of an resrvation operation
+   description: The unique identifier of a reservation operation
    type: int
 
 attributes:

@@ -1,7 +1,7 @@
 ﻿using Nox.Core.Components;
 using Nox.Core.Interfaces.Entity;
 
-namespace Nox.Core.Models;
+namespace Nox.Core.Models.Entity;
 
 public abstract class BaseEntityAttribute : MetaBase, IBaseEntityAttribute
 {

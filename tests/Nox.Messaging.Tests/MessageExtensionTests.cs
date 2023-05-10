@@ -14,11 +14,6 @@ public class MessageExtensionTests: MessagingTestFixture
     [Test]
     public void Can_Find_a_Create_Event_Implementation()
     {
-        var personEntity = new Core.Models.Entity
-        {
-            Id = 1,
-            Name = "Person"
-        };
         TestServices!.AddNoxEvents(Assembly.GetExecutingAssembly());
         BuildServiceProvider();
         
@@ -32,11 +27,6 @@ public class MessageExtensionTests: MessagingTestFixture
     {
         TestServices!.AddNoxEvents(Assembly.GetExecutingAssembly());
         BuildServiceProvider();
-        var personEntity = new Core.Models.Entity
-        {
-            Id = 1,
-            Name = "Something"
-        };
         var messages = TestServiceProvider!.GetRequiredService<IEnumerable<INoxEvent>>();
         var msg = messages.FindEventImplementation("Person", NoxEventType.Deleted);
         Assert.That(msg, Is.Null);
@@ -51,11 +41,6 @@ public class MessageExtensionTests: MessagingTestFixture
         exObject.AddProperty("Id", 1);
         exObject.AddProperty("Name", "Test User");
         exObject.AddProperty("Age", 50);
-        var personEntity = new Core.Models.Entity
-        {
-            Id = 1,
-            Name = "Person"
-        };
         var messages = TestServiceProvider!.GetRequiredService<IEnumerable<INoxEvent>>();
         var msg = messages.FindEventImplementation("Person", NoxEventType.Created);
         Assert.That(msg, Is.Not.Null);
@@ -66,7 +51,5 @@ public class MessageExtensionTests: MessagingTestFixture
         Assert.That(createEvent.Payload!.Id, Is.EqualTo(1));
         Assert.That(createEvent.Payload!.Name, Is.EqualTo("Test User"));
         Assert.That(createEvent.Payload!.Age, Is.EqualTo(50));
-    }
-    
-    
+    }    
 }

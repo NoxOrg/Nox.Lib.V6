@@ -88,10 +88,16 @@ namespace Nox.Generator.Generators
             sb.AppendLine($@"");
         }
 
-        protected static string GetParametersString(object entity)
+        protected static string GetParametersString(object entity, bool withDefaults = true)
         {            
             return string.Join(", ", ((List<object>)entity).Cast<Dictionary<object, object>>()
-                .Select(parameter => $"{parameter["type"]} {parameter["name"]}{GetDefaultIfDefined(parameter, "defaultValue")}"));
+                .Select(parameter => $"{parameter["type"]} {parameter["name"]}{(withDefaults ? GetDefaultIfDefined(parameter, "defaultValue") : string.Empty)}"));
+        }
+
+        protected static string GetParametersExecuteString(object entity)
+        {
+            return string.Join(", ", ((List<object>)entity).Cast<Dictionary<object, object>>()
+                .Select(parameter => $"{parameter["name"]}"));
         }
 
         protected static void AddDbContextProperty(StringBuilder sb)
@@ -117,7 +123,7 @@ namespace Nox.Generator.Generators
         protected static void AddBaseTypeDefinition(
             StringBuilder sb,
             string className,
-            string parent,
+            string? parent,
             string noxNamespace,
             bool isAbstract = false,
             bool isPartial = false,
@@ -132,7 +138,7 @@ namespace Nox.Generator.Generators
             sb.AppendLine($@"");
             sb.AppendLine($@"namespace {noxNamespace};");
             sb.AppendLine($@"");
-            sb.AppendLine($@"public {(isAbstract ? "abstract " : string.Empty)}{(isPartial ? "partial " : string.Empty)}class {className} : {parent}");
+            sb.AppendLine($@"public {(isAbstract ? "abstract " : string.Empty)}{(isPartial ? "partial " : string.Empty)}class {className} {(parent == null ? string.Empty : $": {parent}")}");
             sb.AppendLine($@"{{");
         }
 

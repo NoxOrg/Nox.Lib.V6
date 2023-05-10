@@ -4,6 +4,7 @@ using Nox.Core.Configuration.Secrets;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Configuration;
 using Nox.Core.Models;
+using Nox.Core.Models.Entity;
 
 namespace Nox.Core.Extensions;
 
@@ -16,12 +17,12 @@ public static class ProjectConfigurationExtensions
             cfg.CreateMap<YamlConfiguration, ProjectConfiguration>();
             cfg.CreateMap<SecretConfiguration, Secret>();
             cfg.CreateMap<DataSourceConfiguration, ServiceDatabase>();
-            cfg.CreateMap<ApiConfiguration, Core.Models.Api>();
-            cfg.CreateMap<ApiRouteConfiguration, Core.Models.ApiRoute>();
+            cfg.CreateMap<ApiConfiguration, Api>();
+            cfg.CreateMap<ApiRouteConfiguration, ApiRoute>();
             cfg.CreateMap<ApiRouteParameterConfiguration, ApiRouteParameter>();
             cfg.CreateMap<ApiRouteResponseConfiguration, ApiRouteResponse>();
             cfg.CreateMap<MessagingProviderConfiguration, MessagingProvider>();
-            cfg.CreateMap<EntityConfiguration, Core.Models.Entity>();
+            cfg.CreateMap<EntityConfiguration, Entity>();
             cfg.CreateMap<EntityRelationshipConfiguration, EntityRelationship>();
             cfg.CreateMap<EntityAttributeConfiguration, EntityAttribute>();
             cfg.CreateMap<EntityKeyConfiguration, EntityKey>();
@@ -36,9 +37,13 @@ public static class ProjectConfigurationExtensions
             cfg.CreateMap<VersionControlConfiguration, VersionControl>();
             cfg.CreateMap<TeamConfiguration, Team>();
             cfg.CreateMap<TeamMemberConfiguration, TeamMember>();
+            cfg.CreateMap<ParameterConfiguration, QueryParameter>();
+            cfg.CreateMap<QueryConfiguration, EntityQuery>();
+            cfg.CreateMap<CommandConfiguration, EntityCommand>();
+            cfg.CreateMap<ResponseConfiguration, QueryResponse>();
         });
 
         var mapper = mapperConfig.CreateMapper();
-        return mapper.Map<Models.ProjectConfiguration>(source);
+        return mapper.Map<ProjectConfiguration>(source);
     }
 }

@@ -1,11 +1,13 @@
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Nox.Api;
+using Nox.Api.OData.Constants;
 using Nox.Api.OData.Swagger;
 using Nox.Core.Interfaces;
-using Nox.Core.Interfaces.Configuration;
+using System.Reflection;
 
 namespace Nox;
 
@@ -14,12 +16,19 @@ public static class ApplicationBuilderExtensions
     public static IApplicationBuilder UseNox(
         this IApplicationBuilder builder)
     {
+        builder.UseDomainQueriesAndCommands();
+
         builder.UseODataEntitySectionsSwaggerFilter();
 
-        if (builder.ApplicationServices.GetService<IProjectConfiguration>() == null) return builder;
+        if (builder.ApplicationServices.GetService<IProjectConfiguration>() == null)
+        {
+            return builder;
+        }
+
         builder.UseMiddleware<DynamicApiMiddleware>().UseRouting();
 
         builder.UseHangfireDashboard("/jobs");
+
         return builder;
     }
 
@@ -29,6 +38,53 @@ public static class ApplicationBuilderExtensions
         ODataEntitySectionsSwaggerFilter.Initialize(
             appBuilder.ApplicationServices.GetService<ILogger<ODataEntitySectionsSwaggerFilter>>(),
             appBuilder.ApplicationServices.GetService<IDynamicService>());
+
+        return appBuilder;
+    }
+
+    /// <summary>
+    /// Method find and executes the generated Request Mappings for Queries/Command handlers
+    /// </summary>
+    /// <param name="appBuilder">The app builder.</param>
+    /// <returns>The app builder.</returns>
+    public static IApplicationBuilder UseDomainQueriesAndCommands(
+        this IApplicationBuilder appBuilder)
+    {
+        var dynamicService = appBuilder.ApplicationServices.GetService<IDynamicService>();
+
+        if (dynamicService != null)
+        {
+            var entities = dynamicService.Entities;
+
+            var assembly = Assembly.GetEntryAssembly();
+            if (assembly != null && entities != null)
+            {
+                // TODO: move ApiHelper to the global generation constants
+                var apiHelper = assembly.ExportedTypes.FirstOrDefault(t => t.Name.Equals("ApiHelper"));
+                var app = appBuilder as IEndpointRouteBuilder;
+
+                if (app != null && apiHelper != null)
+                {
+                    // Get all queries and commands names
+                    var queriesAndCommands = entities
+                        .SelectMany(e => e.Value.Queries)
+                        .Select(q => q.Name)
+                        .Union(entities
+                            .SelectMany(e => e.Value.Commands)
+                            .Select(c => c.Name));
+
+                    foreach (var name in queriesAndCommands)
+                    {
+                        // TODO: Move path generation to a helper method in order to avoid duplication
+                        var path = $"/{RoutingConstants.ODATA_ROUTE_PREFIX}/{RoutingConstants.EntitySetParameterPathName}/{name}";
+
+                        // Invoke generated Map method
+                        apiHelper.GetMethod(name)?
+                            .Invoke(null, new object[] { app, path });
+                    }
+                }
+            }
+        }
 
         return appBuilder;
     }

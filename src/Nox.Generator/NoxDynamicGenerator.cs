@@ -75,7 +75,7 @@ public class NoxDynamicGenerator : ISourceGenerator
                 EntityGenerator.AddEntity(assemblyName!, entity!);
             }
         }
-        
+
         List<object?> dtos = GetConfigurationByType(designRootFullPath, deserializer, "dto");
         var DtoGenerator = new DtoGenerator(context);
         foreach (var dto in dtos.Cast<Dictionary<object, object>>())
@@ -90,8 +90,14 @@ public class NoxDynamicGenerator : ISourceGenerator
             commandGenerator.AddCommand(command);
         }
 
-        var DbContextGenerator = new DbContextGenerator(context);
-        DbContextGenerator.AddDbContext(EntityGenerator.AggregateRoots.ToArray(), EntityGenerator.CompositeKeys.ToArray());
+        var dbContextGenerator = new DbContextGenerator(context);
+        dbContextGenerator.AddDbContext(EntityGenerator.AggregateRoots.ToArray(), EntityGenerator.CompositeKeys.ToArray());
+
+        if (EntityGenerator.AllQueries.Any() || EntityGenerator.AllCommands.Any())
+        {
+            var webHelperGenerator = new WebHelperGenerator(context);
+            webHelperGenerator.AddQueries(EntityGenerator.AllQueries, EntityGenerator.AllCommands);
+        }
     }
 
     private static List<object?> GetConfigurationByType(string designRootFullPath, IDeserializer deserializer, string configType)

@@ -1,6 +1,6 @@
 ﻿using Nox.Core.Interfaces.Messaging;
-using Nox.Core.Models;
-using EntityAttribute = Nox.Core.Models.EntityAttribute;
+using Nox.Core.Models.Entity;
+using EntityAttribute = Nox.Core.Models.Entity.EntityAttribute;
 
 namespace Nox.Core.Interfaces.Entity;
 
@@ -11,6 +11,8 @@ public interface IEntity : IMetaBase
     string Description { get; set; }
     ICollection<string> RelatedParents { get; }
     ICollection<EntityAttribute> Attributes { get; set; }
+    ICollection<EntityQuery> Queries { get; set; }
+    ICollection<EntityCommand> Commands { get; set; }
     ICollection<IMessageTarget>? Messaging { get; set; }
     ICollection<EntityRelationship> OwnedRelationships { get; set; }
     ICollection<EntityRelationship> AllRelationships { get; }

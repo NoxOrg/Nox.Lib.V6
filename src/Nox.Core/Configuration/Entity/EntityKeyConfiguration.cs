@@ -11,6 +11,5 @@ public class EntityKeyConfiguration : MetaBase
     public bool IsUnicode { get; set; } = true;
     public int MinWidth { get; set; } = 0;
     public int MaxWidth { get; set; } = 512;
-    public int Precision { get; set; } = 2;
     public List<string> Entities { get; set; } = new();
 }
