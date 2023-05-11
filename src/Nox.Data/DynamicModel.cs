@@ -1,6 +1,7 @@
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -149,7 +150,25 @@ public class DynamicModel : IDynamicModel
 
         _dynamicService.AddMetadata(modelBuilder);
 
+        SetCascadeBehaviour(modelBuilder);
+
         return modelBuilder;
+    }
+
+    private static void SetCascadeBehaviour(ModelBuilder modelBuilder)
+    {
+        var entityTypes = modelBuilder.Model
+                    .GetEntityTypes()
+                    .ToList();
+
+        // Disable cascade delete
+        var foreignKeys = entityTypes
+            .SelectMany(e => e.GetForeignKeys().Where(f => f.DeleteBehavior == DeleteBehavior.Cascade));
+
+        foreach (var foreignKey in foreignKeys)
+        {
+            foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
+        }
     }
 
     private Microsoft.EntityFrameworkCore.Metadata.Builders.PropertyBuilder SetAttribute(EntityTypeBuilder builder, IBaseEntityAttribute attr)

@@ -24,7 +24,7 @@ relationships:
   - name: DestinationCurrency
     entity: Currency
     isMany: false
-    isRequired: false # temporaly to avoid cascading problem
+    isRequired: true
 
   - name: Customer
     entity: Customer
