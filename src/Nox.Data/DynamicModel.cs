@@ -306,23 +306,10 @@ public class DynamicModel : IDynamicModel
                 if (relation.IsMany)
                 {
                     tb.AddPublicGetSetPropertyAsList(relation.Name, relatedTb);
-
-                    // Add reciprocal property in the related type if needed
-                    if (!relation.IsOneWay
-                        && !relatedEntity.Entity.AllRelationships.Any(r => !r.IsMany && r.Entity.Equals(entity.Name)))
-                    {
-                        relatedTb.AddPublicGetSetProperty(entity.Name, tb);
-                    }
                 }
                 else
                 {
                     var property = tb.AddPublicGetSetProperty(relation.Name, relatedTb);
-
-                    if (!relation.IsOneWay
-                        && !relatedEntity.Entity.AllRelationships.Any(r => r.IsMany && r.Entity.Equals(entity.Name)))
-                    {
-                        relatedTb.AddPublicGetSetPropertyAsList(entity.Name.Pluralize(), tb);
-                    }
                 }
             }
 

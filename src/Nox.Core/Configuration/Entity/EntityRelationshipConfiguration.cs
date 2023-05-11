@@ -12,7 +12,5 @@ public class EntityRelationshipConfiguration : MetaBase
 
     public bool IsMany { get; set; } = false;
 
-    public bool IsOneWay { get; set; } = false;
-
     public bool IsRequired { get; set; } = false;
 }

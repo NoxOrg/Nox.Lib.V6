@@ -57,6 +57,7 @@ namespace Nox.Generator.Generators
             sb.AppendLine(@"        _dynamicDbModel = dynamicDbModel;");
             sb.AppendLine(@"    }");
             sb.AppendLine(@"");
+            // Generate a method to register this DbContext implementation in the IoC container
             sb.AppendLine(@"    public static void RegisterContext(IServiceCollection services)");
             sb.AppendLine(@"    {");
             sb.AppendLine(@"        services.AddDbContext<NoxDomainDbContext>();");
