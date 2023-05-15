@@ -6,7 +6,7 @@ namespace Samples.Api.Domain.Store.Queries
 {
     public class ActiveReservations : Nox.Queries.ActiveReservationsQuery
     {
-        public ActiveReservations(NoxDomainDbContext dbContext) : base(dbContext)
+        public ActiveReservations(NoxDbContext dbContext) : base(dbContext)
         {
         }
 

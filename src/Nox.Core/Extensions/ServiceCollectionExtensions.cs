@@ -22,12 +22,15 @@ public static class ServiceCollectionExtensions
     {
         var configuration = ConfigurationHelper.GetNoxAppSettings();
 
-        if(configuration != null && designRoot == null) 
+        if (configuration != null && designRoot == null) 
         { 
             designRoot = configuration["Nox:DesignFolder"] ?? configuration["Nox:DefinitionRootPath"];
         }
 
-        if (!Directory.Exists(designRoot)) designRoot = "./";
+        if (!Directory.Exists(designRoot))
+        {
+            designRoot = "./";
+        }
 
         if (designRoot == null)
         {
@@ -48,7 +51,6 @@ public static class ServiceCollectionExtensions
                 .Configure();
 
             services.AddSingleton(_projectConfig);
-
         }
 
         return services;

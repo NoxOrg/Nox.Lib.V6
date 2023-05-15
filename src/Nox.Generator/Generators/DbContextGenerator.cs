@@ -25,20 +25,8 @@ namespace Nox.Generator.Generators
             sb.AppendLine(@"namespace Nox;");
             sb.AppendLine(@"");
             
-            // Dynamic DB context 
-            sb.AppendLine($@"public class NoxDbContext : DynamicDbContext");
-            sb.AppendLine(@"{");
-            sb.AppendLine(@"    public NoxDbContext(");
-            sb.AppendLine(@"        DbContextOptions<DynamicDbContext> options,");
-            sb.AppendLine(@"        IDynamicModel dynamicDbModel");
-            sb.AppendLine(@"    )");
-            sb.AppendLine(@"    : base(options, dynamicDbModel) { }");
-            sb.AppendLine(@"");
-            sb.AppendLine(@"}");
-            sb.AppendLine(@"");
-            
             // Strongly typed DbContext for Queries / Commands
-            sb.AppendLine($@"public class NoxDomainDbContext : DbContext, IDynamicNoxDomainDbContext");
+            sb.AppendLine($@"public class NoxDbContext : DbContext, IDynamicNoxDomainDbContext");
             sb.AppendLine(@"{");
             sb.AppendLine(@"    private readonly IDynamicModel _dynamicDbModel;");
             sb.AppendLine(@"");
@@ -48,8 +36,8 @@ namespace Nox.Generator.Generators
                 sb.AppendLine($@"    public DbSet<{setEntity}> {setEntity} {{ get; set; }}");
                 sb.AppendLine(@"");
             }
-            sb.AppendLine(@"    public NoxDomainDbContext(");
-            sb.AppendLine(@"        DbContextOptions<NoxDomainDbContext> options,");
+            sb.AppendLine(@"    public NoxDbContext(");
+            sb.AppendLine(@"        DbContextOptions<NoxDbContext> options,");
             sb.AppendLine(@"        IDynamicModel dynamicDbModel");
             sb.AppendLine(@"    )");
             sb.AppendLine(@"    : base(options)");
@@ -60,7 +48,7 @@ namespace Nox.Generator.Generators
             // Generate a method to register this DbContext implementation in the IoC container
             sb.AppendLine(@"    public static void RegisterContext(IServiceCollection services)");
             sb.AppendLine(@"    {");
-            sb.AppendLine(@"        services.AddDbContext<NoxDomainDbContext>();");
+            sb.AppendLine(@"        services.AddDbContext<NoxDbContext>();");
             sb.AppendLine(@"    }");
             sb.AppendLine(@"");
             sb.AppendLine(@"    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)");

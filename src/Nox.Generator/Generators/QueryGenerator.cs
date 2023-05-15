@@ -32,7 +32,7 @@ namespace Nox.Generator.Generators
 
             // Add constructor
             AddConstructor(sb, className, new Dictionary<string, string> {
-                { "NoxDomainDbContext", "DbContext" }
+                { "NoxDbContext", "DbContext" }
             });
 
             // Add params (which can be DTO)

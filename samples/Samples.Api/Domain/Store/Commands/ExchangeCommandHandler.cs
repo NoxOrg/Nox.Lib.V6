@@ -9,7 +9,7 @@ namespace Samples.Api.Domain.Store.Commands
 {
     public class ExchangeCommandHandler : ExchangeCommandHandlerBase
     {
-        public ExchangeCommandHandler(NoxDomainDbContext dbContext, INoxMessenger messenger)
+        public ExchangeCommandHandler(NoxDbContext dbContext, INoxMessenger messenger)
             : base(dbContext, messenger)
         {
         }

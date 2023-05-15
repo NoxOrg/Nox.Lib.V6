@@ -9,7 +9,7 @@ namespace Samples.Api.Domain.Store.Commands
 {
     public class ReserveCommandHandler : ReserveCommandHandlerBase
     {
-        public ReserveCommandHandler(NoxDomainDbContext dbContext, INoxMessenger messenger)
+        public ReserveCommandHandler(NoxDbContext dbContext, INoxMessenger messenger)
             : base(dbContext, messenger)
         {
         }
