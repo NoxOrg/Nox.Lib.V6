@@ -16,7 +16,7 @@ namespace Nox.Generator.Generators
 
             AddBaseTypeDefinition(sb,
                 className,
-                "IDynamicDTO",
+                "IDynamicDto",
                 "Nox.Dto",
                 isAbstract: false,
                 isPartial: false,

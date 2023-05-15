@@ -1,6 +1,6 @@
 ﻿namespace Nox.Core.Interfaces.Entity
 {
-    public interface IDynamicDTO
+    public interface IDynamicDto
     {
     }
 }

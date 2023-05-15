@@ -10,7 +10,7 @@ namespace Nox.Generator.Generators
     {
         protected GeneratorExecutionContext Context { get; }
 
-        internal BaseGenerator(GeneratorExecutionContext context)
+        private protected BaseGenerator(GeneratorExecutionContext context)
         {
             Context = context;
         }
@@ -80,9 +80,9 @@ namespace Nox.Generator.Generators
             }
             sb.AppendLine($@"      )");
             sb.AppendLine($@"   {{");
-            foreach (var parameter in parameters)
+            foreach (var value in parameters.Select(p => p.Value))
             {
-                sb.AppendLine($@"      {parameter.Value} = {ToLowerFirstChar(parameter.Value)};");
+                sb.AppendLine($@"      {value} = {ToLowerFirstChar(value)};");
             }
             sb.AppendLine($@"   }}");
             sb.AppendLine($@"");

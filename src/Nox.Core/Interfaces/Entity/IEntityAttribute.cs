@@ -1,7 +1,7 @@
 ﻿
 namespace Nox.Core.Interfaces.Entity;
 
-public interface IEntityAttribute : IMetaBase, IBaseEntityAttribute
+public interface IEntityAttribute : IBaseEntityAttribute
 {
     bool CanFilter { get; set; }
     bool CanSort { get; set; }

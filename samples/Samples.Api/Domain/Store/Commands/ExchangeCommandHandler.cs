@@ -15,7 +15,7 @@ namespace Samples.Api.Domain.Store.Commands
         {
         }
 
-        public override async Task<INoxCommandResult> ExecuteAsync(ExchangeCommand exchangeCommandDto)
+        public override async Task<INoxCommandResult> ExecuteAsync(ExchangeCommand command)
         {
             // DTO validation
 
@@ -28,14 +28,14 @@ namespace Samples.Api.Domain.Store.Commands
                                 .Include(s => s.Reservations)
                                 .ThenInclude(r => r.Customer)
                                 .Include(s => s.CashBalances)
-                                .FirstOrDefaultAsync(s => s.Id == exchangeCommandDto.StoreId);
+                                .FirstOrDefaultAsync(s => s.Id == command.StoreId);
 
                 if (store == null)
                 {
                     return new NoxCommandResult { IsSuccess = false, Message = "Store cannot be found" };
                 }
 
-                var reservation = store.Reservations.FirstOrDefault(r => r.Id == exchangeCommandDto.ReservationId);
+                var reservation = store.Reservations.FirstOrDefault(r => r.Id == command.ReservationId);
 
                 if (reservation == null)
                 {

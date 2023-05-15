@@ -123,7 +123,7 @@ public class DynamicModel : IDynamicModel
                 {
                     var prop = SetAttribute(b, key);
 
-                    b.HasKey(new string[] { key.Name });
+                    b.HasKey(key.Name);
 
                     if (!key.IsAutoNumber)
                     {
@@ -328,7 +328,7 @@ public class DynamicModel : IDynamicModel
                 }
                 else
                 {
-                    var property = tb.AddPublicGetSetProperty(relation.Name, relatedTb);
+                    tb.AddPublicGetSetProperty(relation.Name, relatedTb);
                 }
             }
 

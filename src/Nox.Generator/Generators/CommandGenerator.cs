@@ -16,7 +16,7 @@ namespace Nox.Generator.Generators
 
             AddBaseTypeDefinition(sb,
                 className,
-                "IDynamicDTO",
+                "IDynamicDto",
                 "Nox.Commands",
                 isAbstract: false,
                 isPartial: false,
@@ -41,25 +41,23 @@ namespace Nox.Generator.Generators
                 "Nox.Commands",
                 isAbstract: true,
                 isPartial: false,
-                new[] 
-                {
                     "Nox.Core.Interfaces.Entity.Commands",
                     "Nox.Core.Interfaces.Messaging",
                     "Nox.Events"
-                });
+                );
 
             // Add Db Context
             AddDbContextProperty(sb);
 
             // Add Db Context
             AddNoxMessangerProperty(sb);
-                        
+
             // Add constructor
             AddConstructor(sb, className, new Dictionary<string, string> {
                 { "NoxDomainDbContext", "DbContext" },
                 { "INoxMessenger", "Messenger" }
             });
-                        
+
             // Add params
             sb.AppendLine($@"   public abstract Task<INoxCommandResult> ExecuteAsync({command["name"]}{NamingConstants.CommandSuffix} command);");
 

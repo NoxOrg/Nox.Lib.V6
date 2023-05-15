@@ -8,13 +8,10 @@ namespace Nox.Generator.Generators
 {
     internal class EntityGenerator : BaseGenerator
     {
-        internal IReadOnlyList<string> AggregateRoots
-        {
-            get =>
-                _entityNames.Where(e => !_ownedEntities.Contains(e))
+        internal IReadOnlyList<string> AggregateRoots => _entityNames
+                .Where(e => !_ownedEntities.Contains(e))
                 .Distinct()
                 .ToList();
-        }
 
         internal List<EntityWithCompositeKey> CompositeKeys { get; set; } = new List<EntityWithCompositeKey>();
 
@@ -65,7 +62,7 @@ namespace Nox.Generator.Generators
                 "Nox",
                 isAbstract: false,
                 isPartial: true,
-                new[] { "Nox.Core.Interfaces.Entity" });
+                "Nox.Core.Interfaces.Entity");
 
             AddPrimaryKey(entity, sb, entityName);
 

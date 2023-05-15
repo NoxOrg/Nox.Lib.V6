@@ -15,7 +15,7 @@ namespace Samples.Api.Domain.Store.Commands
         {
         }
 
-        public override async Task<INoxCommandResult> ExecuteAsync(ReserveCommand reserveCommandDto)
+        public override async Task<INoxCommandResult> ExecuteAsync(ReserveCommand command)
         {
             // DTO validation           
 
@@ -26,7 +26,7 @@ namespace Samples.Api.Domain.Store.Commands
                 var store = await DbContext
                     .Store
                     .Include(s => s.Reservations)
-                    .FirstOrDefaultAsync(s => s.Id == reserveCommandDto.StoreId);
+                    .FirstOrDefaultAsync(s => s.Id == command.StoreId);
 
                 if (store == null)
                 {
@@ -35,7 +35,7 @@ namespace Samples.Api.Domain.Store.Commands
 
                 var customer = await DbContext
                     .Customer
-                    .FirstOrDefaultAsync(s => s.Id == reserveCommandDto.CustomerId);
+                    .FirstOrDefaultAsync(s => s.Id == command.CustomerId);
 
                 if (customer == null)
                 {
@@ -47,7 +47,7 @@ namespace Samples.Api.Domain.Store.Commands
                     new Reservation
                     {
                         IsActive = true,
-                        SourceAmount = reserveCommandDto.SourceAmount,
+                        SourceAmount = command.SourceAmount,
                         Customer = customer
                     });
 
@@ -70,9 +70,9 @@ namespace Samples.Api.Domain.Store.Commands
                 {
                     Payload = new BalanceChangedDto
                     {
-                        StoreId = reserveCommandDto.StoreId,
-                        Amount = reserveCommandDto.SourceAmount,
-                        CurrencyId = reserveCommandDto.SourceCurrencyId
+                        StoreId = command.StoreId,
+                        Amount = command.SourceAmount,
+                        CurrencyId = command.SourceCurrencyId
                     }
                 });
 

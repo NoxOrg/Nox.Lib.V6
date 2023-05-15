@@ -6,7 +6,7 @@ namespace Nox.Generator.Generators
 {
     internal class QueryGenerator : BaseGenerator
     {
-        internal QueryGenerator(GeneratorExecutionContext context) 
+        internal QueryGenerator(GeneratorExecutionContext context)
             : base(context) { }
 
         internal void AddQuery(Dictionary<object, object> query)
@@ -21,11 +21,9 @@ namespace Nox.Generator.Generators
                 "Nox.Queries",
                 isAbstract: true,
                 isPartial: false,
-                new[] 
-                { 
                     "Nox.Core.Interfaces.Entity",
                     "Nox.Dto"
-                });
+                );
 
             // Add Db Context
             AddDbContextProperty(sb);
@@ -44,7 +42,7 @@ namespace Nox.Generator.Generators
             var dto = response["responseDto"];
 
             var typeDefinition = isMany ? $"IList<{dto}>" : $"{dto}";
-            
+
             sb.AppendLine($@"   public abstract Task<{typeDefinition}> ExecuteAsync({parameters});");
 
             sb.AppendLine($@"}}");

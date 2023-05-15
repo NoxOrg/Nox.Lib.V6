@@ -4,7 +4,7 @@ using Nox.Core.Interfaces.Entity;
 namespace Nox.Core.Interfaces.Messaging.Events;
 
 public class NoxDomainEvent<T> : INoxEvent 
-    where T : IDynamicDTO
+    where T : IDynamicDto
 {
     public NoxEventType EventType => NoxEventType.Domain;
     public NoxEventSource EventSource => NoxEventSource.Command;

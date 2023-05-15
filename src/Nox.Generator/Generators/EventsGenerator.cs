@@ -19,7 +19,7 @@ namespace Nox.Generator.Generators
                 "Nox.Events",
                 isAbstract: false,
                 isPartial: false,
-                new[] { "Nox.Core.Interfaces.Messaging.Events", "Nox.Dto" });
+                "Nox.Core.Interfaces.Messaging.Events", "Nox.Dto");
 
             sb.AppendLine($@"}}");
 
@@ -40,7 +40,7 @@ namespace Nox.Generator.Generators
                 "Nox.Events",
                 isAbstract: false,
                 isPartial: false,
-                new[] { "Nox.Core.Interfaces.Messaging.Events" });
+                "Nox.Core.Interfaces.Messaging.Events");
 
             sb.AppendLine($@"}}");
 

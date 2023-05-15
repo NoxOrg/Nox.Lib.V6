@@ -1,6 +1,6 @@
 ﻿namespace Nox.Core.Interfaces.Entity;
 
-public interface IEntityKey : IMetaBase, IBaseEntityAttribute
+public interface IEntityKey : IBaseEntityAttribute
 {
     string[] Entities { get; set; }
 
