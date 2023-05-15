@@ -4,6 +4,7 @@ using Nox.Core.Interfaces.Entity.Commands;
 using Nox.Core.Interfaces.Messaging;
 using Nox.Commands;
 using Nox.Dto;
+using Nox.Core.Interfaces.Entity;
 
 namespace Samples.Api.Domain.Store.Commands
 {
@@ -52,6 +53,10 @@ namespace Samples.Api.Domain.Store.Commands
 
                 await DbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
+            }
+            catch (NoxDomainException noxEx)
+            {
+                return new NoxCommandResult { IsSuccess = false, Message = noxEx.Message };
             }
             catch (Exception)
             {
