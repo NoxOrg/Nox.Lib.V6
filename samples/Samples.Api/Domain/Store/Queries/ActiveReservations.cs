@@ -4,6 +4,9 @@ using Nox.Dto;
 
 namespace Samples.Api.Domain.Store.Queries
 {
+    /// <summary>
+    /// Query to retrieve active reservations for a store.
+    /// </summary>
     public class ActiveReservations : Nox.Queries.ActiveReservationsQuery
     {
         public ActiveReservations(NoxDomainDbContext dbContext) : base(dbContext)

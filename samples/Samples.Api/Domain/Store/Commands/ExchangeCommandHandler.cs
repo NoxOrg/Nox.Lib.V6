@@ -8,27 +8,27 @@ using Nox.Core.Interfaces.Entity;
 
 namespace Samples.Api.Domain.Store.Commands
 {
+    /// <summary>
+    /// Performs an exchange operation for an existing reservation.
+    /// Handler is derived from the automatically generated.
+    /// </summary>
     public class ExchangeCommandHandler : ExchangeCommandHandlerBase
     {
-        public ExchangeCommandHandler(NoxDomainDbContext dbContext, INoxMessenger messenger)
+        private readonly ILogger _logger;
+
+        public ExchangeCommandHandler(NoxDomainDbContext dbContext, INoxMessenger messenger, ILogger<ExchangeCommandHandler> logger)
             : base(dbContext, messenger)
         {
+            _logger = logger;
         }
 
         public override async Task<INoxCommandResult> ExecuteAsync(ExchangeCommand command)
         {
-            // DTO validation
-
-            using var transaction = await DbContext.Database.BeginTransactionAsync();
+            // TODO: add DTO validation
 
             try
             {
-                var store = await DbContext
-                                .Store
-                                .Include(s => s.Reservations)
-                                .ThenInclude(r => r.Customer)
-                                .Include(s => s.CashBalances)
-                                .FirstOrDefaultAsync(s => s.Id == command.StoreId);
+                Nox.Store? store = await GetStore(command.StoreId);
 
                 if (store == null)
                 {
@@ -42,42 +42,52 @@ namespace Samples.Api.Domain.Store.Commands
                     return new NoxCommandResult { IsSuccess = false, Message = "Reservation cannot be found" };
                 }
 
-                // Check balance - aggregate validation
-                // TODO: change balances
+                using var transaction = await DbContext.Database.BeginTransactionAsync();
 
-                var destinatonAmount = reservation.SourceAmount * reservation.Rate;
-
-                reservation.IsActive = false;
+                var destinatonAmount = store.Exchange(reservation);
 
                 await DbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 // emit events
                 await RaiseDomainEvents(reservation, destinatonAmount);
+
+                _logger.LogInformation(message: $"Exchange for {reservation.Customer.Id} is successful");
             }
             catch (NoxDomainException noxEx)
             {
+                _logger.LogError(noxEx, message: noxEx.Message);
                 return new NoxCommandResult { IsSuccess = false, Message = noxEx.Message };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // TODO: Handle failure and add logger
+                _logger.LogError(ex, message: "Cannot perform the exchange operation");
                 return new NoxCommandResult { IsSuccess = false };
-            }            
+            }
 
             return new NoxCommandResult { IsSuccess = true };
         }
 
-        private async Task RaiseDomainEvents(Reservation exchangeCommandDto, decimal destinatonAmount)
+        private async Task<Nox.Store?> GetStore(int storeId)
+        {
+            return await DbContext
+                            .Store
+                            .Include(s => s.Reservations)
+                            .ThenInclude(r => r.Customer)
+                            .Include(s => s.CashBalances)
+                            .FirstOrDefaultAsync(s => s.Id == storeId);
+        }
+
+        private async Task RaiseDomainEvents(Reservation reservation, decimal destinatonAmount)
         {
             await SendBalanceChangedDomainEventAsync(
                 new Nox.Events.BalanceChangedDomainEvent
                 {
                     Payload = new BalanceChangedDto
                     {
-                        StoreId = exchangeCommandDto.Store.Id,
-                        Amount = exchangeCommandDto.SourceAmount,
-                        CurrencyId = exchangeCommandDto.SourceCurrency.Id                     
+                        StoreId = reservation.Store.Id,
+                        Amount = reservation.SourceAmount,
+                        CurrencyId = reservation.SourceCurrency.Id
                     }
                 });
 
@@ -86,9 +96,9 @@ namespace Samples.Api.Domain.Store.Commands
                 {
                     Payload = new BalanceChangedDto
                     {
-                        StoreId = exchangeCommandDto.Store.Id,
+                        StoreId = reservation.Store.Id,
                         Amount = -destinatonAmount,
-                        CurrencyId = exchangeCommandDto.DestinationCurrency.Id
+                        CurrencyId = reservation.DestinationCurrency.Id
                     }
                 });
         }
