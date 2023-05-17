@@ -41,17 +41,21 @@ attributes:
   - name: ExpirationTime
     description: The date and time when resrvation expires
     type: datetime
+    isRequired: true
 
   - name: SourceAmount
     type: decimal
     maxWidth: 14
     precision: 8
+    isRequired: true
 
   - name: Rate
     type: decimal
     maxWidth: 14
     precision: 8
+    isRequired: true
 
   - name: IsActive
     description: Is active
     type: bool
+    isRequired: true

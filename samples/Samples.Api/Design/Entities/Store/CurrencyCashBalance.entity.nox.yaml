@@ -17,6 +17,14 @@ attributes:
 
   - name: Amount
     description: The amount
+    isRequired: true
+    type: decimal
+    maxWidth: 14
+    precision: 8
+
+  - name: OperationLimit
+    description: The Operation Limit
+    isRequired: false
     type: decimal
     maxWidth: 14
     precision: 8

@@ -12,11 +12,14 @@ attributes:
 
   - name: Amount
     type: decimal
+    isRequired: true
     maxWidth: 14
     precision: 8
 
   - name: CurrencyId
+    isRequired: true
     type: int
 
   - name: StoreId
+    isRequired: true
     type: int

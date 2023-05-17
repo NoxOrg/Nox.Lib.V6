@@ -59,9 +59,11 @@ namespace Nox.Generator.Generators
             return entity;
         }
 
-        protected static void AddSimpleProperty(object type, object name, StringBuilder sb)
+        protected static void AddSimpleProperty(object type, object name, bool isRequired, StringBuilder sb)
         {
-            AddProperty(ClassDataType((string)type), name, sb);
+            var typeName = ClassDataType((string)type);
+            // Do not generate "string?" - TODO: make configurable
+            AddProperty(isRequired || typeName == "string" ? typeName : $"{typeName}?", name, sb);
         }
 
         protected static void AddProperty(string type, object name, StringBuilder sb, bool initOnly = false)
@@ -108,10 +110,10 @@ namespace Nox.Generator.Generators
         protected static void AddAttributes(Dictionary<object, object> entity, StringBuilder sb)
         {
             var attributes = (List<object>)entity["attributes"];
-
+            
             foreach (var attr in attributes.Cast<Dictionary<object, object>>())
             {
-                AddSimpleProperty(attr["type"], attr["name"], sb);
+                AddSimpleProperty(attr["type"], attr["name"], GetBooleanValueOrDefault(attr, "isRequired"), sb);
             }
         }
 

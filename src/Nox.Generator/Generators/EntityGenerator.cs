@@ -101,7 +101,7 @@ namespace Nox.Generator.Generators
                 }
                 else
                 {
-                    AddSimpleProperty(key["type"], key["name"], sb);
+                    AddSimpleProperty(key["type"], key["name"], true, sb);
                 }
             }
         }

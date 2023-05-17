@@ -12,9 +12,12 @@ attributes:
 
   - name: StoreId
     type: int
+    isRequired: true
 
   - name: ReservationId
     type: int
+    isRequired: true
 
   - name: CompletedAt
     type: datetime
+    isRequired: true
