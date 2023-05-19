@@ -4,6 +4,7 @@ using Nox.Api.OData.Constants;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Entity;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.IO;
 
 namespace Nox.Api.OData.Swagger
 {
@@ -57,7 +58,8 @@ namespace Nox.Api.OData.Swagger
             // Loop to convert generic odata path items to per entity ones
             foreach (var entity in entities.OrderBy(e => e.PluralName))
             {
-                foreach (var odataPathItem in odataPathItems)
+                foreach (var odataPathItem in odataPathItems.Union(swaggerDoc.Paths.Where(path =>
+                    path.Key.Contains($"/{RoutingConstants.ODATA_ROUTE_PREFIX}/{entity.PluralName}/", StringComparison.OrdinalIgnoreCase)).Distinct().ToList()))
                 {
                     // Hide property endpoint as it not required at the moment
                     if (odataPathItem.Key.Contains(RoutingConstants.PropertyParameterPathName))
@@ -66,6 +68,7 @@ namespace Nox.Api.OData.Swagger
                     }
 
                     OpenApiPathItem newPathItem = CreateCopyWithOperations(entity.Name, odataPathItem.Value);
+                    swaggerDoc.Paths.Remove(odataPathItem.Key);
 
                     if (odataPathItem.Key.Contains(RoutingConstants.NavigationParameterPathName))
                     {

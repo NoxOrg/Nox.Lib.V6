@@ -65,22 +65,25 @@ public static class ApplicationBuilderExtensions
 
                 if (app != null && apiHelper != null)
                 {
-                    // Get all queries and commands names
-                    var queriesAndCommands = entities
-                        .SelectMany(e => e.Value.Queries)
-                        .Select(q => q.Name)
-                        .Union(entities
-                            .SelectMany(e => e.Value.Commands)
-                            .Select(c => c.Name));
-
-                    foreach (var name in queriesAndCommands)
+                    foreach (var entity in entities)
                     {
-                        // TODO: Move path generation to a helper method in order to avoid duplication
-                        var path = $"/{RoutingConstants.ODATA_ROUTE_PREFIX}/{RoutingConstants.EntitySetParameterPathName}/{name}";
+                        // Get all queries and commands names
+                        var queriesAndCommands = entity.Value
+                            .Queries
+                            .Select(q => q.Name)
+                            .Union(entity.Value
+                                .Commands
+                                .Select(c => c.Name));
 
-                        // Invoke generated Map method
-                        apiHelper.GetMethod(name)?
-                            .Invoke(null, new object[] { app, path });
+                        foreach (var name in queriesAndCommands)
+                        {
+                            // TODO: Move path generation to a helper method in order to avoid duplication
+                            var path = $"/{RoutingConstants.ODATA_ROUTE_PREFIX}/{entity.Value.PluralName}/{name}";
+
+                            // Invoke generated Map method
+                            apiHelper.GetMethod(name)?
+                                .Invoke(null, new object[] { app, path });
+                        }
                     }
                 }
             }
