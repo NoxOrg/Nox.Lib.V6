@@ -16,7 +16,7 @@
     },
     "parameters": {
       "type": "array",
-      "description": "Indicates if this attribute is a Primary Key in the database",
+      "description": "Parameters of the query",
       "items": {
         "properties": {
           "name": {
@@ -35,16 +35,20 @@
       }
     },
     "response": {
-      "type": "boolean",
-      "description": "Indicates if this attribute is a required value",
+      "type": "object",
+      "description": "Query resposne",
       "properties": {
         "responseDto": {
           "type": "string",
-          "description": "The Key name"
+          "description": "The response DTO"
+        },
+        "description": {
+          "type": "string",
+          "description": "The response description"
         },
         "isMany": {
-          "type": "string",
-          "description": "The Key type"
+          "type": "boolean",
+          "description": "Indicates whether query returns a collection"
         }
       }
     }
