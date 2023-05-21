@@ -18,6 +18,9 @@ namespace Samples.Api.Domain.Store.Queries
             var store = await DbContext
                 .Store
                 .Include(s => s.Reservations)
+                .ThenInclude(r => r.SourceCurrency)
+                .Include(s => s.Reservations)
+                .ThenInclude(r => r.DestinationCurrency)
                 .FirstOrDefaultAsync(s => s.Id == storeId) ?? throw new Exception("Store cannot be found");
 
             return store.Reservations

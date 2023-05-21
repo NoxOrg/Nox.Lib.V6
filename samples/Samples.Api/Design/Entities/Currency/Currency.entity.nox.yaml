@@ -67,6 +67,7 @@ attributes:
   - name: DecimalDigits
     description: The number of decimal digits to display for monetary values
     type: int
+    isRequired: true
 
   - name: DecimalRounding
     description: The decimal rounding to apply to monetary values

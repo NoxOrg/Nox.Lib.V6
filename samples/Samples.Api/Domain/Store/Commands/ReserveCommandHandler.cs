@@ -31,6 +31,7 @@ namespace Samples.Api.Domain.Store.Commands
                 var store = await DbContext
                     .Store
                     .Include(s => s.Reservations)
+                    .Include(s => s.CashBalances)
                     .FirstOrDefaultAsync(s => s.Id == command.StoreId);
 
                 if (store == null)

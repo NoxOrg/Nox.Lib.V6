@@ -90,6 +90,7 @@ attributes:
   - name: AreaInSquareKilometres
     description: Country area in square kilometers 
     type: int
+    isRequired: true
 
   - name: GeoLattitude
     description: The the north–south position of the workplace's point on the surface of the Earth
