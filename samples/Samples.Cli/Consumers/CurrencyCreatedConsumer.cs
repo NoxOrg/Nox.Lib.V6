@@ -1,12 +1,10 @@
-using System.Text.Json;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using Nox;
-using Nox.Core.Enumerations;
+using Nox.Events;
 
 namespace Samples.Cli.Consumers;
 
-public class CurrencyCreatedEventConsumer : IConsumer<CurrencyCreatedDomainEvent>
+public class CurrencyCreatedEventConsumer : IConsumer<CurrencyCreatedEvent>
 {
     readonly ILogger<CurrencyCreatedEventConsumer> _logger;
 
@@ -15,7 +13,7 @@ public class CurrencyCreatedEventConsumer : IConsumer<CurrencyCreatedDomainEvent
         _logger = logger;
     }
 
-    public Task Consume(ConsumeContext<CurrencyCreatedDomainEvent> context)
+    public Task Consume(ConsumeContext<CurrencyCreatedEvent> context)
     {
         _logger.LogInformation("Currency Created by {source}: {@payload}", context.Message.EventSource, context.Message.Payload);
         return Task.CompletedTask;
@@ -29,5 +27,3 @@ public class CurrencyCreatedEventConsumerDefinition : ConsumerDefinition<Currenc
         endpointConfigurator.UseMessageRetry(r => r.Intervals(500, 1000));
     }
 }
-
-

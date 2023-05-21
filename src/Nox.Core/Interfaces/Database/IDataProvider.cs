@@ -23,7 +23,7 @@ namespace Nox.Core.Interfaces.Database
         EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema);
         IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration);
 
-        string ToDatabaseColumnType(IEntityAttribute entityAttribute);
+        string ToDatabaseColumnType(IBaseEntityAttribute entityAttribute);
         string ToTableNameForSql(string table, string schema);
         string ToTableNameForSqlRaw(string table, string schema);
 

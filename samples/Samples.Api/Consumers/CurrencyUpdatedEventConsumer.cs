@@ -1,10 +1,9 @@
 using MassTransit;
-using Nox;
-using Nox.Core.Enumerations;
+using Nox.Events;
 
 namespace Samples.Api.Consumers;
 
-public class CurrencyUpdatedEventConsumer: IConsumer<CurrencyUpdatedDomainEvent>
+public class CurrencyUpdatedEventConsumer: IConsumer<CurrencyUpdatedEvent>
 {
     readonly ILogger<CurrencyUpdatedEventConsumer> _logger;
 
@@ -13,9 +12,9 @@ public class CurrencyUpdatedEventConsumer: IConsumer<CurrencyUpdatedDomainEvent>
         _logger = logger;
     }
     
-    public Task Consume(ConsumeContext<CurrencyUpdatedDomainEvent> context)
+    public Task Consume(ConsumeContext<CurrencyUpdatedEvent> context)
     {
-        _logger.LogInformation("Received CurrencyUpdatedDomainEvent from {message}: {@payload}", context.Message, context.Message.Payload);
+        _logger.LogInformation("Received CurrencyUpdatedEvent from {message}: {@payload}", context.Message, context.Message.Payload);
         return Task.CompletedTask;
     }
 }

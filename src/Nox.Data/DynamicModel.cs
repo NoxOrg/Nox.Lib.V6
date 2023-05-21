@@ -1,5 +1,7 @@
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -9,6 +11,7 @@ using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Messaging;
 using Nox.Core.Interfaces.Messaging.Events;
+using Nox.Core.Models.Entity;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -22,7 +25,7 @@ public class DynamicModel : IDynamicModel
     private readonly Dictionary<string, IDynamicDbEntity> _dynamicDbEntities = new();
 
     public DynamicModel(
-        ILogger<DynamicModel> logger, 
+        ILogger<DynamicModel> logger,
         IDynamicService dynamicService,
         IEnumerable<INoxEvent>? messages = null,
         INoxMessenger? messenger = null)
@@ -44,24 +47,30 @@ public class DynamicModel : IDynamicModel
         var dbContextGetNavigationMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.GetDynamicTypedNavigation));
 
         var dbContextPostMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.PostDynamicTypedObject));
-        
+
         var dbContextPutMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.PutDynamicTypedObject));
-        
+
         var dbContextPatchMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.PatchDynamicTypedObject));
-        
+
         var dbContextDeleteMethod = methods.First(m => m.Name == nameof(IDynamicDbContext.DeleteDynamicTypedObject));
 
         foreach (var (entityName, (entity, typeBuilder)) in GetTablesAndTypeBuilders())
         {
             var t = typeBuilder.CreateType();
-
-            var entityType = builder.AddEntityType(t);
-
             var pluralName = entityName.Pluralize();
 
-            builder.AddEntitySet(pluralName, entityType);
+            if (entity.Key.IsComposite)
+            {
+                // add complex type to handle composite keys
+                builder.AddComplexType(t);
+            }
+            else
+            {
+                var entityType = builder.AddEntityType(t);
+                builder.AddEntitySet(pluralName, entityType);
+            }
 
-            _dynamicDbEntities[pluralName] = new DynamicDbEntity()
+            _dynamicDbEntities[pluralName] = new DynamicDbEntity
             {
                 Name = entityName,
                 PluralName = pluralName,
@@ -104,65 +113,111 @@ public class DynamicModel : IDynamicModel
             {
                 _databaseProvider.ConfigureEntityTypeBuilder(b, entity.Entity.Table, entity.Entity.Schema);
 
-                foreach (var attr in entity.Entity.Attributes)
+                var key = entity.Entity.Key;
+                if (key.IsComposite)
                 {
-                    var prop = b.Property(attr.Name);
+                    // Create composite key
+                    b.HasKey(key.Entities.Select(e => $"{e}Id").ToArray());
+                }
+                else
+                {
+                    var prop = SetAttribute(b, key);
 
-                    var netType = attr.NetDataType();
+                    b.HasKey(key.Name);
 
-                    prop.HasColumnType(_databaseProvider.ToDatabaseColumnType(attr));
-
-                    if (netType == typeof(string))
+                    if (!key.IsAutoNumber)
                     {
-                        prop.HasMaxLength(attr.MaxWidth);
+                        prop.ValueGeneratedNever();
                     }
-
-                    else if (attr.IsDateTimeType())
-                    {
-                        // don't set MaxWidth, throw's error on db create
-                    }
-
-                    else if (attr.MaxWidth > 0 && attr.Precision > 0)
-                    {
-                        prop.HasPrecision(attr.MaxWidth, attr.Precision);
-                    }
-
-                    try
-                    {
-                        prop.IsRequired(attr.IsRequired);
-                    }
-                    catch
-                    {
-                    }
-
-                    if (attr.IsPrimaryKey)
-                    {
-                        b.HasKey(new string[] { attr.Name });
-
-                        if (!attr.IsAutoNumber)
-                        {
-                            prop.ValueGeneratedNever();
-                        }
-                    }
-
-                    if (attr.IsUnicode)
-                    {
-                        prop.IsUnicode();
-                    }
-
-                    if (attr.MinWidth == attr.MaxWidth)
-                    {
-                        prop.IsFixedLength();
-                    }
-
                 }
 
-            });
+                foreach (var attr in entity.Entity.Attributes)
+                {
+                    SetAttribute(b, attr);
+                }
 
+                // Set relationship properties
+                foreach (var relation in entity.Entity.AllRelationships)
+                {
+                    if (!relation.IsMany)
+                    {
+                        var relationProperty = b.Property($"{relation.Name}Id");
+                        SetIsRequired(relationProperty, relation.IsRequired);
+                    }
+                }
+            });
         }
-        
+
         _dynamicService.AddMetadata(modelBuilder);
+
+        SetCascadeBehaviour(modelBuilder);
+
         return modelBuilder;
+    }
+
+    private static void SetCascadeBehaviour(ModelBuilder modelBuilder)
+    {
+        var entityTypes = modelBuilder.Model
+                    .GetEntityTypes()
+                    .ToList();
+
+        // Disable cascade delete
+        var foreignKeys = entityTypes
+            .SelectMany(e => e.GetForeignKeys().Where(f => f.DeleteBehavior == DeleteBehavior.Cascade));
+
+        foreach (var foreignKey in foreignKeys)
+        {
+            foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
+        }
+    }
+
+    private Microsoft.EntityFrameworkCore.Metadata.Builders.PropertyBuilder SetAttribute(EntityTypeBuilder builder, IBaseEntityAttribute attr)
+    {
+        var prop = builder.Property(attr.Name);
+
+        var netType = attr.NetDataType();
+
+        prop.HasColumnType(_databaseProvider.ToDatabaseColumnType(attr));
+
+        if (netType == typeof(string))
+        {
+            prop.HasMaxLength(attr.MaxWidth);
+        }
+
+        else if (attr is EntityAttribute attribute && attribute.IsDateTimeType())
+        {
+            // don't set MaxWidth, throw's error on db create
+        }
+
+        else if (attr.MaxWidth > 0 && attr.Precision > 0)
+        {
+            prop.HasPrecision(attr.MaxWidth, attr.Precision);
+        }
+
+        SetIsRequired(prop, attr.IsRequired);
+
+        if (attr.IsUnicode)
+        {
+            prop.IsUnicode();
+        }
+
+        if (attr.MinWidth == attr.MaxWidth)
+        {
+            prop.IsFixedLength();
+        }
+
+        return prop;
+    }
+
+    private static void SetIsRequired(Microsoft.EntityFrameworkCore.Metadata.Builders.PropertyBuilder prop, bool isRequired)
+    {
+        try
+        {
+            prop.IsRequired(isRequired);
+        }
+        catch
+        {
+        }
     }
 
     public IEdmModel GetEdmModel()
@@ -232,7 +287,6 @@ public class DynamicModel : IDynamicModel
         _dynamicDbEntities[dbSetName].DbContextDeleteMethod.Invoke(context, parameters);
     }
 
-
     private Dictionary<string, (IEntity Entity, TypeBuilder TypeBuilder)> GetTablesAndTypeBuilders()
     {
         var entities = _dynamicService.Entities;
@@ -257,28 +311,43 @@ public class DynamicModel : IDynamicModel
             }
 
             dynamicTypes.Add(entity.Name, (entity, tb));
-
         }
 
         foreach (var (key, entity) in entities)
         {
             var tb = dynamicTypes[entity.Name].TypeBuilder;
 
-            foreach (var col in entity.Attributes)
+            foreach (var relation in entity.AllRelationships)
             {
-                foreach (var relatedEntityName in entity.RelatedParents)
+                var relatedEntity = dynamicTypes[relation.Entity];
+                var relatedTb = relatedEntity.TypeBuilder;
+
+                if (relation.IsMany)
                 {
-                    var relatedTb = dynamicTypes[relatedEntityName].TypeBuilder;
-
-                    tb.AddPublicGetSetProperty(relatedEntityName, relatedTb);
-
-                    relatedTb.AddPublicGetSetPropertyAsList(entity.PluralName, tb);
+                    tb.AddPublicGetSetPropertyAsList(relation.Name, relatedTb);
                 }
+                else
+                {
+                    tb.AddPublicGetSetProperty(relation.Name, relatedTb);
+                }
+            }
 
+            if (entity.Key.IsComposite)
+            {
+                // Add properties for each composite key entity
+                foreach (var keyEntity in entity.Key.Entities)
+                {
+                    var relatedTb = dynamicTypes[keyEntity].TypeBuilder;
+                    tb.AddPublicGetSetProperty(keyEntity, relatedTb);
+                }
+            }
+            else
+            {
+                // Add simple key
+                tb.AddPublicGetSetProperty(entity.Key.Name, entity.Key.NetDataType());
             }
         }
 
         return dynamicTypes;
-
     }
 }

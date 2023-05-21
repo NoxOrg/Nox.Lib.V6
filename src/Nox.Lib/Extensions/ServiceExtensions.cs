@@ -5,7 +5,6 @@ using Nox.Api.OData.Swagger;
 using Nox.Core.Extensions;
 using Nox.Core.Helpers;
 using Nox.Core.Interfaces;
-using Nox.Core.Interfaces.Configuration;
 using Nox.Data;
 using Nox.Etl;
 using Nox.Jobs;
@@ -23,7 +22,6 @@ public static class ServiceExtensions
         this IServiceCollection services,
         NoxSwaggerConfiguration? swaggerConfiguration = null)
     {
-
         var designRoot = "./";
         if (_configuration?["Nox:DefinitionRootPath"] != null)
         {
@@ -45,7 +43,6 @@ public static class ServiceExtensions
 
         services.AddNoxSwaggerGeneration(swaggerConfiguration);
 
-
         return services;
     }
 
@@ -59,6 +56,8 @@ public static class ServiceExtensions
         {
             return services;
         }
+        
+        services.AddEndpointsApiExplorer();
 
         services.AddSwaggerGen(cfg =>
         {

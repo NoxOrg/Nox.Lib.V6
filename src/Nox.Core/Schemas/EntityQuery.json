@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NOX Entity Query",
+  "description": "Defines a NOX entity query",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [ "name" ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the query"
+    },
+    "description": {
+      "type": "string",
+      "description": "The query description"
+    },
+    "parameters": {
+      "type": "array",
+      "description": "Parameters of the query",
+      "items": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the parameter"
+          },
+          "description": {
+            "type": "string",
+            "description": "The parameter description"
+          },
+          "type": {
+            "type": "string",
+            "description": "The parameter type"
+          }
+        }
+      }
+    },
+    "response": {
+      "type": "object",
+      "description": "Query resposne",
+      "properties": {
+        "responseDto": {
+          "type": "string",
+          "description": "The response DTO"
+        },
+        "description": {
+          "type": "string",
+          "description": "The response description"
+        },
+        "isMany": {
+          "type": "boolean",
+          "description": "Indicates whether query returns a collection"
+        }
+      }
+    }
+  }
+}

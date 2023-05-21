@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Nox.Core.Constants;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Models;
+using Nox.Core.Models.Entity;
 using Nox.TestFixtures;
 using NUnit.Framework;
 

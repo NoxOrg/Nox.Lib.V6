@@ -7,7 +7,6 @@ public class EntityValidator : AbstractValidator<IEntity>
 {
     public EntityValidator()
     {
-
         RuleFor(entity => entity.Name)
             .NotEmpty()
             .WithMessage(entity => $"The entity's name must be specified in {entity.DefinitionFileName}");
@@ -23,5 +22,7 @@ public class EntityValidator : AbstractValidator<IEntity>
         RuleForEach(entity => entity.Attributes)
             .SetValidator(new EntityAttributeValidator());
 
+        RuleFor(service => service.Key)
+            .SetValidator(new EntityKeyValidator());
     }
 }

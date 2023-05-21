@@ -1,12 +1,9 @@
-using System.Collections.Immutable;
-using System.Dynamic;
-using Amazon.SimpleNotificationService.Model;
-using AutoMapper;
 using Newtonsoft.Json;
 using Nox.Core.Enumerations;
-using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Messaging.Events;
+using System.Collections.Immutable;
+using System.Dynamic;
 
 namespace Nox.Messaging;
 
@@ -18,10 +15,11 @@ public static class MessageExtensions
         {
             var type = msg.GetType();
             var baseType = type.BaseType;
+            
             if (baseType == null) return null;
+            
             if (baseType.GenericTypeArguments.Any(gta => gta.Name == entityName))
             {
-
                 switch (eventType)
                 {
                     case NoxEventType.Created:
@@ -36,12 +34,14 @@ public static class MessageExtensions
                 }
             }
         }
+
         return null;
     }
 
     public static object MapInstance(this INoxEvent template, ExpandoObject source, NoxEventSource eventSource)
     {
         var sourceDict = source as IDictionary<string, object?>;
+        
         return template
             .ToInstance(eventSource)
             .ResolvePayload(template, sourceDict);
@@ -60,10 +60,7 @@ public static class MessageExtensions
         var result = Activator.CreateInstance(template.GetType())!;
         var props = template.GetType().GetProperties();
         var eventSourceProp = props.FirstOrDefault(p => p.Name.ToLower() == "eventsource");
-        if (eventSourceProp != null)
-        {
-            eventSourceProp.SetValue(result, eventSource);
-        }
+        eventSourceProp?.SetValue(result, eventSource);
 
         return result;
     }
@@ -71,6 +68,7 @@ public static class MessageExtensions
     private static object ResolvePayload(this object eventInstance, INoxEvent template, IDictionary<string, object?> source)
     {
         var payloadProp = template.GetType().GetProperties().FirstOrDefault(p => p.Name.ToLower() == "payload");
+        
         if (payloadProp != null)
         {
             var payload = Activator.CreateInstance(payloadProp.PropertyType);
@@ -79,44 +77,50 @@ public static class MessageExtensions
             {
                 foreach (var prop in payload.GetType().GetProperties())
                 {
-                    var sourceVal = source?[prop.Name];
-                    if (sourceVal == null) continue;
+                    if (!source.TryGetValue(prop.Name, out var sourceVal) || sourceVal is null)
+                    {
+                        continue;
+                    }
 
+                    var propType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
+                    
                     try
                     {
+
+
                         // when reading from json, numbers and booleans are long - will AutoMapper handle this better? A.S.
-                        if(sourceVal.GetType().Equals(prop.PropertyType))
+                        if (sourceVal.GetType().Equals(propType))
                         {
                             prop.SetValue(payload, sourceVal);
                         }
                         else if (sourceVal is long) 
                         {
-                            if (prop.PropertyType.Equals(typeof(Int32)))
+                            if (propType.Equals(typeof(int)))
                             {
                                 prop.SetValue(payload, Convert.ToInt32(sourceVal));
                             }
-                            else if (prop.PropertyType.Equals(typeof(bool)))
+                            else if (propType.Equals(typeof(bool)))
                             {
                                 prop.SetValue(payload, Convert.ToBoolean(sourceVal));
                             }
                             else 
                             {
-                                prop.SetValue(payload, Convert.ChangeType(sourceVal, prop.PropertyType));
+                                prop.SetValue(payload, Convert.ChangeType(sourceVal, propType));
                             }
                         }
-                        else if (sourceVal is int && prop.PropertyType.Equals(typeof(bool)))
+                        else if (sourceVal is int && propType.Equals(typeof(bool)))
                         {
                             prop.SetValue(payload, Convert.ToBoolean(sourceVal));
                         }
                         else
                         {
-                            prop.SetValue(payload, Convert.ChangeType(sourceVal, prop.PropertyType));
+                            prop.SetValue(payload, Convert.ChangeType(sourceVal, propType));
                         }
                     }
                     catch 
                     {
                         throw new InvalidCastException(string.Format(ExceptionResources.MapInstanceCastException, template.GetType().Name, payload.GetType().Name, prop.Name, sourceVal.GetType().Name,
-                            prop.PropertyType.Name, payload.GetType().Name));
+                            propType.Name, payload.GetType().Name));
                     }
                 }    
             }

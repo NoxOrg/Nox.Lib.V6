@@ -1,0 +1,62 @@
+﻿#
+# Reservation.entity.nox.yaml
+#
+# https://open.er-api.com/v6/latest/CHF
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
+#
+
+name: Reservation
+
+description: The cash reservation in Store
+
+relationships:
+  - name: Store
+    entity: Store
+    isMany: false
+    isRequired: true
+
+  - name: SourceCurrency
+    entity: Currency
+    isMany: false
+    isRequired: true
+
+  - name: DestinationCurrency
+    entity: Currency
+    isMany: false
+    isRequired: true
+
+  - name: Customer
+    entity: Customer
+    isMany: false
+    isRequired: true
+
+key: 
+   name: Id
+   description: The unique identifier of a reservation operation
+   type: int
+   isAutoNumber: true
+
+attributes:
+
+  - name: ExpirationTime
+    description: The date and time when resrvation expires
+    type: datetime
+    isRequired: true
+
+  - name: SourceAmount
+    type: decimal
+    maxWidth: 14
+    precision: 8
+    isRequired: true
+
+  - name: Rate
+    type: decimal
+    maxWidth: 14
+    precision: 8
+    isRequired: true
+
+  - name: IsActive
+    description: Is active
+    type: bool
+    isRequired: true

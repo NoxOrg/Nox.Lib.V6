@@ -7,9 +7,7 @@ CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
 
 // Add Nox to the service collection
 builder.Services.AddNox();
@@ -25,7 +23,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//Add Nox to the application middleware
+// Add Nox to the application middleware
 app.UseNox();
 
 app.UseAuthorization();

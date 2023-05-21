@@ -7,7 +7,6 @@ public class EntityAttributeValidator : AbstractValidator<IEntityAttribute>
 {
     public EntityAttributeValidator()
     {
-
         RuleFor(attribute => attribute.Name)
             .NotEmpty()
             .WithMessage(attribute => $"The attribute name must be specified in {attribute.DefinitionFileName}");
@@ -19,6 +18,5 @@ public class EntityAttributeValidator : AbstractValidator<IEntityAttribute>
         RuleFor(attribute => attribute.ApplyDefaults())
             .NotEqual(false)
             .WithMessage(attribute => $"Defaults could not be applied to attributes defined in {attribute.DefinitionFileName}");
-
     }
 }

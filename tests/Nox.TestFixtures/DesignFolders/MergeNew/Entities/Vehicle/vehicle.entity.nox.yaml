@@ -7,14 +7,12 @@ description: Vehicles
 pluralName: Vehicles
 table: Vehicle
 
-attributes:
+key: 
+  name: Id
+  description: The vehicle's unique identifier 
+  type: int
 
-  - name: Id
-    description: The vehicle's unique identifier
-    isPrimaryKey: true
-    type: int
-    canFilter: true
-    canSort: true
+attributes:
 
   - name: Brand
     description: The brand of the vehicle

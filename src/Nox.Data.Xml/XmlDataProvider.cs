@@ -145,7 +145,7 @@ public class XmlDataProvider : IDataProvider
         return _dataFlowExecutableSource;
     }
 
-    public string ToDatabaseColumnType(IEntityAttribute entityAttribute)
+    public string ToDatabaseColumnType(IBaseEntityAttribute entityAttribute)
     {
         throw new NotImplementedException();
     }

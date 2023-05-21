@@ -1,0 +1,30 @@
+﻿#
+# CurrencyCashBalance.entity.nox.yaml
+#
+# https://open.er-api.com/v6/latest/CHF
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
+#
+
+name: CurrencyCashBalance
+
+description: The cash balance in Store
+
+key:
+  entities: [Store, Currency]
+
+attributes:
+
+  - name: Amount
+    description: The amount
+    isRequired: true
+    type: decimal
+    maxWidth: 14
+    precision: 8
+
+  - name: OperationLimit
+    description: The Operation Limit
+    isRequired: false
+    type: decimal
+    maxWidth: 14
+    precision: 8

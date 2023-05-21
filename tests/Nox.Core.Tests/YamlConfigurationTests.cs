@@ -40,12 +40,12 @@ public class YamlConfigurationTests: ConfigurationTestFixture
         //Person
         var vehicle = config.Entities.FirstOrDefault(e => e.Name == "Vehicle");
         Assert.That(vehicle, Is.Not.Null);
-        Assert.That(vehicle!.Attributes.Count, Is.EqualTo(3));
+        Assert.That(vehicle!.Attributes.Count, Is.EqualTo(2));
         Assert.That(vehicle.DefinitionFileName, Is.Not.Empty);
         Assert.That(vehicle.Description, Is.EqualTo("Vehicles"));
         Assert.That(vehicle.Name, Is.EqualTo("Vehicle"));
         Assert.That(vehicle.PluralName, Is.EqualTo("Vehicles"));
-        Assert.That(vehicle.RelatedParents!.Count, Is.EqualTo(1));
+        Assert.That(vehicle.Relationships!.Count, Is.EqualTo(1));
         Assert.That(vehicle.Schema, Is.EqualTo("dbo"));
         Assert.That(vehicle.Table, Is.EqualTo("Vehicle"));
 
@@ -87,6 +87,5 @@ public class YamlConfigurationTests: ConfigurationTestFixture
         Assert.That(msgProvider, Is.Not.Null);
         Assert.That(msgProvider!.Name, Is.EqualTo("TestMessagingProvider1"));
         Assert.That(msgProvider.Provider, Is.EqualTo("InMemory"));
-    }
-    
+    }    
 }

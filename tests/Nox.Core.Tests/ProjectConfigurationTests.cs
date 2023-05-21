@@ -44,7 +44,7 @@ public class ProjectConfigurationTests: ConfigurationTestFixture
         //Person
         var person = config.Entities.FirstOrDefault(e => e.Name == "Person");
         Assert.That(person, Is.Not.Null);
-        Assert.That(person!.Attributes.Count, Is.EqualTo(3));
+        Assert.That(person!.Attributes.Count, Is.EqualTo(2));
         Assert.That(person.DefinitionFileName, Is.Not.Empty);
         Assert.That(person.Description, Is.EqualTo("Persons"));
         Assert.That(person.Name, Is.EqualTo("Person"));
@@ -56,7 +56,7 @@ public class ProjectConfigurationTests: ConfigurationTestFixture
         //Vehicle
         var vehicle = config.Entities.FirstOrDefault(e => e.Name == "Vehicle");
         Assert.That(vehicle, Is.Not.Null);
-        Assert.That(vehicle!.Attributes.Count, Is.EqualTo(3));
+        Assert.That(vehicle!.Attributes.Count, Is.EqualTo(2));
         Assert.That(vehicle.DefinitionFileName, Is.Not.Empty);
         Assert.That(vehicle.Description, Is.EqualTo("Vehicles"));
         Assert.That(vehicle.Name, Is.EqualTo("Vehicle"));

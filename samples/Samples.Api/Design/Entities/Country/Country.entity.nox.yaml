@@ -10,20 +10,27 @@ pluralName: Countries
 table: Country
 schema: dbo
 
-relatedParents: [Currency]
+relationships:
+  - name: Currency
+    entity: Currency
+    isMany: false
+    isRequired: true
 
 messaging:
   - messagingProvider: Mediator
   - messagingProvider: AppServiceBus
-    
-attributes:
 
-  - name: Id
-    description: The country's unique identifier 
-    isPrimaryKey: true
-    type: int
-    canFilter: true
-    canSort: true
+raiseCrudEvents: 
+  create: yes
+  update: yes
+  delete: yes
+
+key: 
+  name: Id
+  description: The country's unique identifier 
+  type: int
+
+attributes:
 
   - name: Name
     description: The country's common name 
@@ -83,6 +90,7 @@ attributes:
   - name: AreaInSquareKilometres
     description: Country area in square kilometers 
     type: int
+    isRequired: true
 
   - name: GeoLattitude
     description: The the north–south position of the workplace's point on the surface of the Earth

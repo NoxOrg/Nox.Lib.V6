@@ -1,0 +1,52 @@
+﻿#
+# Customer.entity.nox.yaml
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
+#
+
+name: Customer
+description: Customer
+pluralName: Customers
+table: Customer
+schema: dbo
+
+raiseCrudEvents: 
+  create: no
+  update: no
+  delete: no
+
+relationships:
+  - name: Reservations
+    entity: Reservation
+    description: Pre-arranged excanged operation at the store by a specific client.
+    isMany: true
+    isRequired: true
+
+key: 
+   name: Id
+   description: The customer's unique identifier 
+   type: int
+   isAutoNumber: true
+    
+attributes:
+
+  - name: FirstName
+    description: The customer's name 
+    isRequired: true
+    type: string
+    maxWidth: 64
+    canFilter: true
+    canSort: true
+    
+  - name: LastName
+    description: The customer's name 
+    isRequired: true
+    type: string
+    maxWidth: 64
+    canFilter: true
+    canSort: true
+        
+  - name: IsBlackListed
+    description: The customer's status
+    isRequired: true
+    type: bool

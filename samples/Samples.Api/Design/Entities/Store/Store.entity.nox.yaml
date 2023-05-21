@@ -1,0 +1,81 @@
+﻿#
+# Store.entity.nox.yaml
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/Entity.json
+#
+
+name: Store
+description: Cash Store
+pluralName: Stores
+table: Store
+schema: dbo
+
+raiseCrudEvents: 
+  create: yes
+  update: yes
+  delete: no
+
+ownedRelationships:
+  - name: Reservations
+    entity: Reservation
+    description: Pre-arranged exchange operation at the store by a specific client.
+    isMany: true
+    isRequired: true # to model 1-1* or 1-0* relations
+
+  #- name: Exchanges
+  #  entity: Exchange
+  #  description: Exchange operation at the store by a specific client.
+  #  isMany: true
+  #  isRequired: true
+
+  - name: CashBalances
+    entity: CurrencyCashBalance
+    description: Cash balances by currency.
+    isMany: true
+    isRequired: true
+
+queries:
+    - name: ActiveReservations
+      description: Gets active reservations by store.
+      parameters:
+       - name: storeId
+         description: 
+         type: int # can be DTO here
+       - name: customerId
+         description: 
+         type: int?
+         defaultValue: null
+      response:
+        responseDto: ReservationInfoDto
+        description: 
+        isMany: true
+
+commands:
+    - name: Reserve
+      description: Reserves amount of cash in a store for a specific customer.
+      events: [BalanceChanged]
+      
+    - name: Exchange
+      description: Performs an exchange operation in a store.
+      events: [BalanceChanged]
+
+events:
+    - name: BalanceChanged
+      description: Represents a cash balance change in a store.
+      type: BalanceChangedDto
+
+key: 
+   name: Id
+   description: The store's unique identifier 
+   type: int
+   isAutoNumber: true
+    
+attributes:
+
+  - name: Name
+    description: The store's common name 
+    isRequired: true
+    type: string
+    maxWidth: 64
+    canFilter: true
+    canSort: true

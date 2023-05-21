@@ -1,0 +1,44 @@
+﻿#
+# ReservationInfo.entity.nox.yaml
+#
+# https://open.er-api.com/v6/latest/CHF
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/DTO.json
+#
+
+name: ReservationInfo
+
+attributes:
+
+  - name: ExpirationTime
+    description: The date and time when resrvation expires
+    type: datetime
+    isRequired: true
+
+  - name: SourceCurrencyId
+    type: int
+    isRequired: true
+
+  - name: DestinationCurrencyId
+    type: int
+    isRequired: true
+
+  - name: SourceAmount
+    type: decimal
+    maxWidth: 14
+    precision: 8
+    isRequired: true
+
+  - name: Rate
+    type: decimal
+    maxWidth: 14
+    precision: 8
+    isRequired: true
+
+  - name: CustomerId
+    type: int
+    isRequired: true
+    
+  - name: CustomerName
+    type: string
+    isRequired: true

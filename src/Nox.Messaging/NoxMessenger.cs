@@ -10,7 +10,7 @@ namespace Nox.Messaging;
 public class NoxMessenger: INoxMessenger
 {
     private readonly ILogger _logger;
-    private IProjectConfiguration _config;
+    private readonly IProjectConfiguration _config;
     private readonly IRabbitMqBus? _rabbitBus = null;
     private readonly IAzureBus? _azureBus = null;
     private readonly IAmazonBus? _amazonBus = null;
@@ -32,34 +32,45 @@ public class NoxMessenger: INoxMessenger
         _mediator = mediator;
     }
 
-    public async Task SendMessage(IEnumerable<IMessageTarget> messageTargets, object message)
+    public async Task SendMessageAsync<T>(IEnumerable<string> messageProviders, T message) where T : notnull
     {
-        foreach (var target in messageTargets)
+        foreach (var messageProvider in messageProviders)
         {
             try
             {
-                if (_config.MessagingProviders == null) throw new ConfigurationException("Cannot add messaging if messaging providers not present in configuration!");
-                var providerInstance = _config.MessagingProviders.First(p => 
-                    p.Name != null && p.Name.Equals(target.MessagingProvider, StringComparison.OrdinalIgnoreCase)
+                if (_config.MessagingProviders == null)
+                {
+                    throw new ConfigurationException("Cannot add messaging if messaging providers not present in configuration!");
+                }
+
+                var providerInstance = _config.MessagingProviders.First(p =>
+                    p.Name != null && p.Name.Equals(messageProvider, StringComparison.OrdinalIgnoreCase)
                 );
 
-                switch (providerInstance.Provider!.ToLower())
+                if (providerInstance == null)
+                {
+                    throw new ConfigurationException($"Messaging provider '{messageProvider}' is referneced but not present in the NOX configuration");
+                }
+                
+                var messageType = message.GetType().Name;
+
+                switch (providerInstance.Provider.ToLower())
                 {
                     case "rabbitmq":
                         await _rabbitBus!.Publish(message);
-                        _logger.LogInformation($"{message.GetType().Name} sent to RabbitMq bus.");
+                        _logger.LogInformation($"{messageType} sent to RabbitMq bus.");
                         break;
                     case "azureservicebus":
                         await _azureBus!.Publish(message);
-                        _logger.LogInformation($"{message.GetType().Name} sent to Azure bus.");
+                        _logger.LogInformation($"{messageType} sent to Azure bus.");
                         break;
                     case "amazonsqs":
                         await _amazonBus!.Publish(message);
-                        _logger.LogInformation($"{message.GetType().Name} sent to Amazon bus.");
+                        _logger.LogInformation($"{messageType} sent to Amazon bus.");
                         break;
                     case "mediator":
                         await _mediator!.Publish(message);
-                        _logger.LogInformation($"{message.GetType().Name} sent to Mediator.");
+                        _logger.LogInformation($"{messageType} sent to Mediator.");
                         break;
                 }
             }
@@ -70,6 +81,10 @@ public class NoxMessenger: INoxMessenger
         }
     }
 
+    public async Task SendMessage(IEnumerable<IMessageTarget> messageTargets, object message)
+    {
+        await SendMessageAsync(messageTargets.Select(m => m.MessagingProvider), message);
+    }
 
     public async Task SendHeartbeat(IHeartbeatMessage message, CancellationToken stoppingToken)
     {
@@ -99,9 +114,6 @@ public class NoxMessenger: INoxMessenger
                         }
                         break;
                 }
-
-                
-
             }
             catch (Exception ex)
             {

@@ -39,7 +39,7 @@ messagingProviders:
     ## RabbitMQ
     provider: rabbitMQ
     connectionString: rabbitmq://guest:guest@localhost/
-
+    
     ### Azure Service Bus
     #provider: azureServiceBus
     #connectionString: ${ConnectionString:AzureServiceBus}
@@ -78,7 +78,6 @@ team:
   developers:
     - name: Andre Sharpe
       userName: andre.sharpe@iwgplc.com
-      mobilePhoneNumber: +41789461056
       isAdmin: true
     - name: Jan Schutte
       userName: jan.schutte@iwgplc.com

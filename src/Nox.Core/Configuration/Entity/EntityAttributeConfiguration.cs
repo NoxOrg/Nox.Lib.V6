@@ -7,7 +7,6 @@ public class EntityAttributeConfiguration: MetaBase
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Type { get; set; } = "string";
-    public bool IsPrimaryKey { get; set; } = false;
     public bool IsAutoNumber { get; set; } = false;
     public bool IsForeignKey { get; set; } = false;
     public bool IsRequired { get; set; } = false;

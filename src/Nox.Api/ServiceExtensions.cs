@@ -13,6 +13,7 @@ public static class ServiceExtensions
         {
             default:
                 services.AddDynamicODataFeature();
+                services.AddDynamicQueriesAndCommands();
                 break;
         }
 

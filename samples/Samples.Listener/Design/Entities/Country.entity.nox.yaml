@@ -9,15 +9,18 @@ description: Countries and related data
 
 messaging:
   - messagingProvider: AppServiceBus
-    
-attributes:
 
-  - name: Id
-    description: The country's unique identifier 
-    isPrimaryKey: true
-    type: int
-    canFilter: true
-    canSort: true
+raiseCrudEvents: 
+  create: yes
+  update: no
+  delete: no
+ 
+key: 
+  name: Id
+  description: The country's unique identifier 
+  type: int
+
+attributes:
 
   - name: Name
     description: The country's common name 

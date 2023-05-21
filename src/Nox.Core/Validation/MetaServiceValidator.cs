@@ -21,6 +21,5 @@ public class MetaServiceValidator : AbstractValidator<IProjectConfiguration>
 
         RuleForEach(service => service.MessagingProviders)
             .SetValidator(new ServiceMessageBusValidator());
-
     }
 }

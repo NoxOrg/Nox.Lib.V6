@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NOX Entity Command",
+  "description": "Defines a NOX entity command",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [ "name" ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the command"
+    },
+    "description": {
+      "type": "string",
+      "description": "The command description"
+    },
+    "events": {
+      "type": "array",
+      "description": "The domain events raised by the command",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

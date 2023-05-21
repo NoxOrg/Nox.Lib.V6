@@ -1,0 +1,23 @@
+﻿#
+# Exchange.dto.nox.yaml
+#
+# https://open.er-api.com/v6/latest/CHF
+#
+# yaml-language-server: $schema=https://noxorg.dev/schemas/DTO.json
+#
+
+name: Exchange
+
+attributes:
+
+  - name: StoreId
+    type: int
+    isRequired: true
+
+  - name: ReservationId
+    type: int
+    isRequired: true
+
+  - name: CompletedAt
+    type: datetime
+    isRequired: true

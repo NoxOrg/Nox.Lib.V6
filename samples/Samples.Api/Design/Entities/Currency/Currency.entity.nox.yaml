@@ -14,14 +14,22 @@ messaging:
   - messagingProvider: Mediator
   - messagingProvider: AppServiceBus
 
-attributes:
+raiseCrudEvents: 
+  create: yes
+  update: yes
+  delete: yes
 
-  - name: Id
-    description: The currency's unique identifier 
-    isPrimaryKey: true
-    type: int
-    canFilter: true
-    canSort: true
+relationships:
+  - name: ExchangeRates
+    entity: ExchangeRate
+    isMany: true
+
+key: 
+  name: Id
+  description: The currency's unique identifier 
+  type: int
+
+attributes:
 
   - name: Name
     description: The currency's name 
@@ -59,6 +67,7 @@ attributes:
   - name: DecimalDigits
     description: The number of decimal digits to display for monetary values
     type: int
+    isRequired: true
 
   - name: DecimalRounding
     description: The decimal rounding to apply to monetary values

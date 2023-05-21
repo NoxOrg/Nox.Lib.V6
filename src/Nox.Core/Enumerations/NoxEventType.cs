@@ -4,5 +4,6 @@ public enum NoxEventType
 {
     Created,
     Updated,
-    Deleted
+    Deleted,
+    Domain
 }

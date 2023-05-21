@@ -164,9 +164,12 @@ public class EtlExecutor : IEtlExecutor
     {
         var lastMergeDateTimeStampInfo = GetAllLastMergeDateTimeStamps(loader, targetProvider, entity);
 
-        var targetColumns = entity.Attributes
-            .Where(a => a.IsMappedAttribute())
-            .Select(a => a.Name)
+        var targetColumns =
+            (new string[] { entity.Key.Name })
+            .Concat( entity.Attributes
+                .Where(a => a.IsMappedAttribute())
+                .Select(a => a.Name)
+            )
             .Concat(entity.RelatedParents.Select(p => p + "Id"))
             .ToArray();
 
@@ -273,7 +276,7 @@ public class EtlExecutor : IEtlExecutor
         _logger.LogInformation("Publishing bus message: {Name}", toSend.GetType().Name);
         if (loader.Messaging != null)
         {
-            _messenger?.SendMessage(loader.Messaging, toSend);    
+            _messenger?.SendMessage(loader.Messaging, toSend).Wait();    
         }
     }
 

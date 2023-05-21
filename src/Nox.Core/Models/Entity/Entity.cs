@@ -5,24 +5,49 @@ using Nox.Core.Interfaces.Messaging;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Nox.Core.Models;
+namespace Nox.Core.Models.Entity;
 
 public sealed class Entity : MetaBase, IEntity
 {
+    public EntityKey Key { get; set; } = new();
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string PluralName { get; set; } = string.Empty;
     public string Table { get; set; } = null!;
     public string Schema { get; set; } = "dbo";
+
+    public ICollection<EntityQuery> Queries { get; set; } = new Collection<EntityQuery>();
+
+    public ICollection<EntityCommand> Commands { get; set; } = new Collection<EntityCommand>();
+
+    public ICollection<EntityRelationship> Relationships { get; set; } = new Collection<EntityRelationship>();
+
+    public ICollection<OwnedEntityRelationship> OwnedRelationships { get; set; } = new Collection<OwnedEntityRelationship>();
+
     [NotMapped]
-    public List<string> RelatedParents { get; set; } = new();
+    public ICollection<IRelationship> AllRelationships => Relationships
+        .Cast<IRelationship>()
+        .Union(OwnedRelationships)
+        .Union(Key.IsComposite
+                ? Key.Entities.Select(key => new EntityRelationship
+                {
+                    Entity = key,
+                    Name = key,
+                    IsMany = false,
+                    IsRequired = true
+                }).AsEnumerable()
+                : Enumerable.Empty<EntityRelationship>()) // Include composite key if exists
+        .ToList();
+
     [NotMapped]
-    public List<string> RelatedChildren { get; set; } = new();
-    public string RelatedParentsJson { get => string.Join('|',RelatedParents.ToArray()); set => RelatedParents = value.Split('|').ToList(); }
-    public string RelatedChildrenJson { get => string.Join('|',RelatedChildren.ToArray()); set => RelatedChildren = value.Split('|').ToList(); }
+    public ICollection<string> RelatedParents => AllRelationships
+            .Where(r => !r.IsMany)
+            .Select(r => r.Entity)
+            .ToList();
+
     public int SortOrder { get; set; }
     public ICollection<EntityAttribute> Attributes { get; set; } = new Collection<EntityAttribute>();
-    
+
     ICollection<IMessageTarget>? IEntity.Messaging
     {
         get => Messaging?.ToList<IMessageTarget>();
@@ -42,13 +67,6 @@ public sealed class Entity : MetaBase, IEntity
         if (string.IsNullOrWhiteSpace(Schema))
             Schema = "dbo";
 
-        RelatedChildren = RelatedChildren.Where(x => x.Trim().Length > 0).ToList();
-
-        RelatedParents = RelatedParents.Where(x => x.Trim().Length > 0).ToList();
-
         return true;
     }
 }
-
-
-

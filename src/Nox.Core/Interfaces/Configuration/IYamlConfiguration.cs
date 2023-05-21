@@ -16,6 +16,8 @@ internal interface IYamlConfiguration
     List<MessagingProviderConfiguration>? MessagingProviders { get; set; }
     List<ApiConfiguration>? Apis { get; set; }
     List<EntityConfiguration>? Entities { get; set; }
+    List<DtoConfiguration>? Dtos { get; set; }
+    List<DtoConfiguration>? Commands { get; set; }
     List<LoaderConfiguration>? Loaders { get; set; }
     List<DataSourceConfiguration>? DataSources { get; set; }
 }

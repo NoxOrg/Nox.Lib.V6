@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NOX DTO",
+  "description": "Defines a NOX DTO",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [ "name", "attributes" ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the entity"
+    },
+    "description": {
+      "type": "string",
+      "description": "The entity description"
+    },    
+    "attributes": {
+      "type": "array",
+      "description": "A list of attributres of the entity",
+      "items": { "$ref": "https://noxorg.dev/schemas/EntityAttribute.json" }
+    },
+    "relationships": {
+      "type": "array",
+      "description": "A list of relationships of the entity",
+      "items": { "$ref": "https://noxorg.dev/schemas/EntityRelationship.json" }
+    }
+  }
+}

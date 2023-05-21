@@ -19,4 +19,5 @@ public interface IDynamicDbContext
     object PatchDynamicTypedObject<T>(object id, string json) where T : class;
     void DeleteDynamicObject(string dbSetName, object id);
     void DeleteDynamicTypedObject<T>(object id) where T : class;
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

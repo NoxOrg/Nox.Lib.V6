@@ -6,12 +6,12 @@ namespace Nox.Core.Extensions
 {
     public static class ReflectionExtensions
     {
-        public static FieldBuilder AddPublicGetSetPropertyAsList(this TypeBuilder tb, string propertyName, Type listType)
+        public static PropertyBuilder AddPublicGetSetPropertyAsList(this TypeBuilder tb, string propertyName, Type listType)
         {
             return AddPublicGetSetProperty(tb, propertyName, typeof(Collection<>).MakeGenericType(new[] { listType }));
         }
 
-        public static FieldBuilder AddPublicGetSetProperty(this TypeBuilder tb, 
+        public static PropertyBuilder AddPublicGetSetProperty(this TypeBuilder tb, 
             string propertyName, Type propertyType)
         {
             var getSetAttr = MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig;
@@ -49,9 +49,7 @@ namespace Nox.Core.Extensions
             pb.SetGetMethod(mbGetAccessor);
             pb.SetSetMethod(mbSetAccessor);
 
-            return fb;
-
+            return pb;
         }
-
     }
 }

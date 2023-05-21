@@ -8,6 +8,7 @@ using Nox.Core.Components;
 using Nox.Core.Constants;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
+using Nox.Core.Models;
 using SqlKata.Compilers;
 
 namespace Nox.Data.SQLite;
@@ -47,11 +48,9 @@ public class SqLiteDatabaseProvider: DatabaseProviderBase
         );
     }
 
-    public override string ToDatabaseColumnType(IEntityAttribute entityAttribute)
+    public override string ToDatabaseColumnType(IBaseEntityAttribute entityAttribute)
     {
         var propType = entityAttribute.Type?.ToLower() ?? "string";
-        var propWidth = entityAttribute.MaxWidth < 1 ? "max" : entityAttribute.MaxWidth.ToString();
-        var propPrecision = entityAttribute.Precision.ToString();
 
         //     "real" => typeof(Single),
         //     "float" => typeof(Single),
