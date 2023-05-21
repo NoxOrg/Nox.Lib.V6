@@ -1,4 +1,4 @@
-﻿plusing Nox.Core.Components;
+﻿using Nox.Core.Components;
 
 namespace Nox.Core.Models.Entity;
 
