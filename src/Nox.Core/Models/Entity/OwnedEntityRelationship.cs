@@ -1,8 +1,8 @@
-﻿using Nox.Core.Components;
+﻿plusing Nox.Core.Components;
 
 namespace Nox.Core.Models.Entity;
 
-public class EntityRelationship : MetaBase, IRelationship
+public sealed class OwnedEntityRelationship : MetaBase, IRelationship
 {
     public string Name { get; set; } = string.Empty;
 

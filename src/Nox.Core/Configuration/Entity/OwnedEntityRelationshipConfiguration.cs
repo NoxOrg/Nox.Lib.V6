@@ -1,12 +1,14 @@
-﻿using Nox.Core.Components;
+using Nox.Core.Components;
 
-namespace Nox.Core.Models.Entity;
+namespace Nox.Core.Configuration;
 
-public class EntityRelationship : MetaBase, IRelationship
+public class OwnedEntityRelationshipConfiguration : MetaBase
 {
     public string Name { get; set; } = string.Empty;
 
     public string Entity { get; set; } = string.Empty;
+
+    public string Description { get; set; } = string.Empty;
 
     public bool IsMany { get; set; } = false;
 

@@ -14,8 +14,9 @@ public interface IEntity : IMetaBase
     ICollection<EntityQuery> Queries { get; set; }
     ICollection<EntityCommand> Commands { get; set; }
     ICollection<IMessageTarget>? Messaging { get; set; }
-    ICollection<EntityRelationship> OwnedRelationships { get; set; }
-    ICollection<EntityRelationship> AllRelationships { get; }
+    ICollection<EntityRelationship> Relationships { get; set; }
+    ICollection<OwnedEntityRelationship> OwnedRelationships { get; set; }
+    ICollection<IRelationship> AllRelationships { get; }
     string PluralName { get; set; }
     string Schema { get; set; }
     int SortOrder { get; set; }
