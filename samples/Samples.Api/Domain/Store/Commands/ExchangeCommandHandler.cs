@@ -73,6 +73,10 @@ namespace Samples.Api.Domain.Store.Commands
             return await DbContext
                             .Store
                             .Include(s => s.Reservations)
+                            .ThenInclude(r => r.SourceCurrency)
+                            .Include(s => s.Reservations)
+                            .ThenInclude(r => r.DestinationCurrency)
+                            .Include(s => s.Reservations)
                             .ThenInclude(r => r.Customer)
                             .Include(s => s.CashBalances)
                             .FirstOrDefaultAsync(s => s.Id == storeId);

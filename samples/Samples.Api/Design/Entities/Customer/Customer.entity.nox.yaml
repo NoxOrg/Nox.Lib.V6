@@ -26,6 +26,7 @@ key:
    name: Id
    description: The customer's unique identifier 
    type: int
+   isAutoNumber: true
     
 attributes:
 

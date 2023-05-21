@@ -68,6 +68,7 @@ key:
    name: Id
    description: The store's unique identifier 
    type: int
+   isAutoNumber: true
     
 attributes:
 

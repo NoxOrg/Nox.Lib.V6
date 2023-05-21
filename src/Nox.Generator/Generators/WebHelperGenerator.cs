@@ -21,7 +21,8 @@ namespace Nox.Generator.Generators
                 isAbstract: false,
                 isPartial: false,
                 "Microsoft.AspNetCore.Builder",
-                "Microsoft.Extensions.DependencyInjection");
+                "Microsoft.Extensions.DependencyInjection",
+                "Microsoft.AspNetCore.Http");
 
             // Generate GET request mapping for Queries
             foreach (var query in queries)
@@ -33,7 +34,9 @@ namespace Nox.Generator.Generators
                 sb.AppendLine($"            async ({GetParametersString(query["parameters"], withDefaults: false)}) =>");
                 sb.AppendLine(@"            {");
                 sb.AppendLine(@"                using var scope = app.Services.CreateScope();");
-                sb.AppendLine($"                await scope.ServiceProvider.GetRequiredService<Nox.Queries.{query["name"]}Query>().ExecuteAsync({GetParametersExecuteString(query["parameters"])});");
+                sb.AppendLine($"                var result = await scope.ServiceProvider.GetRequiredService<Nox.Queries.{query["name"]}Query>().ExecuteAsync({GetParametersExecuteString(query["parameters"])});");
+                // TODO: Extend to NotFound and other codes
+                sb.AppendLine(@"                return Results.Ok(result);");
                 sb.AppendLine(@"            });");
                 sb.AppendLine(@"    }");
                 sb.AppendLine(@"");
@@ -49,7 +52,8 @@ namespace Nox.Generator.Generators
                 sb.AppendLine($"            async (Nox.Commands.{command["name"]}{NamingConstants.CommandSuffix} command) =>");
                 sb.AppendLine(@"            {");
                 sb.AppendLine(@"                using var scope = app.Services.CreateScope();");
-                sb.AppendLine($"                await scope.ServiceProvider.GetRequiredService<Nox.Commands.{command["name"]}CommandHandlerBase>().ExecuteAsync(command);");
+                sb.AppendLine($"                var result = await scope.ServiceProvider.GetRequiredService<Nox.Commands.{command["name"]}CommandHandlerBase>().ExecuteAsync(command);");
+                sb.AppendLine(@"                return result.IsSuccess ? Results.Ok(result) : Results.BadRequest(result);");
                 sb.AppendLine(@"            });");
                 sb.AppendLine(@"    }");
                 sb.AppendLine(@"");

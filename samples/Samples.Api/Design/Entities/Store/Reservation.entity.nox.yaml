@@ -35,6 +35,7 @@ key:
    name: Id
    description: The unique identifier of a reservation operation
    type: int
+   isAutoNumber: true
 
 attributes:
 
