@@ -52,17 +52,24 @@ public static class YamlHelper
         var outputLines = new List<string>();
         foreach (var sourceLine in sourceLines)
         {
-            var match = _referenceRegex.Match(sourceLine);
-            if (match.Success)
+            if (!sourceLine.TrimStart().StartsWith('#'))
             {
-                var padding = new string(' ', match.Index);
-                var childPath = match.Groups[1].Value;
-                if (!Path.IsPathRooted(childPath)) childPath = Path.Combine(path!, childPath);
-                if (!File.Exists(childPath)) throw new NoxYamlException($"Referenced yaml file does not exist for reference: {match.Groups[1].Value}");
-                var childLines = await File.ReadAllLinesAsync(childPath);
-                foreach (var childLine in childLines)
+                var match = _referenceRegex.Match(sourceLine);
+                if (match.Success)
                 {
-                    outputLines.Add(padding + childLine);
+                    var padding = new string(' ', match.Index);
+                    var childPath = match.Groups[1].Value;
+                    if (!Path.IsPathRooted(childPath)) childPath = Path.Combine(path!, childPath);
+                    if (!File.Exists(childPath)) throw new NoxYamlException($"Referenced yaml file does not exist for reference: {match.Groups[1].Value}");
+                    var childLines = await File.ReadAllLinesAsync(childPath);
+                    foreach (var childLine in childLines)
+                    {
+                        outputLines.Add(padding + childLine);
+                    }
+                }
+                else
+                {
+                    outputLines.Add(sourceLine);
                 }
             }
             else
@@ -71,7 +78,7 @@ public static class YamlHelper
             }
         }
 
-        if (outputLines.Any(ol => ol.Contains("$ref:")))
+        if (outputLines.Any(ol => ol.Contains("$ref:") && !ol.TrimStart().StartsWith('#')))
         {
             outputLines = await ResolveYamlReferences(outputLines, path);    
         }
