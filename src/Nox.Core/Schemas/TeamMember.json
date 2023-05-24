@@ -21,6 +21,10 @@
         "isAdmin": {
             "type": "boolean",
             "description": "Is the team member is a project administrator"
+        },
+        "isProductOwner": {
+            "type": "boolean",
+            "description": "Is the team member a Product Owner of the project"
         }
     }
 }
