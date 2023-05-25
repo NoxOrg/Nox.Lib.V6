@@ -139,10 +139,10 @@ public class DynamicModel : IDynamicModel
                 // Set relationship properties
                 foreach (var relation in entity.Entity.AllRelationships)
                 {
-                    if (!relation.IsMany)
+                    if (relation.Relationship == Relationship.ExactlyOne || relation.Relationship == Relationship.ZeroOrOne)
                     {
                         var relationProperty = b.Property($"{relation.Name}Id");
-                        SetIsRequired(relationProperty, relation.IsRequired);
+                        SetIsRequired(relationProperty, relation.Relationship == Relationship.ExactlyOne);
                     }
                 }
             });
@@ -322,7 +322,7 @@ public class DynamicModel : IDynamicModel
                 var relatedEntity = dynamicTypes[relation.Entity];
                 var relatedTb = relatedEntity.TypeBuilder;
 
-                if (relation.IsMany)
+                if (relation.Relationship == Relationship.ZeroOrMany || relation.Relationship == Relationship.OneOrMany)
                 {
                     tb.AddPublicGetSetPropertyAsList(relation.Name, relatedTb);
                 }

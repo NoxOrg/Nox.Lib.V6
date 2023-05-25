@@ -13,23 +13,19 @@ description: The cash reservation in Store
 relationships:
   - name: Store
     entity: Store
-    isMany: false
-    isRequired: true
+    relationship: ExactlyOne
 
   - name: SourceCurrency
     entity: Currency
-    isMany: false
-    isRequired: true
+    relationship: ExactlyOne
 
   - name: DestinationCurrency
     entity: Currency
-    isMany: false
-    isRequired: true
+    relationship: ExactlyOne
 
   - name: Customer
     entity: Customer
-    isMany: false
-    isRequired: true
+    relationship: ExactlyOne
 
 key: 
    name: Id

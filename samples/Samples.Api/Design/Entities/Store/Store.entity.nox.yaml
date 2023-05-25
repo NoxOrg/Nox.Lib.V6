@@ -19,20 +19,12 @@ ownedRelationships:
   - name: Reservations
     entity: Reservation
     description: Pre-arranged exchange operation at the store by a specific client.
-    isMany: true
-    isRequired: true # to model 1-1* or 1-0* relations
-
-  #- name: Exchanges
-  #  entity: Exchange
-  #  description: Exchange operation at the store by a specific client.
-  #  isMany: true
-  #  isRequired: true
+    relationship: ZeroOrMany
 
   - name: CashBalances
     entity: CurrencyCashBalance
     description: Cash balances by currency.
-    isMany: true
-    isRequired: true
+    relationship: ZeroOrMany
 
 queries:
     - name: ActiveReservations

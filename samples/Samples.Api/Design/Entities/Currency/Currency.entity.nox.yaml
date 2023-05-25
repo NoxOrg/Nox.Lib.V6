@@ -22,7 +22,8 @@ raiseCrudEvents:
 relationships:
   - name: ExchangeRates
     entity: ExchangeRate
-    isMany: true
+    description: Exchange rates
+    relationship: ZeroOrMany
 
 key: 
   name: Id

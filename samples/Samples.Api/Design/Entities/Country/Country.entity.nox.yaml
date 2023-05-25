@@ -13,8 +13,7 @@ schema: dbo
 relationships:
   - name: Currency
     entity: Currency
-    isMany: false
-    isRequired: true
+    relationship: ExactlyOne
 
 messaging:
   - messagingProvider: Mediator

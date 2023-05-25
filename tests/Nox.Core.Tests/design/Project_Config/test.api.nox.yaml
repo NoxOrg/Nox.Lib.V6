@@ -9,7 +9,7 @@
     - name: Persons
       httpVerb: GET
       description: Returns all persons
-      targetUrl: odata/Persons
+      targetUrl: odata/Persons # query?
       responses:
         - type: Person
           isCollection: true

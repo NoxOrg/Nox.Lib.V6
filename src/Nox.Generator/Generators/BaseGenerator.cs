@@ -50,11 +50,20 @@ namespace Nox.Generator.Generators
 
         protected string AddRelationship(StringBuilder sb, Dictionary<object, object> attr)
         {
-            bool isMany = bool.Parse((string)attr["isMany"]);
+            bool allowNavigation = GetBooleanValueOrDefault(attr, "allow-navigation", true);
             var entity = (string)attr["entity"];
-            var typeDefinition = isMany ? $"IList<{entity}>" : $"{entity}";
-            
-            AddProperty(typeDefinition, attr["name"], sb);
+
+            if (allowNavigation)
+            {
+                var relationship = (string)attr["relationship"];
+                
+                bool isMany = relationship.Equals("ZeroOrMany") || relationship.Equals("OneOrMany");
+                bool isRequired = relationship.Equals("ExactlyOne");
+
+                var typeDefinition = isMany ? $"IList<{entity}>" : (isRequired ? $"{entity}" : $"{entity}?");
+
+                AddProperty(typeDefinition, (string)attr["name"], sb);
+            }
 
             return entity;
         }
@@ -63,10 +72,10 @@ namespace Nox.Generator.Generators
         {
             var typeName = ClassDataType((string)type);
             // Do not generate "string?" - TODO: make configurable
-            AddProperty(isRequired || typeName == "string" ? typeName : $"{typeName}?", name, sb);
+            AddProperty(isRequired || typeName == "string" ? typeName : $"{typeName}?", (string)name, sb);
         }
 
-        protected static void AddProperty(string type, object name, StringBuilder sb, bool initOnly = false)
+        protected static void AddProperty(string type, string name, StringBuilder sb, bool initOnly = false)
         {
             sb.AppendLine($@"   public {type} {name} {{ get; {(initOnly ? "init" : "set")}; }}");
             sb.AppendLine($@"");
@@ -91,7 +100,7 @@ namespace Nox.Generator.Generators
         }
 
         protected static string GetParametersString(object entity, bool withDefaults = true)
-        {            
+        {
             return string.Join(", ", ((List<object>)entity).Cast<Dictionary<object, object>>()
                 .Select(parameter => $"{parameter["type"]} {parameter["name"]}{(withDefaults ? GetDefaultIfDefined(parameter, "defaultValue") : string.Empty)}"));
         }
@@ -110,7 +119,7 @@ namespace Nox.Generator.Generators
         protected static void AddAttributes(Dictionary<object, object> entity, StringBuilder sb)
         {
             var attributes = (List<object>)entity["attributes"];
-            
+
             foreach (var attr in attributes.Cast<Dictionary<object, object>>())
             {
                 AddSimpleProperty(attr["type"], attr["name"], GetBooleanValueOrDefault(attr, "isRequired"), sb);
@@ -144,14 +153,17 @@ namespace Nox.Generator.Generators
             sb.AppendLine($@"{{");
         }
 
-        protected static bool GetBooleanValueOrDefault(Dictionary<object, object> entity, string key)
+        protected static bool GetBooleanValueOrDefault(Dictionary<object, object> entity, string key, bool defaultValue = false)
         {
             entity.TryGetValue(key, out object val);
 
             var valString = (string)val;
 
             // cover yes/no and true/false
-            return valString != null && (valString.Equals("yes") || !valString.Equals("no") && bool.Parse(valString));
+            return valString != null
+                && (valString.Equals("yes") || !valString.Equals("no")
+                && bool.Parse(valString))
+                || valString == null && defaultValue;
         }
 
         protected static string ClassDataType(string type)

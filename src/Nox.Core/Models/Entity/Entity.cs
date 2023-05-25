@@ -31,15 +31,15 @@ public sealed class Entity : MetaBase, IEntity
                     {
                         Entity = key,
                         Name = key,
-                        IsMany = false,
-                        IsRequired = true
+                         AllowNavigation = true,
+                          Relationship = Relationship.ExactlyOne
                     }).AsEnumerable()
                     : Enumerable.Empty<EntityRelationship>()) // Include composite key if exists
             .ToList();
 
     [NotMapped]
     public ICollection<string> RelatedParents => AllRelationships
-            .Where(r => !r.IsMany)
+            .Where(r => r.Relationship == Relationship.ExactlyOne || r.Relationship == Relationship.ZeroOrOne)
             .Select(r => r.Entity)
             .ToList();
 
