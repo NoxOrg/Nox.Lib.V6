@@ -6,13 +6,8 @@ CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// TODO: logging shoild be integrated into Nox
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
 
 // Add Nox to the service collection
 builder.Services.AddNox();
@@ -34,10 +29,5 @@ app.UseNox();
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.UseExceptionHandler(exceptionHandlerApp
-    => exceptionHandlerApp.Run(async context
-        => await Results.Problem()
-                     .ExecuteAsync(context)));
 
 app.Run();

@@ -78,7 +78,6 @@ team:
   developers:
     - name: Andre Sharpe
       userName: andre.sharpe@iwgplc.com
-      mobilePhoneNumber: +41789461056
       isAdmin: true
     - name: Jan Schutte
       userName: jan.schutte@iwgplc.com

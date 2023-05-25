@@ -46,10 +46,15 @@ public class NoxMessenger: INoxMessenger
                 var providerInstance = _config.MessagingProviders.First(p =>
                     p.Name != null && p.Name.Equals(messageProvider, StringComparison.OrdinalIgnoreCase)
                 );
+
+                if (providerInstance == null)
+                {
+                    throw new ConfigurationException($"Messaging provider '{messageProvider}' is referneced but not present in the NOX configuration");
+                }
                 
                 var messageType = message.GetType().Name;
 
-                switch (messageProvider!.ToLower())
+                switch (providerInstance.Provider.ToLower())
                 {
                     case "rabbitmq":
                         await _rabbitBus!.Publish(message);

@@ -56,6 +56,8 @@ public static class ServiceExtensions
         {
             return services;
         }
+        
+        services.AddEndpointsApiExplorer();
 
         services.AddSwaggerGen(cfg =>
         {

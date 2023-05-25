@@ -2,7 +2,7 @@
 
 namespace Nox.Core.Models.Entity;
 
-public sealed class EntityRelationship : MetaBase
+public class EntityRelationship : MetaBase, IRelationship
 {
     public string Name { get; set; } = string.Empty;
 

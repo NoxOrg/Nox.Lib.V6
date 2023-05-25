@@ -24,6 +24,7 @@ public static class ProjectConfigurationExtensions
             cfg.CreateMap<MessagingProviderConfiguration, MessagingProvider>();
             cfg.CreateMap<EntityConfiguration, Entity>();
             cfg.CreateMap<EntityRelationshipConfiguration, EntityRelationship>();
+            cfg.CreateMap<OwnedEntityRelationshipConfiguration, OwnedEntityRelationship>();
             cfg.CreateMap<EntityAttributeConfiguration, EntityAttribute>();
             cfg.CreateMap<EntityKeyConfiguration, EntityKey>();
             cfg.CreateMap<MessageTargetConfiguration, MessageTarget>();

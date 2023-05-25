@@ -22,7 +22,7 @@ public sealed class Entity : MetaBase, IEntity
 
     public ICollection<EntityRelationship> Relationships { get; set; } = new Collection<EntityRelationship>();
 
-    public ICollection<EntityRelationship> OwnedRelationships { get; set; } = new Collection<EntityRelationship>();
+    public ICollection<OwnedEntityRelationship> OwnedRelationships { get; set; } = new Collection<OwnedEntityRelationship>();
 
     public ICollection<EntityRelationship> AllRelationships => Relationships
             .Union(OwnedRelationships)
