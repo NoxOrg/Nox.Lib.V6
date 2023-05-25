@@ -24,7 +24,7 @@ public sealed class Entity : MetaBase, IEntity
 
     public ICollection<OwnedEntityRelationship> OwnedRelationships { get; set; } = new Collection<OwnedEntityRelationship>();
 
-    public ICollection<EntityRelationship> AllRelationships => Relationships
+    public ICollection<IRelationship> AllRelationships => Relationships.Cast<IRelationship>()
             .Union(OwnedRelationships)
             .Union(Key.IsComposite
                     ? Key.Entities.Select(key => new EntityRelationship
@@ -32,14 +32,14 @@ public sealed class Entity : MetaBase, IEntity
                         Entity = key,
                         Name = key,
                          AllowNavigation = true,
-                          Relationship = Relationship.ExactlyOne
+                          Relationship = RelationshipType.ExactlyOne
                     }).AsEnumerable()
-                    : Enumerable.Empty<EntityRelationship>()) // Include composite key if exists
+                    : Enumerable.Empty<IRelationship>()) // Include composite key if exists
             .ToList();
 
     [NotMapped]
     public ICollection<string> RelatedParents => AllRelationships
-            .Where(r => r.Relationship == Relationship.ExactlyOne || r.Relationship == Relationship.ZeroOrOne)
+            .Where(r => r.Relationship == RelationshipType.ExactlyOne || r.Relationship == RelationshipType.ZeroOrOne)
             .Select(r => r.Entity)
             .ToList();
 

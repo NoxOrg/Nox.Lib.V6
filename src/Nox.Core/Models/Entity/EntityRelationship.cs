@@ -8,15 +8,7 @@ public class EntityRelationship : MetaBase, IRelationship
 
     public string Entity { get; set; } = string.Empty;
 
-    public Relationship Relationship { get; set; }
+    public RelationshipType Relationship { get; set; }
 
     public bool AllowNavigation { get; set; } = false;
-}
-
-public enum Relationship
-{
-    ZeroOrOne,
-    ExactlyOne,
-    ZeroOrMany,
-    OneOrMany,
 }

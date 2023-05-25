@@ -8,7 +8,7 @@ public sealed class OwnedEntityRelationship : MetaBase, IRelationship
 
     public string Entity { get; set; } = string.Empty;
 
-    public bool IsMany { get; set; } = false;
+    public RelationshipType Relationship { get; set; }
 
-    public bool IsRequired { get; set; } = false;
+    public bool AllowNavigation { get; set; } = false;
 }
