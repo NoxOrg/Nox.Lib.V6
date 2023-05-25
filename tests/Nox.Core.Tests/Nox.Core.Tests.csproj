@@ -70,6 +70,9 @@
       <None Update="design\Project_Config\test.service.nox.yaml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="yaml-files\commented-parent.yaml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
