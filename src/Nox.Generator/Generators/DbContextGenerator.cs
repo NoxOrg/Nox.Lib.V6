@@ -24,8 +24,11 @@ namespace Nox.Generator.Generators
             sb.AppendLine(@"");
             sb.AppendLine(@"namespace Nox;");
             sb.AppendLine(@"");
-            
-            // Dynamic DB context 
+
+            // Dynamic DB context
+            sb.AppendLine(@"/// <summary>");
+            sb.AppendLine(@"/// Dynamic DB Context for OData endpoints");
+            sb.AppendLine(@"/// </summary>");
             sb.AppendLine($@"public class NoxDbContext : DynamicDbContext");
             sb.AppendLine(@"{");
             sb.AppendLine(@"    public NoxDbContext(");
@@ -36,10 +39,14 @@ namespace Nox.Generator.Generators
             sb.AppendLine(@"");
             sb.AppendLine(@"}");
             sb.AppendLine(@"");
-            
+
             // Strongly typed DbContext for Queries / Commands
+            sb.AppendLine(@"/// <summary>");
+            sb.AppendLine(@"/// Strongly typed DbContext for Queries / Commands / Custom code");
+            sb.AppendLine(@"/// </summary>");
             sb.AppendLine($@"public class NoxDomainDbContext : DbContext, IDynamicNoxDomainDbContext");
             sb.AppendLine(@"{");
+            sb.AppendLine(@"    // Dynamic model is needed to access the Data Provider");
             sb.AppendLine(@"    private readonly IDynamicModel _dynamicDbModel;");
             sb.AppendLine(@"");
             // Generate strongly typed DbSets for each aggreagate root or independent entity

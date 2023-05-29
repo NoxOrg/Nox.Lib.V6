@@ -4,7 +4,7 @@
   "description": "Defines a NOX entity relationship",
   "type": "object",
   "additionalProperties": false,
-  "required": [ "name" ],
+  "required": [ "name", "entity" ],
   "properties": {
     "name": {
       "type": "string",
@@ -18,13 +18,31 @@
       "type": "string",
       "description": "The relationship description"
     },
-    "isMany": {
-      "type": "boolean",
-      "description": "Indicates whether it is one-to-one or one-to-many relationship"
+    "relationship": {
+      "type": "string",
+      "description": "The relationship type",
+      "oneOf": [
+        {
+          "const": "ZeroOrOne",
+          "description": "Zero Or One"
+        },
+        {
+          "const": "ExactlyOne",
+          "description": "Exactly One"
+        },
+        {
+          "const": "ZeroOrMany",
+          "description": "Zero Or Many"
+        },
+        {
+          "const": "OneOrMany",
+          "description": "One Or Many"
+        }
+      ]
     },
-    "isRequired": {
+    "allowNavigation": {
       "type": "boolean",
-      "description": "Indicates if this relationship is required"
+      "description": "Indicates whether navigation is allowed"
     }
   }
 }

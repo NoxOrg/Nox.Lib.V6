@@ -31,8 +31,8 @@ public sealed class Entity : MetaBase, IEntity
                     {
                         Entity = key,
                         Name = key,
-                         AllowNavigation = true,
-                          Relationship = RelationshipType.ExactlyOne
+                        AllowNavigation = true,
+                        Relationship = RelationshipType.ExactlyOne
                     }).AsEnumerable()
                     : Enumerable.Empty<IRelationship>()) // Include composite key if exists
             .ToList();
