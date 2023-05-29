@@ -60,7 +60,15 @@ namespace Nox.Generator.Generators
                 bool isMany = relationship.Equals("ZeroOrMany") || relationship.Equals("OneOrMany");
                 bool isRequired = relationship.Equals("ExactlyOne");
 
-                var typeDefinition = isMany ? $"IList<{entity}>" : (isRequired ? $"{entity}" : $"{entity}?");
+                string? typeDefinition;
+                if (isMany)
+                {
+                    typeDefinition = $"IList<{entity}>";
+                }
+                else
+                {
+                    typeDefinition = isRequired ? $"{entity}" : $"{entity}?";
+                }
 
                 AddProperty(typeDefinition, (string)attr["name"], sb);
             }
