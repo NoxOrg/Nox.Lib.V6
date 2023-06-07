@@ -13,8 +13,7 @@ schema: dbo
 relationships:
   - name: Person
     entity: Person
-    isMany: false
-    isRequired: true
+    relationship: ExactlyOne
 
 key: 
   name: Id

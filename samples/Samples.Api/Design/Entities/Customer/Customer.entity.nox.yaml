@@ -19,8 +19,7 @@ relationships:
   - name: Reservations
     entity: Reservation
     description: Pre-arranged excanged operation at the store by a specific client.
-    isMany: true
-    isRequired: true
+    relationship: ZeroOrMany
 
 key: 
    name: Id

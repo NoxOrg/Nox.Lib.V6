@@ -24,24 +24,22 @@ public sealed class Entity : MetaBase, IEntity
 
     public ICollection<OwnedEntityRelationship> OwnedRelationships { get; set; } = new Collection<OwnedEntityRelationship>();
 
-    [NotMapped]
-    public ICollection<IRelationship> AllRelationships => Relationships
-        .Cast<IRelationship>()
-        .Union(OwnedRelationships)
-        .Union(Key.IsComposite
-                ? Key.Entities.Select(key => new EntityRelationship
-                {
-                    Entity = key,
-                    Name = key,
-                    IsMany = false,
-                    IsRequired = true
-                }).AsEnumerable()
-                : Enumerable.Empty<EntityRelationship>()) // Include composite key if exists
-        .ToList();
+    public ICollection<IRelationship> AllRelationships => Relationships.Cast<IRelationship>()
+            .Union(OwnedRelationships)
+            .Union(Key.IsComposite
+                    ? Key.Entities.Select(key => new EntityRelationship
+                    {
+                        Entity = key,
+                        Name = key,
+                        AllowNavigation = true,
+                        Relationship = RelationshipType.ExactlyOne
+                    }).AsEnumerable()
+                    : Enumerable.Empty<IRelationship>()) // Include composite key if exists
+            .ToList();
 
     [NotMapped]
     public ICollection<string> RelatedParents => AllRelationships
-            .Where(r => !r.IsMany)
+            .Where(r => r.Relationship == RelationshipType.ExactlyOne || r.Relationship == RelationshipType.ZeroOrOne)
             .Select(r => r.Entity)
             .ToList();
 

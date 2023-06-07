@@ -13,8 +13,7 @@ description: The exchange rate at a piont in time vs CHF (reference currency)
 relationships:
   - name: Currency
     entity: Currency
-    isMany: false
-    isRequired: true
+    relationship: ExactlyOne
 
 key: 
   name: Id

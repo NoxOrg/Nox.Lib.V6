@@ -4,7 +4,6 @@ using Nox.Api.OData.Constants;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Entity;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.IO;
 
 namespace Nox.Api.OData.Swagger
 {
@@ -95,7 +94,7 @@ namespace Nox.Api.OData.Swagger
             // Data grouped by api path, so each operation (GET, POST, etc.) should be 
             // handled individually
             foreach (var operation in odataPathItem.Operations
-                .Where(o => o.Key != OperationType.Patch && o.Key != OperationType.Put)) // Exclude Patch/Put
+                .Where(o => o.Key != OperationType.Patch && o.Key != OperationType.Put && o.Key != OperationType.Delete)) // Exclude Patch/Put/Delete
             {
                 var newOperation = CreateACopyOfExistingOperation(operation);
 
@@ -157,17 +156,11 @@ namespace Nox.Api.OData.Swagger
             string key,
             OpenApiPathItem newPathItem)
         {
-            if (entity?.RelatedParents == null ||
-                !entity.RelatedParents.Any())
-            {
-                return;
-            }
-
-            foreach (var parentEntity in entity!.RelatedParents!)
+            foreach (var relationship in entity.Relationships.Where(r => r.AllowNavigation))
             {
                 swaggerDoc.Paths.Add(
                     ReplaceODataEntityName(key, entity.PluralName)
-                        .Replace(RoutingConstants.NavigationParameterPathName, parentEntity, StringComparison.OrdinalIgnoreCase),
+                        .Replace(RoutingConstants.NavigationParameterPathName, relationship.Entity, StringComparison.OrdinalIgnoreCase),
                     newPathItem);
             }
         }

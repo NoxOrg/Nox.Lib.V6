@@ -1,4 +1,5 @@
 using Nox.Core.Components;
+using Nox.Core.Models.Entity;
 
 namespace Nox.Core.Configuration;
 
@@ -10,7 +11,7 @@ public class OwnedEntityRelationshipConfiguration : MetaBase
 
     public string Description { get; set; } = string.Empty;
 
-    public bool IsMany { get; set; } = false;
+    public RelationshipType Relationship { get; set; }
 
-    public bool IsRequired { get; set; } = false;
+    public bool AllowNavigation { get; set; } = true;
 }

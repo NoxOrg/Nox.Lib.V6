@@ -1,0 +1,42 @@
+﻿#
+# BackOffice.entity.nox.yaml
+#
+# yaml-language-server: $schema=C:\Work\Nox_aggregate_roots\src\Nox.Core\Schemas\Entity.json
+#
+
+name: BackOffice
+description: Exchange Back Office
+pluralName: BackOffices
+table: BackOffice
+schema: dbo
+
+raiseCrudEvents: 
+  create: no
+  update: no
+  delete: no
+
+relationships:
+  - name: Stores
+    entity: Store
+    description: The operationg Cash Stores.
+    relationship: ZeroOrMany
+
+#commands:
+#    - name: UpdateBalance
+#      description: .
+#      triggeredBy: [BalanceChanged]
+
+key: 
+   name: Id
+   description: The store's unique identifier 
+   type: int
+    
+attributes:
+
+  - name: Name
+    description: The Back Office name 
+    isRequired: true
+    type: string
+    maxWidth: 64
+    canFilter: true
+    canSort: true

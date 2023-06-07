@@ -1,6 +1,4 @@
-﻿using Nox.Core.Components;
-
-namespace Nox.Core.Models.Entity;
+﻿namespace Nox.Core.Models.Entity;
 
 public interface IRelationship 
 {
@@ -8,7 +6,7 @@ public interface IRelationship
 
     string Entity { get; set; }
 
-    bool IsMany { get; set; }
+    RelationshipType Relationship { get; set; }
 
-    bool IsRequired { get; set; }
+    bool AllowNavigation { get; set; }
 }
