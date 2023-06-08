@@ -2,7 +2,6 @@ using MassTransit;
 using MassTransit.Mediator;
 using Microsoft.Extensions.Logging;
 using Nox.Core.Interfaces;
-using Nox.Core.Interfaces.Configuration;
 using Nox.Core.Interfaces.Messaging;
 
 namespace Nox.Messaging;
@@ -10,7 +9,7 @@ namespace Nox.Messaging;
 public class NoxMessenger: INoxMessenger
 {
     private readonly ILogger _logger;
-    private readonly IProjectConfiguration _config;
+    private readonly NoxSolution _solution;
     private readonly IRabbitMqBus? _rabbitBus = null;
     private readonly IAzureBus? _azureBus = null;
     private readonly IAmazonBus? _amazonBus = null;
@@ -18,14 +17,13 @@ public class NoxMessenger: INoxMessenger
     
     public NoxMessenger(
         ILogger<NoxMessenger> logger,
-        IProjectConfiguration config,
+        NoxSolution solution,
         IRabbitMqBus? rabbitBus = null,
         IAzureBus? azureBus = null,
         IAmazonBus? amazonBus = null,
         IMediator? mediator = null)
     {
         _logger = logger;
-        _config = config;
         _rabbitBus = rabbitBus;
         _azureBus = azureBus;
         _amazonBus = amazonBus;
@@ -34,50 +32,36 @@ public class NoxMessenger: INoxMessenger
 
     public async Task SendMessageAsync<T>(IEnumerable<string> messageProviders, T message) where T : notnull
     {
-        foreach (var messageProvider in messageProviders)
+        try
         {
-            try
+            var messageType = message.GetType().Name;
+            await _mediator!.Publish(message);
+            _logger.LogInformation("{MessageType} sent to Mediator", messageType);
+
+            var ieServer = _solution.Infrastructure?.Messaging?.IntegrationEventServer;
+            if (ieServer != null)
             {
-                if (_config.MessagingProviders == null)
+                switch (ieServer.Provider)
                 {
-                    throw new ConfigurationException("Cannot add messaging if messaging providers not present in configuration!");
-                }
-
-                var providerInstance = _config.MessagingProviders.First(p =>
-                    p.Name != null && p.Name.Equals(messageProvider, StringComparison.OrdinalIgnoreCase)
-                );
-
-                if (providerInstance == null)
-                {
-                    throw new ConfigurationException($"Messaging provider '{messageProvider}' is referneced but not present in the NOX configuration");
-                }
-                
-                var messageType = message.GetType().Name;
-
-                switch (providerInstance.Provider.ToLower())
-                {
-                    case "rabbitmq":
+                    case MessagingServerProvider.RabbitMq:
                         await _rabbitBus!.Publish(message);
-                        _logger.LogInformation($"{messageType} sent to RabbitMq bus.");
+                        _logger.LogInformation("{MessageType} sent to RabbitMq bus", messageType);
                         break;
-                    case "azureservicebus":
+                    case MessagingServerProvider.AzureServiceBus:
                         await _azureBus!.Publish(message);
-                        _logger.LogInformation($"{messageType} sent to Azure bus.");
+                        _logger.LogInformation("{MessageType} sent to Azure bus", messageType);
                         break;
-                    case "amazonsqs":
+                    case MessagingServerProvider.AmazonSqs:
                         await _amazonBus!.Publish(message);
-                        _logger.LogInformation($"{messageType} sent to Amazon bus.");
+                        _logger.LogInformation("{MessageType} sent to Amazon bus", messageType);
                         break;
-                    case "mediator":
-                        await _mediator!.Publish(message);
-                        _logger.LogInformation($"{messageType} sent to Mediator.");
-                        break;
+                        
                 }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.ToString());
-            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
         }
     }
 
@@ -88,37 +72,35 @@ public class NoxMessenger: INoxMessenger
 
     public async Task SendHeartbeat(IHeartbeatMessage message, CancellationToken stoppingToken)
     {
-        foreach (var provider in _config.MessagingProviders!)
+        try
         {
-            try
+            await _mediator!.Publish(message, stoppingToken);
+            _logger.LogInformation("Heartbeat sent to Mediator");
+
+            var ieServer = _solution.Infrastructure?.Messaging?.IntegrationEventServer;
+            if (ieServer != null)
             {
-                switch (provider.Provider!.ToLower())
+                switch (ieServer.Provider)
                 {
-                    case "rabbitmq":
+                    case MessagingServerProvider.RabbitMq:
                         await _rabbitBus!.Publish(message, stoppingToken);
-                        _logger.LogInformation($"Heartbeat sent to RabbitMq bus.");
+                        _logger.LogInformation("Heartbeat sent to RabbitMq bus");
                         break;
-                    case "azureservicebus":
+                    case MessagingServerProvider.AzureServiceBus:
                         await _azureBus!.Publish(message, stoppingToken);
-                        _logger.LogInformation($"Heartbeat sent to Azure bus.");
+                        _logger.LogInformation("Heartbeat sent to Azure bus");
                         break;
-                    case "amazonsqs":
+                    case MessagingServerProvider.AmazonSqs:
                         await _amazonBus!.Publish(message, stoppingToken);
-                        _logger.LogInformation($"Heartbeat sent to Amazon bus.");
+                        _logger.LogInformation("Heartbeat sent to Amazon bus");
                         break;
-                    case "mediator":
-                        if (_mediator != null)
-                        {
-                            await _mediator.Publish(message, stoppingToken)!;
-                            _logger.LogInformation($"Heartbeat sent to Mediator.");
-                        }
-                        break;
+                        
                 }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.ToString());
-            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
         }
     }
 }

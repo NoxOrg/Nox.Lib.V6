@@ -16,30 +16,22 @@ namespace Nox;
 
 public static class ServiceExtensions
 {
-    private static readonly IConfiguration? _configuration = ConfigurationHelper.GetNoxAppSettings();
-
     public static IServiceCollection AddNox(
         this IServiceCollection services,
         NoxSwaggerConfiguration? swaggerConfiguration = null)
     {
-        var designRoot = "./";
-        if (_configuration?["Nox:DefinitionRootPath"] != null)
-        {
-            designRoot = _configuration["Nox:DefinitionRootPath"];
-        }
-
-        if (services.AddNoxConfiguration(designRoot!).ConfirmNoxConfigurationAdded())
-        {
-            services
-                .AddPersistedSecretStore()
-                .AddNoxMessaging(false)
-                .AddDataProviderFactory()
-                .AddDynamicApi(_configuration!)
-                .AddData()
-                .AddEtl()
-                .AddMicroservice()
-                .AddJobScheduler();
-        }
+        new NoxSolutionBuilder()
+            .UseDependencyInjection(services)
+            .Build();
+        services
+            .AddPersistedSecretStore()
+            .AddNoxMessaging(false)
+            .AddDataProviderFactory()
+            .AddDynamicApi(_configuration!)
+            .AddData()
+            .AddEtl()
+            .AddMicroservice()
+            .AddJobScheduler();
 
         services.AddNoxSwaggerGeneration(swaggerConfiguration);
 

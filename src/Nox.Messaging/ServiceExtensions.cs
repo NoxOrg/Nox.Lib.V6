@@ -1,16 +1,8 @@
 using System.Reflection;
 using MassTransit;
-using MassTransit.Configuration;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.Extensions.DependencyInjection;
-using Nox.Core.Configuration;
-using Nox.Core.Extensions;
-using Nox.Core.Helpers;
-using Nox.Core.Interfaces;
-using Nox.Core.Interfaces.Configuration;
 using Nox.Core.Interfaces.Messaging;
 using Nox.Core.Interfaces.Messaging.Events;
-using Nox.Core.Models;
 using Nox.Messaging.AmazonSQS;
 using Nox.Messaging.AzureServiceBus;
 using Nox.Messaging.RabbitMQ;
@@ -33,75 +25,93 @@ public static class ServiceExtensions
     {
         if (isExternalListener)
         {
-            var appSettings = ConfigurationHelper.GetNoxAppSettings();
-            services.AddNoxConfiguration((appSettings != null ? appSettings["Nox:DefinitionRootPath"] : "")!);
+            new NoxSolutionBuilder()
+                .UseDependencyInjection(services)
+                .Build();
         }
 
         if (services == null) throw new ArgumentNullException(nameof(services));
         var svcProvider = services.BuildServiceProvider();
-        var projectConfig = svcProvider.GetRequiredService<IProjectConfiguration>();
+        var solution = svcProvider.GetRequiredService<NoxSolution>();
 
         services.AddSingleton<INoxMessenger, NoxMessenger>();
-
-        //Create the messaging providers if not defined in yaml
-        projectConfig.MessagingProviders ??= new List<IMessagingProvider>();
-
-        //Ensure Mediator is added
-        if (projectConfig.MessagingProviders.All(mp => !mp.Provider!.ToLower().Equals("mediator")))
-        {
-            projectConfig.AddMessagingProvider(new MessagingProvider() { 
-                Provider = "Mediator", 
-                Name = "Mediator" 
-            });
-        }
 
         var isRabbitAdded = false;
         var isAzureAdded = false;
         var isAmazonAdded = false;
         var isMemoryAdded = false;
-
-        foreach (var msgProvider in projectConfig.MessagingProviders)
+        
+        //Always add mediator 
+        services.AddNoxMediator();
+        
+        if (solution.Infrastructure != null)
         {
-            switch (msgProvider.Provider!.ToLower())
+            if (solution.Infrastructure.Messaging?.IntegrationEventServer != null)
             {
-                case "rabbitmq":
-                    if (!isRabbitAdded)
-                    {
-                        services.AddRabbitMqBus((MessagingProvider)msgProvider, isExternalListener);
+                var ieServer = solution.Infrastructure.Messaging.IntegrationEventServer;
+                switch (ieServer.Provider)
+                {
+                    case MessagingServerProvider.RabbitMq:
+                        services.AddRabbitMqBus(ieServer, isExternalListener);
                         isRabbitAdded = true;
-                    }
-
-                    break;
-                case "azureservicebus":
-                    if (!isAzureAdded)
-                    {
-                        services.AddAzureBus((MessagingProvider)msgProvider, isExternalListener);
+                        break;
+                    case MessagingServerProvider.AzureServiceBus:
+                        services.AddAzureBus(ieServer, isExternalListener);
                         isAzureAdded = true;
-                    }
-
-                    break;
-                case "amazonsqs":
-                    if (!isAmazonAdded)
-                    {
-                        services.AddAmazonBus((MessagingProvider)msgProvider, isExternalListener);
+                        break;
+                    case MessagingServerProvider.AmazonSqs:
+                        services.AddAmazonBus(ieServer, isExternalListener);
                         isAmazonAdded = true;
-                    }
-
-                    break;
-                case "inmemory":
-                    if (!isMemoryAdded)
-                    {
+                        break;
+                    case MessagingServerProvider.InMemory:
                         services.AddInMemoryBus();
                         isMemoryAdded = true;
-                    }
-
-                    break;
-
-                case "mediator":
-                    if (!isExternalListener) services.AddNoxMediator();
-                    break;
+                        break;
+                }
             }
+
+            if (solution.Infrastructure.Dependencies?.DataConnections != null)
+            {
+                foreach (var dataConnection in solution.Infrastructure.Dependencies?.DataConnections!)
+                {
+                    switch (dataConnection.Provider)
+                    {
+                        case DataConnectionProvider.RabbitMq:
+                            if (!isRabbitAdded)
+                            {
+                                services.AddRabbitMqBus(dataConnection, isExternalListener);
+                                isRabbitAdded = true;
+                            }
+                            break;
+                        case DataConnectionProvider.AzureServiceBus:
+                            if (!isAzureAdded)
+                            {
+                                services.AddAzureBus(dataConnection, isExternalListener);
+                                isAzureAdded = true;
+                            }
+                            break;
+                        case DataConnectionProvider.AmazonSqs:
+                            if (!isAmazonAdded)
+                            {
+                                services.AddAmazonBus(dataConnection, isExternalListener);
+                                isAmazonAdded = true;
+                            }
+                            break;
+                        case DataConnectionProvider.InMemory:
+                            if (!isMemoryAdded)
+                            {
+                                services.AddInMemoryBus();
+                                isMemoryAdded = true;
+                            }
+
+                            break;
+                    }
+                }
+            }
+
         }
+        
+        
 
         services.AddNoxEvents();
 
@@ -131,7 +141,7 @@ public static class ServiceExtensions
         });
     }
 
-    private static void AddRabbitMqBus(this IServiceCollection services, MessagingProvider config, bool isExternalListener)
+    private static void AddRabbitMqBus(this IServiceCollection services, ServerBase msgServer, bool isExternalListener)
     {
         services.AddMassTransit<IRabbitMqBus>(mt =>
         {
@@ -148,11 +158,13 @@ public static class ServiceExtensions
                 mt.AddSagas(entryAssembly);
                 mt.AddActivities(entryAssembly);
             }
-            mt.UseRabbitMq(config.ConnectionString!);
+
+            //todo build a connection string parser that can take ServerBase and return a connection string                  
+            mt.UseRabbitMq(msgServer.ServerUri!);
         });
     }
     
-    private static void AddAzureBus(this IServiceCollection services, MessagingProvider config, bool isExternalListener)
+    private static void AddAzureBus(this IServiceCollection services, ServerBase msgServer, bool isExternalListener)
     {
         services.AddMassTransit<IAzureBus>(mt =>
         {
@@ -170,11 +182,11 @@ public static class ServiceExtensions
                 mt.AddActivities(entryAssembly);
             }
 
-            mt.UseAzureServiceBus(config.ConnectionString!);
+            mt.UseAzureServiceBus(msgServer.ServerUri!);
         });
     }
     
-    private static void AddAmazonBus(this IServiceCollection services, MessagingProvider config, bool isExternalListener)
+    private static void AddAmazonBus(this IServiceCollection services, ServerBase msgServer, bool isExternalListener)
     {
         services.AddMassTransit<IAmazonBus>(mt =>
         {
@@ -192,9 +204,7 @@ public static class ServiceExtensions
                 mt.AddActivities(entryAssembly);
             }
 
-            // TODO: there should be no secrets in the yaml. We should maybe look at supporting special ${ENV_VARIABLE_NAME} expressions for 
-            // connection strings and other environment variable/secret injection. Have opened an Issue to resolve.
-            mt.UseAmazonSqs(config.ConnectionString!, config.AccessKey!, config.SecretKey!);
+            mt.UseAmazonSqs(msgServer.ServerUri!, msgServer.User!, msgServer.Password!);
         });
     }
     

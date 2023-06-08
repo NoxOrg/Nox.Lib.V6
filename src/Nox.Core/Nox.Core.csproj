@@ -51,7 +51,7 @@
     <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.9" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Nox.Cron" Version="1.0.13" />
-    <PackageReference Include="Nox.Solution" Version="1.0.0" />
+    <PackageReference Include="Nox.Solution" Version="1.0.2" />
     <PackageReference Include="Nox.Utilities" Version="1.0.5" />
     <PackageReference Include="Serilog" Version="2.12.0" />
     <PackageReference Include="SqlKata" Version="2.4.0" />
@@ -63,18 +63,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="ValidationResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ValidationResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <EmbeddedResource Remove="Configuration\Dto\**" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="ValidationResources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ValidationResources.resx</DependentUpon>
-    </Compile>
     <Compile Remove="Configuration\Dto\**" />
   </ItemGroup>
   <ItemGroup>
