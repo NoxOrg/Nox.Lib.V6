@@ -1,8 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using Nox.Solution;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
+using System.Text;
 
 namespace Nox.Generator.Generators
 {
@@ -33,54 +34,37 @@ namespace Nox.Generator.Generators
             Context.AddSource(hintName, source);
         }
 
-        protected IReadOnlyList<string> AddRelationships(Dictionary<object, object> dto, StringBuilder sb, string key = "relationships")
+        protected void AddRelationships(IEnumerable<EntityRelationship> relationships, StringBuilder sb)
         {
-            var relatedEntities = new List<string>();
-            dto.TryGetValue(key, out var relations);
-            if (relations != null)
+            foreach (var relationship in relationships)
             {
-                foreach (var attr in ((List<object>)relations).Cast<Dictionary<object, object>>())
-                {
-                    relatedEntities.Add(AddRelationship(sb, attr));
-                }
+                AddRelationship(sb, relationship);
             }
-
-            return relatedEntities.Distinct().ToList();
         }
 
-        protected string AddRelationship(StringBuilder sb, Dictionary<object, object> attr)
+        protected void AddRelationship(StringBuilder sb, EntityRelationship relationship)
         {
-            bool allowNavigation = GetBooleanValueOrDefault(attr, "allow-navigation", true);
-            var entity = (string)attr["entity"];
+            string typeDefinition;
 
-            if (allowNavigation)
+            // Is Many
+            if (relationship.Relationship == EntityRelationshipType.ZeroOrMany || relationship.Relationship == EntityRelationshipType.OneOrMany)
             {
-                var relationship = (string)attr["relationship"];
-                
-                bool isMany = relationship.Equals("ZeroOrMany") || relationship.Equals("OneOrMany");
-                bool isRequired = relationship.Equals("ExactlyOne");
-
-                string? typeDefinition;
-                if (isMany)
-                {
-                    typeDefinition = $"IList<{entity}>";
-                }
-                else
-                {
-                    typeDefinition = isRequired ? $"{entity}" : $"{entity}?";
-                }
-
-                AddProperty(typeDefinition, (string)attr["name"], sb);
+                typeDefinition = $"IList<{relationship.Entity}>";
+            }
+            else
+            {
+                // Nullable or not check
+                typeDefinition = relationship.Relationship == EntityRelationshipType.ExactlyOne ? $"{relationship.Entity}" : $"{relationship.Entity}?";
             }
 
-            return entity;
+            AddProperty(typeDefinition, relationship.Name, sb);
         }
 
-        protected static void AddSimpleProperty(object type, object name, bool isRequired, StringBuilder sb)
+        protected static void AddSimpleProperty(NoxType type, string name, bool isRequired, StringBuilder sb)
         {
-            var typeName = ClassDataType((string)type);
+            var typeName = ClassDataType(type);
             // Do not generate "string?" - TODO: make configurable
-            AddProperty(isRequired || typeName == "string" ? typeName : $"{typeName}?", (string)name, sb);
+            AddProperty(isRequired || typeName == "string" ? typeName : $"{typeName}?", name, sb);
         }
 
         protected static void AddProperty(string type, string name, StringBuilder sb, bool initOnly = false)
@@ -107,10 +91,11 @@ namespace Nox.Generator.Generators
             sb.AppendLine($@"");
         }
 
-        protected static string GetParametersString(object entity, bool withDefaults = true)
+        protected static string GetParametersString(IEnumerable<DomainQueryRequestInput> input, bool withDefaults = true)
         {
-            return string.Join(", ", ((List<object>)entity).Cast<Dictionary<object, object>>()
-                .Select(parameter => $"{parameter["type"]} {parameter["name"]}{(withDefaults ? GetDefaultIfDefined(parameter, "defaultValue") : string.Empty)}"));
+            // TODO: switch to a general type resolver
+            return string.Join(", ", input
+                .Select(parameter => $"{(parameter.Type == NoxType.entity ? ClassDataType(parameter.Type) : parameter.EntityTypeOptions.Entity)} {parameter.Name}{(withDefaults ? parameter.IsRequired : string.Empty)}"));
         }
 
         protected static string GetParametersExecuteString(object entity)
@@ -124,13 +109,11 @@ namespace Nox.Generator.Generators
             AddProperty("NoxDomainDbContext", "DbContext", sb, initOnly: true);
         }
 
-        protected static void AddAttributes(Dictionary<object, object> entity, StringBuilder sb)
+        protected static void AddAttributes(IEnumerable<NoxSimpleTypeDefinition> attributes, StringBuilder sb)
         {
-            var attributes = (List<object>)entity["attributes"];
-
-            foreach (var attr in attributes.Cast<Dictionary<object, object>>())
+            foreach (var attr in attributes)
             {
-                AddSimpleProperty(attr["type"], attr["name"], GetBooleanValueOrDefault(attr, "isRequired"), sb);
+                AddSimpleProperty(attr.Type, attr.Name, attr.IsRequired, sb);
             }
         }
 
@@ -161,62 +144,19 @@ namespace Nox.Generator.Generators
             sb.AppendLine($@"{{");
         }
 
-        protected static bool GetBooleanValueOrDefault(Dictionary<object, object> entity, string key, bool defaultValue = false)
+        protected static string ClassDataType(NoxType type)
         {
-            entity.TryGetValue(key, out object val);
-
-            var valString = (string)val;
-
-            // cover yes/no and true/false
-            return valString != null
-                && (valString.Equals("yes") || !valString.Equals("no")
-                && bool.Parse(valString))
-                || valString == null && defaultValue;
-        }
-
-        protected static string ClassDataType(string type)
-        {
-            var propType = type?.ToLower() ?? "string";
-
-            return propType switch
+            return type switch
             {
-                "string" => "string",
-                "varchar" => "string",
-                "nvarchar" => "string",
-                "char" => "string",
-                "guid" => "Guid",
-                "url" => "string",
-                "email" => "string",
-                "date" => "DateTime",
-                "time" => "DateTime",
-                "timespan" => "TimeSpan",
-                "datetime" => "DateTimeOffset",
-                "bool" => "bool",
-                "boolean" => "bool",
-                "object" => "object",
-                "int" => "int",
-                "uint" => "uint",
-                "tinyint" => "int",
-                "bigint" => "long",
-                "money" => "decimal",
-                "smallmoney" => "decimal",
-                "decimal" => "decimal",
-                "real" => "single",
-                "float" => "single",
-                "bigreal" => "double",
-                "bigfloat" => "double",
+                NoxType.text => "string",
+                NoxType.guid => "Guid",
+                NoxType.date => "DateTime",
+                NoxType.dateTime => "DateTime",
+                NoxType.boolean => "bool",
+                NoxType.@object => "object",
+                NoxType.number => "int",
                 _ => "string"
             };
-        }
-
-        private static string GetDefaultIfDefined(Dictionary<object, object> parameter, string key)
-        {
-            if (!parameter.TryGetValue(key, out object val))
-            {
-                return string.Empty;
-            }
-
-            return $" = {val ?? "null"}";
         }
     }
 }

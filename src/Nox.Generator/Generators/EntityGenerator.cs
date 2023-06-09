@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
-using Nox.Generator.Generators.Entities;
+using Nox.Solution;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,182 +9,95 @@ namespace Nox.Generator.Generators
 {
     internal class EntityGenerator : BaseGenerator
     {
-        internal IReadOnlyList<string> AggregateRoots => _entityNames
-                .Where(e => !_ownedEntities.Contains(e))
-                .Distinct()
-                .ToList();
-
-        internal List<EntityWithCompositeKey> CompositeKeys { get; set; } = new List<EntityWithCompositeKey>();
-
-        internal List<Dictionary<object, object>> AllQueries { get; set; } = new List<Dictionary<object, object>>();
-
-        internal List<Dictionary<object, object>> AllCommands { get; set; } = new List<Dictionary<object, object>>();
-
         internal EntityGenerator(GeneratorExecutionContext context)
             : base(context) { }
 
-        private readonly List<string> _entityNames = new();
-
-        private readonly List<string> _ownedEntities = new();
-
-        internal bool AddEntity(string assemblyName, Dictionary<object, object> entity)
+        internal bool AddEntity(Entity entity)
         {
-            var entityName = entity["name"].ToString();
+            GenerateEntity(entity);
 
-            Context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NI0000, null, $"Adding Entity class: {entityName} from assembly {assemblyName}"));
+            GenerateQueries(entity.Queries);
 
-            if (_entityNames.Any(n => n == entityName))
-            {
-                Context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NE0001, null, entityName));
+            GenerateDomainEvents(entity.Events);
 
-                return false;
-            }
-
-            _entityNames.Add(entityName);
-
-            GenerateEntity(entity, entityName);
-
-            AllQueries.AddRange(GenerateQueries(entity));
-
-            GenerateEvents(entity, entityName);
-
-            AllCommands.AddRange(GenerateCommands(entity));
+            // Depends on events
+            GenerateCommands(entity.Commands);
 
             return true;
         }
 
-        private void GenerateEntity(Dictionary<object, object> entity, string entityName)
+        private void GenerateDomainEvents(IReadOnlyList<NoxSimpleTypeDefinition> events)
+        {
+            var eventsGenerator = new EventsGenerator(Context);
+
+            foreach (var domainEvent in events)
+            {
+                eventsGenerator.AddDomainEvent(domainEvent.Name, domainEvent.EntityTypeOptions.Entity);
+            }
+        }
+
+        private void GenerateEntity(Entity entity)
         {
             var sb = new StringBuilder();
 
             AddBaseTypeDefinition(sb,
-                entityName,
+                entity.Name,
                 "IDynamicEntity",
                 "Nox",
                 isAbstract: false,
                 isPartial: true,
                 "Nox.Core.Interfaces.Entity");
 
-            AddPrimaryKey(entity, sb, entityName);
+            // Key
+            AddPrimaryKey(entity.Keys, sb);
 
             // Attributes
-            AddAttributes(entity, sb);
+            AddAttributes(entity.Attributes, sb);
 
             // Relationships
-            AddRelationships(entity, sb);
+            AddRelationships(entity.Relationships, sb);
 
             // Owned Relationships - define Aggregate Root boundaries
-            _ownedEntities.AddRange(AddRelationships(entity, sb, key: "ownedRelationships"));
+            AddRelationships(entity.OwnedRelationships, sb);
 
             sb.AppendLine(@"}");
 
-            GenerateFile(sb, entityName);
+            GenerateFile(sb, entity.Name);
         }
 
-        private void AddPrimaryKey(Dictionary<object, object> entity, StringBuilder sb, string entityName)
+        private void AddPrimaryKey(IEnumerable<NoxSimpleTypeDefinition> keys, StringBuilder sb)
         {
-            entity.TryGetValue("key", out var keyValue);
-            if (keyValue != null)
+            foreach (var key in keys)
             {
-                var key = (Dictionary<object, object>)keyValue;
-
-                key.TryGetValue("entities", out var entities);
-                if (entities != null)
+                if (key.Type == NoxType.entity)
                 {
-                    var entityWithCompositeKey = new EntityWithCompositeKey(entityName);
-                    foreach (var keyEntity in ((List<object>)entities).Cast<string>())
-                    {
-                        AddProperty(keyEntity, keyEntity, sb);
-                        entityWithCompositeKey.KeyEntities.Add(keyEntity);
-                    }
-
-                    CompositeKeys.Add(entityWithCompositeKey);
+                    AddProperty(key.EntityTypeOptions.Entity, key.Name, sb);
                 }
                 else
                 {
-                    AddSimpleProperty(key["type"], key["name"], true, sb);
+                    AddSimpleProperty(key.Type, key.Name, true, sb);
                 }
             }
         }
 
-        private void GenerateEvents(Dictionary<object, object> entity, string entityName)
+        private void GenerateCommands(IEnumerable<DomainCommand> commands)
         {
-            var eventsGenerator = new EventsGenerator(Context);
+            var commandGenerator = new CommandGenerator(Context);
 
-            // Basic CRUD events
-            entity.TryGetValue("raiseCrudEvents", out var raiseCrudEvents);
-
-            if (raiseCrudEvents == null)
+            foreach (var command in commands)
             {
-                // Generate Created and Updated by default
-                eventsGenerator.AddCrudEvent(GeneratorEventType.Created, entityName);
-                eventsGenerator.AddCrudEvent(GeneratorEventType.Updated, entityName);
-            }
-            else
-            {
-                var crudEvents = (Dictionary<object, object>)raiseCrudEvents;
-
-                if (GetBooleanValueOrDefault(crudEvents, "create"))
-                {
-                    eventsGenerator.AddCrudEvent(GeneratorEventType.Created, entityName);
-                }
-
-                if (GetBooleanValueOrDefault(crudEvents, "update"))
-                {
-                    eventsGenerator.AddCrudEvent(GeneratorEventType.Updated, entityName);
-                }
-
-                if (GetBooleanValueOrDefault(crudEvents, "delete"))
-                {
-                    eventsGenerator.AddCrudEvent(GeneratorEventType.Deleted, entityName);
-                }
-            }
-
-            entity.TryGetValue("events", out var events);
-            if (events != null)
-            {
-                foreach (var domainEvent in ((List<object>)events).Cast<Dictionary<object, object>>())
-                {
-                    eventsGenerator.AddDomainEvent((string)domainEvent["name"], (string)domainEvent["type"]);
-                }
+                commandGenerator.AddCommandHandler(command);
             }
         }
 
-        private IEnumerable<Dictionary<object, object>> GenerateCommands(Dictionary<object, object> entity)
+        private void GenerateQueries(IEnumerable<DomainQuery> queries)
         {
-            var commandsList = new List<Dictionary<object, object>>();
-            entity.TryGetValue("commands", out var commands);
-            if (commands != null)
+            var queryGenerator = new QueryGenerator(Context);
+
+            foreach (var query in queries)
             {
-                var commandGenerator = new CommandGenerator(Context);
-
-                foreach (var command in ((List<object>)commands).Cast<Dictionary<object, object>>())
-                {
-                    commandGenerator.AddCommandHandler(command);
-                    commandsList.Add(command);
-                }
+                queryGenerator.AddQuery(query);
             }
-
-            return commandsList;
-        }
-
-        private IEnumerable<Dictionary<object, object>> GenerateQueries(Dictionary<object, object> entity)
-        {
-            var queriesList = new List<Dictionary<object, object>>();
-
-            entity.TryGetValue("queries", out var queries);
-            if (queries != null)
-            {
-                var queryGenerator = new QueryGenerator(Context);
-
-                foreach (var query in ((List<object>)queries).Cast<Dictionary<object, object>>())
-                {
-                    queryGenerator.AddQuery(query);
-                    queriesList.Add(query);
-                }
-            }
-
-            return queriesList;
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
-using System.Collections.Generic;
+using Nox.Solution;
 using System.Text;
 
 namespace Nox.Generator.Generators
@@ -8,11 +8,11 @@ namespace Nox.Generator.Generators
     {
         internal DtoGenerator(GeneratorExecutionContext context) : base(context) { }
 
-        internal void AddDTO(Dictionary<object, object> dto)
+        internal void AddDTO(DataTransferObject dto)
         {
             var sb = new StringBuilder();
 
-            var className = $"{dto["name"]}{NamingConstants.DtoSuffix}";
+            var className = $"{dto.Name}{NamingConstants.DtoSuffix}";
 
             AddBaseTypeDefinition(sb,
                 className,
@@ -23,10 +23,7 @@ namespace Nox.Generator.Generators
                 "Nox.Core.Interfaces.Entity");
 
             // Attributes
-            AddAttributes(dto, sb);
-
-            // Relationships
-            AddRelationships(dto, sb);
+            AddAttributes(dto.Attributes, sb);
 
             sb.AppendLine($@"}}");
 

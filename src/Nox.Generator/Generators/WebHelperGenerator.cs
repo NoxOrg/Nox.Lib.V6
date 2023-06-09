@@ -27,19 +27,19 @@ namespace Nox.Generator.Generators
             // Generate GET request mapping for Queries
             foreach (var query in queries)
             {
-                sb.AppendLine(@"");
-                sb.AppendLine($"    public static void {query["name"]}(WebApplication app, string path)");
-                sb.AppendLine(@"    {");
-                sb.AppendLine(@"        app.MapGet(path,");
-                sb.AppendLine($"            async ({GetParametersString(query["parameters"], withDefaults: false)}) =>");
-                sb.AppendLine(@"            {");
-                sb.AppendLine(@"                using var scope = app.Services.CreateScope();");
-                sb.AppendLine($"                var result = await scope.ServiceProvider.GetRequiredService<Nox.Queries.{query["name"]}Query>().ExecuteAsync({GetParametersExecuteString(query["parameters"])});");
-                // TODO: Extend to NotFound and other codes
-                sb.AppendLine(@"                return Results.Ok(result);");
-                sb.AppendLine(@"            });");
-                sb.AppendLine(@"    }");
-                sb.AppendLine(@"");
+                //sb.AppendLine(@"");
+                //sb.AppendLine($"    public static void {query["name"]}(WebApplication app, string path)");
+                //sb.AppendLine(@"    {");
+                //sb.AppendLine(@"        app.MapGet(path,");
+                //sb.AppendLine($"            async ({GetParametersString(query, withDefaults: false)}) =>");
+                //sb.AppendLine(@"            {");
+                //sb.AppendLine(@"                using var scope = app.Services.CreateScope();");
+                //sb.AppendLine($"                var result = await scope.ServiceProvider.GetRequiredService<Nox.Queries.{query["name"]}Query>().ExecuteAsync({GetParametersExecuteString(query["parameters"])});");
+                //// TODO: Extend to NotFound and other codes
+                //sb.AppendLine(@"                return Results.Ok(result);");
+                //sb.AppendLine(@"            });");
+                //sb.AppendLine(@"    }");
+                //sb.AppendLine(@"");
             }
 
             // Generate POST request mapping for Command Handlers

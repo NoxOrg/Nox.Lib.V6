@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using Nox.Solution;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,11 +10,11 @@ namespace Nox.Generator.Generators
         internal QueryGenerator(GeneratorExecutionContext context)
             : base(context) { }
 
-        internal void AddQuery(Dictionary<object, object> query)
+        internal void AddQuery(DomainQuery query)
         {
             var sb = new StringBuilder();
 
-            var className = $"{query["name"]}Query";
+            var className = $"{query.Name}Query";
 
             AddBaseTypeDefinition(sb,
                 className,
@@ -34,12 +35,10 @@ namespace Nox.Generator.Generators
             });
 
             // Add params (which can be DTO)
-            string parameters = GetParametersString(query["parameters"]);
+            string parameters = GetParametersString(query.RequestInput);
 
-            var response = (Dictionary<object, object>)query["response"];
-
-            bool isMany = bool.Parse((string)response["isMany"]);
-            var dto = response["responseDto"];
+            bool isMany = query.ResponseOutput.Type == NoxType.array || query.ResponseOutput.Type == NoxType.collection;
+            var dto = query.ResponseOutput.EntityTypeOptions.Entity;
 
             var typeDefinition = isMany ? $"IList<{dto}>" : $"{dto}";
 

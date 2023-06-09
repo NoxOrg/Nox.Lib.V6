@@ -1,11 +1,8 @@
 using Microsoft.CodeAnalysis;
-using Newtonsoft.Json.Linq;
 using Nox.Generator.Generators;
-using System.Collections.Generic;
+using Nox.Solution;
 using System.IO;
 using System.Linq;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace Nox.Generator;
 
@@ -36,31 +33,18 @@ public class NoxDynamicGenerator : ISourceGenerator
         if (mainSyntaxTree == null)
         {
             return;
-        }
+        }        
 
         var programPath = Path.GetDirectoryName(mainSyntaxTree.FilePath);
         var designRootFullPath = Path.GetFullPath(programPath!);
 
-        var json = Path.Combine(programPath!, "appsettings.json");
-        if (File.Exists(json))
-        {
-            var config = JObject.Parse(File.ReadAllText(json));
-            var designRoot = config["Nox"]?["DefinitionRootPath"]?.ToString();
-            if (string.IsNullOrEmpty(designRoot))
-            {
-                context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NW0002, null));
-            }
-            else
-            {
-                designRootFullPath = Path.GetFullPath(Path.Combine(programPath!, designRoot));
-            }
-        }
-
-        var deserializer = new DeserializerBuilder()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+        // TODO: fix
+        var noxConfig = new NoxSolutionBuilder()
+            .UseYamlFile("./files/domain.solution.nox.yaml")
+            .UseYamlFile("./files/application.solution.nox.yaml")
             .Build();
 
-        var entities = GetConfigurationByType(designRootFullPath, deserializer, "entity");
+        var entities = noxConfig.Domain.Entities;
 
         if (!entities.Any())
         {
@@ -70,45 +54,28 @@ public class NoxDynamicGenerator : ISourceGenerator
         {
             context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NI0000, null, $"{entities.Count} entities found"));
 
-            foreach (var entity in entities.Cast<Dictionary<object, object>?>())
+            foreach (var entity in entities)
             {
-                EntityGenerator.AddEntity(assemblyName!, entity!);
+                context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NI0000, null, $"Adding Entity class: {entity.Name} from assembly {assemblyName}"));
+                EntityGenerator.AddEntity(entity);
             }
         }
 
-        List<object?> dtos = GetConfigurationByType(designRootFullPath, deserializer, "dto");
         var DtoGenerator = new DtoGenerator(context);
-        foreach (var dto in dtos.Cast<Dictionary<object, object>>())
+        foreach (var dto in noxConfig.Application.DataTransferObjects)
         {
             DtoGenerator.AddDTO(dto);
         }
 
-        List<object?> commands = GetConfigurationByType(designRootFullPath, deserializer, "command");
-        var commandGenerator = new CommandGenerator(context);
-        foreach (var command in commands.Cast<Dictionary<object, object>>())
-        {
-            commandGenerator.AddCommand(command);
-        }
-
         var dbContextGenerator = new DbContextGenerator(context);
-        dbContextGenerator.AddDbContext(EntityGenerator.AggregateRoots.ToArray(), EntityGenerator.CompositeKeys.ToArray());
+        dbContextGenerator.AddDbContext(entities);
 
-        if (EntityGenerator.AllQueries.Any() || EntityGenerator.AllCommands.Any())
-        {
-            var webHelperGenerator = new WebHelperGenerator(context);
-            webHelperGenerator.AddQueries(EntityGenerator.AllQueries, EntityGenerator.AllCommands);
-        }
-    }
+        // TODO: Generate controllers
 
-    private static List<object?> GetConfigurationByType(string designRootFullPath, IDeserializer deserializer, string configType)
-    {
-        return Directory
-            .EnumerateFiles(designRootFullPath, $"*.{configType}.nox.yaml", SearchOption.AllDirectories)
-            .Select(f =>
-            {
-                using var reader = new StringReader(File.ReadAllText(f));
-                return deserializer.Deserialize(reader);
-            })
-            .ToList();
+        //if (EntityGenerator.AllQueries.Any() || EntityGenerator.AllCommands.Any())
+        //{
+        //    var webHelperGenerator = new WebHelperGenerator(context);
+        //    webHelperGenerator.AddQueries(EntityGenerator.AllQueries, EntityGenerator.AllCommands);
+        //}
     }
 }

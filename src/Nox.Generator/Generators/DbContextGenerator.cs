@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
-using Nox.Generator.Generators.Entities;
+using Nox.Solution;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -10,7 +11,7 @@ namespace Nox.Generator.Generators
         internal DbContextGenerator(GeneratorExecutionContext context)
             : base(context) { }
 
-        internal bool AddDbContext(string[] dbSets, EntityWithCompositeKey[] entityWithCompositeKeys)
+        internal bool AddDbContext(IEnumerable<Entity> entities)
         {
             var sb = new StringBuilder();
 
@@ -50,9 +51,9 @@ namespace Nox.Generator.Generators
             sb.AppendLine(@"    private readonly IDynamicModel _dynamicDbModel;");
             sb.AppendLine(@"");
             // Generate strongly typed DbSets for each aggreagate root or independent entity
-            foreach (var setEntity in dbSets)
+            foreach (var setEntity in entities)
             {
-                sb.AppendLine($@"    public DbSet<{setEntity}> {setEntity} {{ get; set; }}");
+                sb.AppendLine($@"    public DbSet<{setEntity.Name}> {setEntity.Name} {{ get; set; }}");
                 sb.AppendLine(@"");
             }
             sb.AppendLine(@"    public NoxDomainDbContext(");
@@ -79,9 +80,10 @@ namespace Nox.Generator.Generators
             sb.AppendLine(@"    protected override void OnModelCreating(ModelBuilder modelBuilder)");
             sb.AppendLine(@"    {");
             // Set up composite keys
-            foreach (var entity in entityWithCompositeKeys)
+            foreach (var entity in entities.Where(e => e.Keys.Count > 1))
             {
-                sb.AppendLine($@"        modelBuilder.Entity<{entity.EntityName}>().HasKey(new [] {{ ""{string.Join(@""", """, entity.KeyEntities.Select(k => $"{k}Id"))}"" }});");
+                // TODO: verify the logic whith Key.Name/Entity
+                sb.AppendLine($@"        modelBuilder.Entity<{entity.Name}>().HasKey(new [] {{ ""{string.Join(@""", """, entity.Keys.Select(k => $"{k.Name}Id"))}"" }});");
             }
             sb.AppendLine(@"        base.OnModelCreating(modelBuilder);");
             sb.AppendLine(@"    }");

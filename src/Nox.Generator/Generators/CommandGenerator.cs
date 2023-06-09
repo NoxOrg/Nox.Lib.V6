@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using Nox.Solution;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,32 +9,11 @@ namespace Nox.Generator.Generators
     {
         internal CommandGenerator(GeneratorExecutionContext context) : base(context) { }
 
-        internal void AddCommand(Dictionary<object, object> command)
+        internal void AddCommandHandler(DomainCommand command)
         {
             var sb = new StringBuilder();
 
-            var className = $"{command["name"]}{NamingConstants.CommandSuffix}";
-
-            AddBaseTypeDefinition(sb,
-                className,
-                "IDynamicDto",
-                "Nox.Commands",
-                isAbstract: false,
-                isPartial: false,
-                "Nox.Core.Interfaces.Entity");
-
-            AddAttributes(command, sb);
-
-            sb.AppendLine($@"}}");
-
-            GenerateFile(sb, className);
-        }
-
-        internal void AddCommandHandler(Dictionary<object, object> command)
-        {
-            var sb = new StringBuilder();
-
-            var className = $"{command["name"]}CommandHandlerBase";
+            var className = $"{command.Name}CommandHandlerBase";
 
             AddBaseTypeDefinition(sb,
                 className,
@@ -59,16 +39,12 @@ namespace Nox.Generator.Generators
             });
 
             // Add params
-            sb.AppendLine($@"   public abstract Task<INoxCommandResult> ExecuteAsync({command["name"]}{NamingConstants.CommandSuffix} command);");
+            sb.AppendLine($@"   public abstract Task<INoxCommandResult> ExecuteAsync({command.Name}{NamingConstants.CommandSuffix} command);");
 
             // Add Events
-            command.TryGetValue("events", out var events);
-            if (events != null)
+            foreach (var domainEvent in command.EmitEvents)
             {
-                foreach (var domainEvent in (List<object>)events)
-                {
-                    AddDomainEvent(sb, (string)domainEvent);
-                }
+                AddDomainEvent(sb, domainEvent);
             }
 
             sb.AppendLine($@"}}");
