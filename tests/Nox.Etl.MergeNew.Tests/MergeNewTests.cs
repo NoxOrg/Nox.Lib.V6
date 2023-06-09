@@ -16,7 +16,7 @@ public class MergeNewTests : MergeNewTestFixture
         var service = TestServiceProvider!.GetRequiredService<IDynamicService>();
         var loader = service.Loaders!.Single(l => l.Name == "VehicleLoader");
         var entity = service.Entities!.FirstOrDefault(e => e.Key == "Vehicle").Value;
-        var result = await loaderExecutor.ExecuteLoaderAsync(service.MetaService, loader, entity);
+        var result = await loaderExecutor.ExecuteEtlAsync(service.MetaService, loader, entity);
         Assert.That(result, Is.True);
         var sqlHelper = TestServiceProvider!.GetRequiredService<SqlHelper>();
         var count = await sqlHelper.ExecuteInt("SELECT COUNT(*) FROM Vehicle");
@@ -25,7 +25,7 @@ public class MergeNewTests : MergeNewTestFixture
         var seed = TestServiceProvider!.GetRequiredService<MergeNewSeed>();
         await seed.Update(10);
         await seed.Insert(false, 10);
-        result = await loaderExecutor.ExecuteLoaderAsync(service.MetaService, loader, entity);
+        result = await loaderExecutor.ExecuteEtlAsync(service.MetaService, loader, entity);
         Assert.That(result, Is.True);
         count = await sqlHelper.ExecuteInt("SELECT COUNT(*) FROM Vehicle");
         //Count must be 110 as only 10 new items

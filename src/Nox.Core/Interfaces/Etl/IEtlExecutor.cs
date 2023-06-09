@@ -1,10 +1,11 @@
 ﻿using Nox.Core.Interfaces.Entity;
+using Nox.Solution;
 
 namespace Nox.Core.Interfaces.Etl
 {
     public interface IEtlExecutor
     {
-        Task<bool> ExecuteAsync(IProjectConfiguration service);
-        Task<bool> ExecuteLoaderAsync(IProjectConfiguration service, ILoader loader, IEntity entity);
+        Task<bool> ExecuteAsync(NoxSolution solution);
+        Task<bool> ExecuteEtlAsync(NoxSolution solution, Integration etl, Solution.Entity entity);
     }
 }

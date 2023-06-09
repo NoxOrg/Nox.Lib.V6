@@ -6,6 +6,7 @@ using Nox.Core.Interfaces.Messaging.Events;
 using Nox.Messaging.AmazonSQS;
 using Nox.Messaging.AzureServiceBus;
 using Nox.Messaging.RabbitMQ;
+using Nox.Solution;
 
 namespace Nox.Messaging;
 

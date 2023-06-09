@@ -8,6 +8,7 @@ using Nox.Api.OData.Constants;
 using Nox.Api.OData.Swagger;
 using Nox.Core.Interfaces;
 using System.Reflection;
+using Nox.Solution;
 
 namespace Nox;
 
@@ -20,7 +21,7 @@ public static class ApplicationBuilderExtensions
 
         builder.UseODataEntitySectionsSwaggerFilter();
 
-        if (builder.ApplicationServices.GetService<IProjectConfiguration>() == null)
+        if (builder.ApplicationServices.GetService<NoxSolution>() == null)
         {
             return builder;
         }

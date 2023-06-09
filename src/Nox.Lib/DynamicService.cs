@@ -6,55 +6,63 @@ using Microsoft.Extensions.Logging;
 using Nox.Core.Components;
 using Nox.Core.Constants;
 using Nox.Core.Interfaces;
-using Nox.Core.Interfaces.Api;
 using Nox.Core.Interfaces.Database;
-using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Etl;
-using Nox.Core.Models;
-using Nox.Core.Models.Entity;
 using Nox.Entity.XtendedAttributes;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
+using Humanizer;
+using Nox.Solution;
 
 namespace Nox.Lib;
 
 public class DynamicService : IDynamicService
 {
     private ILogger _logger;
-    private readonly IProjectConfiguration _metaService;
+    private readonly NoxSolution _solution;
     private readonly IEtlExecutor _etlExecutor;
-    public string Name => _metaService.Name;
-    public IProjectConfiguration MetaService => _metaService;
-    public string KeyVaultUri => _metaService.KeyVaultUri;
-    public bool AutoMigrations => _metaService.AutoMigrations;
-    public IReadOnlyDictionary<string, IEntity>? Entities
+    private IServiceDataSource _entityStore;
+    
+    public string Name => _solution.Name;
+    public NoxSolution Solution => _solution;
+
+    public IServiceDataSource EntityStore => _entityStore;
+    
+    //Todo change this to new structure
+    //public string KeyVaultUri => _metaService.KeyVaultUri;
+    
+    public IReadOnlyDictionary<string, Solution.Entity>? Entities
     {
         get
         {
-            if (_metaService.Entities != null)
-                return new ReadOnlyDictionary<string, IEntity>(
-                    _metaService.Entities.ToDictionary(x => x.Name, x => x));
+            if (_solution.Domain is { Entities: not null })
+                return new ReadOnlyDictionary<string, Solution.Entity>(
+                    _solution.Domain.Entities.ToDictionary(x => x.Name, x => x));
             return null;
         }
     }
-    public IReadOnlyDictionary<string, IApi>? Apis
+    // public IReadOnlyDictionary<string, IApi>? Apis
+    // {
+    //     get
+    //     {
+    //         if (_solution != null)
+    //             return new ReadOnlyDictionary<string, IApi>(
+    //                 _metaService.Apis.ToDictionary(x => x.Name, x => x)
+    //             );
+    //         return null;
+    //     }
+    // }
+    
+    public IEnumerable<Integration>? Integrations
     {
         get
         {
-            if (_metaService.Apis != null)
-                return new ReadOnlyDictionary<string, IApi>(
-                    _metaService.Apis.ToDictionary(x => x.Name, x => x)
-                );
-            return null;
-        }
-    }
-    public IEnumerable<ILoader>? Loaders
-    {
-        get
-        {
-            if (_metaService.Loaders != null) return new ReadOnlyCollection<ILoader>(_metaService.Loaders.ToList());
+            if (_solution.Application is { Integration.Count: > 0 })
+            {
+                return new ReadOnlyCollection<Integration>(_solution.Application.Integration.ToList());
+            }
             return null;
         }
     }
@@ -63,15 +71,15 @@ public class DynamicService : IDynamicService
         IConfiguration appConfig,
         IEtlExecutor etlExecutor,
         IDataProviderFactory factory,
-        IProjectConfiguration metaService)
+        NoxSolution solution)
     {
         _logger = logger;
         _etlExecutor = etlExecutor;
 
-        _metaService = new Configurator(this)
+        _solution = new Configurator(this)
             .WithLogger(_logger)
             .WithAppConfiguration(appConfig)
-            .WithMetaService(metaService)
+            .WithSolution(solution)
             .WithDatabaseProviderFactory(factory)
             .Configure();
     }
@@ -79,73 +87,67 @@ public class DynamicService : IDynamicService
     public async Task<bool> ExecuteDataLoadersAsync()
     {
         _logger.LogInformation("Executing data load tasks");
-
-        return await _etlExecutor.ExecuteAsync(_metaService);
+        return await _etlExecutor.ExecuteAsync(_solution);
     }
 
     public async Task<bool> ExecuteDataLoaderAsync(ILoader loader)
     {
-        if (_metaService.Entities == null) return false;
-        var entity = _metaService.Entities.First(e => e.Name.Equals(loader.Target!.Entity, StringComparison.OrdinalIgnoreCase));
-        return await _etlExecutor.ExecuteLoaderAsync(_metaService, loader, entity);
+        if (_solution.Domain?.Entities == null) return false;
+        var entity = _solution.Domain.Entities.First(e => e.Name.Equals(loader.Target!.Entity, StringComparison.OrdinalIgnoreCase));
+        return await _etlExecutor.ExecuteEtlAsync(_solution, loader, entity);
     }
 
     public void AddMetadata(ModelBuilder modelBuilder)
     {
         AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(MetaBase)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
         AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(DynamicService)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
-        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(Loader)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
+        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(Solution.Solution)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
         AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(DataSourceBase)), typeof(DataSourceBase), DatabaseObject.MetadataSchemaName);
-        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(ServiceDatabase)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
-        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(Core.Models.Api)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
-        AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(MessagingProvider)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
+        // AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(ServiceDatabase)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
+        // AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(Core.Models.Api)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
+        // AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(MessagingProvider)), typeof(MetaBase), DatabaseObject.MetadataSchemaName);
         AddMetadataFromNamespace(modelBuilder, Assembly.GetAssembly(typeof(XtendedAttributeValue)), typeof(XtendedAttributeValue), "dbo");
     }
     
-    public void SetupRecurringLoaderTasks()
+    public void SetupRecurringIntegrationTasks()
     {
-        var executor = _etlExecutor;
+        if (Integrations != null && Integrations.Any())
+        {
+            var executor = _etlExecutor;
         
-        //Remove old jobs
-        using (var connection = JobStorage.Current.GetConnection())
-        {
-            foreach (var recurringJob in connection.GetRecurringJobs())
+            //Remove old jobs
+            using (var connection = JobStorage.Current.GetConnection())
             {
-                RecurringJob.RemoveIfExists(recurringJob.Id);
-            }
-        }
-
-        // setup recurring jobs based on cron schedule
-
-        foreach (var loader in Loaders!)
-        {
-            var loaderInstance = (Loader)loader;
-            var entity = Entities![loaderInstance.Target!.Entity];
-            //
-
-            if (loaderInstance.Schedule!.RunOnStartup)
-            {
-                executor.ExecuteLoaderAsync(_metaService, loaderInstance, entity).GetAwaiter().GetResult();
+                foreach (var recurringJob in connection.GetRecurringJobs())
+                {
+                    RecurringJob.RemoveIfExists(recurringJob.Id);
+                }
             }
 
-            RecurringJob.AddOrUpdate(
-                $"{Name}.{loader.Name}",
-                () => executor.ExecuteLoaderAsync(_metaService, loader, entity),
-                loaderInstance.Schedule.CronExpression
-            );
-        }
-    }
+            // setup recurring jobs based on cron schedule
 
-    public void EnsureDatabaseCreatedIfAutoMigrationsIsSet(DbContext dbContext)
-    {
-        if (_metaService.AutoMigrations)
-        {
-            if (dbContext.Database.EnsureCreated())
+            foreach (var integration in Integrations)
             {
-                dbContext.Add((ProjectConfiguration)_metaService);
-                dbContext.SaveChanges();
+                // todo loaders no longer exist, need to change this process
+                // if (integration.Target?.TargetType == EtlTargetType.Entity)
+                // {
+                //     var entity = Entities![integration.Target.Name];
+                // }
+                //
+                // if (integration.Source?.Schedule?.RunOnStartup == true)
+                //     executor.ExecuteEtlAsync(_solution, integration, )
+                //     if (loaderInstance.Schedule!.RunOnStartup)
+                //     {
+                //         executor.ExecuteEtlAsync(_metaService, loaderInstance, entity).GetAwaiter().GetResult();
+                //     }
+                //
+                // RecurringJob.AddOrUpdate(
+                //     $"{Name}.{loader.Name}",
+                //     () => executor.ExecuteEtlAsync(_metaService, loader, entity),
+                //     loaderInstance.Schedule.CronExpression
+                // );
             }
-        }
+        } 
     }
 
     private void AddMetadataFromNamespace(ModelBuilder modelBuilder, Assembly? assembly, Type baseType, string schema)
@@ -159,7 +161,7 @@ public class DynamicService : IDynamicService
         {
             modelBuilder.Entity(metaType, b =>
             {
-                _metaService.Database!.DataProvider!.ConfigureEntityTypeBuilder(b, metaType.Name, schema);
+                _entityStore!.DataProvider!.ConfigureEntityTypeBuilder(b, metaType.Name, schema);
 
                 var entityTypes = modelBuilder.Model.GetEntityTypes();
 
@@ -199,7 +201,7 @@ public class DynamicService : IDynamicService
                     }
                     else if (typeString == "object")
                     {
-                        var dbType = _metaService.Database.DataProvider!.ToDatabaseColumnType(new EntityAttribute { Type = "object" });
+                        var dbType = _entityStore.DataProvider!.ToDatabaseColumnType(new EntityAttribute { Type = "object" });
                         if (dbType == null)
                         {
                             b.Ignore(prop.Name);
@@ -219,7 +221,7 @@ public class DynamicService : IDynamicService
         private readonly DynamicService _dynamicService;
         private IDataProviderFactory? _factory;
         private ILogger? _logger;
-        private IProjectConfiguration _metaService = null!;
+        private NoxSolution _solution = null!;
         private IConfiguration? _appConfig;
 
         public Configurator(DynamicService dynamicService)
@@ -234,9 +236,9 @@ public class DynamicService : IDynamicService
             return this;
         }
 
-        public Configurator WithMetaService(IProjectConfiguration metaService)
+        public Configurator WithSolution(NoxSolution solution)
         {
-            _metaService = metaService;
+            _solution = solution;
             return this;
         }
 
@@ -252,32 +254,16 @@ public class DynamicService : IDynamicService
             return this;
         }
 
-        public IProjectConfiguration Configure()
+        public NoxSolution Configure()
         {
-            var serviceDatabases = GetServiceDatabasesFromNoxConfig();
-            
-            serviceDatabases.ToList().ForEach(db =>
-            {
-                db.DataProvider = _factory!.Create(db.Provider);
-                db.DataProvider.Configure(db, _metaService.Name);
-            });
-
-            return _metaService;
+            //GetServiceDatabaseFromNoxSolution();
+            return _solution;
         }
 
-        private IList<IServiceDataSource> GetServiceDatabasesFromNoxConfig()
+        private IServiceDataSource? GetServiceDatabaseFromNoxSolution()
         {
-            var serviceDatabases = new List<IServiceDataSource>
-            {
-                _metaService!.Database!
-            };
-
-            foreach (var dataSource in _metaService.DataSources!)
-            {
-                serviceDatabases.Add(dataSource);
-            }
-
-            return serviceDatabases;
+            //todo set and configure the database providers for all Etl data sources;
+            throw new NotImplementedException();
         }
 
     }

@@ -1,16 +1,15 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nox.Api;
 using Nox.Api.OData.Swagger;
-using Nox.Core.Extensions;
-using Nox.Core.Helpers;
 using Nox.Core.Interfaces;
 using Nox.Data;
 using Nox.Etl;
 using Nox.Jobs;
 using Nox.Lib;
 using Nox.Messaging;
+using Nox.Solution;
 using Nox.Utilities.Secrets;
+
 
 namespace Nox;
 
@@ -20,14 +19,14 @@ public static class ServiceExtensions
         this IServiceCollection services,
         NoxSwaggerConfiguration? swaggerConfiguration = null)
     {
-        new NoxSolutionBuilder()
+        var solution = new NoxSolutionBuilder()
             .UseDependencyInjection(services)
             .Build();
         services
             .AddPersistedSecretStore()
             .AddNoxMessaging(false)
             .AddDataProviderFactory()
-            .AddDynamicApi(_configuration!)
+            .AddDynamicApi(solution)
             .AddData()
             .AddEtl()
             .AddMicroservice()

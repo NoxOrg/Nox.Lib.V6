@@ -1,10 +1,9 @@
 ﻿
 namespace Nox.Core.Interfaces.Database
 {
-    public interface IServiceDataSource: IMetaBase
+    public interface IServiceDataSource
     {
         string? ConnectionString { get; set; }
-        string? ConnectionVariable { get; set; }
         string Name { get; set; }
         string Options { get; set; }
         string Password { get; set; }
