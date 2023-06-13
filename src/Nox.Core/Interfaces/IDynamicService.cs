@@ -16,7 +16,6 @@ namespace Nox.Core.Interfaces
         IDataProvider? DatabaseProvider { get; }
         IReadOnlyDictionary<string, Solution.Entity>? Entities { get; }
         IEnumerable<Integration>? Integrations { get; }
-        Task<bool> ExecuteIntegrationAsync(Integration integration);
         Task<bool> ExecuteIntegrationsAsync();
         void AddMetadata(ModelBuilder modelBuilder);
         void SetupRecurringIntegrationTasks();

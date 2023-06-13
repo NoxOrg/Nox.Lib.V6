@@ -13,6 +13,7 @@ using Nox.Core.Models;
 using Nox.Messaging;
 using System.Dynamic;
 using Nox.Core.Enumerations;
+using Nox.Core.Exceptions;
 using Nox.Core.Interfaces.Messaging.Events;
 using Nox.Solution;
 
@@ -24,33 +25,43 @@ public class EtlExecutor : IEtlExecutor
     private readonly ILogger<EtlExecutor> _logger;
     private readonly IEnumerable<INoxEvent> _messages;
     private readonly INoxMessenger? _messenger;
+    private readonly NoxSolution _solution;
     
     public EtlExecutor(
         ILogger<EtlExecutor> logger,
         IEnumerable<INoxEvent> messages,
+        NoxSolution solution,
         INoxMessenger? messenger = null)
     {
         _logger = logger;
         _messages = messages;
         _messenger = messenger;
+        _solution = solution;
     }
 
-    public async Task<bool> ExecuteAsync(NoxSolution solution)
+    public async Task<bool> ExecuteAsync(IDataProvider entityStore)
     {
-        if (solution.Application?.Integrations != null)
+        if (_solution.Application?.Integrations != null)
         {
-            var integrations = solution.Application.Integrations;
+            var integrations = _solution.Application.Integrations;
 
-            var entities = solution.Domain?.Entities.ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
+            var entities = _solution.Domain?.Entities.ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
             
             foreach (var integration in integrations!)
             {
-                if (integration.Target.TargetType == EtlTargetType.Entity && entities == null)
+                if (integration.Target!.TargetType == EtlTargetType.Entity && entities == null)
                 {
-                    throw new 
+                    throw new NoxIntegrationException($"Nox domain configuration does not contain any entities. If an entity is configured as an integration target, the entity must exist in the domain configuration.");
                 }
-                
-                await LoadDataFromSource(service, loader, entities[loader.Target!.Entity]);
+
+                if (!entities!.ContainsKey(integration.Target!.Name))
+                {
+                    throw new NoxIntegrationException($"Integration target entity does not exist. Integration {integration.Name} targets an entity {integration.Target.Name}, but it does not exist in the domain configuration.");
+                }
+
+                var entity = _solution.Domain!.Entities.First(e => e.Name.Equals(integration.Target!.Name, StringComparison.OrdinalIgnoreCase));
+
+                await LoadDataFromSource(integration, entityStore, entity);
             }    
         }
         
@@ -59,28 +70,28 @@ public class EtlExecutor : IEtlExecutor
         return true;
     }
 
-    public async Task<bool> ExecuteLoaderAsync(NoxSolution solution, ILoader loader, IEntity entity)
+    public async Task<bool> ExecuteEtlAsync(Integration integration, IDataProvider entityStore)
     {
-        entity.ApplyDefaults();
-        
-        entity.Attributes.ToList().ForEach(a => a.ApplyDefaults());
-
-        await LoadDataFromSource(service, loader, entity);
-
+        var entities = _solution.Domain?.Entities.ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
+        if (!entities!.ContainsKey(integration.Target!.Name))
+        {
+            throw new NoxIntegrationException($"Integration target entity does not exist. Integration {integration.Name} targets an entity {integration.Target.Name}, but it does not exist in the domain configuration.");
+        }
+        var entity = _solution.Domain!.Entities.First(e => e.Name.Equals(integration.Target!.Name, StringComparison.OrdinalIgnoreCase));
+        await LoadDataFromSource(integration, entityStore, entity);
         return true;
     }
 
-    private async Task LoadDataFromSource(NoxSolution solution, Integration integration, IEntity entity)
+    private async Task LoadDataFromSource(Integration integration, IDataProvider entityStore, Solution.Entity entity)
     {
-        var loaderInstance = (Loader)loader;
-        var targetProvider = service.Database!.DataProvider!;
+        var targetProvider = entityStore;
         var destinationDb = targetProvider.ConnectionManager;
-        var destinationTable = targetProvider.ToTableNameForSql(entity.Table, entity.Schema);
+        var destinationTable = targetProvider.ToTableNameForSql(entity., entity.Schema);
         var destinationSqlCompiler = targetProvider.SqlCompiler;
 
         foreach (var loaderSource in loaderInstance.Sources!)
         {
-            var sourceProvider = service.DataSources!.First(ds => ds.Name == loaderSource.DataSource).DataProvider!;
+            var sourceProvider = _solution.DataSources!.First(ds => ds.Name == loaderSource.DataSource).DataProvider!;
             var source = sourceProvider!.DataFlowSource(loaderSource);
             var loadStrategy = loaderInstance.LoadStrategy?.Type.Trim().ToLower() ?? "unknown";
             
@@ -124,7 +135,7 @@ public class EtlExecutor : IEtlExecutor
         string[] targetColumns,
         ILoader loader,
         IEntity entity,
-        LoaderMergeStates lastMergeDateTimeStampInfo
+        IntegrationMergeStates lastMergeDateTimeStampInfo
         )
     {
         var destination = new DbMerge(destinationDb, destinationTable)
@@ -218,7 +229,7 @@ public class EtlExecutor : IEtlExecutor
         }
     }
 
-    private static void UpdateMergeStates(LoaderMergeStates lastMergeDateTimeStampInfo, IDictionary<string, object?> record)
+    private static void UpdateMergeStates(IntegrationMergeStates lastMergeDateTimeStampInfo, IDictionary<string, object?> record)
     {
         foreach (var dateColumn in lastMergeDateTimeStampInfo.Keys)
         {
@@ -254,9 +265,9 @@ public class EtlExecutor : IEtlExecutor
         }
     }
 
-    private static LoaderMergeStates GetAllLastMergeDateTimeStamps(ILoader loader, IDataProvider dataProvider, IEntity entity)
+    private static IntegrationMergeStates GetAllLastMergeDateTimeStamps(ILoader loader, IDataProvider dataProvider, IEntity entity)
     {
-        var lastMergeDateTimeStampInfo = new LoaderMergeStates();
+        var lastMergeDateTimeStampInfo = new IntegrationMergeStates();
 
         var addedMergeColumn = false;
         
@@ -296,7 +307,7 @@ public class EtlExecutor : IEtlExecutor
         return lastMergeDateTimeStampInfo;
     }
 
-    private void SetAllLastMergeDateTimeStamps(ILoader loader, IDataProvider dataProvider, LoaderMergeStates lastMergeDateTimeStampInfo)
+    private void SetAllLastMergeDateTimeStamps(ILoader loader, IDataProvider dataProvider, IntegrationMergeStates lastMergeDateTimeStampInfo)
     {
         foreach (var (dateColumn, mergeState) in lastMergeDateTimeStampInfo)
         {
@@ -404,7 +415,7 @@ public class EtlExecutor : IEtlExecutor
         _logger.LogInformation($"{inserts} records inserted, last merge at {DateTime.Now}");
     }
     
-    private void LogMergeAnalytics(int inserts, int updates, int unchanged, LoaderMergeStates lastMergeDateTimeStampInfo)
+    private void LogMergeAnalytics(int inserts, int updates, int unchanged, IntegrationMergeStates lastMergeDateTimeStampInfo)
     {
         var lastMergeDateTimeStamp = DateTime.MinValue;
         

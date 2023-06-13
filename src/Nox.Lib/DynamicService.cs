@@ -89,16 +89,7 @@ public class DynamicService : IDynamicService
     public async Task<bool> ExecuteIntegrationsAsync()
     {
         _logger.LogInformation("Executing data load tasks");
-        return await _etlExecutor.ExecuteAsync(_solution);
-    }
-
-    public async Task<bool> ExecuteIntegrationAsync(Integration integration)
-    {
-        if (_solution.Domain?.Entities == null) return false;
-        //todo fix this
-        //var entity = _solution.Domain.Entities.First(e => e.Name.Equals(integration.Target!.Entity, StringComparison.OrdinalIgnoreCase));
-        var entity = new Solution.Entity();
-        return await _etlExecutor.ExecuteEtlAsync(_solution, integration, entity);
+        return await _etlExecutor.ExecuteAsync(_databaseProvider);
     }
 
     public void AddMetadata(ModelBuilder modelBuilder)

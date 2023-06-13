@@ -1,11 +1,12 @@
-﻿using Nox.Core.Interfaces.Entity;
+﻿using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces.Entity;
 using Nox.Solution;
 
 namespace Nox.Core.Interfaces.Etl
 {
     public interface IEtlExecutor
     {
-        Task<bool> ExecuteAsync(NoxSolution solution);
-        Task<bool> ExecuteEtlAsync(NoxSolution solution, Integration etl, Solution.Entity entity);
+        Task<bool> ExecuteAsync(IDataProvider entityStore);
+        Task<bool> ExecuteEtlAsync(Integration etl, IDataProvider entityStore);
     }
 }
