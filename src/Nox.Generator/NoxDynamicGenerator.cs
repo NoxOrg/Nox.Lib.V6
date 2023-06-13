@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Nox.Generator.Generators;
 using Nox.Solution;
-using System.IO;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Nox.Generator;
@@ -11,12 +11,12 @@ public class NoxDynamicGenerator : ISourceGenerator
 {
     public void Initialize(GeneratorInitializationContext context)
     {
-        /*
-        if (!Debugger.IsAttached)
-        {
-            Debugger.Launch();
-        }
-        */
+
+        //if (!Debugger.IsAttached)
+        //{
+        //    Debugger.Launch();
+        //}
+
     }
 
     public void Execute(GeneratorExecutionContext context)
@@ -35,15 +35,23 @@ public class NoxDynamicGenerator : ISourceGenerator
             return;
         }        
 
-        var programPath = Path.GetDirectoryName(mainSyntaxTree.FilePath);
-        var designRootFullPath = Path.GetFullPath(programPath!);
-
-        // TODO: fix
+        // Read and check Nox configuration
         var noxConfig = new NoxSolutionBuilder()
-            .UseYamlFile("./files/domain.solution.nox.yaml")
-            .UseYamlFile("./files/application.solution.nox.yaml")
             .Build();
 
+        if (noxConfig == null || noxConfig.Domain == null)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NW0001, null, "Unable to load Nox configuration and domain."));
+            return;
+        }
+
+        if (noxConfig.Application == null)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NW0001, null, "Unable to load Nox Application configuration."));
+            return;
+        }
+
+        // Generate Domain
         var entities = noxConfig.Domain.Entities;
 
         if (!entities.Any())
@@ -61,10 +69,14 @@ public class NoxDynamicGenerator : ISourceGenerator
             }
         }
 
-        var DtoGenerator = new DtoGenerator(context);
-        foreach (var dto in noxConfig.Application.DataTransferObjects)
+        // Generate DTO
+        if (noxConfig.Application.DataTransferObjects != null)
         {
-            DtoGenerator.AddDTO(dto);
+            var DtoGenerator = new DtoGenerator(context);
+            foreach (var dto in noxConfig.Application.DataTransferObjects)
+            {
+                DtoGenerator.AddDTO(dto);
+            }
         }
 
         var dbContextGenerator = new DbContextGenerator(context);

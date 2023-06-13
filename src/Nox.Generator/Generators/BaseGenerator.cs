@@ -95,7 +95,7 @@ namespace Nox.Generator.Generators
         {
             // TODO: switch to a general type resolver
             return string.Join(", ", input
-                .Select(parameter => $"{(parameter.Type == NoxType.entity ? ClassDataType(parameter.Type) : parameter.EntityTypeOptions.Entity)} {parameter.Name}{(withDefaults ? parameter.IsRequired : string.Empty)}"));
+                .Select(parameter => $"{(parameter.Type == NoxType.Entity ? ClassDataType(parameter.Type) : parameter.EntityTypeOptions.Entity)} {parameter.Name}{(withDefaults ? parameter.IsRequired : string.Empty)}"));
         }
 
         protected static string GetParametersExecuteString(object entity)
@@ -144,17 +144,18 @@ namespace Nox.Generator.Generators
             sb.AppendLine($@"{{");
         }
 
+        // TODO: should be replaced by Nox.Types - temporaly use dotnet types
         protected static string ClassDataType(NoxType type)
         {
             return type switch
             {
-                NoxType.text => "string",
-                NoxType.guid => "Guid",
-                NoxType.date => "DateTime",
-                NoxType.dateTime => "DateTime",
-                NoxType.boolean => "bool",
-                NoxType.@object => "object",
-                NoxType.number => "int",
+                NoxType.Text => "string",
+                NoxType.Guid => "Guid",
+                NoxType.Date => "DateTime",
+                NoxType.DateTime => "DateTime",
+                NoxType.Boolean => "bool",
+                NoxType.Object => "object",
+                NoxType.Number => "int",
                 _ => "string"
             };
         }
