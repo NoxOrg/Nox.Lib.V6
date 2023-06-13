@@ -2,6 +2,6 @@
 {
     public interface IDataProviderFactory
     {
-        IDataProvider Create(string provider);
+        IDataProvider Create(DataConnectionProvider provider);
     }
 }

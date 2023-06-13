@@ -1,20 +1,19 @@
-﻿using ETLBox.Connection;
-using ETLBox.DataFlow.Connectors;
-using ETLBox.DataFlow;
+﻿using System.Dynamic;
+using ETLBox.Connection;
 using ETLBox.ControlFlow;
+using ETLBox.DataFlow;
+using ETLBox.DataFlow.Connectors;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Nox.Core.Interfaces.Etl;
-using SqlKata.Compilers;
-using System.Dynamic;
-using Nox.Core.Interfaces.Entity;
-using Nox.Core.Models;
-using SqlKata;
-using Nox.Core.Interfaces.Database;
-using Hangfire;
 using Nox.Core.Constants;
+using Nox.Core.Interfaces.Database;
+using Nox.Core.Interfaces.Entity;
+using Nox.Core.Interfaces.Etl;
+using SqlKata;
+using SqlKata.Compilers;
 
-namespace Nox.Core.Components;
+namespace Nox.Data;
 
 public abstract class DatabaseProviderBase : IDataProvider
 {

@@ -12,10 +12,11 @@ public class DataProviderFactory : IDataProviderFactory
         _factory = factory;
     }
 
-    public IDataProvider Create(string provider)
+    public IDataProvider Create(DataConnectionProvider provider)
     {
         var dbProviders = _factory!();
-        var dbProvider = dbProviders.First(p => p.Name.Equals(provider, StringComparison.OrdinalIgnoreCase));
+        //todo Check that name == provider
+        var dbProvider = dbProviders.First(p => p.Name.Equals("", StringComparison.OrdinalIgnoreCase));
         return dbProvider;
     }
 }

@@ -19,30 +19,30 @@ public class DynamicApiMiddleware
     public DynamicApiMiddleware(RequestDelegate next, IDynamicService service)
     {
         _next = next;
-
-        if (service.Apis != null)
-        {
-            foreach (var api in service.Apis.Values)
-            {
-                if (api.Routes != null)
-                {
-                    foreach (var route in api.Routes)
-                    {
-                        if (route.Name[0] != BACKSLASH)
-                        {
-                            route.Name = @$"/{route.Name}";
-                        }
-
-                        if (route.TargetUrl[0] != BACKSLASH)
-                        {
-                            route.TargetUrl = @$"/{route.TargetUrl}";
-                        }
-
-                        _matchers.Add(new RouteMatcher(route, DYNAMIC_API_PREFIX));
-                    }
-                }
-            }
-        }
+        //todo check if this is still used anywhere
+        // if (service.Apis != null)
+        // {
+        //     foreach (var api in service.Apis.Values)
+        //     {
+        //         if (api.Routes != null)
+        //         {
+        //             foreach (var route in api.Routes)
+        //             {
+        //                 if (route.Name[0] != BACKSLASH)
+        //                 {
+        //                     route.Name = @$"/{route.Name}";
+        //                 }
+        //
+        //                 if (route.TargetUrl[0] != BACKSLASH)
+        //                 {
+        //                     route.TargetUrl = @$"/{route.TargetUrl}";
+        //                 }
+        //
+        //                 _matchers.Add(new RouteMatcher(route, DYNAMIC_API_PREFIX));
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     public async Task InvokeAsync(HttpContext context)

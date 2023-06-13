@@ -13,9 +13,9 @@ namespace Nox.Core.Interfaces
         NoxSolution Solution { get; }
         IReadOnlyDictionary<string, Solution.Entity>? Entities { get; }
         IEnumerable<Integration>? Integrations { get; }
-        Task<bool> ExecuteDataLoaderAsync(ILoader loader);
-        Task<bool> ExecuteDataLoadersAsync();
+        Task<bool> ExecuteIntegrationAsync(Integration integration);
+        Task<bool> ExecuteIntegrationsAsync();
         void AddMetadata(ModelBuilder modelBuilder);
-        void SetupRecurringLoaderTasks();
+        void SetupRecurringIntegrationTasks();
     }
 }

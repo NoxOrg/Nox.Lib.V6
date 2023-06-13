@@ -7,7 +7,7 @@ namespace Nox.Core.Components;
 public class DataSourceBase : MetaBase, IServiceDataSource
 {
     public string Name { get; set; } = string.Empty;
-    public string Provider { get; set; } = string.Empty;
+    public DataConnectionProvider Provider { get; set; } = DataConnectionProvider.SqlServer;
     public string Server { get; set; } = "localhost";
     public string User { get; set; } = "user";
     public int Port { get; set; } = 0;
@@ -26,25 +26,26 @@ public class DataSourceBase : MetaBase, IServiceDataSource
     {
         var isValid = true;
 
-        Provider = Provider.Trim().ToLower();
-
         switch (Provider)
         {
-            case Constants.DataProvider.SqlServer:
+            case DataConnectionProvider.SqlServer:
                 if (Port == 0) Port = 1433;
                 break;
 
-            case Constants.DataProvider.Postgres:
+            case DataConnectionProvider.Postgres:
                 if (Port == 0) Port = 5432;
                 break;
 
-            case Constants.DataProvider.MySql:
+            case DataConnectionProvider.MySql:
                 if (Port == 0) Port = 3306;
                 break;
 
-            case Constants.DataProvider.Json:
-                break;
-            case Constants.DataProvider.SqLite:
+            case DataConnectionProvider.CsvFile:
+            case DataConnectionProvider.ExcelFile:
+            case DataConnectionProvider.JsonFile:                
+            case DataConnectionProvider.ParquetFile:
+            case DataConnectionProvider.SqLite:
+            case DataConnectionProvider.XmlFile:
                 break;
             default:
                 isValid = false;

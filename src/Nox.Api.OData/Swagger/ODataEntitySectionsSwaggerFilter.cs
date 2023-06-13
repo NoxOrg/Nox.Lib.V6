@@ -3,6 +3,7 @@ using Microsoft.OpenApi.Models;
 using Nox.Api.OData.Constants;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Entity;
+using Nox.Solution;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Nox.Api.OData.Swagger
@@ -152,22 +153,26 @@ namespace Nox.Api.OData.Swagger
 
         private static void AddNewPathItemPerEachParentEntity(
             OpenApiDocument swaggerDoc,
-            IEntity entity,
+            Entity entity,
             string key,
             OpenApiPathItem newPathItem)
         {
-            foreach (var relationship in entity.Relationships.Where(r => r.AllowNavigation))
+            if (entity.Relationships != null && entity.Relationships.Any())
             {
-                swaggerDoc.Paths.Add(
-                    ReplaceODataEntityName(key, entity.PluralName)
-                        .Replace(RoutingConstants.NavigationParameterPathName, relationship.Entity, StringComparison.OrdinalIgnoreCase),
-                    newPathItem);
+                foreach (var relationship in entity.Relationships.Where(r => r.CanNavigate))
+                {
+                    swaggerDoc.Paths.Add(
+                        ReplaceODataEntityName(key, entity.PluralName)
+                            .Replace(RoutingConstants.NavigationParameterPathName, relationship.Entity, StringComparison.OrdinalIgnoreCase),
+                        newPathItem);
+                }    
             }
+            
         }
 
         private static void AddNewPathItemToItemsList(
             OpenApiDocument swaggerDoc,
-            IEntity entity,
+            Entity entity,
             string key,
             OpenApiPathItem newPathItem)
         {

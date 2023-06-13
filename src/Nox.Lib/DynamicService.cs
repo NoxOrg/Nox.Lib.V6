@@ -14,6 +14,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using Humanizer;
+using Nox.Core.Models.Entity;
+using Nox.Data.Extensions;
 using Nox.Solution;
 
 namespace Nox.Lib;
@@ -59,9 +61,9 @@ public class DynamicService : IDynamicService
     {
         get
         {
-            if (_solution.Application is { Integration.Count: > 0 })
+            if (_solution.Application is { Integrations.Count: > 0 })
             {
-                return new ReadOnlyCollection<Integration>(_solution.Application.Integration.ToList());
+                return new ReadOnlyCollection<Integration>(_solution.Application.Integrations.ToList());
             }
             return null;
         }
@@ -84,17 +86,19 @@ public class DynamicService : IDynamicService
             .Configure();
     }
 
-    public async Task<bool> ExecuteDataLoadersAsync()
+    public async Task<bool> ExecuteIntegrationsAsync()
     {
         _logger.LogInformation("Executing data load tasks");
         return await _etlExecutor.ExecuteAsync(_solution);
     }
 
-    public async Task<bool> ExecuteDataLoaderAsync(ILoader loader)
+    public async Task<bool> ExecuteIntegrationAsync(Integration integration)
     {
         if (_solution.Domain?.Entities == null) return false;
-        var entity = _solution.Domain.Entities.First(e => e.Name.Equals(loader.Target!.Entity, StringComparison.OrdinalIgnoreCase));
-        return await _etlExecutor.ExecuteEtlAsync(_solution, loader, entity);
+        //todo fix this
+        //var entity = _solution.Domain.Entities.First(e => e.Name.Equals(integration.Target!.Entity, StringComparison.OrdinalIgnoreCase));
+        var entity = new Solution.Entity();
+        return await _etlExecutor.ExecuteEtlAsync(_solution, integration, entity);
     }
 
     public void AddMetadata(ModelBuilder modelBuilder)
@@ -201,7 +205,8 @@ public class DynamicService : IDynamicService
                     }
                     else if (typeString == "object")
                     {
-                        var dbType = _entityStore.DataProvider!.ToDatabaseColumnType(new EntityAttribute { Type = "object" });
+                        //todo set this to object type
+                        var dbType = _entityStore.DataProvider!.ToDatabaseColumnType(new NoxSimpleTypeDefinition());
                         if (dbType == null)
                         {
                             b.Ignore(prop.Name);
@@ -256,14 +261,33 @@ public class DynamicService : IDynamicService
 
         public NoxSolution Configure()
         {
-            //GetServiceDatabaseFromNoxSolution();
+            var serviceDatabases = GetServiceDatabasesFromNoxSolution();
+            serviceDatabases.ToList().ForEach(db =>
+            {
+                db.DataProvider = _factory!.Create(db.Provider);
+                db.DataProvider.Configure(db, _solution.Name);
+            });
+
             return _solution;
         }
 
-        private IServiceDataSource? GetServiceDatabaseFromNoxSolution()
+        private IList<IServiceDataSource> GetServiceDatabasesFromNoxSolution()
         {
-            //todo set and configure the database providers for all Etl data sources;
-            throw new NotImplementedException();
+            var serviceDatabases = new List<IServiceDataSource>();
+            if (_solution.Infrastructure != null)
+            {
+                //Nox Entity Store
+                serviceDatabases.Add(_solution.Infrastructure.Persistence.DatabaseServer.ToEntityStore());
+                
+                if (_solution.Infrastructure.Dependencies is { DataConnections: not null } && _solution.Infrastructure.Dependencies.DataConnections.Any())
+                {
+                    foreach (var dataConnection in _solution.Infrastructure.Dependencies.DataConnections)
+                    {
+                        serviceDatabases.Add(dataConnection.ToDataSource());
+                    }
+                }
+            }
+            return serviceDatabases;
         }
 
     }

@@ -8,6 +8,7 @@ using Nox.Core.Interfaces.Etl;
 using Nox.Core.Models;
 using SqlKata.Compilers;
 using System.Dynamic;
+using Nox.Solution;
 
 namespace Nox.Core.Interfaces.Database
 {
@@ -23,7 +24,7 @@ namespace Nox.Core.Interfaces.Database
         EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema);
         IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration);
 
-        string ToDatabaseColumnType(IBaseEntityAttribute entityAttribute);
+        string ToDatabaseColumnType(NoxSimpleTypeDefinition type);
         string ToTableNameForSql(string table, string schema);
         string ToTableNameForSqlRaw(string table, string schema);
 

@@ -11,7 +11,7 @@ namespace Nox
         public bool UseODataEntitySectionsSwaggerFilter { get; set; } = true;
         public Action<SwaggerGenOptions> SetupAction { get; set; } = cfg =>
         {
-            var projectConfig = ServiceCollectionExtensions.NoxProjectConfiguration;
+            var projectConfig = ServiceCollectionExtensions.Solution;
 
             cfg.SwaggerDoc("v1", new OpenApiInfo
             {
