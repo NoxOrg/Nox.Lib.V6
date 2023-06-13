@@ -1,5 +1,4 @@
-﻿using Nox.Core.Configuration.Secrets;
-using Nox.Core.Models;
+﻿using Nox.Core.Models;
 
 namespace Nox.Core.Interfaces.Secrets
 {

@@ -13,8 +13,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
-using Humanizer;
-using Nox.Core.Models.Entity;
+using Nox.Data;
 using Nox.Data.Extensions;
 using Nox.Solution;
 
@@ -25,12 +24,13 @@ public class DynamicService : IDynamicService
     private ILogger _logger;
     private readonly NoxSolution _solution;
     private readonly IEtlExecutor _etlExecutor;
-    private IServiceDataSource _entityStore;
+    private IDataProvider? _databaseProvider;
     
     public string Name => _solution.Name;
     public NoxSolution Solution => _solution;
 
-    public IServiceDataSource EntityStore => _entityStore;
+    public IDataProvider DatabaseProvider => _databaseProvider!;
+
     
     //Todo change this to new structure
     //public string KeyVaultUri => _metaService.KeyVaultUri;
@@ -165,7 +165,7 @@ public class DynamicService : IDynamicService
         {
             modelBuilder.Entity(metaType, b =>
             {
-                _entityStore!.DataProvider!.ConfigureEntityTypeBuilder(b, metaType.Name, schema);
+                _databaseProvider!.ConfigureEntityTypeBuilder(b, metaType.Name, schema);
 
                 var entityTypes = modelBuilder.Model.GetEntityTypes();
 
@@ -206,15 +206,8 @@ public class DynamicService : IDynamicService
                     else if (typeString == "object")
                     {
                         //todo set this to object type
-                        var dbType = _entityStore.DataProvider!.ToDatabaseColumnType(new NoxSimpleTypeDefinition());
-                        if (dbType == null)
-                        {
-                            b.Ignore(prop.Name);
-                        }
-                        else
-                        {
-                            b.Property(prop.Name).HasColumnType(dbType);
-                        }
+                        var dbType = _databaseProvider.ToDatabaseColumnType(new NoxSimpleTypeDefinition());
+                        b.Property(prop.Name).HasColumnType(dbType);
                     }
                 }
             });
@@ -277,7 +270,9 @@ public class DynamicService : IDynamicService
             if (_solution.Infrastructure != null)
             {
                 //Nox Entity Store
-                serviceDatabases.Add(_solution.Infrastructure.Persistence.DatabaseServer.ToEntityStore());
+                var entityStore = _solution.Infrastructure.Persistence.DatabaseServer.ToEntityStore();
+                _dynamicService._databaseProvider = entityStore.DataProvider;
+                serviceDatabases.Add(entityStore);
                 
                 if (_solution.Infrastructure.Dependencies is { DataConnections: not null } && _solution.Infrastructure.Dependencies.DataConnections.Any())
                 {

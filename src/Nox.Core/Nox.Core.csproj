@@ -72,7 +72,4 @@
     <None Include="..\..\docs\images\nox.png" Pack="true" PackagePath="" />
     <None Remove="Configuration\Dto\**" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
 </Project>

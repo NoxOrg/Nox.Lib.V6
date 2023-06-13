@@ -9,6 +9,7 @@ using Nox.Core.Constants;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Models;
+using Nox.Solution;
 using SqlKata.Compilers;
 
 namespace Nox.Data.SQLite;
@@ -48,29 +49,31 @@ public class SqLiteDatabaseProvider: DatabaseProviderBase
         );
     }
 
-    public override string ToDatabaseColumnType(IBaseEntityAttribute entityAttribute)
+    public override string ToDatabaseColumnType(NoxSimpleTypeDefinition entityAttribute)
     {
-        var propType = entityAttribute.Type?.ToLower() ?? "string";
-
-        //     "real" => typeof(Single),
-        //     "float" => typeof(Single),
-        //     "bigreal" => typeof(Double),
-        //     "bigfloat" => typeof(Double),
-
-        return propType switch
-        {
-            "bool" => "integer",
-            "boolean" => "integer",
-            "object" => null!,
-            "int" => "integer",
-            "uint" => "integer",
-            "bigint" => "integer",
-            "smallint" => "integer",
-            "decimal" => "real",
-            "money" => "real",
-            "smallmoney" => "real",
-            _ => "text"
-        };
+        //todo use NoxType underlying type to map to db types
+        return "text";
+        // var propType = entityAttribute.Type?.ToLower() ?? "string";
+        //
+        // //     "real" => typeof(Single),
+        // //     "float" => typeof(Single),
+        // //     "bigreal" => typeof(Double),
+        // //     "bigfloat" => typeof(Double),
+        //
+        // return propType switch
+        // {
+        //     "bool" => "integer",
+        //     "boolean" => "integer",
+        //     "object" => null!,
+        //     "int" => "integer",
+        //     "uint" => "integer",
+        //     "bigint" => "integer",
+        //     "smallint" => "integer",
+        //     "decimal" => "real",
+        //     "money" => "real",
+        //     "smallmoney" => "real",
+        //     _ => "text"
+        // };
     }
 
     public override EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema)

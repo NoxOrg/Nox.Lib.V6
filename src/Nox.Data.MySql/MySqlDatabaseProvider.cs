@@ -5,11 +5,11 @@ using Hangfire.MySql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MySql.Data.MySqlClient;
-using Nox.Core.Components;
 using Nox.Core.Constants;
 using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Models;
+using Nox.Solution;
 using SqlKata.Compilers;
 
 namespace Nox.Data.MySql;
@@ -65,42 +65,66 @@ public class MySqlDatabaseProvider: DatabaseProviderBase
         );
     }
 
-    public override string ToDatabaseColumnType(IBaseEntityAttribute entityAttribute)
+    public override string ToDatabaseColumnType(NoxSimpleTypeDefinition entityAttribute)
     {
-        var propType = entityAttribute.Type?.ToLower() ?? "string";
-        var propWidth = entityAttribute.MaxWidth < 1 ? "65535" : entityAttribute.MaxWidth.ToString();
-        var propPrecision = entityAttribute.Precision.ToString();
-        var isFixedWidth = entityAttribute.MaxWidth == entityAttribute.MinWidth;
+        //todo use NoxType underlying type to map to db types
+        var propWidth = 0;
+        var propPrecision = 0;
+        var isFixedWidth = false;
+        if (entityAttribute.TextTypeOptions != null)
+        {
+            propWidth = entityAttribute.TextTypeOptions.MaxLength < 1 ? 65534 : entityAttribute.TextTypeOptions.MaxLength;
+            isFixedWidth = entityAttribute.TextTypeOptions.MinLength == entityAttribute.TextTypeOptions.MaxLength;
+        }
+
+        if (entityAttribute.NumberTypeOptions != null)
+        {
+            propWidth = entityAttribute.NumberTypeOptions.IntegerDigits + entityAttribute.NumberTypeOptions.DecimalDigits;
+            propPrecision = entityAttribute.NumberTypeOptions.DecimalDigits;
+        }
+        
 
         //     "real" => typeof(Single),
         //     "float" => typeof(Single),
         //     "bigreal" => typeof(Double),
         //     "bigfloat" => typeof(Double),
 
-        return propType switch
+        return entityAttribute.Type switch
         {
-            "string" => isFixedWidth ? $"char({propWidth})" : $"varchar({propWidth})",
-            "varchar" => $"varchar({propWidth})",
-            "nvarchar" => $"varchar({propWidth})",
-            "url" => "varchar(2048)",
-            "email" => "varchar(320)",
-            "char" => $"char({propWidth})",
-            "guid" => "binary(16)",
-            "date" => "date",
-            "datetime" => "datetime",
-            "time" => "timestamp",
-            "timespan" => "timestamp",
-            "bool" => "tinyint(1)",
-            "boolean" => "tinyint(1)",
-            "object" => null!,
-            "int" => "integer",
-            "uint" => "integer",
-            "bigint" => "bigint",
-            "smallint" => "smallint",
-            "decimal" => $"decimal({propWidth},{propPrecision})",
-            "money" => $"decimal({propWidth},{propPrecision})",
-            "smallmoney" => $"decimal({propWidth},{propPrecision})",
-            _ => "varchar"
+            //todo use NoxType underlying type to map to db types
+            //
+            // NoxType.text or NoxType.password => isFixedWidth ? $"char({propWidth})" : $"varchar({propWidth})",
+            // NoxType.url => "varchar(2048)",
+            // NoxType.email => "varchar(320)",
+            // NoxType.guid => "binary(16)",
+            // NoxType.date => "date",
+            // NoxType.dateTime => "datetime",
+            // NoxType.time or NoxType.dateTimeDuration => "timestamp",
+            // NoxType.boolean => "tinyint(1)",
+            // NoxType.@object => null!,
+            
+
+            // "varchar" => $"varchar({propWidth})",
+            // "nvarchar" => $"varchar({propWidth})",
+            // "url" => 
+            // "email" => "varchar(320)",
+            // "char" => $"char({propWidth})",
+            // "guid" => "binary(16)",
+            // "date" => "date",
+            // "datetime" => "datetime",
+            // "time" => "timestamp",
+            // "timespan" => "timestamp",
+            // "bool" => "tinyint(1)",
+            // "boolean" => "tinyint(1)",
+            // "object" => null!,
+            // "int" => "integer",
+            // "uint" => "integer",
+            // "bigint" => "bigint",
+            // "smallint" => "smallint",
+            // "decimal" => $"decimal({propWidth},{propPrecision})",
+            // "money" => $"decimal({propWidth},{propPrecision})",
+            // "smallmoney" => $"decimal({propWidth},{propPrecision})",
+            // _ => "varchar"
         };
     }
 

@@ -14,6 +14,7 @@ using Nox.Core.Interfaces.Messaging.Events;
 using Nox.Core.Models.Entity;
 using System.Reflection;
 using System.Reflection.Emit;
+using Nox.Solution;
 
 namespace Nox.Data;
 
@@ -32,7 +33,7 @@ public class DynamicModel : IDynamicModel
     {
         _dynamicService = dynamicService;
 
-        _databaseProvider = dynamicService.MetaService.Database!.DataProvider!;
+        _databaseProvider = dynamicService.DatabaseProvider!;
 
         var builder = new ODataConventionModelBuilder();
 
@@ -96,7 +97,6 @@ public class DynamicModel : IDynamicModel
 
         var model = dbContext.Model;
 
-        _dynamicService.EnsureDatabaseCreatedIfAutoMigrationsIsSet(dbContext);
     }
 
     public IDataProvider GetDatabaseProvider() => _databaseProvider;
@@ -171,40 +171,24 @@ public class DynamicModel : IDynamicModel
         }
     }
 
-    private Microsoft.EntityFrameworkCore.Metadata.Builders.PropertyBuilder SetAttribute(EntityTypeBuilder builder, IBaseEntityAttribute attr)
+    private Microsoft.EntityFrameworkCore.Metadata.Builders.PropertyBuilder SetAttribute(EntityTypeBuilder builder, NoxSimpleTypeDefinition attr)
     {
         var prop = builder.Property(attr.Name);
 
-        var netType = attr.NetDataType();
+        var noxType = attr.Type;
 
         prop.HasColumnType(_databaseProvider.ToDatabaseColumnType(attr));
 
-        if (netType == typeof(string))
+        if (attr.TextTypeOptions != null)
         {
-            prop.HasMaxLength(attr.MaxWidth);
-        }
-
-        else if (attr is EntityAttribute attribute && attribute.IsDateTimeType())
+            prop.HasMaxLength(attr.TextTypeOptions!.MaxLength);
+            if (attr.TextTypeOptions.IsUnicode) prop.IsUnicode();
+            if (attr.TextTypeOptions.MaxLength == attr.TextTypeOptions.MinLength) prop.IsFixedLength();
+        } else if (attr.NumberTypeOptions != null)
         {
-            // don't set MaxWidth, throw's error on db create
+            prop.HasPrecision(attr.NumberTypeOptions!.IntegerDigits + attr.NumberTypeOptions.DecimalDigits, attr.NumberTypeOptions.DecimalDigits);
         }
-
-        else if (attr.MaxWidth > 0 && attr.Precision > 0)
-        {
-            prop.HasPrecision(attr.MaxWidth, attr.Precision);
-        }
-
-        SetIsRequired(prop, attr.IsRequired);
-
-        if (attr.IsUnicode)
-        {
-            prop.IsUnicode();
-        }
-
-        if (attr.MinWidth == attr.MaxWidth)
-        {
-            prop.IsFixedLength();
-        }
+        //todo add code for EntityTypeOptions and MoneyTypeOptions
 
         return prop;
     }
@@ -217,6 +201,7 @@ public class DynamicModel : IDynamicModel
         }
         catch
         {
+            //Ignore
         }
     }
 
@@ -305,7 +290,7 @@ public class DynamicModel : IDynamicModel
 
             tb.AddInterfaceImplementation(typeof(IDynamicEntity));
 
-            foreach (var col in entity.Attributes)
+            foreach (var col in entity.Attributes!)
             {
                 tb.AddPublicGetSetProperty(col.Name, col.NetDataType());
             }

@@ -24,11 +24,11 @@ namespace Nox.Core.Interfaces.Database
         EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema);
         IGlobalConfiguration ConfigureJobScheduler(IGlobalConfiguration configuration);
 
-        string ToDatabaseColumnType(NoxSimpleTypeDefinition type);
+        string ToDatabaseColumnType(NoxSimpleTypeDefinition entityAttribute);
         string ToTableNameForSql(string table, string schema);
         string ToTableNameForSqlRaw(string table, string schema);
 
         IDataFlowExecutableSource<ExpandoObject> DataFlowSource(ILoaderSource loaderSource);
-        void ApplyMergeInfo(ILoaderSource loaderSource, LoaderMergeStates lastMergeDateTimeStampInfo, string[] dateTimeStampColumns, string[] targetColumns);
+        void ApplyMergeInfo(ILoaderSource loaderSource, IntegrationMergeStates lastMergeDateTimeStampInfo, string[] dateTimeStampColumns, string[] targetColumns);
     }
 }

@@ -10,6 +10,8 @@ using Nox.Core.Interfaces.Entity;
 using Nox.Core.Models;
 using SqlKata.Compilers;
 using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
+using Nox.Solution;
 
 namespace Nox.Data.SqlServer;
 
@@ -64,42 +66,44 @@ public class SqlServerDatabaseProvider: DatabaseProviderBase
         );
     }
 
-    public override string ToDatabaseColumnType(IBaseEntityAttribute entityAttribute)
+    public override string ToDatabaseColumnType(NoxSimpleTypeDefinition entityAttribute)
     {
-        var propType = entityAttribute.Type?.ToLower() ?? "string";
-        var propWidth = entityAttribute.MaxWidth < 1 ? "max" : entityAttribute.MaxWidth.ToString();
-        var propPrecision = entityAttribute.Precision.ToString();
-
-        //     "real" => typeof(Single),
-        //     "float" => typeof(Single),
-        //     "bigreal" => typeof(Double),
-        //     "bigfloat" => typeof(Double),
-
-        return propType switch
-        {
-            "string" => entityAttribute.IsUnicode ? $"nvarchar({propWidth})" : $"varchar({propWidth})",
-            "varchar" => $"varchar({propWidth})",
-            "nvarchar" => $"nvarchar({propWidth})",
-            "url" => "varchar(2048)",
-            "email" => "varchar(320)",
-            "char" => entityAttribute.IsUnicode ? $"nchar({propWidth})" : $"char({propWidth})",
-            "guid" => "uniqueidentifier",
-            "date" => "date",
-            "datetime" => "datetimeoffset",
-            "time" => "datetime",
-            "timespan" => "timespan",
-            "bool" => "bit",
-            "boolean" => "bit",
-            "object" => "sql_variant",
-            "int" => "int",
-            "uint" => "uint",
-            "bigint" => "bigint",
-            "smallint" => "smallint",
-            "decimal" => $"decimal({propWidth},{propPrecision})",
-            "money" => $"decimal({propWidth},{propPrecision})",
-            "smallmoney" => $"decimal({propWidth},{propPrecision})",
-            _ => "nvarchar(max)"
-        };
+        //todo use NoxType underlying type to map to db types
+        return "nvarchar(max)";
+        // var propType = entityAttribute.Type?.ToLower() ?? "string";
+        // var propWidth = entityAttribute.MaxWidth < 1 ? "max" : entityAttribute.MaxWidth.ToString();
+        // var propPrecision = entityAttribute.Precision.ToString();
+        //
+        // //     "real" => typeof(Single),
+        // //     "float" => typeof(Single),
+        // //     "bigreal" => typeof(Double),
+        // //     "bigfloat" => typeof(Double),
+        //
+        // return propType switch
+        // {
+        //     "string" => entityAttribute.IsUnicode ? $"nvarchar({propWidth})" : $"varchar({propWidth})",
+        //     "varchar" => $"varchar({propWidth})",
+        //     "nvarchar" => $"nvarchar({propWidth})",
+        //     "url" => "varchar(2048)",
+        //     "email" => "varchar(320)",
+        //     "char" => entityAttribute.IsUnicode ? $"nchar({propWidth})" : $"char({propWidth})",
+        //     "guid" => "uniqueidentifier",
+        //     "date" => "date",
+        //     "datetime" => "datetimeoffset",
+        //     "time" => "datetime",
+        //     "timespan" => "timespan",
+        //     "bool" => "bit",
+        //     "boolean" => "bit",
+        //     "object" => "sql_variant",
+        //     "int" => "int",
+        //     "uint" => "uint",
+        //     "bigint" => "bigint",
+        //     "smallint" => "smallint",
+        //     "decimal" => $"decimal({propWidth},{propPrecision})",
+        //     "money" => $"decimal({propWidth},{propPrecision})",
+        //     "smallmoney" => $"decimal({propWidth},{propPrecision})",
+        //     _ => "nvarchar(max)"
+        // };
     }
 
     public override EntityTypeBuilder ConfigureEntityTypeBuilder(EntityTypeBuilder builder, string table, string schema)

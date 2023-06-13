@@ -8,12 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Nox.Core.Constants;
 using Nox.Core.Interfaces.Database;
-using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Etl;
+using Nox.Solution;
 using SqlKata;
 using SqlKata.Compilers;
 
-namespace Nox.Data;
+namespace Nox.Core.Models;
 
 public abstract class DatabaseProviderBase : IDataProvider
 {
@@ -55,7 +55,7 @@ public abstract class DatabaseProviderBase : IDataProvider
 
     public void ApplyMergeInfo(
         ILoaderSource loaderSource,
-        LoaderMergeStates lastMergeDateTimeStampInfo,
+        IntegrationMergeStates lastMergeDateTimeStampInfo,
         string[] dateTimeStampColumns,
         string[] targetColumns)
     {
@@ -111,7 +111,7 @@ public abstract class DatabaseProviderBase : IDataProvider
         throw new NotImplementedException();
     }
 
-    public virtual string ToDatabaseColumnType(IBaseEntityAttribute entityAttribute)
+    public virtual string ToDatabaseColumnType(NoxSimpleTypeDefinition entityAttribute)
     {
         throw new NotImplementedException();
     }

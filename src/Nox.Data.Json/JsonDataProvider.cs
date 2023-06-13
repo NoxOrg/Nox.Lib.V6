@@ -11,6 +11,7 @@ using Nox.Core.Interfaces.Etl;
 using Nox.Core.Models;
 using SqlKata.Compilers;
 using System.Dynamic;
+using Nox.Solution;
 
 namespace Nox.Data.JsonFile;
 
@@ -80,7 +81,7 @@ public class JsonDataProvider : IDataProvider
         SetConnectionString(_options);
     }
 
-    public void ApplyMergeInfo(ILoaderSource loaderSource, LoaderMergeStates lastMergeDateTimeStampInfo, string[] dateTimeStampColumns, string[] targetColumns)
+    public void ApplyMergeInfo(ILoaderSource loaderSource, IntegrationMergeStates lastMergeDateTimeStampInfo, string[] dateTimeStampColumns, string[] targetColumns)
     {
         // noop for now...
     }
@@ -130,7 +131,7 @@ public class JsonDataProvider : IDataProvider
         return _dataFlowExecutableSource;
     }
 
-    public string ToDatabaseColumnType(IBaseEntityAttribute entityAttribute)
+    public string ToDatabaseColumnType(NoxSimpleTypeDefinition entityAttribute)
     {
         throw new NotImplementedException();
     }

@@ -14,6 +14,7 @@ using Nox.Messaging;
 using System.Dynamic;
 using Nox.Core.Enumerations;
 using Nox.Core.Interfaces.Messaging.Events;
+using Nox.Solution;
 
 
 namespace Nox.Etl;
@@ -34,7 +35,7 @@ public class EtlExecutor : IEtlExecutor
         _messenger = messenger;
     }
 
-    public async Task<bool> ExecuteAsync(IProjectConfiguration service)
+    public async Task<bool> ExecuteAsync(NoxSolution service)
     {
         // ETLBox.Logging.Logging.LogInstance = _logger;
 

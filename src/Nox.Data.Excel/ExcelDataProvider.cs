@@ -10,6 +10,7 @@ using Nox.Core.Interfaces.Database;
 using Nox.Core.Interfaces.Entity;
 using Nox.Core.Interfaces.Etl;
 using Nox.Core.Models;
+using Nox.Solution;
 using SqlKata.Compilers;
 
 namespace Nox.Data.Excel;
@@ -80,7 +81,7 @@ public class ExcelDataProvider : IDataProvider
         SetConnectionString(_options);
     }
 
-    public void ApplyMergeInfo(ILoaderSource loaderSource, LoaderMergeStates lastMergeDateTimeStampInfo, string[] dateTimeStampColumns, string[] targetColumns)
+    public void ApplyMergeInfo(ILoaderSource loaderSource, IntegrationMergeStates lastMergeDateTimeStampInfo, string[] dateTimeStampColumns, string[] targetColumns)
     {
         // noop for now...
     }
@@ -130,7 +131,7 @@ public class ExcelDataProvider : IDataProvider
         return _dataFlowExecutableSource;
     }
 
-    public string ToDatabaseColumnType(IBaseEntityAttribute entityAttribute)
+    public string ToDatabaseColumnType(NoxSimpleTypeDefinition entityAttribute)
     {
         throw new NotImplementedException();
     }
