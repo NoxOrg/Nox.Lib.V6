@@ -7,12 +7,12 @@ namespace Nox.Core.Helpers;
 
 public class ConfigurationHelper
 {
-    public static IConfiguration? GetNoxAppSettings()
+    public static IConfiguration GetNoxAppSettings()
     {
         return GetNoxAppSettings(Array.Empty<string>());
     }
 
-    public static IConfiguration? GetNoxAppSettings(string[] args)
+    public static IConfiguration GetNoxAppSettings(string[] args)
     {
         var configBuilder = GetApplicationConfigurationBuilder(args);
         var config = configBuilder.Build();

@@ -1,7 +1,6 @@
 using Nox.Core.Configuration;
 using Nox.Core.Constants;
-using Nox.Core.Interfaces.Configuration;
-using Nox.Core.Models;
+using Nox.Core.Helpers.TextMacros;
 using Serilog;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -11,12 +10,14 @@ namespace Nox.Core.Helpers;
 public class ProjectConfigurator
 {
     private readonly string _designRoot;
+    private readonly ITextMacroParser[] _textMacroParsers;
     private readonly IDeserializer _deserializer;
     private YamlConfiguration? _config;
     
-    public ProjectConfigurator(string designRoot)
+    public ProjectConfigurator(string designRoot, ITextMacroParser[] textMacroParsers)
     {
         _designRoot = designRoot;
+        _textMacroParsers = textMacroParsers;
         _deserializer = new DeserializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .Build();
@@ -121,10 +122,21 @@ public class ProjectConfigurator
             })
             .ToList();
     }
-    
-    private static string ReadDefinitionFile(string fileName)
+
+    internal string ReadDefinitionFile(string fileName)
     {
+
         Log.Information("Reading definition from {fileName}", fileName.Replace('\\', '/'));
-        return File.ReadAllText(fileName);
+
+        //regex \$\{\w+\} ${env:VARIABLE_NAME}
+        var yamlText = File.ReadAllText(fileName);
+
+        string yamlResult = yamlText;
+        foreach (var macroParser in _textMacroParsers)
+        {
+            yamlResult = macroParser.Parse(yamlText);
+        }
+
+        return yamlResult;
     }
 }
