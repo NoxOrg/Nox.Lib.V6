@@ -1,15 +1,17 @@
-﻿{
+{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
     "Samples.Api": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "SAMPLE_CURRENCY_DB_PASSWORD": "Developer*123",
+        "RABBITMQ_CONNECTION": "rabbitmq://guest:guest@localhost/"
+      },
+      "dotnetRunMessages": true
     }
   }
 }

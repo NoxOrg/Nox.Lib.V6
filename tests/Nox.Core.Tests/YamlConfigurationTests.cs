@@ -2,6 +2,8 @@ using Nox.Core.Helpers;
 using Nox.TestFixtures;
 using NUnit.Framework;
 using System.Linq;
+using Moq;
+using Nox.Core.Helpers.TextMacros;
 
 namespace Nox.Core.Tests;
 
@@ -10,8 +12,9 @@ public class YamlConfigurationTests: ConfigurationTestFixture
     [Test]
     public void Can_Load_Nox_Configuration_From_Yaml_Definitions()
     {
+        var environmentProvider = new Mock<IEnvironmentProvider>();
         var appSettings = ConfigurationHelper.GetNoxAppSettings();
-        var configurator = new ProjectConfigurator(appSettings!["Nox:DefinitionRootPath"]!);
+        var configurator = new ProjectConfigurator(appSettings!["Nox:DefinitionRootPath"]!,new ITextMacroParser[]{ new TextEnvironmentVariableMacroParser(environmentProvider.Object)});
         var config = configurator.LoadConfiguration();
         Assert.That(config, Is.Not.Null);
         Assert.That(config!.Name, Is.EqualTo("Test"));

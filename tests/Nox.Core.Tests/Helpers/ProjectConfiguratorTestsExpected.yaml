@@ -16,9 +16,9 @@ database:
 
   ### Sql Server
   provider: sqlServer
-  options: Trusted_Connection=no;connection timeout=120;
-  user: sa  
-  password: ${env:SAMPLE_CURRENCY_DB_PASSWORD}
+  options: Trusted_Connection=no;connection timeout=120;TrustServerCertificate=True
+  user: sa
+  password: password1
 
   ### Postgres
   #provider: postgres
@@ -38,7 +38,7 @@ messagingProviders:
 
     ## RabbitMQ
     provider: rabbitMQ
-    connectionString: ${env:RABBITMQ_CONNECTION}
+    connectionString: rabbitmq://guest:guest@localhost/
     
     ### Azure Service Bus
     #provider: azureServiceBus

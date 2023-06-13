@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Nox.Core.Exceptions;
 using Nox.Core.Extensions;
 using Nox.Core.Helpers;
+using Nox.Core.Helpers.TextMacros;
 using Nox.Core.Interfaces;
 using Nox.Core.Interfaces.Configuration;
 using Nox.Core.Interfaces.Database;
@@ -25,10 +26,7 @@ public class ProjectConfigurationBuilder
         
         if (string.IsNullOrEmpty(_designRoot))
         {
-            if(configuration != null) 
-            { 
-                _designRoot = configuration["Nox:DesignFolder"] ?? configuration["Nox:DefinitionRootPath"];
-            }
+            _designRoot = configuration["Nox:DesignFolder"] ?? configuration["Nox:DefinitionRootPath"];
 
             if (!Directory.Exists(_designRoot)) _designRoot = "./";
   
@@ -37,7 +35,9 @@ public class ProjectConfigurationBuilder
                 throw new ConfigurationException("Could not load Nox configuration.");
             }
         }
-        var configurator = new ProjectConfigurator(_designRoot);
+        //TODO DI
+        var configurator = new ProjectConfigurator(_designRoot,
+            new ITextMacroParser[]{ new TextEnvironmentVariableMacroParser(new EnvironmentProvider())});
 
         var yamlConfig = configurator.LoadConfiguration();
         
