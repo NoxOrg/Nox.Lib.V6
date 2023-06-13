@@ -35,23 +35,31 @@ public class EtlExecutor : IEtlExecutor
         _messenger = messenger;
     }
 
-    public async Task<bool> ExecuteAsync(NoxSolution service)
+    public async Task<bool> ExecuteAsync(NoxSolution solution)
     {
-        // ETLBox.Logging.Logging.LogInstance = _logger;
-
-        var loaders = service.Loaders;
-
-        var entities = service.Entities!.ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
-
-        foreach (var loader in loaders!)
+        if (solution.Application?.Integrations != null)
         {
-            await LoadDataFromSource(service, loader, entities[loader.Target!.Entity]);
+            var integrations = solution.Application.Integrations;
+
+            var entities = solution.Domain?.Entities.ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
+            
+            foreach (var integration in integrations!)
+            {
+                if (integration.Target.TargetType == EtlTargetType.Entity && entities == null)
+                {
+                    throw new 
+                }
+                
+                await LoadDataFromSource(service, loader, entities[loader.Target!.Entity]);
+            }    
         }
+        
+        
 
         return true;
     }
 
-    public async Task<bool> ExecuteLoaderAsync(IProjectConfiguration service, ILoader loader, IEntity entity)
+    public async Task<bool> ExecuteLoaderAsync(NoxSolution solution, ILoader loader, IEntity entity)
     {
         entity.ApplyDefaults();
         
@@ -62,7 +70,7 @@ public class EtlExecutor : IEtlExecutor
         return true;
     }
 
-    private async Task LoadDataFromSource(IProjectConfiguration service, ILoader loader, IEntity entity)
+    private async Task LoadDataFromSource(NoxSolution solution, Integration integration, IEntity entity)
     {
         var loaderInstance = (Loader)loader;
         var targetProvider = service.Database!.DataProvider!;
@@ -75,81 +83,10 @@ public class EtlExecutor : IEtlExecutor
             var sourceProvider = service.DataSources!.First(ds => ds.Name == loaderSource.DataSource).DataProvider!;
             var source = sourceProvider!.DataFlowSource(loaderSource);
             var loadStrategy = loaderInstance.LoadStrategy?.Type.Trim().ToLower() ?? "unknown";
-
-            switch (loadStrategy)
-            {
-                case "dropandload":
-                    _logger.LogInformation("Reload data for entity {entity}...", entity.Name);
-                    await DropAndLoadData(source, destinationDb, destinationTable, loader, entity);
-                    break;
-
-                case "mergenew":
-                    _logger.LogInformation("Merging new data for entity {entity}...", entity.Name);
-                    await MergeNewData(source, destinationDb, destinationTable, loader, loaderSource, entity, sourceProvider, targetProvider);
-                    break;
-
-                default:
-                    _logger.LogError("{message}",$"Unsupported load strategy '{loaderInstance.LoadStrategy!.Type}' in loader '{loaderInstance.Name}'.");
-                    break;
-
-            };
-
+            
+            _logger.LogInformation("Merging new data for entity {entity}...", entity.Name);
+            await MergeNewData(source, destinationDb, destinationTable, loader, loaderSource, entity, sourceProvider, targetProvider);
         }
-    }
-
-    private async Task DropAndLoadData(
-        IDataFlowExecutableSource<ExpandoObject> source,
-        IConnectionManager destinationDb,
-        string destinationTable,
-        ILoader loader,
-        IEntity entity)
-    {
-        var destination = new DbDestination()
-        {
-            ConnectionManager = destinationDb,
-            TableName = destinationTable,
-        };
-        
-        source.LinkTo(destination);
-
-        SqlTask.ExecuteNonQuery(destinationDb, $"DELETE FROM {destinationTable};");
-        
-        var postProcessDestination = new CustomDestination();
-
-        // Store analytics
-
-        int inserts = 0;
-
-        // Get events to fire, if any
-        INoxEvent? entityCreatedMsg = null;
-        if (loader.Messaging != null && loader.Messaging.Any())
-        {
-            entityCreatedMsg = _messages.FindEventImplementation(entity.Name, NoxEventType.Created);
-        }
-        
-        postProcessDestination.WriteAction = (row, _) =>
-        {
-            var record = (IDictionary<string, object?>)row;
-
-            if ((ChangeAction)record["ChangeAction"]! == ChangeAction.Insert)
-            {
-                inserts++;
-                if(entityCreatedMsg is not null) SendChangeEvent(loader, row, entityCreatedMsg, NoxEventSource.EtlLoad);
-            }
-        };
-        
-        try
-        {
-            await Network.ExecuteAsync((DataFlowExecutableSource<ExpandoObject>)source);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogCritical("Failed to run Drop & Load for Entity {entity}", entity.Name);
-            _logger.LogError("{message}", ex.Message);
-            throw;
-        }
-
-        LogReloadAnalytics(inserts);
     }
 
     private async Task MergeNewData(
