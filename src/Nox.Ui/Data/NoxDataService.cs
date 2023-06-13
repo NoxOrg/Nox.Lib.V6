@@ -1,7 +1,6 @@
-﻿using Newtonsoft.Json;
-using Nox.Core.Interfaces.Entity;
-using System.Dynamic;
+﻿using System.Dynamic;
 using System.Net.Http.Json;
+using Nox.Solution;
 
 namespace Nox.Ui.Data;
 
@@ -14,7 +13,7 @@ internal class NoxDataService : INoxDataService
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<IEnumerable<dynamic>> Find(IEntity entity, int skip = 0, int top = 10)
+    public async Task<IEnumerable<dynamic>> Find(Entity entity, int skip = 0, int top = 10)
     {
         var httpClient = _httpClientFactory.CreateClient("NoxUi");
 

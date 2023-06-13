@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
-using Nox.Core.Extensions;
 using Nox.Ui.Data;
-using System.Runtime.CompilerServices;
+using Nox.Solution;
 
 namespace Nox;
 
@@ -41,8 +40,10 @@ public static class ServiceCollectionExtensions
     
         services.AddTransient<NoxDataService>();
 
-        services.AddNoxConfiguration();
-
+        new NoxSolutionBuilder()
+            .UseDependencyInjection(services)
+            .Build();
+        
         return services;
     }
 

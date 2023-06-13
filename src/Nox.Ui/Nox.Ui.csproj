@@ -37,7 +37,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.5" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
     <PackageReference Include="Microsoft.Net.Http.Headers" Version="2.2.8" />
-    <ProjectReference Include="..\Nox.Core\Nox.Core.csproj" />
+    <PackageReference Include="Nox.Solution" Version="1.0.5-BETA1" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\docs\images\nox.png" Pack="true" PackagePath="" />
