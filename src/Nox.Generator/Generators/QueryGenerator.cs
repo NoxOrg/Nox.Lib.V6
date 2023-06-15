@@ -37,8 +37,8 @@ namespace Nox.Generator.Generators
             // Add params (which can be DTO)
             string parameters = GetParametersString(query.RequestInput);
 
-            bool isMany = query.ResponseOutput.Type == NoxType.Array || query.ResponseOutput.Type == NoxType.Collection;
-            var dto = query.ResponseOutput.EntityTypeOptions.Entity;
+            bool isMany = query.ResponseOutput.Type == NoxType.array || query.ResponseOutput.Type == NoxType.collection;
+            var dto = query.ResponseOutput.Name;
 
             var typeDefinition = isMany ? $"IList<{dto}>" : $"{dto}";
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Nox.Solution;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Nox.Generator.Generators
@@ -14,12 +15,21 @@ namespace Nox.Generator.Generators
         {
             GenerateEntity(entity);
 
-            GenerateQueries(entity.Queries);
+            if (entity.Queries != null)
+            {
+                GenerateQueries(entity.Queries);
+            }
 
-            GenerateDomainEvents(entity.Events);
+            if (entity.Events != null)
+            {
+                GenerateDomainEvents(entity.Events);
+            }
 
-            // Depends on events
-            GenerateCommands(entity.Commands);
+            // Commands - may depend on events
+            if (entity.Commands != null)
+            {
+                GenerateCommands(entity.Commands);
+            }
 
             return true;
         }
@@ -46,17 +56,32 @@ namespace Nox.Generator.Generators
                 isPartial: true,
                 "Nox.Core.Interfaces.Entity");
 
+            if (entity.Keys == null || !entity.Keys.Any())
+            {
+                Context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NW0001, null, $"Entity {entity.Name} must have a primary key defined."));
+                return;
+            }
+
             // Key
             AddPrimaryKey(entity.Keys, sb);
 
             // Attributes
-            AddAttributes(entity.Attributes, sb);
+            if (entity.Attributes != null)
+            {
+                AddAttributes(entity.Attributes, sb);
+            }
 
             // Relationships
-            AddRelationships(entity.Relationships, sb);
+            if (entity.Relationships != null)
+            {
+                AddRelationships(entity.Relationships, sb);
+            }
 
             // Owned Relationships - define Aggregate Root boundaries
-            AddRelationships(entity.OwnedRelationships, sb);
+            if (entity.OwnedRelationships != null)
+            {
+                AddRelationships(entity.OwnedRelationships, sb);
+            }
 
             sb.AppendLine(@"}");
 
@@ -67,7 +92,7 @@ namespace Nox.Generator.Generators
         {
             foreach (var key in keys)
             {
-                if (key.Type == NoxType.Entity)
+                if (key.Type == NoxType.entity)
                 {
                     AddProperty(key.EntityTypeOptions.Entity, key.Name, sb);
                 }

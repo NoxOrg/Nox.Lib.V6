@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
-using System.Net;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Nox.Generator.TestFixture;
 using NUnit.Framework;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
 
 namespace Nox.Generator.Tests;
 
@@ -67,6 +65,5 @@ public class GeneratorTests: GeneratorTestFixture
         var driver = CSharpGeneratorDriver.Create(generators);
         driver.RunGeneratorsAndUpdateCompilation(c, out var updated, out diagnostics);
         return updated;
-    }
-    
+    }    
 }

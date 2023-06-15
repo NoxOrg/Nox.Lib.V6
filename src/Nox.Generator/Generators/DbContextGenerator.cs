@@ -80,7 +80,7 @@ namespace Nox.Generator.Generators
             sb.AppendLine(@"    protected override void OnModelCreating(ModelBuilder modelBuilder)");
             sb.AppendLine(@"    {");
             // Set up composite keys
-            foreach (var entity in entities.Where(e => e.Keys.Count > 1))
+            foreach (var entity in entities.Where(e => e.Keys != null && e.Keys.Count > 1))
             {
                 // TODO: verify the logic whith Key.Name/Entity
                 sb.AppendLine($@"        modelBuilder.Entity<{entity.Name}>().HasKey(new [] {{ ""{string.Join(@""", """, entity.Keys.Select(k => $"{k.Name}Id"))}"" }});");
