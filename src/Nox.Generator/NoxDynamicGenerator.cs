@@ -1,7 +1,9 @@
 using Microsoft.CodeAnalysis;
 using Nox.Generator.Generators;
 using Nox.Solution;
+using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 
 namespace Nox.Generator;
@@ -11,12 +13,10 @@ public class NoxDynamicGenerator : ISourceGenerator
 {
     public void Initialize(GeneratorInitializationContext context)
     {
-
-        //if (!Debugger.IsAttached)
-        //{
-        //    Debugger.Launch();
-        //}
-
+        if (!Debugger.IsAttached)
+        {
+            Debugger.Launch();
+        }
     }
 
     public void Execute(GeneratorExecutionContext context)
@@ -30,14 +30,27 @@ public class NoxDynamicGenerator : ISourceGenerator
         var mainSyntaxTree = context.Compilation.SyntaxTrees
             .FirstOrDefault(x => x.FilePath.EndsWith("Program.cs"));
 
+        var programPath = Path.GetDirectoryName(mainSyntaxTree.FilePath);
+        var designRootFullPath = Path.GetFullPath(programPath!);
+
         if (mainSyntaxTree == null)
         {
             return;
-        }        
+        }
 
-        // Read and check Nox configuration
-        var noxConfig = new NoxSolutionBuilder()
-            .Build();
+        NoxSolution noxConfig;
+        try
+        {
+            // Read and check Nox configuration
+            noxConfig = new NoxSolutionBuilder()
+                .UseYamlFile($"{designRootFullPath}\\Design\\domain.solution.nox.yaml")
+                .Build();
+        }
+        catch (Exception ex)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NE0001, null, ex.Message, designRootFullPath));
+            return;
+        }
 
         if (noxConfig == null || noxConfig.Domain == null)
         {
@@ -61,11 +74,19 @@ public class NoxDynamicGenerator : ISourceGenerator
         else
         {
             context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NI0000, null, $"{entities.Count} entities found"));
+            
+            var apiGenerator = new ControllerGenerator(context);
 
             foreach (var entity in entities)
             {
                 context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NI0000, null, $"Adding Entity class: {entity.Name} from assembly {assemblyName}"));
                 EntityGenerator.AddEntity(entity);
+
+                // Generate API controllers
+                if (entity.Queries != null && entity.Queries.Any() || entity.Commands != null && entity.Commands.Any())
+                {                    
+                    apiGenerator.GenerateController(entity);
+                }
             }
         }
 
@@ -81,13 +102,5 @@ public class NoxDynamicGenerator : ISourceGenerator
 
         var dbContextGenerator = new DbContextGenerator(context);
         dbContextGenerator.AddDbContext(entities);
-
-        // TODO: Generate controllers
-
-        //if (EntityGenerator.AllQueries.Any() || EntityGenerator.AllCommands.Any())
-        //{
-        //    var webHelperGenerator = new WebHelperGenerator(context);
-        //    webHelperGenerator.AddQueries(EntityGenerator.AllQueries, EntityGenerator.AllCommands);
-        //}
     }
 }

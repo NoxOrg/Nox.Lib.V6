@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Nox.Solution;
+using Nox.Types;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -95,13 +96,12 @@ namespace Nox.Generator.Generators
         {
             // TODO: switch to a general type resolver
             return string.Join(", ", input
-                .Select(parameter => $"{(parameter.Type != NoxType.entity ? ClassDataType(parameter.Type) : parameter.EntityTypeOptions.Entity)} {parameter.Name}{(withDefaults ? parameter.IsRequired : string.Empty)}"));
+                .Select(parameter => $"{(parameter.Type != NoxType.Entity ? ClassDataType(parameter.Type) : parameter.EntityTypeOptions.Entity)} {parameter.Name}{(withDefaults ? parameter.IsRequired : string.Empty)}"));
         }
 
-        protected static string GetParametersExecuteString(object entity)
+        protected static string GetParametersExecuteString(IReadOnlyList<DomainQueryRequestInput> input)
         {
-            return string.Join(", ", ((List<object>)entity).Cast<Dictionary<object, object>>()
-                .Select(parameter => $"{parameter["name"]}"));
+            return string.Join(", ", input.Select(parameter => $"{parameter.Name}"));
         }
 
         protected static void AddDbContextProperty(StringBuilder sb)

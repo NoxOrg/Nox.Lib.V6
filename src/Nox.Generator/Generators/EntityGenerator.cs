@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Nox.Solution;
+using Nox.Types;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -92,7 +93,7 @@ namespace Nox.Generator.Generators
         {
             foreach (var key in keys)
             {
-                if (key.Type == NoxType.entity)
+                if (key.Type == NoxType.Entity)
                 {
                     AddProperty(key.EntityTypeOptions.Entity, key.Name, sb);
                 }
