@@ -94,7 +94,7 @@ namespace Nox.Generator.Generators
 
         protected static string GetParametersString(IEnumerable<DomainQueryRequestInput> input, bool withDefaults = true)
         {
-            // TODO: switch to a general type resolver
+            // TODO: switch to a general type resolver and error processing
             return string.Join(", ", input
                 .Select(parameter => $"{(parameter.Type != NoxType.Entity ? ClassDataType(parameter.Type) : parameter.EntityTypeOptions.Entity)} {parameter.Name}{(withDefaults ? parameter.IsRequired : string.Empty)}"));
         }
@@ -106,7 +106,7 @@ namespace Nox.Generator.Generators
 
         protected static void AddDbContextProperty(StringBuilder sb)
         {
-            AddProperty("NoxDomainDbContext", "DbContext", sb, initOnly: true);
+            AddProperty(NamingConstants.DbContextName, "DbContext", sb, initOnly: true);
         }
 
         protected static void AddAttributes(IEnumerable<NoxSimpleTypeDefinition> attributes, StringBuilder sb)
@@ -149,13 +149,13 @@ namespace Nox.Generator.Generators
         {
             return type switch
             {
-                //NoxType.Text => "string",
-                //NoxType.Guid => "Guid",
-                //NoxType.Date => "DateTime",
-                //NoxType.DateTime => "DateTime",
-                //NoxType.Boolean => "bool",
-                //NoxType.Object => "object",
-                //NoxType.Number => "int",
+                NoxType.Text => "string",
+                NoxType.Guid => "Guid",
+                NoxType.Date => "DateTime",
+                NoxType.DateTime => "DateTime",
+                NoxType.Boolean => "bool",
+                NoxType.Object => "object",
+                NoxType.Number => "int",
                 _ => "string"
             };
         }

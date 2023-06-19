@@ -23,7 +23,7 @@ public class NoxDynamicGenerator : ISourceGenerator
     {
         var EntityGenerator = new EntityGenerator(context);
 
-        context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NI0000, null, $"Executing Nox Generator"));
+        context.ReportDiagnosticsDebug("Executing Nox Generator");
 
         var assemblyName = context.Compilation.AssemblyName;
 
@@ -43,24 +43,23 @@ public class NoxDynamicGenerator : ISourceGenerator
         {
             // Read and check Nox configuration
             noxConfig = new NoxSolutionBuilder()
-                .UseYamlFile($"{designRootFullPath}\\Design\\domain.solution.nox.yaml")
                 .Build();
         }
         catch (Exception ex)
         {
-            context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NE0001, null, ex.Message, designRootFullPath));
+            context.ReportDiagnosticsError(ex.Message);
             return;
         }
 
         if (noxConfig == null || noxConfig.Domain == null)
         {
-            context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NW0001, null, "Unable to load Nox configuration and domain."));
+            context.ReportDiagnosticsError("Unable to load Nox configuration and domain.");
             return;
         }
 
         if (noxConfig.Application == null)
         {
-            context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NW0001, null, "Unable to load Nox Application configuration."));
+            context.ReportDiagnosticsError("Unable to load Nox Application configuration.");
             return;
         }
 
@@ -69,17 +68,17 @@ public class NoxDynamicGenerator : ISourceGenerator
 
         if (!entities.Any())
         {
-            context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NW0001, null));
+            context.ReportDiagnosticsError("No entities found.");
         }
         else
         {
-            context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NI0000, null, $"{entities.Count} entities found"));
+            context.ReportDiagnosticsDebug($"{entities.Count} entities found");
             
             var apiGenerator = new ControllerGenerator(context);
 
             foreach (var entity in entities)
             {
-                context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NI0000, null, $"Adding Entity class: {entity.Name} from assembly {assemblyName}"));
+                context.ReportDiagnosticsDebug($"Adding Entity class: {entity.Name} from assembly {assemblyName}");
                 EntityGenerator.AddEntity(entity);
 
                 // Generate API controllers

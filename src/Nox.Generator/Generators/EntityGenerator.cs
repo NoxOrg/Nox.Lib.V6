@@ -41,6 +41,7 @@ namespace Nox.Generator.Generators
 
             foreach (var domainEvent in events)
             {
+                // TODO: add error processing
                 eventsGenerator.AddDomainEvent(domainEvent.Name, domainEvent.EntityTypeOptions.Entity);
             }
         }
@@ -59,7 +60,7 @@ namespace Nox.Generator.Generators
 
             if (entity.Keys == null || !entity.Keys.Any())
             {
-                Context.ReportDiagnostic(Diagnostic.Create(WarningsErrors.NW0001, null, $"Entity {entity.Name} must have a primary key defined."));
+                Context.ReportDiagnosticsError($"Entity {entity.Name} must have a primary key defined.");
                 return;
             }
 
@@ -93,7 +94,7 @@ namespace Nox.Generator.Generators
         {
             foreach (var key in keys)
             {
-                if (key.Type == NoxType.Entity)
+                if (key.Type == NoxType.Entity && key.EntityTypeOptions != null)
                 {
                     AddProperty(key.EntityTypeOptions.Entity, key.Name, sb);
                 }

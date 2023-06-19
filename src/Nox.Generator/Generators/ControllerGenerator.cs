@@ -1,19 +1,23 @@
 ﻿using Microsoft.CodeAnalysis;
 using Nox.Solution;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Nox.Generator.Generators
 {
     internal class ControllerGenerator : BaseGenerator
     {
-        internal ControllerGenerator(GeneratorExecutionContext context) 
-            : base(context) 
+        internal ControllerGenerator(GeneratorExecutionContext context)
+            : base(context)
         {
         }
 
         internal void GenerateController(Entity entity)
         {
             var sb = new StringBuilder();
+
+            IReadOnlyCollection<DomainQuery> queries = entity.Queries ?? new List<DomainQuery>();
+            IReadOnlyCollection<DomainCommand> commands = entity.Commands ?? new List<DomainCommand>();
 
             var className = $"{entity.Name}Controller";
 
@@ -27,18 +31,18 @@ namespace Nox.Generator.Generators
                 "Microsoft.Extensions.DependencyInjection",
                 "Microsoft.AspNetCore.Http");
 
-            foreach (var query in entity.Queries)
+            foreach (var query in queries)
             {
                 AddProperty(query.Name, query.Name, sb, initOnly: true);
             }
 
-            foreach (var command in entity.Commands)
+            foreach (var command in commands)
             {
                 AddProperty(command.Name, command.Name, sb, initOnly: true);
             }
 
             // Generate GET request mapping for Queries
-            foreach (var query in entity.Queries)
+            foreach (var query in queries)
             {
                 sb.AppendLine(@"");
                 sb.AppendLine($"    public async Task<IActionResult> Get{query.Name}Async({GetParametersString(query.RequestInput, withDefaults: false)})");
@@ -51,7 +55,7 @@ namespace Nox.Generator.Generators
             }
 
             // Generate POST request mapping for Command Handlers
-            foreach (var command in entity.Commands)
+            foreach (var command in commands)
             {
                 sb.AppendLine(@"");
                 sb.AppendLine($"    public async Task<IActionResult> {command.Name}(Nox.Commands.{command.Name}{NamingConstants.CommandSuffix} command)");

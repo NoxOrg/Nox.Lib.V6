@@ -34,7 +34,7 @@ namespace Nox.Generator.Generators
 
             // Add constructor
             AddConstructor(sb, className, new Dictionary<string, string> {
-                { "NoxDomainDbContext", "DbContext" },
+                { NamingConstants.DbContextName, "DbContext" },
                 { "INoxMessenger", "Messenger" }
             });
 
@@ -42,9 +42,12 @@ namespace Nox.Generator.Generators
             sb.AppendLine($@"   public abstract Task<INoxCommandResult> ExecuteAsync({command.Name}{NamingConstants.CommandSuffix} command);");
 
             // Add Events
-            foreach (var domainEvent in command.EmitEvents)
+            if (command.EmitEvents != null)
             {
-                AddDomainEvent(sb, domainEvent);
+                foreach (var domainEvent in command.EmitEvents)
+                {
+                    AddDomainEvent(sb, domainEvent);
+                }
             }
 
             sb.AppendLine($@"}}");
