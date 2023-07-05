@@ -1,3 +1,5 @@
+:no_entry: [DEPRECATED] Active at https://github.com/NoxOrg/Nox.Generator
+
 <!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a name="readme-top"></a>
 <!--
@@ -47,8 +49,6 @@
   </p>
 </div>
     <br />
-
-:no_entry: [DEPRECATED] Active at https://github.com/NoxOrg/Nox.Generator
 
 <!-- TABLE OF CONTENTS -->
 <details>
